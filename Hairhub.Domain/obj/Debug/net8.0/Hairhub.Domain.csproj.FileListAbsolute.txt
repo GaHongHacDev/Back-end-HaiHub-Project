@@ -6,6 +6,7 @@ D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.GeneratedMS
 D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.AssemblyInfoInputs.cache
 D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.AssemblyInfo.cs
 D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.csproj.CoreCompileInputs.cache
+D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.sourcelink.json
 D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\refint\Hairhub.Domain.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.pdb

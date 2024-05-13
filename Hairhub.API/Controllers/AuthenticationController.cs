@@ -1,81 +1,40 @@
-﻿using Hairhub.API.Constants;
-using Hairhub.API.Middlewares;
-using Hairhub.Aplication.ICustomerServices;
-using Hairhub.Domain.Payload.Request;
-using Microsoft.AspNetCore.Authentication;
+﻿using Hairhub.Domain.Entitities;
+using Hairhub.Service.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
 
 namespace Hairhub.API.Controllers
 {
+    [Route("/[controller]/[action]")]
     [ApiController]
-    [AllowAnonymous]
-    public class AuthenticationController : BaseController<AuthenticationController>
+    public class AuthenticationController : BaseController
     {
-        private readonly IAuthenticationService _authenticationService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ICustomerService _customerService;
-        private readonly IHostPartyService _hostPartyService;
-        public AuthenticationController(ILogger<AuthenticationController> logger
-            , IAuthenticationService authenticationService,
-              IHttpContextAccessor httpContextAccessor, ICustomerService customerService
-            , IHostPartyService hostPartyService)
-            : base(logger)
+        private IUserService _userService;
+
+        public AuthenticationController(IUserService userService)
         {
-            _authenticationService = authenticationService;
-            _httpContextAccessor = httpContextAccessor;
-            _customerService = customerService;
-            _hostPartyService = hostPartyService;
+            _userService = userService;
         }
 
-        [HttpPost(ApiEndPointConstant.Authentication.Login)]
-        public async Task<IActionResult> Login(LoginRequest loginRequest)
+        // POST api/user/login
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult Login([FromBody] Account user)
         {
-            var loginResponse = await _authenticationService.Login(loginRequest);
-            if (loginResponse == null)
-            {
-                return Unauthorized(new ErrorResponse()
-                {
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Error = "Invalid or account is banned !",
-                    TimeStamp = DateTime.Now,
-                });
-            }
+            var token = _userService.Login(user.Username, user.Password);
 
-            return Ok(loginResponse);
+            if (token == null || token == String.Empty)
+                return BadRequest(new { message = "User name or password is incorrect" });
 
+            return Ok(token);
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet(ApiEndPointConstant.Authentication.Info)]
 
-        public async Task<IActionResult> GetUserInfo()
+        [HttpGet]
+        [Authorize(Roles = "admin,manager")]
+        public ActionResult<IEnumerable<string>> Load()
         {
-            var currentUser = _httpContextAccessor.HttpContext.User;
-            if (currentUser is null) return Unauthorized("Email Or Role Invalid!!!");
-
-            var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var email = currentUser.FindFirst(ClaimTypes.Email)?.Value;
-            var role = currentUser.FindFirst(ClaimTypes.Role)?.Value;
-            if (role is null || userId is null || email is null) return Unauthorized("Email Or Role Invalid!!!");
-            if (role.Equals("customer"))
-            {
-                GetCustomerResponse customerResponse = await _customerService.GetCustomerByAccountId(userId);
-                return Ok(customerResponse);
-            }
-            if (role.Equals("host"))
-            {
-                GetHostPartyResponse hostResponse = await _hostPartyService.GetHostPartyByAccountId(userId);
-                return Ok(hostResponse);
-            }
-            if (role.Equals("admin"))
-            {
-                return Ok(new
-                {
-                    id = userId
-                });
-            }
-            return Unauthorized("Email Or Role Invalid!!!");
+            return new string[] { "value1", "value2" };
         }
     }
+}

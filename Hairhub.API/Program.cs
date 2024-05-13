@@ -4,7 +4,6 @@ using Hairhub.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -16,7 +15,11 @@ builder.Services.AddSwaggerGen();
 //******************* Add services to the container  ****************************
 
 //Dependecy Injection
-builder.Services.RegisterServices();
+builder.Services.AddUnitOfWork();
+builder.Services.AddDIServices();
+builder.Services.AddDIRepositories();
+builder.Services.AddDIAccessor();
+
 //Auto Mapping
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
@@ -30,8 +33,9 @@ builder.Services.AddCors(options =>
 });
 
 //Jwt configuration starts here
-var jwtIssuer = builder.Configuration.GetSection("Jwt:JWT_ISSUER").Get<string>();
-var jwtKey = builder.Configuration.GetSection("Jwt:JWT_SECRET_KEY").Get<string>();
+var jwtIssuer = builder.Configuration.GetSection("JwtSettings:Issuer").Get<string>();
+var jwtAudience = builder.Configuration.GetSection("JwtSettings:Audience").Get<string>();
+var jwtKey = builder.Configuration.GetSection("JwtSettings:Key").Get<string>();
 //Config JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>
@@ -39,15 +43,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
      options.TokenValidationParameters = new TokenValidationParameters
      {
          ValidateIssuer = true,
-         ValidateAudience = false,
-         /*             ValidateLifetime = true,
-         */
+         ValidateAudience = true,
+         ValidateLifetime = true,
          ValidateIssuerSigningKey = true,
          ValidIssuer = jwtIssuer,
-         //ValidAudience = jwtIssuer,
+         ValidAudience = jwtAudience,
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
      };
  });
+builder.Services.AddAuthorization();
+
 
 
 //****BUILD
@@ -63,6 +68,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

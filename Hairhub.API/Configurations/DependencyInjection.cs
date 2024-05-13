@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Hairhub.Infrastructure.Repository;
+using Hairhub.Service.Repositories.IRepositories;
+using Hairhub.Service.Services.IServices;
+using Hairhub.Service.Services.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +12,32 @@ namespace Hairhub.Infrastructure.Configuration
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection RegisterServices(this IServiceCollection services)
+        public static IServiceCollection AddUnitOfWork(this IServiceCollection services)
         {
-            //services.AddScoped<IYourService, YourServiceImplementation>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
+
+        public static IServiceCollection AddDIServices(this IServiceCollection services)
+        {
+            //services.AddScoped<IYourService, YourServiceImplementation>();
+            services.AddScoped<IUserService, UserService>();
+            return services;
+        }
+
+        public static IServiceCollection AddDIRepositories(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            return services;
+        }
+
+        public static IServiceCollection AddDIAccessor(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            return services;
+        }
+
     }
 }

@@ -12,12 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\" />
+    <ProjectReference Include="..\Hairhub.Domain\Hairhub.Domain.csproj" />
+    <ProjectReference Include="..\Hairhub.Infrastructure\Hairhub.Infrastructure.csproj" />
+    <ProjectReference Include="..\Hairhub.Service\Hairhub.Service.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hairhub.Domain\Hairhub.Domain.csproj" />
-    <ProjectReference Include="..\Hairhub.Service\Hairhub.Service.csproj" />
+    <Folder Include="Dtos\Responses\" />
+    <Folder Include="Dtos\Requests\" />
   </ItemGroup>
 
 </Project>

@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace Hairhub.Infrastructure.Repository
 {
-    public class UnitOfWork
+    public class UnitOfWork: IUnitOfWork
     {
         private Dictionary<Type, object> _repositories;
         public DbContext Context { get; }
 
         public UnitOfWork()
         {
-            Context = new PartydbContext();
+            Context = new HaiHubDbContext();
             _repositories = new Dictionary<Type, object>();
         }
 

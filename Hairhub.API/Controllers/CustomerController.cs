@@ -7,5 +7,9 @@ namespace Hairhub.API.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
+        [HttpGet]
+        public IActionResult GetAllUser() {
+            return Ok();
+        }
     }
 }
