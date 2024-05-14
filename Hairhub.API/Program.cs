@@ -1,7 +1,9 @@
 using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Helpers;
+using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -13,6 +15,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //******************* Add services to the container  ****************************
+
+//MS SQL SERVER
+builder.Services.AddDbContext<HaiHubDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
+});
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
+
+//builder.Services.AddDbContext<HaiHubDbContext>(options =>
+//    options.UseSqlServer(connectionString,
+//        b => b.MigrationsAssembly("Hairhub.Infrastructure"))
+//);
 
 //Dependecy Injection
 builder.Services.AddUnitOfWork();

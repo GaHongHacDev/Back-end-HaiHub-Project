@@ -21,7 +21,7 @@ namespace Hairhub.Infrastructure.Configuration
         public static IServiceCollection AddDIServices(this IServiceCollection services)
         {
             //services.AddScoped<IYourService, YourServiceImplementation>();
-            services.AddScoped<IUserService, UserService>();
+            //services.AddScoped<IUserService, UserService>();
             return services;
         }
 

@@ -12,23 +12,23 @@ using System.Threading.Tasks;
 
 namespace Hairhub.Service.Services.Services
 {
-    public class UserService : IUserService
+    public class UserService //: IUserService
     {
-        private readonly IConfiguration configuaration;
+       /* private readonly IConfiguration configuaration;
         public UserService(IConfiguration configuaration)
         {
             this.configuaration = configuaration;
         }
-        private List<User> _users = new List<User>
+        private List<Account> _users = new List<Account>
         {
-            new User { Id = 1, UserName = "user1", Password = "password1", Role = "admin"},
-            new User { Id = 2, UserName = "user2", Password = "password2", Role = "guest"}
+            new Account { Id = 1, Username = "user1", Password = "password1", RoleId = "admin"},
+            new Account { Id = 2, Username = "user2", Password = "password2", RoleId = "guest"}
         };
 
         public string Login(string userName, string password)
         {
             
-            var user = _users.SingleOrDefault(x => x.UserName == userName && x.Password == password);
+            var user = _users.SingleOrDefault(x => x.Username == userName && x.Password == password);
 
             // return null if user not found
             if (user == null)
@@ -57,6 +57,6 @@ namespace Hairhub.Service.Services.Services
 
             return user.Token;
             
-        }
+        }*/
     }
 }
