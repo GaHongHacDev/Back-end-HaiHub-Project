@@ -10,7 +10,7 @@ namespace Hairhub.Infrastructure
 {
     public partial class HaiHubDbContext : DbContext
     {
-        //public HaiHubDbContext() { }
+        public HaiHubDbContext() { }
         public HaiHubDbContext(DbContextOptions<HaiHubDbContext> dbContextOptions) : base(dbContextOptions)
         {
             
