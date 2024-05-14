@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace Hairhub.Domain.Entitities
 {
     public class Voucher
     {
+        [Key]
         public Guid VoucherId { get; set; }
         public Guid SalonInformationId { get; set; }
         public string? Code { get; set; }

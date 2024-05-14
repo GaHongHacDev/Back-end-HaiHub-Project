@@ -17,10 +17,6 @@ builder.Services.AddSwaggerGen();
 //******************* Add services to the container  ****************************
 
 //MS SQL SERVER
-builder.Services.AddDbContext<HaiHubDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
-});
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
 
 //builder.Services.AddDbContext<HaiHubDbContext>(options =>
