@@ -10,11 +10,11 @@ namespace Hairhub.API.Controllers
     [ApiController]
     public class AuthenticationController : BaseController
     {
-        private IUserService _userService;
+        private IAccountService accountService;
 
-        public AuthenticationController(IUserService userService)
+        public AuthenticationController(IAccountService accountService)
         {
-            _userService = userService;
+            this.accountService = accountService;
         }
 
         // POST api/user/login
@@ -22,9 +22,9 @@ namespace Hairhub.API.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] Account user)
         {
-            var token = _userService.Login(user.Username, user.Password);
+            var token = accountService.Login(user.Username, user.Password);
 
-            if (token == null || token == String.Empty)
+            if (token == null || String.IsNullOrWhiteSpace(token.ToString()))
                 return BadRequest(new { message = "User name or password is incorrect" });
 
             return Ok(token);

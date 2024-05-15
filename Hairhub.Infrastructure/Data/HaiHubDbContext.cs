@@ -53,7 +53,6 @@ namespace Hairhub.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<AppointmentDetail>()
             .HasOne(a => a.Customer)

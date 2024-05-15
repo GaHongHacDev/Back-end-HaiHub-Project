@@ -26,7 +26,10 @@ namespace Hairhub.Infrastructure.Repository
 
         #region Gett Async
 
-        public virtual async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
+        public virtual async Task<T> SingleOrDefaultAsync(
+            Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
+                        Func<IQueryable<T>, IIncludableQueryable<T, object>> 
+                        include = null)
         {
             IQueryable<T> query = _dbSet;
             if (include != null) query = include(query);
@@ -38,7 +41,9 @@ namespace Hairhub.Infrastructure.Repository
             return await query.AsNoTracking().FirstOrDefaultAsync();
         }
 
-        public virtual async Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+        public virtual async Task<TResult> SingleOrDefaultAsync<TResult>(
+            Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, 
+                            IOrderedQueryable<T>> orderBy = null,
             Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
         {
             IQueryable<T> query = _dbSet;
@@ -51,7 +56,10 @@ namespace Hairhub.Infrastructure.Repository
             return await query.AsNoTracking().Select(selector).FirstOrDefaultAsync();
         }
 
-        public virtual async Task<ICollection<T>> GetListAsync(Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
+        public virtual async Task<ICollection<T>> GetListAsync(
+            Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
+                        Func<IQueryable<T>, IIncludableQueryable<T, object>> 
+                        include = null)
         {
             IQueryable<T> query = _dbSet;
 
@@ -64,7 +72,10 @@ namespace Hairhub.Infrastructure.Repository
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public virtual async Task<ICollection<TResult>> GetListAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
+        public virtual async Task<ICollection<TResult>> GetListAsync<TResult>(
+            Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, 
+                        IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> 
+                        include = null)
         {
             IQueryable<T> query = _dbSet;
 
@@ -77,8 +88,11 @@ namespace Hairhub.Infrastructure.Repository
             return await query.Select(selector).ToListAsync();
         }
 
-        public Task<IPaginate<T>> GetPagingListAsync(Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int page = 1,
-            int size = 10)
+        public Task<IPaginate<T>> GetPagingListAsync(
+                Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
+                            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, 
+                int page = 1,
+                int size = 10)
         {
             IQueryable<T> query = _dbSet;
             if (include != null) query = include(query);
@@ -87,8 +101,11 @@ namespace Hairhub.Infrastructure.Repository
             return query.AsNoTracking().ToPaginateAsync(page, size, 1);
         }
 
-        public Task<IPaginate<TResult>> GetPagingListAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int page = 1, int size = 10)
+        public Task<IPaginate<TResult>> GetPagingListAsync<TResult>(
+            Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, 
+                        IOrderedQueryable<T>> orderBy = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, 
+            int page = 1, int size = 10)
         {
             if (page <= 0) page = 1;
             if (size <= 0) size = 10;

@@ -1,4 +1,5 @@
 ﻿using Hairhub.Domain.Entitities;
+using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -12,23 +13,21 @@ using System.Threading.Tasks;
 
 namespace Hairhub.Service.Services.Services
 {
-    public class UserService //: IUserService
+    public class AccountService : IAccountService
     {
-       /* private readonly IConfiguration configuaration;
-        public UserService(IConfiguration configuaration)
+        private readonly IConfiguration configuaration;
+        private readonly IUnitOfWork unitOfWork;
+
+        public AccountService(IConfiguration configuaration, IUnitOfWork unitOfWork)
         {
             this.configuaration = configuaration;
+            this.unitOfWork = unitOfWork;
         }
-        private List<Account> _users = new List<Account>
-        {
-            new Account { Id = 1, Username = "user1", Password = "password1", RoleId = "admin"},
-            new Account { Id = 2, Username = "user2", Password = "password2", RoleId = "guest"}
-        };
 
-        public string Login(string userName, string password)
+        public async Task<string> Login(string userName, string password)
         {
-            
-            var user = _users.SingleOrDefault(x => x.Username == userName && x.Password == password);
+
+            var user = await unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: u => u.Username == userName && u.Password == password);
 
             // return null if user not found
             if (user == null)
@@ -44,8 +43,8 @@ namespace Hairhub.Service.Services.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.RoleId)
                 }),
 
                 Expires = DateTime.UtcNow.AddMinutes(5),
@@ -57,6 +56,6 @@ namespace Hairhub.Service.Services.Services
 
             return user.Token;
             
-        }*/
+        }
     }
 }

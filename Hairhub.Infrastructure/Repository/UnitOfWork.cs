@@ -15,9 +15,9 @@ namespace Hairhub.Infrastructure.Repository
         private Dictionary<Type, object> _repositories;
         public DbContext Context { get; }
 
-        public UnitOfWork(HaiHubDbContext haiHubDbContext)
+        public UnitOfWork()
         {
-            Context = haiHubDbContext;
+            Context = new HaiHubDbContext();
             _repositories = new Dictionary<Type, object>();
         }
 

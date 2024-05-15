@@ -17,6 +17,7 @@ namespace Hairhub.Domain.Entitities
         public string? Password { get; set; }
 
         public string? RoleId { get; set; }
+        public string? Token { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<SalonOwner> SalonOwners { get; set; }

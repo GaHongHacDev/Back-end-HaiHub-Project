@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairhub.Infrastructure.Migrations
 {
     [DbContext(typeof(HaiHubDbContext))]
-    [Migration("20240514080650_InitDatabase")]
+    [Migration("20240515094252_Init Database")]
     partial class InitDatabase
     {
         /// <inheritdoc />
@@ -35,6 +35,9 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<string>("RoleId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .HasColumnType("nvarchar(max)");
