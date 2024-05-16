@@ -15,7 +15,7 @@ namespace Hairhub.Infrastructure.Migrations
                 name: "Role",
                 columns: table => new
                 {
-                    role_id = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    role_id = table.Column<Guid>(type: "uniqueidentifier", maxLength: 64, nullable: false),
                     role_name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -45,7 +45,7 @@ namespace Hairhub.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uniqueidentifier", maxLength: 64, nullable: false),
                     username = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                     password = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
-                    role_id = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
+                    role_id = table.Column<Guid>(type: "uniqueidentifier", maxLength: 64, nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true),
                     token = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },

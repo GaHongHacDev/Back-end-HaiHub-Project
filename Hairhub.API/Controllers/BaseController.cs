@@ -1,4 +1,5 @@
-﻿using Hairhub.API.Constants;
+﻿using AutoMapper;
+using Hairhub.API.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -15,5 +16,11 @@ namespace Hairhub.API.Controllers
     //}
     public class BaseController: ControllerBase
     {
+        protected readonly IMapper _mapper;
+
+        public BaseController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
     }
 }

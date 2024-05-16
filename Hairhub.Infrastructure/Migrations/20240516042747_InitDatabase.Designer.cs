@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairhub.Infrastructure.Migrations
 {
     [DbContext(typeof(HaiHubDbContext))]
-    [Migration("20240515180704_Init Database")]
+    [Migration("20240516042747_InitDatabase")]
     partial class InitDatabase
     {
         /// <inheritdoc />
@@ -42,9 +42,9 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("password");
 
-                    b.Property<string>("RoleId")
+                    b.Property<Guid?>("RoleId")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
 
                     b.Property<string>("Token")
@@ -344,9 +344,10 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Role", b =>
                 {
-                    b.Property<string>("RoleId")
+                    b.Property<Guid>("RoleId")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
 
                     b.Property<string>("RoleName")
@@ -503,7 +504,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
 
-                    b.Property<string>("HumandId")
+                    b.Property<string>("HumanId")
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)")
                         .HasColumnName("humand_id");

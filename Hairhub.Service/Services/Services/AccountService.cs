@@ -1,6 +1,7 @@
 ﻿using Hairhub.Domain.Entitities;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -56,6 +57,36 @@ namespace Hairhub.Service.Services.Services
 
             return user.Token;
             
+        }
+
+        public async Task<(Customer, Account)> RegisterAccountCustomer(Customer customer, Account account)
+        {
+            var role = await unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate:x=>x.RoleName.Equals("Customer"));
+            if (role == null)
+            {
+                throw new Exception("Role Name is not exist!");
+            }
+            account.Id = Guid.NewGuid();
+            account.RoleId = role.RoleId;
+            account.IsActive = true;
+            customer.Id = Guid.NewGuid();
+            customer.AccountId = account.Id;
+            await unitOfWork.GetRepository<Customer>().InsertAsync(customer);
+            await unitOfWork.GetRepository<Account>().InsertAsync(account);
+            return (customer, account);
+        }
+
+        public async Task<(SalonOwner, Account)> RegisterAccountSalonOwner(SalonOwner salonOwner, Account account)
+        {
+            var role = await unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals("SalonOwner"));
+            account.Id = Guid.NewGuid();
+            account.RoleId = role.RoleId;
+            account.IsActive = true;
+            salonOwner.Id = Guid.NewGuid();
+            salonOwner.AccountId = account.Id;
+            await unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonOwner);
+            await unitOfWork.GetRepository<Account>().InsertAsync(account);
+            return (salonOwner, account);
         }
     }
 }

@@ -99,7 +99,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email");
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone");
                 entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address");
-                entity.Property(e => e.HumandId).HasMaxLength(64).HasColumnName("humand_id");
+                entity.Property(e => e.HumanId).HasMaxLength(64).HasColumnName("humand_id");
                 entity.Property(e => e.Img).HasColumnName("img");
                 entity.Property(e => e.BankAccount).HasMaxLength(64).HasColumnName("bank_account");
                 entity.Property(e => e.BankName).HasMaxLength(64).HasColumnName("bank_name");

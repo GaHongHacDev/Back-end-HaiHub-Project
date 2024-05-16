@@ -1,4 +1,5 @@
-﻿using Hairhub.Infrastructure.Repository;
+﻿using Hairhub.Domain.Entitities;
+using Hairhub.Infrastructure.Repository;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
@@ -22,9 +23,9 @@ namespace Hairhub.Infrastructure.Configuration
         {
             //services.AddScoped<IYourService, YourServiceImplementation>();
             //services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAccountService, AccountService>();
             return services;
         }
-
         public static IServiceCollection AddDIRepositories(this IServiceCollection services)
         {
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

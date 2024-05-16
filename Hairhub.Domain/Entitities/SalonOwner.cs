@@ -16,7 +16,7 @@ namespace Hairhub.Domain.Entitities
         public string? Email { get; set; }
         public string? Phone {  get; set; }
         public string? Address { get; set; }
-        public string? HumandId { get; set; }
+        public string? HumanId { get; set; }
         public string? Img { get; set; }
         public string? BankAccount { get; set; }
         public string? BankName { get; set; }

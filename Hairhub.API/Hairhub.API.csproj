@@ -25,9 +25,4 @@
     <ProjectReference Include="..\Hairhub.Service\Hairhub.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dtos\Responses\" />
-    <Folder Include="Dtos\Requests\" />
-  </ItemGroup>
-
 </Project>
