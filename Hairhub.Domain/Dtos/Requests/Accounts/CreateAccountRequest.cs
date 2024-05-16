@@ -1,4 +1,4 @@
-﻿namespace Hairhub.API.Dtos.Requests.Accounts
+﻿namespace Hairhub.Domain.Dtos.Requests.Accounts
 {
     public class CreateAccountRequest
     {

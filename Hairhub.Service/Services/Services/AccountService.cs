@@ -11,24 +11,26 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Hairhub.Domain.Dtos.Requests.Accounts;
 
 namespace Hairhub.Service.Services.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IConfiguration configuaration;
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IConfiguration _configuaration;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AccountService(IConfiguration configuaration, IUnitOfWork unitOfWork)
         {
-            this.configuaration = configuaration;
-            this.unitOfWork = unitOfWork;
+            this._configuaration = configuaration;
+            this._unitOfWork = unitOfWork;
         }
 
         public async Task<string> Login(string userName, string password)
         {
 
-            var user = await unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: u => u.Username == userName && u.Password == password);
+            var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: u => u.Username == userName && u.Password == password);
     
             // return null if user not found
             if (user == null)
@@ -38,7 +40,7 @@ namespace Hairhub.Service.Services.Services
 
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuaration["JWTSettings:Key"]);
+            var key = Encoding.ASCII.GetBytes(_configuaration["JWTSettings:Key"]);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -56,12 +58,11 @@ namespace Hairhub.Service.Services.Services
             user.Token = tokenHandler.WriteToken(token);
 
             return user.Token;
-            
         }
 
         public async Task<(Customer, Account)> RegisterAccountCustomer(Customer customer, Account account)
         {
-            var role = await unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate:x=>x.RoleName.Equals("Customer"));
+            var role = await _unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate:x=>x.RoleName.Equals("Customer"));
             if (role == null)
             {
                 throw new Exception("Role Name is not exist!");
@@ -71,22 +72,69 @@ namespace Hairhub.Service.Services.Services
             account.IsActive = true;
             customer.Id = Guid.NewGuid();
             customer.AccountId = account.Id;
-            await unitOfWork.GetRepository<Customer>().InsertAsync(customer);
-            await unitOfWork.GetRepository<Account>().InsertAsync(account);
+            await _unitOfWork.GetRepository<Customer>().InsertAsync(customer);
+            await _unitOfWork.GetRepository<Account>().InsertAsync(account);
+            await _unitOfWork.CommitAsync();
             return (customer, account);
         }
 
         public async Task<(SalonOwner, Account)> RegisterAccountSalonOwner(SalonOwner salonOwner, Account account)
         {
-            var role = await unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals("SalonOwner"));
+            var role = await _unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals("SalonOwner"));
             account.Id = Guid.NewGuid();
             account.RoleId = role.RoleId;
             account.IsActive = true;
             salonOwner.Id = Guid.NewGuid();
             salonOwner.AccountId = account.Id;
-            await unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonOwner);
-            await unitOfWork.GetRepository<Account>().InsertAsync(account);
+            await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonOwner);
+            await _unitOfWork.GetRepository<Account>().InsertAsync(account);
+            await _unitOfWork.CommitAsync();
             return (salonOwner, account);
+        }
+
+        public async Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest)
+        {
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            SalonOwner salonOwner;
+            Guid accountId;
+            if (customer == null)
+            {
+                salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                if(salonOwner == null)
+                {
+                    return false;
+                }
+                accountId = salonOwner.AccountId;
+                salonOwner.FullName = updateAccountRequest.FullName;
+                customer.Email = updateAccountRequest.Email;
+                customer.Phone = updateAccountRequest.Phone;
+                customer.Address = updateAccountRequest.Address;
+                customer.HumanId = updateAccountRequest.HumanId;
+                customer.Img = updateAccountRequest.Img;
+                customer.BankAccount = updateAccountRequest.BankAccount;
+                customer.BankName = updateAccountRequest.BankName;
+            }
+            else
+            {
+                accountId = customer.AccountId;
+                customer.FullName = updateAccountRequest.FullName;
+                customer.Email = updateAccountRequest.Email;
+                customer.Phone = updateAccountRequest.Phone;
+                customer.Address = updateAccountRequest.Address;
+                customer.HumanId = updateAccountRequest.HumanId;
+                customer.Img = updateAccountRequest.Img;
+                customer.BankAccount = updateAccountRequest.BankAccount;
+                customer.BankName = updateAccountRequest.BankName;
+            }
+            Account account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == accountId);
+
+            if(account==null)
+                throw new Exception("Discount was not found");
+            //Update Account
+            account.Username = updateAccountRequest.Username;
+            account.Password = updateAccountRequest.Password;
+            bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
+            return isSuccessful;
         }
     }
 }

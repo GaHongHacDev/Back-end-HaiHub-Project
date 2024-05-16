@@ -1,10 +1,10 @@
-﻿namespace Hairhub.API.Dtos.Responses.Accounts
+﻿namespace Hairhub.Domain.Dtos.Requests.Accounts
 {
-    public class CreateAccountResponse
+    public class UpdateAccountRequest
     {
         public string? Username { get; set; }
         public string? Password { get; set; }
-        public Guid? RoleId { get; set; }
+        public string? RoleName { get; set; }
         public string? FullName { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }

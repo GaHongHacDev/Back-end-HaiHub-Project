@@ -82,6 +82,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("bank_name");
 
+                    b.Property<DateTime?>("DayOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("day_of_birth");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("email");
@@ -89,6 +93,11 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("full_name");
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("gender");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)")
@@ -243,6 +252,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(64)")
                         .HasColumnName("bank_name");
 
+                    b.Property<DateTime?>("DayOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("day_of_birth");
+
                     b.Property<string>("Email")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
@@ -252,6 +265,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("gender");
 
                     b.Property<string>("HumanId")
                         .HasMaxLength(64)
@@ -369,6 +387,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("address");
 
+                    b.Property<DateTime?>("DayOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("day_of_birth");
+
                     b.Property<string>("Email")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
@@ -378,6 +400,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("gender");
 
                     b.Property<string>("HumanId")
                         .HasMaxLength(64)
@@ -491,6 +518,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(64)")
                         .HasColumnName("bank_name");
 
+                    b.Property<DateTime?>("DayOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("day_of_birth");
+
                     b.Property<string>("Email")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
@@ -500,6 +531,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
+
+                    b.Property<string>("Gender")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("gender");
 
                     b.Property<string>("HumanId")
                         .HasMaxLength(64)

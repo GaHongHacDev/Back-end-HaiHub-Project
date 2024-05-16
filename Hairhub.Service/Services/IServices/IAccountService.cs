@@ -1,4 +1,5 @@
-﻿using Hairhub.Domain.Entitities;
+﻿using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Entitities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace Hairhub.Service.Services.IServices
         Task<string> Login(string userName, string password);
         Task<(Customer, Account)> RegisterAccountCustomer(Customer customer, Account account);
         Task<(SalonOwner, Account)> RegisterAccountSalonOwner(SalonOwner salonOwner, Account account);
+        Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest);
     }
 }

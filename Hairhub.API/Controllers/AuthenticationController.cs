@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
-using Hairhub.API.Dtos.Requests.Accounts;
-using Hairhub.API.Dtos.Responses.Accounts;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Entitities;
 using Hairhub.Service.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -52,7 +52,7 @@ namespace Hairhub.API.Controllers
             {
                 if (string.IsNullOrEmpty(createAccountRequest.RoleName))
                 {
-                    var accountEntity = mapper.Map<Domain.Entitities.Account>(createAccountRequest);
+                    var accountEntity = _mapper.Map<Domain.Entitities.Account>(createAccountRequest);
                     if ("Customer".Equals(createAccountRequest))
                     {
                         var customerEntitiy = _mapper.Map<Domain.Entitities.Customer>(createAccountRequest);
@@ -70,6 +70,30 @@ namespace Hairhub.API.Controllers
                 }
                 return BadRequest("Can not create account!");
             }catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromBody] UpdateAccountRequest updateAccountRequest)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    return BadRequest("Account Id is null or empty!");
+                }
+
+                bool isUpdate = await _accountService.UpdateAccountById(id, updateAccountRequest);
+                if (isUpdate)
+                {
+                    return BadRequest("Cannot update account");
+                }
+                return Ok(_mapper.Map<UpdateAccountResponse>(updateAccountRequest));
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }

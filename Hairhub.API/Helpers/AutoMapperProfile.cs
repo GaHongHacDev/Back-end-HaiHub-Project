@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Hairhub.API.Dtos.Requests.Accounts;
-using Hairhub.API.Dtos.Responses.Accounts;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Entitities;
 
 namespace Hairhub.API.Helpers
@@ -57,6 +57,7 @@ namespace Hairhub.API.Helpers
             CreateMap<CreateAccountResponse, Account>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password));
+            CreateMap<UpdateAccountRequest, UpdateAccountResponse>();
         }
     }
 }

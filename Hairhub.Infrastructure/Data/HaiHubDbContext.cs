@@ -96,6 +96,8 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.AccountId).HasColumnName("account_id");
                 entity.Property(e => e.FullName).HasMaxLength(128).HasColumnName("full_name");
+                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender");
+                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth");
                 entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email");
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone");
                 entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address");
@@ -118,6 +120,8 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
                 entity.Property(e => e.FullName).HasMaxLength(128).HasColumnName("full_name");
+                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender");
+                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth");
                 entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email");
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone");
                 entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address");
@@ -186,6 +190,8 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.AccountId).HasColumnName("account_id");
                 entity.Property(e => e.FullName).HasMaxLength(128).HasColumnName("full_name");
+                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender");
+                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth");
                 entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email");
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone");
                 entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address");
@@ -312,6 +318,8 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.FullName).HasColumnName("full_name");
+                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender");
+                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth");
                 entity.Property(e => e.Email).HasColumnName("email");
                 entity.Property(e => e.Phone).HasColumnName("phone");
                 entity.Property(e => e.Address).HasColumnName("address");
