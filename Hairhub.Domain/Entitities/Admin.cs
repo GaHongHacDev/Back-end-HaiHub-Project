@@ -11,6 +11,7 @@ namespace Hairhub.Domain.Entitities
     {
         [Key]
         public Guid Id { get; set; }
+        public Guid AccountId { get; set; }
         public string? FullName { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }
@@ -18,6 +19,7 @@ namespace Hairhub.Domain.Entitities
         public string? BankAccount { get; set; }
         public string? BankName { get; set; }
 
+        public Account Account { get; set; }
         public virtual ICollection<Config> Configs { get; set; }
 
     }

@@ -10,11 +10,12 @@ namespace Hairhub.Domain.Entitities
     public class Config
     {
         [Key]
-        public Guid ConfigId { get; set; }
+        public Guid Id { get; set; }
         public decimal? CommissionRate { get; set; }
         public decimal? MaintenanceFee { get; set; }
         public DateTime? DateCreate { get; set; }
         public Guid AdminId { get; set; }
+        public bool? IsActive { get; set; }
 
         public virtual Admin Admin { get; set; }
     }

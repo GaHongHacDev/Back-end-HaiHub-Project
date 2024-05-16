@@ -10,12 +10,13 @@ namespace Hairhub.Domain.Entitities
     public class Voucher
     {
         [Key]
-        public Guid VoucherId { get; set; }
+        public Guid Id { get; set; }
         public Guid SalonInformationId { get; set; }
         public string? Code { get; set; }
         public string? Description { get; set; }
         public decimal? Discount { get; set; }
         public bool? IsSystemCreate { get; set; }
+        public bool? IsActive { get; set; }
 
         // Navigation properties
         public virtual SalonInformation SalonInformation { get; set; }

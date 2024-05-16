@@ -28,7 +28,7 @@ namespace Hairhub.Service.Services.Services
         {
 
             var user = await unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: u => u.Username == userName && u.Password == password);
-
+    
             // return null if user not found
             if (user == null)
             {
@@ -44,7 +44,7 @@ namespace Hairhub.Service.Services.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.RoleId)
+                    new Claim(ClaimTypes.Role, user.Role.RoleName)
                 }),
 
                 Expires = DateTime.UtcNow.AddMinutes(5),

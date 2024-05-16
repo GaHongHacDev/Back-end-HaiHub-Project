@@ -16,8 +16,9 @@ namespace Hairhub.Domain.Entitities
         public string? Email { get; set; }
         public string? Phone {  get; set; }
         public string? Address { get; set; }
-        public string? humanId { get; set; }
+        public string? HumanId { get; set; }
         public string? Img { get; set; }
+        public bool? IsActive { get; set; }
 
         public SalonInformation SalonInformation { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }

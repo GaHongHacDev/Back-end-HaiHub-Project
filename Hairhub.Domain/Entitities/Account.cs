@@ -10,18 +10,22 @@ namespace Hairhub.Domain.Entitities
     public partial class Account
     {
         [Key]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public string? Username { get; set; }
 
         public string? Password { get; set; }
 
         public string? RoleId { get; set; }
+
+        public bool? IsActive {  get; set; }
+
         public string? Token { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<SalonOwner> SalonOwners { get; set; }
         public virtual ICollection<Customer> Customers { get; set; }
+        public virtual ICollection<Admin> Admins { get; set; }
 
     }
 }
