@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
 {
-    [Route(ApiEndPointConstant.Customer.CustomerEndpoint + "/[action]")]
+    [Route(ApiEndPointConstant.Customer.CustomersEndpoint + "/[action]")]
     [ApiController]
     public class CustomerController : BaseController
     {

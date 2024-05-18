@@ -74,7 +74,7 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpPut]
         [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromBody] UpdateAccountRequest updateAccountRequest)
         {
