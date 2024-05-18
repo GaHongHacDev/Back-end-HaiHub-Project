@@ -32,7 +32,7 @@ namespace Hairhub.Service.Services.Services
             return customersResponse;
         }
 
-        public async Task<GetCustomerResponse> GetCustomerById(Guid id)
+        public async Task<GetCustomerResponse>? GetCustomerById(Guid id)
         {
             GetCustomerResponse CustomerResponse = await _unitOfWork
                 .GetRepository<Customer>()
@@ -41,7 +41,8 @@ namespace Hairhub.Service.Services.Services
                                                      x.Email, x.Phone, x.Address, x.HumanId, x.Img, x.BankAccount, x.BankName),
                     predicate: x => x.Id.Equals(id)
                  );
-            if (CustomerResponse == null) throw new Exception("Customer is not found");
+            if (CustomerResponse == null) 
+                return null;
             return CustomerResponse;
         }
     }
