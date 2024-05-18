@@ -21,6 +21,7 @@ namespace Hairhub.Domain.Entitities
         public bool? IsActive {  get; set; }
 
         public string? Token { get; set; }
+        public string? RefeshToken { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<SalonOwner> SalonOwners { get; set; }

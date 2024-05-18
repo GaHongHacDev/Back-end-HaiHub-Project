@@ -34,7 +34,6 @@ namespace Hairhub.API.Controllers
 
             if (token == null || String.IsNullOrWhiteSpace(token.ToString()))
                 return BadRequest(new { message = "User name or password is incorrect" });
-
             return Ok(token);
         }
 

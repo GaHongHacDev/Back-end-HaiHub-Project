@@ -76,6 +76,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Password).HasMaxLength(32).HasColumnName("password");
                 entity.Property(e => e.RoleId).HasMaxLength(64).HasColumnName("role_id");
                 entity.Property(e => e.Token).HasMaxLength(100).HasColumnName("token");
+                entity.Property(e => e.RefeshToken).HasMaxLength(100).HasColumnName("refesh_token");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
                 entity.HasIndex(e => e.RoleId, "FK__role__role_id__02084FDA");
             });
