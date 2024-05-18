@@ -31,6 +31,10 @@ namespace Hairhub.API.Controllers
             try
             {
                 var Customer = await _customerService.GetCustomerById(id);
+                if (Customer == null)
+                {
+                    return NotFound("Cannont find this customer!");
+                }
                 return Ok(Customer);
             }
             catch (Exception ex)

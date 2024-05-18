@@ -52,12 +52,6 @@ namespace Hairhub.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<AppointmentDetail>()
-            .HasOne(a => a.Customer)
-            .WithMany(b => b.AppointmentDetails)
-            .HasForeignKey(c => c.CustomerId)
-            .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<AppointmentDetail>()
                 .HasOne(a => a.SalonEmployee)
@@ -227,35 +221,57 @@ namespace Hairhub.Infrastructure
             modelBuilder.Entity<AppointmentDetail>(entity =>
             {
                 entity.ToTable("AppointmentDetail");
+
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.CustomerId).HasColumnName("customer_id");
-                entity.Property(e => e.SalonEmployeeId).HasColumnName("salon_employee_id");
-                entity.Property(e => e.ServiceHairId).HasColumnName("service_hair_id");
-                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
-                entity.Property(e => e.Description).HasColumnName("description");
-                entity.Property(e => e.Date).HasColumnName("date");
-                entity.Property(e => e.Time).HasColumnName("time");
-                entity.Property(e => e.Price).HasColumnType("decimal(18, 2)").HasColumnName("price");
-                entity.Property(e => e.Status).HasColumnName("status");
+                entity.Property(e => e.SalonEmployeeId).HasColumnName("salon_employee_id").IsRequired(false);
+                entity.Property(e => e.ServiceHairId).HasColumnName("service_hair_id").IsRequired(false);
+                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id").IsRequired(false);
+                entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500).IsRequired(false);
+                entity.Property(e => e.Date).HasColumnName("date").IsRequired(false);
+                entity.Property(e => e.Time).HasColumnName("time").IsRequired(false);
+                entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18, 2)").HasColumnName("original_price").IsRequired(false);
+                entity.Property(e => e.DiscountedPrice).HasColumnType("decimal(18, 2)").HasColumnName("discounted_price").IsRequired(false);
+                entity.Property(e => e.Status).HasColumnName("status").IsRequired(false);
 
-                entity.HasOne(d => d.Customer)
-                    .WithMany(p => p.AppointmentDetails)
-                    .HasForeignKey(d => d.CustomerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_customer_appointment_detail");
-
+                // Add configuration for foreign keys if needed
                 entity.HasOne(d => d.SalonEmployee)
-                    .WithMany(p => p.AppointmentDetails)
-                    .HasForeignKey(d => d.SalonEmployeeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_salon_employee_appointment_detail");
+                      .WithMany()
+                      .HasForeignKey(d => d.SalonEmployeeId)
+                      .OnDelete(DeleteBehavior.ClientSetNull);
 
                 entity.HasOne(d => d.ServiceHair)
-                    .WithMany(p => p.AppointmentDetails)
-                    .HasForeignKey(d => d.ServiceHairId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_service_hair_appointment_detail");
+                      .WithMany()
+                      .HasForeignKey(d => d.ServiceHairId)
+                      .OnDelete(DeleteBehavior.ClientSetNull);
+
+                entity.HasOne(d => d.Appointment)
+                      .WithMany()
+                      .HasForeignKey(d => d.AppointmentId)
+                      .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+
+            modelBuilder.Entity<AppointmentDetailVoucher>(entity =>
+            {
+                entity.ToTable("AppointmentDetailVoucher");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.AppliedAmount).HasColumnType("decimal(18, 2)").HasColumnName("applied_amount");
+                entity.Property(e => e.AppliedDate).HasColumnName("applied_date");
+                entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
+                entity.Property(e => e.AppointmentDetailId).HasColumnName("appointment_detail_id");
+
+                entity.HasOne(d => d.Voucher)
+                      .WithMany(p => p.AppointmentDetailVouchers)
+                      .HasForeignKey(d => d.VoucherId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_voucher_appointment_detail_voucher");
+
+                entity.HasOne(d => d.AppointmentDetail)
+                      .WithMany(p => p.AppointmentDetailVouchers)
+                      .HasForeignKey(d => d.AppointmentDetailId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_detail_appointment_detail_voucher");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -295,21 +311,33 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Voucher>(entity =>
             {
-                entity.ToTable("Voucher");
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
-                entity.Property(e => e.Code).HasColumnName("code");
-                entity.Property(e => e.Description).HasColumnName("description");
-                entity.Property(e => e.Discount).HasColumnType("decimal(18, 2)").HasColumnName("discount");
-                entity.Property(e => e.IsSystemCreate).HasColumnName("is_system_create");
-                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.SalonInformationId).IsRequired(false);
 
-                entity.HasOne(d => d.SalonInformation)
-                      .WithMany(p => p.Vouchers)
-                      .HasForeignKey(d => d.SalonInformationId)
-                      .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_salon_information_voucher");
+                entity.Property(e => e.Code)
+                    .HasMaxLength(256) // or any length you want
+                    .IsRequired(false);
+
+                entity.Property(e => e.Description).IsRequired(false);
+
+                entity.Property(e => e.MinimumOrderAmount)
+                    .HasColumnType("decimal(18,2)") // adjust precision as needed
+                    .IsRequired(false);
+
+                entity.Property(e => e.DiscountPercentage)
+                    .HasColumnType("decimal(18,2)") // adjust precision as needed
+                    .IsRequired(false);
+
+                entity.Property(e => e.ExpiryDate).IsRequired(false);
+
+                entity.Property(e => e.CreatedDate).IsRequired(false);
+
+                entity.Property(e => e.ModifiedDate).IsRequired(false);
+
+                entity.Property(e => e.IsSystemCreated).IsRequired(false);
+
+                entity.Property(e => e.IsActive).IsRequired(false);
             });
 
             modelBuilder.Entity<Admin>(entity =>
