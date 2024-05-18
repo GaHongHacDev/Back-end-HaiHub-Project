@@ -36,23 +36,25 @@ namespace Hairhub.API.Controllers
                     return NotFound("Cannot find this appointment!");
                 }
                 return Ok(appointmentResponse);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateAppointment([FromBody] )
-        //{
-        //    try
-        //    {
-        //        return Ok();
-        //    }catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [HttpPost]
+        public async Task<IActionResult> CreateAppointment()
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPut]
         public async Task<IActionResult> UpdateAppointment()
