@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
 {
-    [Route(ApiEndPointConstant.Customer.CustomerEndpoint + "/[action]")]
+    [Route(ApiEndPointConstant.Customer.CustomersEndpoint + "/[action]")]
     [ApiController]
     public class CustomerController : BaseController
     {
@@ -19,7 +19,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUser([FromQuery] int page, [FromQuery] int size) {
+        public async Task<IActionResult> GetAllCustomer([FromQuery] int page, [FromQuery] int size) {
             var customers = await _customerService.GetCustomers(page, size);
             return Ok(customers);
         }
@@ -31,6 +31,10 @@ namespace Hairhub.API.Controllers
             try
             {
                 var Customer = await _customerService.GetCustomerById(id);
+                if (Customer == null)
+                {
+                    return NotFound("Customer not found!");
+                }
                 return Ok(Customer);
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using Hairhub.Domain.Dtos.Responses.Customers;
+﻿using AutoMapper;
+using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -15,34 +16,43 @@ namespace Hairhub.Service.Services.Services
     public class CustomerService : ICustomerService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CustomerService(IUnitOfWork _unitOfWork)
+        public CustomerService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _unitOfWork = _unitOfWork;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
         public async Task<IPaginate<GetCustomerResponse>> GetCustomers(int page, int size)
         {
-            IPaginate<GetCustomerResponse> customersResponse = await _unitOfWork.GetRepository<Customer>()
+            var customerEntities = await _unitOfWork.GetRepository<Customer>()
             .GetPagingListAsync(
-              selector: x => new GetCustomerResponse(x.Id, x.AccountId,x.FullName, x.DayOfBirth, x.Gender,
-                                                     x.Email, x.Phone, x.Address, x.HumanId, x.Img, x.BankAccount, x.BankName),
-              page: page,
-              size: size,
-              orderBy: x => x.OrderBy(x => x.FullName));
-            return customersResponse;
+                page: page,
+                size: size);
+
+            var paginateResponse = new Paginate<GetCustomerResponse>
+            {
+                Page = customerEntities.Page,
+                Size = customerEntities.Size,
+                Total = customerEntities.Total,
+                TotalPages = customerEntities.TotalPages,
+                Items = _mapper.Map<IList<GetCustomerResponse>>(customerEntities.Items)
+            };
+
+            return paginateResponse;
         }
 
-        public async Task<GetCustomerResponse> GetCustomerById(Guid id)
+        public async Task<GetCustomerResponse>? GetCustomerById(Guid id)
         {
-            GetCustomerResponse CustomerResponse = await _unitOfWork
+            var customerEntity = await _unitOfWork
                 .GetRepository<Customer>()
                 .SingleOrDefaultAsync(
-                    selector: x => new GetCustomerResponse(x.Id, x.AccountId, x.FullName, x.DayOfBirth, x.Gender,
-                                                     x.Email, x.Phone, x.Address, x.HumanId, x.Img, x.BankAccount, x.BankName),
                     predicate: x => x.Id.Equals(id)
                  );
-            if (CustomerResponse == null) throw new Exception("Customer is not found");
-            return CustomerResponse;
+            if (customerEntity == null) 
+                return null;
+
+            return _mapper.Map<GetCustomerResponse>(customerEntity);
         }
     }
 }

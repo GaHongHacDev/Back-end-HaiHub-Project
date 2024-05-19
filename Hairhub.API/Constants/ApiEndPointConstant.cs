@@ -26,8 +26,15 @@
         public static class Customer
         {
             public const string CustomersEndpoint = ApiEndpoint + "/customers";
-            public const string CustomerEndpoint = CustomersEndpoint + "/{id}";
-            public const string CustomerByUserIdEndpoint = CustomersEndpoint + "/{userId}/user";
+        }
+
+        public static class Appointment
+        {
+            public const string AppointmentsEndpoint = ApiEndpoint + "/appointments";
+        }
+        public static class AppointmentDetail
+        {
+            public const string AppointmentDetailsEndpoint = ApiEndpoint + "/appointment_details";
         }
     }
 }

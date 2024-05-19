@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hairhub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDatabase : Migration
+    public partial class InstallDBVer11 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Role",
+                name: "role",
                 columns: table => new
                 {
                     role_id = table.Column<Guid>(type: "uniqueidentifier", maxLength: 64, nullable: false),
@@ -20,11 +20,11 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Role", x => x.role_id);
+                    table.PrimaryKey("PK_role", x => x.role_id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceHair",
+                name: "service_hair",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -35,11 +35,11 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceHair", x => x.Id);
+                    table.PrimaryKey("PK_service_hair", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Account",
+                name: "account",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", maxLength: 64, nullable: false),
@@ -47,25 +47,28 @@ namespace Hairhub.Infrastructure.Migrations
                     password = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     role_id = table.Column<Guid>(type: "uniqueidentifier", maxLength: 64, nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true),
-                    token = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                    token = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    refesh_token = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Account", x => x.id);
+                    table.PrimaryKey("PK_account", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Account_Role_role_id",
+                        name: "FK_role_acount",
                         column: x => x.role_id,
-                        principalTable: "Role",
+                        principalTable: "role",
                         principalColumn: "role_id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Admin",
+                name: "admin",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     full_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    day_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     address = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -74,20 +77,22 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Admin", x => x.Id);
+                    table.PrimaryKey("PK_admin", x => x.Id);
                     table.ForeignKey(
                         name: "FK_account_admin",
                         column: x => x.AccountId,
-                        principalTable: "Account",
+                        principalTable: "account",
                         principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customer",
+                name: "customer",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     account_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    day_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     full_name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
@@ -99,21 +104,23 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customer", x => x.Id);
+                    table.PrimaryKey("PK_customer", x => x.Id);
                     table.ForeignKey(
                         name: "FK_account_customer",
                         column: x => x.account_id,
-                        principalTable: "Account",
+                        principalTable: "account",
                         principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "SalonOwner",
+                name: "salon_owner",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     account_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     full_name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    day_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     address = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -124,16 +131,16 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SalonOwner", x => x.Id);
+                    table.PrimaryKey("PK_salon_owner", x => x.Id);
                     table.ForeignKey(
                         name: "FK_account_salon_owner",
                         column: x => x.account_id,
-                        principalTable: "Account",
+                        principalTable: "account",
                         principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Config",
+                name: "config",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -145,16 +152,16 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Config", x => x.Id);
+                    table.PrimaryKey("PK_config", x => x.Id);
                     table.ForeignKey(
                         name: "FK_admin_config",
                         column: x => x.admin_id,
-                        principalTable: "Admin",
+                        principalTable: "admin",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Appointment",
+                name: "appointment",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -165,16 +172,16 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Appointment", x => x.Id);
+                    table.PrimaryKey("PK_appointment", x => x.Id);
                     table.ForeignKey(
                         name: "FK_customer_appointment",
                         column: x => x.customer_id,
-                        principalTable: "Customer",
+                        principalTable: "customer",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Payment",
+                name: "payment",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -185,16 +192,16 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payment", x => x.Id);
+                    table.PrimaryKey("PK_payment", x => x.Id);
                     table.ForeignKey(
                         name: "FK_customer_payment",
                         column: x => x.customer_id,
-                        principalTable: "Customer",
+                        principalTable: "customer",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "SalonInformation",
+                name: "salon_information",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -211,26 +218,28 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SalonInformation", x => x.Id);
+                    table.PrimaryKey("PK_salon_information", x => x.Id);
                     table.ForeignKey(
                         name: "FK_owner_salon_information",
                         column: x => x.owner_id,
-                        principalTable: "SalonOwner",
+                        principalTable: "salon_owner",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_service_hair_salon_information",
                         column: x => x.service_hair_id,
-                        principalTable: "ServiceHair",
+                        principalTable: "service_hair",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "SalonEmployee",
+                name: "salon_employee",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     salon_information_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     full_name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    day_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     address = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -240,78 +249,84 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SalonEmployee", x => x.Id);
+                    table.PrimaryKey("PK_salon_employee", x => x.Id);
                     table.ForeignKey(
                         name: "FK_salon_information_salon_employee",
                         column: x => x.salon_information_id,
-                        principalTable: "SalonInformation",
+                        principalTable: "salon_information",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Voucher",
+                name: "voucher",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    salon_information_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    discount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    is_system_create = table.Column<bool>(type: "bit", nullable: true),
-                    is_active = table.Column<bool>(type: "bit", nullable: true)
+                    SalonInformationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MinimumOrderAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsSystemCreated = table.Column<bool>(type: "bit", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Voucher", x => x.Id);
+                    table.PrimaryKey("PK_voucher", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_salon_information_voucher",
-                        column: x => x.salon_information_id,
-                        principalTable: "SalonInformation",
+                        name: "FK_voucher_salon_information_SalonInformationId",
+                        column: x => x.SalonInformationId,
+                        principalTable: "salon_information",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "AppointmentDetail",
+                name: "appointment_detail",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    salon_employee_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    service_hair_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    appointment_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    time = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    status = table.Column<bool>(type: "bit", nullable: true)
+                    SalonEmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ServiceHairId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AppointmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Time = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    OriginalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DiscountedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AppointmentDetail", x => x.Id);
+                    table.PrimaryKey("PK_appointment_detail", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AppointmentDetail_Appointment_appointment_id",
-                        column: x => x.appointment_id,
-                        principalTable: "Appointment",
+                        name: "FK_appointment_detail_appointment",
+                        column: x => x.AppointmentId,
+                        principalTable: "appointment",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_customer_appointment_detail",
-                        column: x => x.customer_id,
-                        principalTable: "Customer",
+                        name: "FK_appointment_detail_customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "customer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_appointment_detail_salon_employee",
+                        column: x => x.SalonEmployeeId,
+                        principalTable: "salon_employee",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_salon_employee_appointment_detail",
-                        column: x => x.salon_employee_id,
-                        principalTable: "SalonEmployee",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_service_hair_appointment_detail",
-                        column: x => x.service_hair_id,
-                        principalTable: "ServiceHair",
+                        name: "FK_appointment_detail_service_hair",
+                        column: x => x.ServiceHairId,
+                        principalTable: "service_hair",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Schedule",
+                name: "schedule",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -323,16 +338,41 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Schedule", x => x.Id);
+                    table.PrimaryKey("PK_schedule", x => x.Id);
                     table.ForeignKey(
                         name: "FK_employee_schedule",
                         column: x => x.employee_id,
-                        principalTable: "SalonEmployee",
+                        principalTable: "salon_employee",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Feedback",
+                name: "appointment_detail_voucher",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    voucher_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    appointment_detail_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    applied_amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    applied_date = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_appointment_detail_voucher", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_appointment_detail_appointment_detail_voucher",
+                        column: x => x.appointment_detail_id,
+                        principalTable: "appointment_detail",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_voucher_appointment_detail_voucher",
+                        column: x => x.voucher_id,
+                        principalTable: "voucher",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "feedback",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -344,157 +384,170 @@ namespace Hairhub.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Feedback", x => x.Id);
+                    table.PrimaryKey("PK_feedback", x => x.Id);
                     table.ForeignKey(
                         name: "FK_appointment_detail_feedback",
                         column: x => x.appointment_detail_id,
-                        principalTable: "AppointmentDetail",
+                        principalTable: "appointment_detail",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_customer_feedback",
                         column: x => x.customer_id,
-                        principalTable: "Customer",
+                        principalTable: "customer",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "FK__role__role_id__02084FDA",
-                table: "Account",
+                name: "IX_account_role_id",
+                table: "account",
                 column: "role_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Admin_AccountId",
-                table: "Admin",
+                name: "IX_admin_AccountId",
+                table: "admin",
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointment_customer_id",
-                table: "Appointment",
+                name: "IX_appointment_customer_id",
+                table: "appointment",
                 column: "customer_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppointmentDetail_appointment_id",
-                table: "AppointmentDetail",
-                column: "appointment_id");
+                name: "IX_appointment_detail_AppointmentId",
+                table: "appointment_detail",
+                column: "AppointmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppointmentDetail_customer_id",
-                table: "AppointmentDetail",
-                column: "customer_id");
+                name: "IX_appointment_detail_CustomerId",
+                table: "appointment_detail",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppointmentDetail_salon_employee_id",
-                table: "AppointmentDetail",
-                column: "salon_employee_id");
+                name: "IX_appointment_detail_SalonEmployeeId",
+                table: "appointment_detail",
+                column: "SalonEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppointmentDetail_service_hair_id",
-                table: "AppointmentDetail",
-                column: "service_hair_id");
+                name: "IX_appointment_detail_ServiceHairId",
+                table: "appointment_detail",
+                column: "ServiceHairId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Config_admin_id",
-                table: "Config",
-                column: "admin_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customer_account_id",
-                table: "Customer",
-                column: "account_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Feedback_appointment_detail_id",
-                table: "Feedback",
+                name: "IX_appointment_detail_voucher_appointment_detail_id",
+                table: "appointment_detail_voucher",
                 column: "appointment_detail_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Feedback_customer_id",
-                table: "Feedback",
-                column: "customer_id");
+                name: "IX_appointment_detail_voucher_voucher_id",
+                table: "appointment_detail_voucher",
+                column: "voucher_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payment_customer_id",
-                table: "Payment",
-                column: "customer_id");
+                name: "IX_config_admin_id",
+                table: "config",
+                column: "admin_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SalonEmployee_salon_information_id",
-                table: "SalonEmployee",
-                column: "salon_information_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalonInformation_owner_id",
-                table: "SalonInformation",
-                column: "owner_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalonInformation_service_hair_id",
-                table: "SalonInformation",
-                column: "service_hair_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalonOwner_account_id",
-                table: "SalonOwner",
+                name: "IX_customer_account_id",
+                table: "customer",
                 column: "account_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Schedule_employee_id",
-                table: "Schedule",
+                name: "IX_feedback_appointment_detail_id",
+                table: "feedback",
+                column: "appointment_detail_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_feedback_customer_id",
+                table: "feedback",
+                column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_payment_customer_id",
+                table: "payment",
+                column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_salon_employee_salon_information_id",
+                table: "salon_employee",
+                column: "salon_information_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_salon_information_owner_id",
+                table: "salon_information",
+                column: "owner_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_salon_information_service_hair_id",
+                table: "salon_information",
+                column: "service_hair_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_salon_owner_account_id",
+                table: "salon_owner",
+                column: "account_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_schedule_employee_id",
+                table: "schedule",
                 column: "employee_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Voucher_salon_information_id",
-                table: "Voucher",
-                column: "salon_information_id");
+                name: "IX_voucher_SalonInformationId",
+                table: "voucher",
+                column: "SalonInformationId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Config");
+                name: "appointment_detail_voucher");
 
             migrationBuilder.DropTable(
-                name: "Feedback");
+                name: "config");
 
             migrationBuilder.DropTable(
-                name: "Payment");
+                name: "feedback");
 
             migrationBuilder.DropTable(
-                name: "Schedule");
+                name: "payment");
 
             migrationBuilder.DropTable(
-                name: "Voucher");
+                name: "schedule");
 
             migrationBuilder.DropTable(
-                name: "Admin");
+                name: "voucher");
 
             migrationBuilder.DropTable(
-                name: "AppointmentDetail");
+                name: "admin");
 
             migrationBuilder.DropTable(
-                name: "Appointment");
+                name: "appointment_detail");
 
             migrationBuilder.DropTable(
-                name: "SalonEmployee");
+                name: "appointment");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "salon_employee");
 
             migrationBuilder.DropTable(
-                name: "SalonInformation");
+                name: "customer");
 
             migrationBuilder.DropTable(
-                name: "SalonOwner");
+                name: "salon_information");
 
             migrationBuilder.DropTable(
-                name: "ServiceHair");
+                name: "salon_owner");
 
             migrationBuilder.DropTable(
-                name: "Account");
+                name: "service_hair");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "account");
+
+            migrationBuilder.DropTable(
+                name: "role");
         }
     }
 }

@@ -11,6 +11,6 @@ namespace Hairhub.Service.Services.IServices
     public interface ICustomerService
     {
         Task<IPaginate<GetCustomerResponse>> GetCustomers(int page, int size);
-        Task<GetCustomerResponse> GetCustomerById(Guid id);
+        Task<GetCustomerResponse>? GetCustomerById(Guid id);
     }
 }
