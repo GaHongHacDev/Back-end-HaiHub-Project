@@ -1,4 +1,5 @@
 ﻿using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Entitities;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,10 @@ namespace Hairhub.Service.Services.IServices
 {
     public interface IAccountService
     {
-        Task<string> Login(string userName, string password);
-        Task<(Customer, Account)> RegisterAccountCustomer(Customer customer, Account account);
-        Task<(SalonOwner, Account)> RegisterAccountSalonOwner(SalonOwner salonOwner, Account account);
+        Task<CreateAccountResponse> RegisterAccount(CreateAccountRequest createAccountRequest);
         Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest);
+        Task<bool> DeleteAccountById(Guid id);
+        Task<bool> ActiveAccount(Guid id);
+        Task<bool> ChangePassword(Guid id, ChangePasswordRequest changePasswordRequest);
     }
 }
