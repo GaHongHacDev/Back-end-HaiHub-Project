@@ -35,5 +35,21 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = "User name or password is incorrect" });
             return Ok(token);
         }
+
+        [HttpPost]
+        public IActionResult LogOut()
+        {
+            // Đọc token từ header X-Auth-Token
+            var token = Request.Headers["X-Auth-Token"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is missing");
+            }
+
+            _authenticationService.Logout(token);
+
+            return Ok();
+        }
     }
 }

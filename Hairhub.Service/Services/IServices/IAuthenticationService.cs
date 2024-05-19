@@ -9,5 +9,6 @@ namespace Hairhub.Service.Services.IServices
     public interface IAuthenticationService
     {
         Task<string> Login(string userName, string password);
+        Task<string> Logout(string token);
     }
 }

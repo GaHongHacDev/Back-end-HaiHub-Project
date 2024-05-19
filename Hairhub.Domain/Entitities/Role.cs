@@ -12,7 +12,7 @@ namespace Hairhub.Domain.Entitities
     {
         [Key]
         public Guid RoleId { get; set; }
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; }
         public virtual ICollection<Account> Accounts { get; set; }
     }
 }

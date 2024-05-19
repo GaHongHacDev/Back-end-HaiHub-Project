@@ -36,5 +36,10 @@
         {
             public const string AppointmentDetailsEndpoint = ApiEndpoint + "/appointment_details";
         }
+
+        public static class Otp
+        {
+            public const string OtpsEndpoint = ApiEndpoint + "/otps";
+        }
     }
 }
