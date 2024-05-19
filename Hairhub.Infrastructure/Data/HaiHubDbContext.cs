@@ -61,7 +61,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Account>(entity =>
             {
-                entity.ToTable("Account");
+                entity.ToTable("account");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasMaxLength(64).HasColumnName("id");
@@ -71,12 +71,17 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Token).HasMaxLength(100).HasColumnName("token");
                 entity.Property(e => e.RefeshToken).HasMaxLength(100).HasColumnName("refesh_token");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
-                entity.HasIndex(e => e.RoleId, "FK__role__role_id__02084FDA");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.Accounts)
+                    .HasForeignKey(d => d.RoleId)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_role_acount");
             });
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.ToTable("Role");
+                entity.ToTable("role");
                 entity.HasKey(e => e.RoleId);
 
                 entity.Property(e => e.RoleId).HasMaxLength(64).HasColumnName("role_id");
@@ -85,7 +90,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<SalonOwner>(entity =>
             {
-                entity.ToTable("SalonOwner");
+                entity.ToTable("salon_owner");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.AccountId).HasColumnName("account_id");
@@ -109,7 +114,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<SalonEmployee>(entity =>
             {
-                entity.ToTable("SalonEmployee");
+                entity.ToTable("salon_employee");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
@@ -132,7 +137,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<SalonInformation>(entity =>
             {
-                entity.ToTable("SalonInformation");
+                entity.ToTable("salon_information");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.OwnerId).HasColumnName("owner_id");
@@ -161,7 +166,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Schedule>(entity =>
             {
-                entity.ToTable("Schedule");
+                entity.ToTable("schedule");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
@@ -179,7 +184,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Customer>(entity =>
             {
-                entity.ToTable("Customer");
+                entity.ToTable("customer");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.AccountId).HasColumnName("account_id");
@@ -203,7 +208,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Appointment>(entity =>
             {
-                entity.ToTable("Appointment");
+                entity.ToTable("appointment");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Date).HasColumnName("date");
@@ -220,40 +225,41 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<AppointmentDetail>(entity =>
             {
-                entity.ToTable("AppointmentDetail");
-
+                entity.ToTable("appointment_detail");
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.SalonEmployeeId).HasColumnName("salon_employee_id").IsRequired(false);
-                entity.Property(e => e.ServiceHairId).HasColumnName("service_hair_id").IsRequired(false);
-                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id").IsRequired(false);
-                entity.Property(e => e.Description).HasColumnName("description").HasMaxLength(500).IsRequired(false);
-                entity.Property(e => e.Date).HasColumnName("date").IsRequired(false);
-                entity.Property(e => e.Time).HasColumnName("time").IsRequired(false);
-                entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18, 2)").HasColumnName("original_price").IsRequired(false);
-                entity.Property(e => e.DiscountedPrice).HasColumnType("decimal(18, 2)").HasColumnName("discounted_price").IsRequired(false);
-                entity.Property(e => e.Status).HasColumnName("status").IsRequired(false);
+                entity.Property(e => e.SalonEmployeeId).IsRequired(false);
+                entity.Property(e => e.ServiceHairId).IsRequired(false);
+                entity.Property(e => e.AppointmentId).IsRequired(false);
+                entity.Property(e => e.Description).IsRequired(false);
+                entity.Property(e => e.Date).IsRequired(false);
+                entity.Property(e => e.Time).IsRequired(false);
+                entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.DiscountedPrice).HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.Status).IsRequired(false);
 
-                // Add configuration for foreign keys if needed
                 entity.HasOne(d => d.SalonEmployee)
-                      .WithMany()
+                      .WithMany(p => p.AppointmentDetails)
                       .HasForeignKey(d => d.SalonEmployeeId)
-                      .OnDelete(DeleteBehavior.ClientSetNull);
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_detail_salon_employee");
 
                 entity.HasOne(d => d.ServiceHair)
-                      .WithMany()
+                      .WithMany(p => p.AppointmentDetails)
                       .HasForeignKey(d => d.ServiceHairId)
-                      .OnDelete(DeleteBehavior.ClientSetNull);
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_detail_service_hair");
 
                 entity.HasOne(d => d.Appointment)
-                      .WithMany()
+                      .WithMany(p => p.AppointmentDetails)
                       .HasForeignKey(d => d.AppointmentId)
-                      .OnDelete(DeleteBehavior.ClientSetNull);
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_detail_appointment");
             });
 
             modelBuilder.Entity<AppointmentDetailVoucher>(entity =>
             {
-                entity.ToTable("AppointmentDetailVoucher");
+                entity.ToTable("appointment_detail_voucher");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.AppliedAmount).HasColumnType("decimal(18, 2)").HasColumnName("applied_amount");
@@ -276,7 +282,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Feedback>(entity =>
             {
-                entity.ToTable("Feedback");
+                entity.ToTable("feedback");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.CustomerId).HasColumnName("customer_id");
@@ -300,7 +306,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<ServiceHair>(entity =>
             {
-                entity.ToTable("ServiceHair");
+                entity.ToTable("service_hair");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.ServiceName).HasColumnName("service_name");
@@ -311,6 +317,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Voucher>(entity =>
             {
+                entity.ToTable("voucher");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.SalonInformationId).IsRequired(false);
@@ -342,7 +349,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Admin>(entity =>
             {
-                entity.ToTable("Admin");
+                entity.ToTable("admin");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.FullName).HasColumnName("full_name");
@@ -363,7 +370,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Payment>(entity =>
             {
-                entity.ToTable("Payment");
+                entity.ToTable("payment");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.CustomerId).HasColumnName("customer_id");
@@ -380,7 +387,7 @@ namespace Hairhub.Infrastructure
 
             modelBuilder.Entity<Config>(entity =>
             {
-                entity.ToTable("Config");
+                entity.ToTable("config");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate");

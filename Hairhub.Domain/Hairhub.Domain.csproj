@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Dtos\Requests\AppointmentDetails\" />
-    <Folder Include="Dtos\Responses\AppointmentDetails\" />
   </ItemGroup>
 
 </Project>
