@@ -51,5 +51,10 @@ namespace Hairhub.Service.Services.Services
 
             return user.Token;
         }
+
+        public async Task<string> Logout(string token)
+        {
+            return "";
+        }
     }
 }

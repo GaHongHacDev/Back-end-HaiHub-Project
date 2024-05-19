@@ -26,6 +26,7 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<IAppointmentService, AppointmentService>();
             services.AddScoped<IAppointmentDetailService, AppointmentDetailService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IEmailService, EmailService>();
             return services;
         }
         public static IServiceCollection AddDIRepositories(this IServiceCollection services)

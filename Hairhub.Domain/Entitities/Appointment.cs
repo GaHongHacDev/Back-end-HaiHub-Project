@@ -13,7 +13,7 @@ namespace Hairhub.Domain.Entitities
         public Guid Id { get; set; }
         public DateTime? Date { get; set; }
         public Decimal? TotalPrice { get; set; }
-        public Guid CustomerId { get; set; }
+        public Guid? CustomerId { get; set; }
         public bool? IsActive { get; set; }
 
 

@@ -21,7 +21,7 @@ namespace Hairhub.Domain.Entitities
         public Decimal? DiscountedPrice { get; set; }
         public bool? Status { get; set; }
 
-        public virtual Customer Customer { get; set; }
+
         public virtual SalonEmployee SalonEmployee { get; set; }
         public virtual ServiceHair ServiceHair { get; set; }
         public virtual Appointment Appointment { get; set; }

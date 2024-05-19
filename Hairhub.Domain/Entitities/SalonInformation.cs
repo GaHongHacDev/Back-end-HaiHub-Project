@@ -11,8 +11,7 @@ namespace Hairhub.Domain.Entitities
     {
         [Key]
         public Guid Id { get; set; }
-        public Guid OwnerId { get; set; }
-        public Guid ServiceHairId { get; set; }
+        public Guid? OwnerId { get; set; }
         public string? Address {  get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
@@ -23,8 +22,8 @@ namespace Hairhub.Domain.Entitities
         public bool? IsActive { get; set; }
 
         public virtual SalonOwner SalonOwner { get; set; }
-        public virtual ServiceHair ServiceHair { get; set; }
         public virtual ICollection<SalonEmployee> SalonEmployees { get; set; }
+        public virtual ICollection<ServiceHair> ServiceHairs { get; set; }
         public virtual ICollection<Voucher> Vouchers { get; set; }
     }
 }

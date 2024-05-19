@@ -144,3 +144,6 @@ D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Wor
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.dll
+D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\MailKit.dll
+D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\MimeKit.dll
