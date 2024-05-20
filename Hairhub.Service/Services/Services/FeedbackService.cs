@@ -30,6 +30,7 @@ namespace Hairhub.Service.Services.Services
         {
             var feedbacks = await _unitOfWork.GetRepository<Feedback>()
                 .GetPagingListAsync(
+                predicate: x => x.IsActive == true,
                 include: query => query.Include(s => s.Customer).Include(s => s.AppointmentDetail),
                 page: page,
                 size: size);

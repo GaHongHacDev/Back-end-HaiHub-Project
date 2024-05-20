@@ -30,6 +30,7 @@ namespace Hairhub.Service.Services.Services
         {
             var schedules = await _unitOfWork.GetRepository<Schedule>()
             .GetPagingListAsync(
+                predicate: x => x.IsActive == true,
                 include: query => query.Include(s => s.SalonEmployee),
                 page: page,
                 size: size
