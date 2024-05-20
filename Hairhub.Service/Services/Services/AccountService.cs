@@ -137,7 +137,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Salon owner or customer was not found!");
                 }
-                accountId = salonOwner.AccountId;
+                accountId = (Guid)salonOwner.AccountId;
                 salonOwner.FullName = updateAccountRequest.FullName;
                 salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;
                 salonOwner.Gender = updateAccountRequest.Gender;
@@ -151,7 +151,7 @@ namespace Hairhub.Service.Services.Services
             }
             else
             {
-                accountId = customer.AccountId;
+                accountId = (Guid)customer.AccountId;
                 customer.FullName = updateAccountRequest.FullName;
                 customer.DayOfBirth = updateAccountRequest.DayOfBirth;
                 customer.Gender = updateAccountRequest.Gender;

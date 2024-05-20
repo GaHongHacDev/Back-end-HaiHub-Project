@@ -32,7 +32,7 @@ namespace Hairhub.Service.Services.Services
                     new CustomerInfomation
                     {
                         Id = x.Customer.Id,
-                        AccountId = x.Customer.AccountId,
+                        AccountId = (Guid)x.Customer.AccountId,
                         DayOfBirth = x.Customer.DayOfBirth,
                         Gender = x.Customer.Gender,
                         FullName = x.Customer.FullName,
@@ -71,7 +71,7 @@ namespace Hairhub.Service.Services.Services
                     new CustomerInfomation
                     {
                         Id = x.Customer.Id,
-                        AccountId = x.Customer.AccountId,
+                        AccountId = (Guid)x.Customer.AccountId,
                         DayOfBirth = x.Customer.DayOfBirth,
                         Gender = x.Customer.Gender,
                         FullName = x.Customer.FullName,
