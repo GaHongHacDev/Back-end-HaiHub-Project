@@ -23,15 +23,17 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IAppointmentDetailService _appointmentDetailService;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _appointmentDetailService = appointmentDetailService;
         }
         public async Task<IPaginate<GetAppointmentResponse>> GetAllAppointment(int page, int size)
         {
-            var schedules = await _unitOfWork.GetRepository<Appointment>()
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
            .GetPagingListAsync(
                include: query => query.Include(s => s.Customer),
                page: page,
@@ -40,11 +42,11 @@ namespace Hairhub.Service.Services.Services
 
             var scheduleResponses = new Paginate<GetAppointmentResponse>()
             {
-                Page = schedules.Page,
-                Size = schedules.Size,
-                Total = schedules.Total,
-                TotalPages = schedules.TotalPages,
-                Items = _mapper.Map<IList<GetAppointmentResponse>>(schedules.Items),
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
             return scheduleResponses;
         }
@@ -64,13 +66,37 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest createAccountRequest)
         {
-            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAccountRequest.CustomerId));
+            //Check customer is exist
+            var customer = await _unitOfWork.GetRepository<Customer>()
+                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAccountRequest.CustomerId));
             if (customer == null)
             {
-                throw new Exception("AccountId not found");
+                throw new Exception("CustomerId not found!");
             }
             var appointment = _mapper.Map<Appointment>(createAccountRequest);
+            appointment.Id = Guid.NewGuid();
+            appointment.IsActive = true;
+            appointment.Date = DateTime.Now;
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+            await _unitOfWork.CommitAsync();
+            if (createAccountRequest.ListAppointmentDetail == null || createAccountRequest.ListAppointmentDetail.Count == 0)
+            {
+                throw new NotFoundException("AppointmentDetail not found!");
+            }
+            foreach(var item in createAccountRequest.ListAppointmentDetail)
+            {
+                try
+                {
+                    await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+                }
+                catch (NotFoundException ex) {
+                    throw new NotFoundException(ex.Message);
+                }
+                catch (Exception ex) 
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
             await _unitOfWork.CommitAsync();
             return _mapper.Map<CreateAppointmentResponse>(appointment);
         }
