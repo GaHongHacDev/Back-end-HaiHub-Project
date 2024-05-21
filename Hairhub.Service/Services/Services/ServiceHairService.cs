@@ -36,10 +36,10 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<CreateServiceHairResponse> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest)
         {
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createServiceHairRequest.SalonInformationId));
-            if (account == null)
+            var serviceHair1 = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createServiceHairRequest.SalonInformationId));
+            if (serviceHair1 == null)
             {
-                throw new Exception("AccountId not found");
+                throw new Exception("SalonInformationId not found");
             }
             var serviceHair = _mapper.Map<ServiceHair>(createServiceHairRequest);
             await _unitOfWork.GetRepository<ServiceHair>().InsertAsync(serviceHair);
