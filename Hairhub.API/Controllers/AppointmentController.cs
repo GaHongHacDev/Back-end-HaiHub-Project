@@ -57,11 +57,11 @@ namespace Hairhub.API.Controllers
                 {
                     return BadRequest("Cannot create appointment!");
                 }
-                return Ok(accoutResponse);
+                //return Ok(accoutResponse);
+                return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
             }
             catch(NotFoundException ex)
             {
-
                 return NotFound(ex.Message);
             }
             catch (Exception ex)

@@ -243,15 +243,15 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.SalonEmployeeId).IsRequired(false);
-                entity.Property(e => e.ServiceHairId).IsRequired(false);
-                entity.Property(e => e.AppointmentId).IsRequired(false);
-                entity.Property(e => e.Description).IsRequired(false);
-                entity.Property(e => e.Date).IsRequired(false);
-                entity.Property(e => e.Time).IsRequired(false);
-                entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18,2)").IsRequired(false);
-                entity.Property(e => e.DiscountedPrice).HasColumnType("decimal(18,2)").IsRequired(false);
-                entity.Property(e => e.Status).IsRequired(false);
+                entity.Property(e => e.SalonEmployeeId).HasColumnName("salon_employee_id").IsRequired(false);
+                entity.Property(e => e.ServiceHairId).HasColumnName("service_hair_id").IsRequired(false);
+                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id").IsRequired(false);
+                entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
+                entity.Property(e => e.Date).HasColumnName("date").IsRequired(false);
+                entity.Property(e => e.Time).HasColumnName("time").IsRequired(false);
+                entity.Property(e => e.OriginalPrice).HasColumnName("original_price").HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.DiscountedPrice).HasColumnName("discounted_price").HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.Status).HasColumnName("status").IsRequired(false);
 
                 entity.HasOne(d => d.SalonEmployee)
                       .WithMany(p => p.AppointmentDetails)
