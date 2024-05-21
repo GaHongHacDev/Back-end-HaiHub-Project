@@ -5,6 +5,7 @@ using Hairhub.Domain.Dtos.Requests.Otps;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.SalonOwners;
+using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using Hairhub.Domain.Dtos.Responses.Customers;
@@ -12,6 +13,7 @@ using Hairhub.Domain.Dtos.Responses.Otps;
 using Hairhub.Domain.Dtos.Responses.SalonEmployees;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Dtos.Responses.SalonOwners;
+using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;
 
 namespace Hairhub.Service.Helpers
@@ -56,6 +58,12 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
+
+            //ServiceHair
+            CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();
+            CreateMap<CreateServiceHairRequest, ServiceHair>().ReverseMap();
+            CreateMap<CreateServiceHairResponse, ServiceHair>().ReverseMap();
+            CreateMap<UpdateServiceHairRequest, ServiceHair>().ReverseMap();
 
             //OTP
             CreateMap<SendOtpEmailRequest, OTP>().ReverseMap();
