@@ -31,7 +31,7 @@ namespace Hairhub.Service.Services.Services
             var appointmentDetailVouchers = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
                 .GetPagingListAsync(
                 predicate: x => x.IsActive == true,
-                include: query => query.Include(s => s.Voucher).Include(s => s.AppointmentDetail),
+                include: query => query.Include(s => s.Voucher).Include(s => s.Appointment),
                 page: page,
                 size: size);
 
@@ -52,7 +52,7 @@ namespace Hairhub.Service.Services.Services
             var appointmentDetailVoucher = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
                 .SingleOrDefaultAsync(
                  predicate: predicate => predicate.Id.Equals(id),
-                 include: query => query.Include(s => s.Voucher).Include(s => s.AppointmentDetail));
+                 include: query => query.Include(s => s.Voucher).Include(s => s.Appointment));
 
             var appointmentDetailVoucherResponse = _mapper.Map<GetAppointmentDetailVoucherResponse>(appointmentDetailVoucher);
 
@@ -65,7 +65,7 @@ namespace Hairhub.Service.Services.Services
             {
                 Id = Guid.NewGuid(),
                 VoucherId = request.VoucherId,
-                AppointmentDetailId = request.AppointmentDetailId,
+                AppointmentId = request.AppointmentId,
                 AppliedAmount = request.AppliedAmount,
                 AppliedDate = request.AppliedDate,
                 

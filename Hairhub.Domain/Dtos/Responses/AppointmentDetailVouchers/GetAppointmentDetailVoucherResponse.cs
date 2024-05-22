@@ -13,11 +13,11 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetailVoucher
         public Guid? AppointmentDetailId { get; set; }
         public Decimal? AppliedAmount { get; set; }
         public DateTime? AppliedDate { get; set; }
-        public VoucherResponse Voucher {  get; set; }
-        public AppointmentDetailResponseA AppointmentDetail { get; set; }
+        public VoucherResponseA Voucher {  get; set; }
+        public AppointmentResponseA Appointment { get; set; }
     }
 
-    public class VoucherResponse
+    public class VoucherResponseA
     {
         public Guid Id { get; set; }
         public Guid? SalonInformationId { get; set; }
@@ -32,17 +32,14 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetailVoucher
         public bool? IsActive { get; set; }
     }
 
-    public class AppointmentDetailResponseA
+    public class AppointmentResponseA
     {
         public Guid Id { get; set; }
-        public Guid? SalonEmployeeId { get; set; }
-        public Guid? ServiceHairId { get; set; }
-        public Guid? AppointmentId { get; set; }
-        public string? Description { get; set; }
         public DateTime? Date { get; set; }
-        public DateTime? Time { get; set; }
+        public Decimal? TotalPrice { get; set; }
+        public Guid? CustomerId { get; set; }
         public Decimal? OriginalPrice { get; set; }
         public Decimal? DiscountedPrice { get; set; }
-        public bool? Status { get; set; }
+        public bool? IsActive { get; set; }
     }
 }

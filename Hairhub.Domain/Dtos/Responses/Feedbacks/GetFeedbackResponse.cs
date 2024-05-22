@@ -14,11 +14,11 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public int? Rating { get; set; }
         public string? Comment { get; set; }
         public bool? IsActive { get; set; }
-        public CustomerResponse Customer { get; set; }
+        public CustomerResponseF Customer { get; set; }
         public AppointmentDetailResponseF AppointmentDetail { get; set; }
     }
 
-    public class CustomerResponse
+    public class CustomerResponseF
     {
         public Guid Id { get; set; }
         public Guid? AccountId { get; set; }

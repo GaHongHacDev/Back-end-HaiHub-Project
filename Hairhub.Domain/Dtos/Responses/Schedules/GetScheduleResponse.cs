@@ -30,16 +30,16 @@ namespace Hairhub.Domain.Dtos.Responses.Schedules
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
         public bool? IsActive { get; set; }
-        public SalonEmployeeResponse SalonEmployee { get; set; }
+        public SalonEmployeeResponseS SalonEmployee { get; set; }
     }
 
-    public class SalonEmployeeResponse
+    public class SalonEmployeeResponseS
     {
-        public SalonEmployeeResponse()
+        public SalonEmployeeResponseS()
         {
 
         }
-        public SalonEmployeeResponse(Guid id, Guid salonInformationId, string? fullName, DateTime? dayOfBirth, string? gender, string? email, string? phone, string? address, string? humanId, string? img, bool? isActive)
+        public SalonEmployeeResponseS(Guid id, Guid salonInformationId, string? fullName, DateTime? dayOfBirth, string? gender, string? email, string? phone, string? address, string? humanId, string? img, bool? isActive)
         {
             Id = id;
             SalonInformationId = salonInformationId;

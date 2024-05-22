@@ -32,21 +32,21 @@ namespace Hairhub.Service.Helpers
             //Schedule
             CreateMap<Schedule, GetScheduleResponse>().ReverseMap();
 
-            CreateMap<SalonEmployee, SalonEmployeeResponse>().ReverseMap();
+            CreateMap<SalonEmployee, SalonEmployeeResponseS>().ReverseMap();
 
             //Feedback
             CreateMap<Feedback, GetFeedbackResponse>().ReverseMap();
 
-            CreateMap<Customer, CustomerResponse>().ReverseMap();
+            CreateMap<Customer, CustomerResponseF>().ReverseMap();
 
             CreateMap<AppointmentDetail, AppointmentDetailResponseF>().ReverseMap();
 
             //AppointmentDetailVoucher
             CreateMap<AppointmentDetailVoucher, GetAppointmentDetailVoucherResponse>().ReverseMap();
 
-            CreateMap<Voucher, VoucherResponse>().ReverseMap();
+            CreateMap<Voucher, VoucherResponseA>().ReverseMap();
 
-            CreateMap<AppointmentDetail, AppointmentDetailResponseA>().ReverseMap();
+            CreateMap<AppointmentDetail, AppointmentResponseA>().ReverseMap();
 
             //Appointment
             CreateMap<GetAppointmentResponse, Appointment>().ReverseMap();

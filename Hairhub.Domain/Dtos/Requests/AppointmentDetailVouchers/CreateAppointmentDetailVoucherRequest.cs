@@ -10,7 +10,7 @@ namespace Hairhub.Domain.Dtos.Requests.AppointmentDetailVouchers
     {
         public Guid Id { get; set; }
         public Guid? VoucherId { get; set; }
-        public Guid? AppointmentDetailId { get; set; }
+        public Guid? AppointmentId { get; set; }
         public Decimal? AppliedAmount { get; set; }
         public DateTime? AppliedDate { get; set; }
     }

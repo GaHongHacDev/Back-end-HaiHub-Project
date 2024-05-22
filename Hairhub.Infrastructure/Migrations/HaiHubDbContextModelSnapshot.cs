@@ -239,12 +239,6 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-<<<<<<< HEAD
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AdminId")
-=======
->>>>>>> Tien
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
@@ -527,9 +521,13 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Address")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
+
+                    b.Property<string>("BusinessLicense")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("business_license");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
@@ -547,26 +545,15 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-<<<<<<< HEAD
-=======
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("name");
 
->>>>>>> Tien
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("owner_id");
 
-<<<<<<< HEAD
-                    b.Property<string>("Phone")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
-                        .HasColumnName("phone");
-
-=======
->>>>>>> Tien
                     b.Property<DateTime?>("StartOperationalHours")
                         .HasColumnType("datetime2")
                         .HasColumnName("start_operational_hours");
@@ -648,8 +635,7 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Date")
                         .HasColumnType("nvarchar(max)")
@@ -842,19 +828,6 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Voucher");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("Hairhub.Domain.Entitities.Config", b =>
-                {
-                    b.HasOne("Hairhub.Domain.Entitities.Admin", "Admin")
-                        .WithMany("Configs")
-                        .HasForeignKey("AdminId")
-                        .HasConstraintName("FK_admin_config");
-
-                    b.Navigation("Admin");
-                });
-
-=======
->>>>>>> Tien
             modelBuilder.Entity("Hairhub.Domain.Entitities.Customer", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
