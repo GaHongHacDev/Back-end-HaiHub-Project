@@ -1,22 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Ky8\\Exe201\\Hairhub\\",
+  "WorkspaceRootPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522094132_Init Database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Hairhub.Infrastructure\\Migrations\\20240522094132_Init Database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\summer-2024\\exe\\back-end-haihub-project\\hairhub.service\\helpers\\automapperprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\helpers\\automapperprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{84AFFC63-E774-40CB-94BB-2391520F1A89}|Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.infrastructure\\data\\haihubdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{84AFFC63-E774-40CB-94BB-2391520F1A89}|Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj|solutionrelative:hairhub.infrastructure\\data\\haihubdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\summer-2024\\exe\\back-end-haihub-project\\hairhub.service\\services\\services\\appointmentdetailvoucherservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\appointmentdetailvoucherservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|d:\\summer-2024\\exe\\back-end-haihub-project\\hairhub.domain\\dtos\\responses\\appointmentdetailvouchers\\getappointmentdetailvoucherresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\appointmentdetailvouchers\\getappointmentdetailvoucherresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -59,51 +55,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "20240522094132_Init Database.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522094132_Init Database.cs",
-              "RelativeDocumentMoniker": "Hairhub.Infrastructure\\Migrations\\20240522094132_Init Database.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522094132_Init Database.cs",
-              "RelativeToolTip": "Hairhub.Infrastructure\\Migrations\\20240522094132_Init Database.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Title": "AutoMapperProfile.cs",
+              "DocumentMoniker": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Helpers\\AutoMapperProfile.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Helpers\\AutoMapperProfile.cs",
+              "ToolTip": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Helpers\\AutoMapperProfile.cs",
+              "RelativeToolTip": "Hairhub.Service\\Helpers\\AutoMapperProfile.cs",
+              "ViewState": "AQIAACIAAAAAAAAAAAAQwDAAAAAhAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-22T09:41:32.439Z",
+              "WhenOpened": "2024-05-22T11:00:25.878Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Program.cs",
-              "RelativeDocumentMoniker": "Hairhub.API\\Program.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Program.cs",
-              "RelativeToolTip": "Hairhub.API\\Program.cs",
-              "ViewState": "AQIAADMAAAAAAAAAAAAAADsAAAACAAAA",
+              "Title": "GetAppointmentDetailVoucherResponse.cs",
+              "DocumentMoniker": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\AppointmentDetailVouchers\\GetAppointmentDetailVoucherResponse.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\AppointmentDetailVouchers\\GetAppointmentDetailVoucherResponse.cs",
+              "ToolTip": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\AppointmentDetailVouchers\\GetAppointmentDetailVoucherResponse.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\AppointmentDetailVouchers\\GetAppointmentDetailVoucherResponse.cs",
+              "ViewState": "AQIAAAQAAAAAAAAAAAAmwCIAAAAlAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-22T09:30:56.821Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "20240522093016_Init Database.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs",
-              "RelativeDocumentMoniker": "Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs",
-              "RelativeToolTip": "Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-22T09:30:16.568Z"
+              "WhenOpened": "2024-05-22T10:54:39.643Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "HaiHubDbContext.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
-              "RelativeDocumentMoniker": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
-              "RelativeToolTip": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
-              "ViewState": "AQIAABIAAAAAAAAAAAAowBoAAAAAAAAA",
+              "Title": "AppointmentDetailVoucherService.cs",
+              "DocumentMoniker": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\AppointmentDetailVoucherService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\AppointmentDetailVoucherService.cs",
+              "ToolTip": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\AppointmentDetailVoucherService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\AppointmentDetailVoucherService.cs",
+              "ViewState": "AQIAACcAAAAAAAAAAAAYwDMAAABjAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-22T09:29:50.604Z",
+              "WhenOpened": "2024-05-22T10:54:12.594Z",
               "EditorCaption": ""
             }
           ]

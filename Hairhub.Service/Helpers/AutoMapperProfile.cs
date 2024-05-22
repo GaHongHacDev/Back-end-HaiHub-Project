@@ -46,7 +46,7 @@ namespace Hairhub.Service.Helpers
 
             CreateMap<Voucher, VoucherResponseA>().ReverseMap();
 
-            CreateMap<AppointmentDetail, AppointmentResponseA>().ReverseMap();
+            CreateMap<Appointment, AppointmentResponseA>().ReverseMap();
 
             //Appointment
             CreateMap<GetAppointmentResponse, Appointment>().ReverseMap();

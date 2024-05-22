@@ -21,7 +21,7 @@ namespace Hairhub.Infrastructure
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-8I9EILA\\GAHONGHAC;Database=HairHubDB;User Id=sa;Password=12345;TrustServerCertificate=True;");
+                optionsBuilder.UseSqlServer("Server=LAPTOP-2DFQIPBM;Database=HairHubDB;User Id=sa;Password=123456a;TrustServerCertificate=True;");
             }
         }
 

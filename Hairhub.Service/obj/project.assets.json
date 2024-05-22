@@ -1938,24 +1938,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\flami\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Admin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj",
+      "projectUniqueName": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
       "projectName": "Hairhub.Service",
-      "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj",
-      "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-      "outputPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\obj\\",
+      "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1969,8 +1964,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-              "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj"
+            "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+              "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
             }
           }
         }
@@ -2039,16 +2034,8 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  }
 }
