@@ -1,123 +1,160 @@
 ﻿using Hairhub.Domain.Entitities;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Hairhub.Domain.Dtos.Requests.Accounts;
+using AutoMapper;
+using Hairhub.Domain.Dtos.Responses.Accounts;
+using Hairhub.Domain.Enums;
+using Hairhub.Domain.Exceptions;
 
 namespace Hairhub.Service.Services.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IConfiguration _configuaration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public AccountService(IConfiguration configuaration, IUnitOfWork unitOfWork)
+        public AccountService( IUnitOfWork unitOfWork, IMapper mapper)
         {
-            this._configuaration = configuaration;
+
             this._unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<string> Login(string userName, string password)
+        public async Task<bool> ActiveAccount(Guid id)
         {
-
-            var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: u => u.Username == userName && u.Password == password);
-    
-            // return null if user not found
-            if (user == null)
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            if (customer == null)
             {
-                return string.Empty;
-            }
-
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuaration["JWTSettings:Key"]);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
+                SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                if (salonOwner == null)
                 {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role.RoleName)
-                }),
-
-                Expires = DateTime.UtcNow.AddMinutes(5),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            user.Token = tokenHandler.WriteToken(token);
-
-            return user.Token;
+                    throw new NotFoundException("This account is not exist!");
+                }
+                var accountSalonOwner = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salonOwner.AccountId);
+                accountSalonOwner.IsActive = true;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(accountSalonOwner);
+                return await _unitOfWork.CommitAsync() > 0;
+            }
+            var accountCustomer = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == customer.AccountId);
+            accountCustomer.IsActive = true;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(accountCustomer);
+            return await _unitOfWork.CommitAsync() > 0;
         }
 
-        public async Task<(Customer, Account)> RegisterAccountCustomer(Customer customer, Account account)
+        public async Task<bool> ChangePassword(Guid id, ChangePasswordRequest changePasswordRequest)
         {
-            var role = await _unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate:x=>x.RoleName.Equals("Customer"));
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            if (customer == null)
+            {
+                SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                if (salonOwner == null)
+                {
+                    throw new NotFoundException("This account is not exist!");
+                }
+                var accountSalonOwner = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salonOwner.AccountId);
+                if (!changePasswordRequest.CurrentPassword.Equals(accountSalonOwner.Password))
+                {
+                    throw new Exception("Current password is not correct!");
+                }
+                accountSalonOwner.Password = changePasswordRequest.NewPassword;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(accountSalonOwner);
+                return await _unitOfWork.CommitAsync() > 0;
+            }
+            var accountCustomer = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == customer.AccountId);
+            if (!changePasswordRequest.CurrentPassword.Equals(accountCustomer.Password))
+            {
+                throw new Exception("Current password is not correct!");
+            }
+            accountCustomer.Password = changePasswordRequest.NewPassword;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(accountCustomer);
+            return await _unitOfWork.CommitAsync() > 0;
+        }
+
+        public async Task<bool> DeleteAccountById(Guid id)
+        {
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            if(customer == null)
+            {
+                SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                if (salonOwner == null)
+                {
+                    throw new NotFoundException("This account is not exist!");
+                }
+                var accountSalonOwner = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salonOwner.AccountId);
+                accountSalonOwner.IsActive = false;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(accountSalonOwner);
+                return await _unitOfWork.CommitAsync()>0;
+            }
+            var accountCustomer = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == customer.AccountId);
+            accountCustomer.IsActive = false;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(accountCustomer);
+            return await _unitOfWork.CommitAsync() > 0;
+        }
+
+        public async Task<CreateAccountResponse> RegisterAccount(CreateAccountRequest createAccountRequest)
+        {
+            var role = await _unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(createAccountRequest.RoleName));
             if (role == null)
             {
-                throw new Exception("Role Name is not exist!");
+                throw new Exception("Role not found");
             }
-            account.Id = Guid.NewGuid();
-            account.RoleId = role.RoleId;
-            account.IsActive = true;
-            customer.Id = Guid.NewGuid();
-            customer.AccountId = account.Id;
-            await _unitOfWork.GetRepository<Customer>().InsertAsync(customer);
+            var account = _mapper.Map<Account>(createAccountRequest);
+            if (RoleEnum.Customer.ToString().Equals(createAccountRequest.RoleName))
+            {
+                var userInfor = _mapper.Map<Customer>(createAccountRequest);
+                account.Id = Guid.NewGuid();
+                account.RoleId = role.RoleId;
+                account.IsActive = true;
+                userInfor.Id = Guid.NewGuid();
+                userInfor.AccountId = account.Id;
+                await _unitOfWork.GetRepository<Customer>().InsertAsync(userInfor);
+            }
+            else if (RoleEnum.SalonOwner.ToString().Equals(createAccountRequest.RoleName))
+            {
+                var userInfor = _mapper.Map<SalonOwner>(createAccountRequest);
+                account.Id = Guid.NewGuid();
+                account.RoleId = role.RoleId;
+                account.IsActive = true;
+                userInfor.Id = Guid.NewGuid();
+                userInfor.AccountId = account.Id;
+                await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(userInfor);
+            }
             await _unitOfWork.GetRepository<Account>().InsertAsync(account);
             await _unitOfWork.CommitAsync();
-            return (customer, account);
-        }
-
-        public async Task<(SalonOwner, Account)> RegisterAccountSalonOwner(SalonOwner salonOwner, Account account)
-        {
-            var role = await _unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals("SalonOwner"));
-            account.Id = Guid.NewGuid();
-            account.RoleId = role.RoleId;
-            account.IsActive = true;
-            salonOwner.Id = Guid.NewGuid();
-            salonOwner.AccountId = account.Id;
-            await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonOwner);
-            await _unitOfWork.GetRepository<Account>().InsertAsync(account);
-            await _unitOfWork.CommitAsync();
-            return (salonOwner, account);
+            return _mapper.Map<CreateAccountResponse>(createAccountRequest);
         }
 
         public async Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest)
         {
             var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
-            SalonOwner salonOwner;
+            SalonOwner salonOwner = new SalonOwner();
             Guid accountId;
             if (customer == null)
             {
                 salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id == id);
-                if(salonOwner == null)
+                if (salonOwner == null)
                 {
-                    return false;
+                    throw new NotFoundException("Salon owner or customer was not found!");
                 }
-                accountId = salonOwner.AccountId;
+                accountId = (Guid)salonOwner.AccountId;
                 salonOwner.FullName = updateAccountRequest.FullName;
-                customer.Email = updateAccountRequest.Email;
-                customer.Phone = updateAccountRequest.Phone;
-                customer.Address = updateAccountRequest.Address;
-                customer.HumanId = updateAccountRequest.HumanId;
-                customer.Img = updateAccountRequest.Img;
-                customer.BankAccount = updateAccountRequest.BankAccount;
-                customer.BankName = updateAccountRequest.BankName;
+                salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;
+                salonOwner.Gender = updateAccountRequest.Gender;
+                salonOwner.Email = updateAccountRequest.Email;
+                salonOwner.Phone = updateAccountRequest.Phone;
+                salonOwner.Address = updateAccountRequest.Address;
+                salonOwner.HumanId = updateAccountRequest.HumanId;
+                salonOwner.Img = updateAccountRequest.Img;
+                salonOwner.BankAccount = updateAccountRequest.BankAccount;
+                salonOwner.BankName = updateAccountRequest.BankName;
             }
             else
             {
-                accountId = customer.AccountId;
+                accountId = (Guid)customer.AccountId;
                 customer.FullName = updateAccountRequest.FullName;
+                customer.DayOfBirth = updateAccountRequest.DayOfBirth;
+                customer.Gender = updateAccountRequest.Gender;
                 customer.Email = updateAccountRequest.Email;
                 customer.Phone = updateAccountRequest.Phone;
                 customer.Address = updateAccountRequest.Address;
@@ -127,12 +164,20 @@ namespace Hairhub.Service.Services.Services
                 customer.BankName = updateAccountRequest.BankName;
             }
             Account account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == accountId);
-
-            if(account==null)
-                throw new Exception("Discount was not found");
+            if (account == null)
+                throw new NotFoundException("Account was not found");
             //Update Account
             account.Username = updateAccountRequest.Username;
             account.Password = updateAccountRequest.Password;
+            if (customer != null)
+            {
+                _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
+            }
+            else
+            {
+                _unitOfWork.GetRepository<SalonOwner>().UpdateAsync(salonOwner);
+            }
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
         }

@@ -19,7 +19,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUser([FromQuery] int page, [FromQuery] int size) {
+        public async Task<IActionResult> GetAllCustomer([FromQuery] int page, [FromQuery] int size) {
             var customers = await _customerService.GetCustomers(page, size);
             return Ok(customers);
         }
@@ -33,7 +33,7 @@ namespace Hairhub.API.Controllers
                 var Customer = await _customerService.GetCustomerById(id);
                 if (Customer == null)
                 {
-                    return NotFound("Cannont find this customer!");
+                    return NotFound("Customer not found!");
                 }
                 return Ok(Customer);
             }

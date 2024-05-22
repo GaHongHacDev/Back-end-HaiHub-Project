@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,90 +13,43 @@ using static Hairhub.API.Constants.ApiEndPointConstant;
 
 namespace Hairhub.API.Controllers
 {
-    [Route(ApiEndPointConstant.Account.AccountsEndpoint + "/[action]")]
+    [Route(ApiEndPointConstant.Authentication.AuthenticationEndpoint + "/[action]")]
     [ApiController]
     public class AuthenticationController : BaseController
     {
-        private IAccountService _accountService;
+        private IAuthenticationService _authenticationService;
 
-        public AuthenticationController(IMapper _mapper, IAccountService accountService) : base(_mapper)
+        public AuthenticationController(IMapper _mapper, IAuthenticationService authenticationService) : base(_mapper)
         {
-            _accountService = accountService;
+            _authenticationService = authenticationService;
         }
-
-
 
         // POST api/user/login
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Login([FromBody] Domain.Entitities.Account user)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            var token = _accountService.Login(user.Username, user.Password);
+            var token = await _authenticationService.Login(loginRequest.Username, loginRequest.Password);
 
             if (token == null || String.IsNullOrWhiteSpace(token.ToString()))
                 return BadRequest(new { message = "User name or password is incorrect" });
             return Ok(token);
         }
 
-        [HttpGet]
-        [Authorize(Roles = "admin,manager")]
-        public ActionResult<IEnumerable<string>> Load()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         [HttpPost]
-        public async Task<IActionResult> RegisterAccount([FromBody] CreateAccountRequest createAccountRequest)
+        public IActionResult LogOut()
         {
-            try
-            {
-                if (string.IsNullOrEmpty(createAccountRequest.RoleName))
-                {
-                    var accountEntity = _mapper.Map<Domain.Entitities.Account>(createAccountRequest);
-                    if ("Customer".Equals(createAccountRequest))
-                    {
-                        var customerEntitiy = _mapper.Map<Domain.Entitities.Customer>(createAccountRequest);
-                        (customerEntitiy, accountEntity) = await _accountService.RegisterAccountCustomer(customerEntitiy, accountEntity);
-                        var response = _mapper.Map(customerEntitiy, accountEntity);
-                        return Ok(response);
-                    }
-                    else if ("SalonOwner".Equals(createAccountRequest))
-                    {
-                        var salonOwnerEntity = _mapper.Map<SalonOwner>(createAccountRequest);
-                        (salonOwnerEntity, accountEntity) = await _accountService.RegisterAccountSalonOwner(salonOwnerEntity, accountEntity);
-                        var response = _mapper.Map(salonOwnerEntity, accountEntity);
-                        return Ok(response);
-                    }
-                }
-                return BadRequest("Can not create account!");
-            }catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
+            // Đọc token từ header X-Auth-Token
+            var token = Request.Headers["X-Auth-Token"].FirstOrDefault();
 
-        [HttpPut]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromBody] UpdateAccountRequest updateAccountRequest)
-        {
-            try
+            if (string.IsNullOrEmpty(token))
             {
-                if (id == null)
-                {
-                    return BadRequest("Account Id is null or empty!");
-                }
+                return BadRequest("Token is missing");
+            }
 
-                bool isUpdate = await _accountService.UpdateAccountById(id, updateAccountRequest);
-                if (isUpdate)
-                {
-                    return BadRequest("Cannot update account");
-                }
-                return Ok(_mapper.Map<UpdateAccountResponse>(updateAccountRequest));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            _authenticationService.Logout(token);
+
+            return Ok();
         }
     }
 }

@@ -21,18 +21,17 @@ namespace Hairhub.Infrastructure.Configuration
 
         public static IServiceCollection AddDIServices(this IServiceCollection services)
         {
-            //services.AddScoped<IYourService, YourServiceImplementation>();
-            //services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IAppointmentService, AppointmentService>();
             services.AddScoped<IAppointmentDetailService, AppointmentDetailService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IEmailService, EmailService>();
             return services;
         }
         public static IServiceCollection AddDIRepositories(this IServiceCollection services)
         {
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
 
