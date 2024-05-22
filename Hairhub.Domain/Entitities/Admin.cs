@@ -22,7 +22,6 @@ namespace Hairhub.Domain.Entitities
         public string? BankName { get; set; }
 
         public Account Account { get; set; }
-        public virtual ICollection<Config> Configs { get; set; }
 
     }
 }
