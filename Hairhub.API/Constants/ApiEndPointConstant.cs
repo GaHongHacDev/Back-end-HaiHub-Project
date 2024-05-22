@@ -59,5 +59,10 @@
             public const string AppointmentDetailVouchersEndpoint = ApiEndpoint + "/roles";
             public const string AppointmentDetailVoucherEndpoint = AppointmentDetailVouchersEndpoint + "/{id}";
         }
+
+        public static class Otp
+        {
+            public const string OtpsEndpoint = ApiEndpoint + "/otps";
+        }
     }
 }

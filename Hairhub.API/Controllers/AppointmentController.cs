@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Requests.Appointments;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +24,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAppointment([FromQuery] int page, [FromQuery] int size)
         {
-            var appointmentsResponse = _appointmentService.GetAllAppointment(page, size);
+            var appointmentsResponse = await _appointmentService.GetAllAppointment(page, size);
             return Ok(appointmentsResponse);
         }
 
@@ -30,7 +34,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var appointmentResponse = _appointmentService.GetAppointmentById(id);
+                var appointmentResponse = await _appointmentService.GetAppointmentById(id);
                 if (appointmentResponse == null)
                 {
                     return NotFound("Cannot find this appointment!");
@@ -44,11 +48,21 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAppointment()
+        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {
             try
             {
-                return Ok();
+                var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
+                if (accoutResponse == null)
+                {
+                    return BadRequest("Cannot create appointment!");
+                }
+                //return Ok(accoutResponse);
+                return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
+            }
+            catch(NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
@@ -57,11 +71,26 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAppointment()
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateAppointment([FromRoute] Guid id, [FromBody] UpdateAppointmentRequest updateAppointmentRequest)
         {
             try
             {
-                return Ok();
+                if (id == null)
+                {
+                    return BadRequest("Apointment Id is null or empty!");
+                }
+
+                bool isUpdate = await _appointmentService.UpdateAppointmentById(id, updateAppointmentRequest);
+                if (!isUpdate)
+                {
+                    return BadRequest("Cannot update appointment");
+                }
+                return Ok("Update appointment successfully");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
@@ -69,12 +98,47 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAppointment()
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> DeleteAppointment([FromRoute] Guid id)
+        {
+            {
+                try
+                {
+                    var isDelete = await _appointmentService.DeleteAppoinmentById(id);
+                    if (!isDelete)
+                    {
+                        return BadRequest("Cannot delete this appointment!");
+                    }
+                    return Ok("Delete appointment successfully!");
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> ActiveAppointment([FromRoute] Guid id)
         {
             try
             {
-                return Ok();
+                var isActive = await _appointmentService.ActiveAppointment(id);
+                if (!isActive)
+                {
+                    return BadRequest("Cannot delete this appointment!");
+                }
+                return Ok("Appointment account successfully!");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
