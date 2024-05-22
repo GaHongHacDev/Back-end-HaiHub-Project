@@ -17,8 +17,6 @@ namespace Hairhub.Domain.Entitities
         public string? Description {  get; set; } 
         public DateTime? Date {  get; set; }
         public DateTime? Time { get; set; }
-        public Decimal? OriginalPrice { get; set; }
-        public Decimal? DiscountedPrice { get; set; }
         public bool? Status { get; set; }
 
 
@@ -26,6 +24,5 @@ namespace Hairhub.Domain.Entitities
         public virtual ServiceHair ServiceHair { get; set; }
         public virtual Appointment Appointment { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
-        public virtual ICollection<AppointmentDetailVoucher> AppointmentDetailVouchers { get; set; }
     }
 }
