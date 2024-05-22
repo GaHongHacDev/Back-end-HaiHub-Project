@@ -1,7 +1,7 @@
 using BirthdayParty.WebApi.Constants;
-using Hairhub.API.Helpers;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
+using Hairhub.Service.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

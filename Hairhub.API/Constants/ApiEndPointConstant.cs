@@ -32,5 +32,11 @@
         {
             public const string AppointmentsEndpoint = ApiEndpoint + "/appointments";
         }
+
+
+        public static class Voucher
+        {
+            public const string VoucherEndpoint = ApiEndpoint + "/vouchers";
+        }
     }
 }
