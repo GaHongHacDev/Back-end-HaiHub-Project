@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {}
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
+        "projectUniqueName": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
         "projectName": "Hairhub.API",
-        "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
-        "packagesPath": "C:\\Users\\duong\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.API\\obj\\",
+        "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\duong\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,14 +28,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               },
-              "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj"
+              "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
+                "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj"
               },
-              "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
-                "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
+              "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+                "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
               }
             }
           }
@@ -95,21 +95,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "projectUniqueName": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
         "projectName": "Hairhub.Domain",
-        "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
-        "packagesPath": "C:\\Users\\duong\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
+        "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\duong\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -161,21 +161,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
         "projectName": "Hairhub.Infrastructure",
-        "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\duong\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
+        "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\duong\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -189,11 +189,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               },
-              "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
-                "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
+              "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+                "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
               }
             }
           }
@@ -254,21 +254,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
+        "projectUniqueName": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
         "projectName": "Hairhub.Service",
-        "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
-        "packagesPath": "C:\\Users\\duong\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\obj\\",
+        "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Service\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\duong\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -282,8 +282,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               }
             }
           }
@@ -352,7 +352,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

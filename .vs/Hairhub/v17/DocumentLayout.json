@@ -1,10 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\",
+  "WorkspaceRootPath": "D:\\Ky8\\Exe201\\Hairhub\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.service\\services\\services\\saloninformationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\saloninformationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.domain\\dtos\\requests\\otps\\checkotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\requests\\otps\\checkotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\controllers\\otpcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\controllers\\otpcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\iservices\\iemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\iservices\\iemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,19 +26,62 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "OtpController.cs",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Controllers\\OtpController.cs",
+              "RelativeDocumentMoniker": "Hairhub.API\\Controllers\\OtpController.cs",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Controllers\\OtpController.cs",
+              "RelativeToolTip": "Hairhub.API\\Controllers\\OtpController.cs",
+              "ViewState": "AQIAABgAAAAAAAAAAADwvygAAABMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-19T19:19:39.584Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "IEmailService.cs",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\IServices\\IEmailService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\IServices\\IEmailService.cs",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\IServices\\IEmailService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\IServices\\IEmailService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAZAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-19T19:16:47.37Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CheckOtpRequest.cs",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAqwAkAAAAgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-19T19:08:21.759Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "SalonInformationService.cs",
-              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
-              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
-              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
-              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
-              "ViewState": "AQIAABsAAAAAAAAAAAAYwCkAAAAsAAAA",
+              "Title": "EmailService.cs",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\EmailService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\EmailService.cs",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\EmailService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\EmailService.cs",
+              "ViewState": "AQIAAFQAAAAAAAAAAAAQwF4AAAAhAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-21T05:56:56.442Z",
+              "WhenOpened": "2024-05-19T19:04:02.102Z",
               "EditorCaption": ""
             }
           ]
