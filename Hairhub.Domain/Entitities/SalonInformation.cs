@@ -14,10 +14,11 @@ namespace Hairhub.Domain.Entitities
         public Guid? OwnerId { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public DateTime? EndOperationalHours {  get; set; } 
+        public DateTime? EndOperationalHours { get; set; }
         public DateTime? StartOperationalHours { get; set; }
         public string? Description { get; set; }
         public string? Img { get; set; }
+        public string? BusinessLicense {  get; set; }
         public bool? IsActive { get; set; }
 
         public virtual SalonOwner SalonOwner { get; set; }
