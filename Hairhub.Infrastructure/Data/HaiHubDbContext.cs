@@ -1,5 +1,6 @@
 ﻿using Hairhub.Domain.Entitities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -157,6 +158,11 @@ namespace Hairhub.Infrastructure
                       .HasConstraintName("FK_owner_salon_information");
             });
 
+            var timeOnlyConverter = new ValueConverter<TimeOnly, string>(
+                v => v.ToString("HH:mm:ss"),
+                v => TimeOnly.Parse(v)
+            );
+
             modelBuilder.Entity<Schedule>(entity =>
             {
                 entity.ToTable("schedule");
@@ -164,8 +170,8 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
                 entity.Property(e => e.Date).HasColumnName("date");
-                entity.Property(e => e.StartTime).HasColumnName("start_time");
-                entity.Property(e => e.EndTime).HasColumnName("end_time");
+                entity.Property(e => e.StartTime).HasColumnName("start_time").HasConversion(timeOnlyConverter);
+                entity.Property(e => e.EndTime).HasColumnName("end_time").HasConversion(timeOnlyConverter);
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
                 entity.HasOne(d => d.SalonEmployee)

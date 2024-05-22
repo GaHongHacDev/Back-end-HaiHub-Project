@@ -14,7 +14,7 @@ namespace Hairhub.Domain.Dtos.Responses.Schedules
             
         }
 
-        public GetScheduleResponse(Guid id, Guid employeeId, DateTime? date, DateTime? startTime, DateTime? endTime, bool? isActive)
+        public GetScheduleResponse(Guid id, Guid employeeId, string? date, TimeOnly? startTime, TimeOnly? endTime, bool? isActive)
         {
             Id = id;
             EmployeeId = employeeId;
@@ -26,9 +26,9 @@ namespace Hairhub.Domain.Dtos.Responses.Schedules
 
         public Guid Id { get; set; }
         public Guid EmployeeId { get; set; }
-        public DateTime? Date { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
+        public string? Date { get; set; }
+        public TimeOnly? StartTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
         public bool? IsActive { get; set; }
         public SalonEmployeeResponse SalonEmployee { get; set; }
     }
