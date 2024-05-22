@@ -32,13 +32,12 @@
         {
             public const string AppointmentsEndpoint = ApiEndpoint + "/appointments";
         }
-<<<<<<< HEAD
-
 
         public static class Voucher
         {
             public const string VoucherEndpoint = ApiEndpoint + "/vouchers";
-=======
+
+        }
         public static class AppointmentDetail
         {
             public const string AppointmentDetailsEndpoint = ApiEndpoint + "/appointment_details";
@@ -47,7 +46,12 @@
         public static class Otp
         {
             public const string OtpsEndpoint = ApiEndpoint + "/otps";
->>>>>>> origin/master
         }
+
+        public static class Config
+        {
+            public const string ConfigEndpoint = ApiEndpoint + "/otps";
+        }
+
     }
-}
+    }

@@ -10,4 +10,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Requests\Config\" />
+    <Folder Include="Dtos\Responses\Config\" />
+  </ItemGroup>
+
 </Project>
