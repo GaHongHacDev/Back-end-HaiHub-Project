@@ -296,3 +296,6 @@ D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\MailKit.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\MimeKit.dll
 >>>>>>> origin/master
+D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\MailKit.dll
+D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\MimeKit.dll
