@@ -5316,11 +5316,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Hairhub.API.csproj",
+      "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
       "projectName": "Hairhub.API",
-      "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Hairhub.API.csproj",
+      "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
       "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-      "outputPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\obj\\",
+      "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -5341,14 +5341,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-              "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj"
+            "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+              "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
             },
-            "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
-              "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj"
+            "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
+              "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj"
             },
-            "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj": {
-              "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj"
+            "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+              "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
             }
           }
         }
