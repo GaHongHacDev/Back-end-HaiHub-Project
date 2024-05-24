@@ -7,6 +7,14 @@
       "RelativeMoniker": "D:0:0:{84AFFC63-E774-40CB-94BB-2391520F1A89}|Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj|solutionrelative:hairhub.infrastructure\\data\\haihubdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\demo\\back-end-haihub-project\\hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\demo\\back-end-haihub-project\\hairhub.api\\hairhub.api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\hairhub.api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\demo\\back-end-haihub-project\\hairhub.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -21,7 +29,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -53,20 +61,46 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\appsettings.json",
+              "RelativeDocumentMoniker": "Hairhub.API\\appsettings.json",
+              "ToolTip": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\appsettings.json",
+              "RelativeToolTip": "Hairhub.API\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-05-24T09:21:06.971Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Hairhub.API.http",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.http",
+              "RelativeDocumentMoniker": "Hairhub.API\\Hairhub.API.http",
+              "ToolTip": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.http",
+              "RelativeToolTip": "Hairhub.API\\Hairhub.API.http",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2024-05-24T09:21:05.696Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "HaiHubDbContext.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
               "RelativeDocumentMoniker": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
               "ToolTip": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
               "RelativeToolTip": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
-              "ViewState": "AQIAAA0AAAAAAAAAAAAxwB8AAAAhAAAA",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAqwBgAAABJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-05-24T03:59:34.088Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Program.cs",
               "RelativeDocumentMoniker": "Hairhub.API\\Program.cs",
@@ -78,7 +112,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "20240522093016_Init Database.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs",
               "RelativeDocumentMoniker": "..\\..\\Hairhub\\Hairhub.Infrastructure\\Migrations\\20240522093016_Init Database.cs",

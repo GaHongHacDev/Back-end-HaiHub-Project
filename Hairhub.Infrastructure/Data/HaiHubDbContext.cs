@@ -18,10 +18,16 @@ namespace Hairhub.Infrastructure
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            IConfiguration config = new ConfigurationBuilder()
+                           .SetBasePath(Directory.GetCurrentDirectory())
+                           .AddJsonFile("appsettings.json", true, true)
+                           .Build();
+            string cs = config["ConnectionStrings:DefaultConnectionString"];
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-8I9EILA\\GAHONGHAC;Database=HairHubDB;User Id=sa;Password=12345;TrustServerCertificate=True;");
+                optionsBuilder.UseSqlServer(cs);
             }
+
         }
 
         private string GetConnectionString()
