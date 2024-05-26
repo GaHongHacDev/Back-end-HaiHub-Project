@@ -296,3 +296,5 @@ D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\refint\H
 D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.pdb
 D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.genruntimeconfig.cache
 D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\ref\Hairhub.API.dll
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\CloudinaryDotNet.dll
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\Newtonsoft.Json.dll
