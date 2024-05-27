@@ -171,3 +171,5 @@
 2024-05-27 16:45:15.33 spid59      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
 2024-05-27 16:45:15.85 spid59      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
 2024-05-27 16:45:15.87 spid59      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:53:13.06 spid54      XE session 'telemetry_xevents' stopping.
+2024-05-27 16:53:13.08 spid54      XE session 'telemetry_xevents' started.
