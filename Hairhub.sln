@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hairhub.Infrastructure", "H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hairhub.Service", "Hairhub.Service\Hairhub.Service.csproj", "{347E6AA0-E53E-44A1-84CC-C0729DE37B49}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{74EF4CAD-A882-473C-98F9-27D9F2C562B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{347E6AA0-E53E-44A1-84CC-C0729DE37B49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{347E6AA0-E53E-44A1-84CC-C0729DE37B49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{347E6AA0-E53E-44A1-84CC-C0729DE37B49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74EF4CAD-A882-473C-98F9-27D9F2C562B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74EF4CAD-A882-473C-98F9-27D9F2C562B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74EF4CAD-A882-473C-98F9-27D9F2C562B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74EF4CAD-A882-473C-98F9-27D9F2C562B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

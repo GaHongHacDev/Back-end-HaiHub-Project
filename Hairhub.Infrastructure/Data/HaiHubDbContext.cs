@@ -22,7 +22,8 @@ namespace Hairhub.Infrastructure
                            .SetBasePath(Directory.GetCurrentDirectory())
                            .AddJsonFile("appsettings.json", true, true)
                            .Build();
-            string cs = config["ConnectionStrings:DefaultConnectionString"];
+            string cs = config["ConnectionStrings:DockerConnectionString"];
+            Console.WriteLine("***********************"+cs);
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer(cs);
@@ -30,15 +31,6 @@ namespace Hairhub.Infrastructure
 
         }
 
-        private string GetConnectionString()
-        {
-            IConfiguration config = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", true, true)
-                        .Build();
-            var strConn = config.GetConnectionString("DefaultConnectionString");
-            return strConn;
-        }
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }

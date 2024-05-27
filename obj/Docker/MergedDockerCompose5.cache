@@ -1,0 +1,73 @@
+name: dockercompose2585152138498544396
+services:
+  hairhub.api:
+    build:
+      context: D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project
+      dockerfile: Hairhub.API/Dockerfile
+    depends_on:
+      mssql:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+    image: hairhubapi
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\flami\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\flami\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  mssql:
+    container_name: mssql-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_DATA_DIR: /var/opt/mssql/data
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: Admin@123
+      MSSQL_TCP_PORT: "1433"
+    hostname: mssql-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1455"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\data
+        target: /var/opt/mssql/data
+        bind:
+          create_host_path: true
+      - type: bind
+        source: D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\log
+        target: /var/opt/mssql/log
+        bind:
+          create_host_path: true
+      - type: bind
+        source: D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\secrets
+        target: /var/opt/mssql/secrets
+        bind:
+          create_host_path: true
+networks:
+  default:
+    name: dockercompose2585152138498544396_default
