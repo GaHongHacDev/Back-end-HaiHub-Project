@@ -14,9 +14,6 @@ namespace Hairhub.Domain.Entitities
         public decimal? CommissionRate { get; set; }
         public decimal? MaintenanceFee { get; set; }
         public DateTime? DateCreate { get; set; }
-        public Guid AdminId { get; set; }
         public bool? IsActive { get; set; }
-
-        public virtual Admin Admin { get; set; }
     }
 }
