@@ -1,3 +1,4 @@
+
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.AppointmentDetails;
@@ -7,6 +8,8 @@ using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.SalonOwners;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
+using Hairhub.Domain.Dtos.Requests.Config;
+using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Appointments;
@@ -19,6 +22,8 @@ using Hairhub.Domain.Dtos.Responses.SalonOwners;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Feedbacks;
 using Hairhub.Domain.Dtos.Responses.Schedules;
+using Hairhub.Domain.Dtos.Responses.Config;
+using Hairhub.Domain.Dtos.Responses.Voucher;
 using Hairhub.Domain.Entitities;
 
 namespace Hairhub.Service.Helpers
@@ -27,41 +32,61 @@ namespace Hairhub.Service.Helpers
     {
         public AutoMapperProfile()
         {
-            //Account
-            CreateMap<CreateAccountRequest, Customer>().ReverseMap();
-            CreateMap<CreateAccountRequest, SalonOwner>().ReverseMap();
-            CreateMap<CreateAccountRequest, Account>().ReverseMap();
-            CreateMap<CreateAccountRequest, CreateAccountResponse>().ReverseMap();
-            
-            //Customer
-            CreateMap<GetCustomerResponse, Customer>().ReverseMap();
-            CreateMap<Customer, CustomerResponse>().ReverseMap();
+            //CreateMap<Region, RegionDto>().ReverseMap();
+            CreateMap<CreateAccountRequest, Customer>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.HumanId, opt => opt.MapFrom(src => src.HumanId))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BankAccount))
+                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName));
 
-            //Schedule
-            CreateMap<Schedule, GetScheduleResponse>().ReverseMap();
+            CreateMap<CreateAccountRequest, SalonOwner>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.HumanId, opt => opt.MapFrom(src => src.HumanId))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BankAccount))
+                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName));
 
-            CreateMap<SalonEmployee, SalonEmployeeResponseS>().ReverseMap();
+            CreateMap<CreateAccountResponse, SalonOwner>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.HumanId, opt => opt.MapFrom(src => src.HumanId))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BankAccount))
+                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName));
 
-            //Feedback
-            CreateMap<Feedback, GetFeedbackResponse>().ReverseMap();
+            CreateMap<CreateAccountResponse, Customer>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.HumanId, opt => opt.MapFrom(src => src.HumanId))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BankAccount))
+                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName));
 
-            CreateMap<Customer, CustomerResponseF>().ReverseMap();
+            CreateMap<CreateAccountRequest, Account>()
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password));
 
-            CreateMap<AppointmentDetail, AppointmentDetailResponseF>().ReverseMap();
+            CreateMap<CreateAccountResponse, Account>()
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password));
+            CreateMap<UpdateAccountRequest, UpdateAccountRequest>();
 
-            //AppointmentDetailVoucher
-            CreateMap<AppointmentDetailVoucher, GetAppointmentDetailVoucherResponse>().ReverseMap();
+            CreateMap<CreateVoucherRequest, Voucher>();
+            CreateMap<Voucher, CreateVoucherResponse>();
+            CreateMap<UpdateVoucherRequest, Voucher>();
+            CreateMap<Voucher, UpdateVoucherResponse>();
 
-            CreateMap<Voucher, VoucherResponseA>().ReverseMap();
-
-            CreateMap<Appointment, AppointmentResponseA>().ReverseMap();
-
-            //Appointment
-            CreateMap<GetAppointmentResponse, Appointment>().ReverseMap();
-            CreateMap<CreateAppointmentRequest, Appointment>().ReverseMap();
-            CreateMap<CreateAppointmentResponse, Appointment>().ReverseMap();
-            CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap();
-            CreateMap<AppointmentDetailRequest, AppointmentDetail>().ReverseMap();
 
             //SalonOwner
             CreateMap<GetSalonOwnerResponse, SalonOwner>().ReverseMap();
@@ -90,16 +115,12 @@ namespace Hairhub.Service.Helpers
             //OTP
             CreateMap<SendOtpEmailRequest, OTP>().ReverseMap();
             CreateMap<SendOtpEmailResponse, OTP>().ReverseMap();
+            CreateMap<CreateConfigRequest, Config>();
+            CreateMap<Config, CreateConfigResponse>();
+            CreateMap<UpdateConfigRequest, Config>();
+            CreateMap<Config, UpdateConfigResponse>();
 
-            //AppointmentDetail
-            CreateMap<ServiceHairResponse, ServiceHair>().ReverseMap();
-            CreateMap<AppointmentResponse, Appointment>().ReverseMap();
-            CreateMap<SalonEmployeeResponse, SalonEmployee>().ReverseMap();
-            CreateMap<GetAppointmentDetailResponse, AppointmentDetail>().ReverseMap();
-            CreateMap<CreateAppointmentDetailRequest, AppointmentDetail>().ReverseMap();
-            CreateMap<AppointmentDetail, CreateAppointmentDetailResponse>().ReverseMap();
-            CreateMap<UpdateAppointmentDetailRequest, AppointmentDetail>().ReverseMap();
-            CreateMap<GetAppointmentResponse, AppointmentDetail>().ReverseMap();
         }
     }
 }
+
