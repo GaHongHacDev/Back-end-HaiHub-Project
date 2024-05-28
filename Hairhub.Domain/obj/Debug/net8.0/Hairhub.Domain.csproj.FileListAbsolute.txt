@@ -24,3 +24,16 @@ D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairh
 D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\refint\Hairhub.Domain.dll
 D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.pdb
 D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\ref\Hairhub.Domain.dll
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\bin\Debug\net8.0\Hairhub.Domain.deps.json
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\bin\Debug\net8.0\Hairhub.Domain.dll
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\bin\Debug\net8.0\Hairhub.Domain.pdb
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.csproj.AssemblyReference.cache
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.AssemblyInfoInputs.cache
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.AssemblyInfo.cs
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.csproj.CoreCompileInputs.cache
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.sourcelink.json
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.dll
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\refint\Hairhub.Domain.dll
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\Hairhub.Domain.pdb
+D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Domain\obj\Debug\net8.0\ref\Hairhub.Domain.dll
