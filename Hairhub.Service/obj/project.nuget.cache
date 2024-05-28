@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "92nhyh65WBAVyLkvlptQrP4V+3JAWOSM4BXHkj0KG9LuKLqNkh5zjd2oR++gjvcsI51KxGwCd4yImxAq83eW6g==",
+  "dgSpecHash": "eOkFdXOM+7JiVeb7aOzJravYJHCLtFAmL24y//1RoiNwdeNo/Fnnv5AUAg4PWmj0sghu17LcP1FNVGfkFak8LQ==",
   "success": true,
-  "projectFilePath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj",
+  "projectFilePath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\flami\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\flami\\.nuget\\packages\\bouncycastle.cryptography\\2.3.1\\bouncycastle.cryptography.2.3.1.nupkg.sha512",

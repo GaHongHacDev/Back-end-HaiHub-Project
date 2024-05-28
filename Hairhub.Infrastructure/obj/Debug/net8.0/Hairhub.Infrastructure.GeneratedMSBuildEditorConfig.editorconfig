@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Hairhub.Infrastructure
-build_property.ProjectDir = D:\Ky8\Exe201\Hairhub\Hairhub.Infrastructure\
+build_property.ProjectDir = D:\Ky8\Exe201\Demo\Back-end-HaiHub-Project\Hairhub.Infrastructure\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
