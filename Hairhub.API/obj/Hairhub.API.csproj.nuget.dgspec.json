@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {}
+    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {}
   },
   "projects": {
-    "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {
+    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
         "projectName": "Hairhub.API",
-        "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.API\\obj\\",
+        "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
+        "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
+        "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,21 +26,20 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               },
-              "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
-                "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj"
+              "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj"
               },
-              "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
-                "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
+              "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
               }
             }
           }
@@ -49,6 +48,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -95,24 +99,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
         "projectName": "Hairhub.Domain",
-        "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
+        "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
+        "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -121,7 +125,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -134,6 +137,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -161,24 +169,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
+    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
         "projectName": "Hairhub.Infrastructure",
-        "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
+        "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
+        "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -187,18 +195,17 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               },
-              "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
-                "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
+              "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
               }
             }
           }
@@ -207,6 +214,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -254,24 +266,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
         "projectName": "Hairhub.Service",
-        "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Service\\obj\\",
+        "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
+        "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
+        "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -280,15 +292,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "D:\\FPT\\Sum2024\\EXE201\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               }
             }
           }
@@ -297,6 +308,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -352,7 +368,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
