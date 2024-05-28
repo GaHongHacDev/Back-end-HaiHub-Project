@@ -27,6 +27,10 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<IAppointmentDetailService, AppointmentDetailService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IAppointmentDetailVoucherService, AppointmentDetailVoucherService>();
             services.AddScoped<IMediaService, MediaService>();
             return services;
         }

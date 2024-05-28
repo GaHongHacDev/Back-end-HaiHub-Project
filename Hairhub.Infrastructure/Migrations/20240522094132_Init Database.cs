@@ -6,11 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hairhub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDB : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "config",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    commission_rate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    maintenance_fee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    date_create = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    is_active = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_config", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "otp",
                 columns: table => new
@@ -143,27 +158,6 @@ namespace Hairhub.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "config",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    commission_rate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    maintenance_fee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    date_create = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    admin_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    is_active = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_config", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_admin_config",
-                        column: x => x.admin_id,
-                        principalTable: "admin",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "appointment",
                 columns: table => new
                 {
@@ -171,6 +165,8 @@ namespace Hairhub.Infrastructure.Migrations
                     date = table.Column<DateTime>(type: "datetime2", nullable: true),
                     total_price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    original_price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    discounted_price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -209,13 +205,13 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    address = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
-                    email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    address = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     end_operational_hours = table.Column<DateTime>(type: "datetime2", nullable: true),
                     start_operational_hours = table.Column<DateTime>(type: "datetime2", nullable: true),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     img = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    business_license = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -240,7 +236,6 @@ namespace Hairhub.Infrastructure.Migrations
                     email = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     address = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    human_id = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                     img = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true)
                 },
@@ -263,6 +258,7 @@ namespace Hairhub.Infrastructure.Migrations
                     service_name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    img = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -280,23 +276,23 @@ namespace Hairhub.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalonInformationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MinimumOrderAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsSystemCreated = table.Column<bool>(type: "bit", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true)
+                    salon_information_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    code = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    minimum_order_amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    discount_percentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    expiry_date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    modified_date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    is_system_created = table.Column<bool>(type: "bit", nullable: true),
+                    is_active = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_voucher", x => x.id);
                     table.ForeignKey(
-                        name: "FK_voucher_salon_information_SalonInformationId",
-                        column: x => x.SalonInformationId,
+                        name: "FK_voucher_salon_information_salon_information_id",
+                        column: x => x.salon_information_id,
                         principalTable: "salon_information",
                         principalColumn: "id");
                 });
@@ -305,16 +301,16 @@ namespace Hairhub.Infrastructure.Migrations
                 name: "schedule",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     employee_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    start_time = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    end_time = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    date = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    start_time = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    end_time = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_schedule", x => x.id);
+                    table.PrimaryKey("PK_schedule", x => x.Id);
                     table.ForeignKey(
                         name: "FK_employee_schedule",
                         column: x => x.employee_id,
@@ -333,8 +329,6 @@ namespace Hairhub.Infrastructure.Migrations
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     date = table.Column<DateTime>(type: "datetime2", nullable: true),
                     time = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    original_price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    discounted_price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     status = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -365,7 +359,8 @@ namespace Hairhub.Infrastructure.Migrations
                     voucher_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     appointment_detail_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     applied_amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    applied_date = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    applied_date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -373,7 +368,7 @@ namespace Hairhub.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_appointment_detail_appointment_detail_voucher",
                         column: x => x.appointment_detail_id,
-                        principalTable: "appointment_detail",
+                        principalTable: "appointment",
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_voucher_appointment_detail_voucher",
@@ -449,11 +444,6 @@ namespace Hairhub.Infrastructure.Migrations
                 column: "voucher_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_config_admin_id",
-                table: "config",
-                column: "admin_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_customer_account_id",
                 table: "customer",
                 column: "account_id");
@@ -499,14 +489,17 @@ namespace Hairhub.Infrastructure.Migrations
                 column: "salon_information_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_voucher_SalonInformationId",
+                name: "IX_voucher_salon_information_id",
                 table: "voucher",
-                column: "SalonInformationId");
+                column: "salon_information_id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "admin");
+
             migrationBuilder.DropTable(
                 name: "appointment_detail_voucher");
 
@@ -527,9 +520,6 @@ namespace Hairhub.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "voucher");
-
-            migrationBuilder.DropTable(
-                name: "admin");
 
             migrationBuilder.DropTable(
                 name: "appointment_detail");

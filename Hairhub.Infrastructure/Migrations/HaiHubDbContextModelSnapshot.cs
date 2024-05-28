@@ -219,6 +219,9 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("appointment_detail_id");
 
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("VoucherId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("voucher_id");
@@ -518,9 +521,13 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Address")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
+
+                    b.Property<string>("BusinessLicense")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("business_license");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
@@ -539,8 +546,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("name");
 
                     b.Property<Guid?>("OwnerId")
@@ -628,27 +635,26 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2")
+                    b.Property<string>("Date")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("date");
 
                     b.Property<Guid?>("EmployeeId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("employee_id");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2")
+                    b.Property<string>("EndTime")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("end_time");
 
                     b.Property<bool?>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<DateTime?>("StartTime")
-                        .HasColumnType("datetime2")
+                    b.Property<string>("StartTime")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("start_time");
 
                     b.HasKey("Id");
