@@ -1,5 +1,6 @@
 ﻿using Hairhub.Domain.Entitities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,22 +17,21 @@ namespace Hairhub.Infrastructure
         {
 
         }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            IConfiguration config = new ConfigurationBuilder()
+                           .SetBasePath(Directory.GetCurrentDirectory())
+                           .AddJsonFile("appsettings.json", true, true)
+                           .Build();
+            string cs = config["ConnectionStrings:DockerConnectionString"];
+            Console.WriteLine("*********************" + cs);
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=LAPTOP-Q339A538\\SQLEXPRESS;Database=HairHubDB;User Id=sa;Password=123456;TrustServerCertificate=True;");
+                optionsBuilder.UseSqlServer(cs);
             }
-        }
 
-        private string GetConnectionString()
-        {
-            IConfiguration config = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", true, true)
-                        .Build();
-            var strConn = config.GetConnectionString("DefaultConnectionString");
-            return strConn;
         }
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }
@@ -174,17 +174,21 @@ namespace Hairhub.Infrastructure
                       .HasConstraintName("FK_owner_salon_information");
             });
 
+            var timeOnlyConverter = new ValueConverter<TimeOnly, string>(
+                v => v.ToString("HH:mm:ss"),
+                v => TimeOnly.Parse(v)
+            );
+
             modelBuilder.Entity<Schedule>(entity =>
             {
                 entity.ToTable("schedule");
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.EmployeeId).HasColumnName("employee_id").IsRequired(false);
-                entity.Property(e => e.Date).HasColumnName("date").IsRequired(false);
-                entity.Property(e => e.StartTime).HasColumnName("start_time").IsRequired(false);
-                entity.Property(e => e.EndTime).HasColumnName("end_time").IsRequired(false);
-                entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
+                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.Date).HasColumnName("date");
+                entity.Property(e => e.StartTime).HasColumnName("start_time").HasConversion(timeOnlyConverter);
+                entity.Property(e => e.EndTime).HasColumnName("end_time").HasConversion(timeOnlyConverter);
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
 
                 entity.HasOne(d => d.SalonEmployee)
                       .WithMany(p => p.Schedules)
