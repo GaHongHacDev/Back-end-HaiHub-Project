@@ -32,6 +32,24 @@
         {
             public const string AppointmentsEndpoint = ApiEndpoint + "/appointments";
         }
+        public static class SalonOwner
+        {
+            public const string SalonOwnersEndpoint = ApiEndpoint + "/salonowners";
+        }
+        public static class SalonEmployee
+        {
+            public const string SalonEmployeesEndpoint = ApiEndpoint + "/salonemployees";
+        }
+
+        public static class SalonInformation
+        {
+            public const string SalonInformationsEndpoint = ApiEndpoint + "/saloninformations";
+        }
+
+        public static class ServiceHair
+        {
+            public const string ServiceHairsEndpoint = ApiEndpoint + "/servicehairs";
+        }
         public static class AppointmentDetail
         {
             public const string AppointmentDetailsEndpoint = ApiEndpoint + "/appointment_details";

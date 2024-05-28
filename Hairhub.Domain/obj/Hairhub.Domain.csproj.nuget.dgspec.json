@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {}
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {}
   },
   "projects": {
-    "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+    "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "projectUniqueName": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
         "projectName": "Hairhub.Domain",
-        "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
-        "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-        "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
+        "projectPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Summer-2024\\EXE\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -70,7 +66,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
