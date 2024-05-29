@@ -6,8 +6,11 @@ using Hairhub.Domain.Dtos.Requests.Otps;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Appointments;
+using Hairhub.Domain.Dtos.Responses.AppointmentDetailVoucher;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Dtos.Responses.Otps;
+using Hairhub.Domain.Dtos.Responses.Feedbacks;
+using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
 
 namespace Hairhub.Service.Helpers
@@ -25,6 +28,25 @@ namespace Hairhub.Service.Helpers
             //Customer
             CreateMap<GetCustomerResponse, Customer>().ReverseMap();
             CreateMap<Customer, CustomerResponse>().ReverseMap();
+
+            //Schedule
+            CreateMap<Schedule, GetScheduleResponse>().ReverseMap();
+
+            CreateMap<SalonEmployee, SalonEmployeeResponseS>().ReverseMap();
+
+            //Feedback
+            CreateMap<Feedback, GetFeedbackResponse>().ReverseMap();
+
+            CreateMap<Customer, CustomerResponseF>().ReverseMap();
+
+            CreateMap<AppointmentDetail, AppointmentDetailResponseF>().ReverseMap();
+
+            //AppointmentDetailVoucher
+            CreateMap<AppointmentDetailVoucher, GetAppointmentDetailVoucherResponse>().ReverseMap();
+
+            CreateMap<Voucher, VoucherResponseA>().ReverseMap();
+
+            CreateMap<AppointmentDetail, AppointmentResponseA>().ReverseMap();
 
             //Appointment
             CreateMap<GetAppointmentResponse, Appointment>().ReverseMap();
