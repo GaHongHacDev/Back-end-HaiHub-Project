@@ -52,7 +52,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var isSuccessFull = await _scheduleService.CreateSchedue(request);
+                var isSuccessFull = await _scheduleService.CreateSchedule(request);
                 return Ok(isSuccessFull);
             } catch (Exception ex)
             {

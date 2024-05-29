@@ -17,6 +17,8 @@ namespace Hairhub.Infrastructure
         {
 
         }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             IConfiguration config = new ConfigurationBuilder()
@@ -24,14 +26,13 @@ namespace Hairhub.Infrastructure
                            .AddJsonFile("appsettings.json", true, true)
                            .Build();
             string cs = config["ConnectionStrings:DockerConnectionString"];
-            Console.WriteLine("***********************"+cs);
+            Console.WriteLine("*********************" + cs);
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer(cs);
             }
 
         }
-
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }
@@ -333,6 +334,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.ServiceName).HasColumnName("service_name").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false); 
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)").HasColumnName("price").IsRequired(false);
+                entity.Property(e => e.Time).HasColumnType("decimal(18, 2)").HasColumnName("time").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
