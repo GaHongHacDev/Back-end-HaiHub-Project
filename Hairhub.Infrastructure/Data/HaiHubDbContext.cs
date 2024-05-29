@@ -17,23 +17,21 @@ namespace Hairhub.Infrastructure
         {
 
         }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            IConfiguration config = new ConfigurationBuilder()
+                           .SetBasePath(Directory.GetCurrentDirectory())
+                           .AddJsonFile("appsettings.json", true, true)
+                           .Build();
+            string cs = config["ConnectionStrings:DockerConnectionString"];
+            Console.WriteLine("*********************" + cs);
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-OMHLRPO\\TRUNGTUAN;Database=HairHubDB;User Id=sa;Password=12345;TrustServerCertificate=True;");
-
+                optionsBuilder.UseSqlServer(cs);
             }
-        }
 
-        private string GetConnectionString()
-        {
-            IConfiguration config = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", true, true)
-                        .Build();
-            var strConn = config.GetConnectionString("DefaultConnectionString");
-            return strConn;
         }
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }

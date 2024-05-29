@@ -50,6 +50,12 @@
         {
             public const string ServiceHairsEndpoint = ApiEndpoint + "/servicehairs";
         }
+
+        public static class Voucher
+        {
+            public const string VoucherEndpoint = ApiEndpoint + "/vouchers";
+
+        }
         public static class AppointmentDetail
         {
             public const string AppointmentDetailsEndpoint = ApiEndpoint + "/appointment_details";
@@ -82,5 +88,11 @@
         {
             public const string OtpsEndpoint = ApiEndpoint + "/otps";
         }
+
+        public static class Config
+        {
+            public const string ConfigEndpoint = ApiEndpoint + "/otps";
+        }
+
     }
-}
+    }

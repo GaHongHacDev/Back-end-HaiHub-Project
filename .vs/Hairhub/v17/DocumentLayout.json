@@ -54,8 +54,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -64,7 +68,7 @@
               "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
               "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAuwAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-05-29T09:54:02.352Z",
               "EditorCaption": ""
@@ -79,8 +83,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonOwners\\CreateSalonOwnerResponse.cs",
               "ViewState": "AQIAAAMAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:53:51.941Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:53:51.941Z"
             },
             {
               "$type": "Document",
@@ -92,8 +95,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\UpdateSalonInformationRequest.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAArAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:53:36.278Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:53:36.278Z"
             },
             {
               "$type": "Document",
@@ -105,12 +107,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\CreateSalonInformationRequest.cs",
               "ViewState": "AQIAAAwAAAAAAAAAAAA1wBMAAAArAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:51:34.009Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+              "WhenOpened": "2024-05-29T09:51:34.009Z"
             },
             {
               "$type": "Document",
@@ -122,8 +119,7 @@
               "RelativeToolTip": "Hairhub.Service\\Services\\Services\\ScheduleService.cs",
               "ViewState": "AQIAAFQAAAAAAAAAAAAowAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:51:58.508Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:51:58.508Z"
             },
             {
               "$type": "Document",
@@ -135,8 +131,7 @@
               "RelativeToolTip": "Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
               "ViewState": "AQIAABgAAAAAAAAAAAAYwCQAAABuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:50:49.2Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:50:49.2Z"
             },
             {
               "$type": "Document",
@@ -148,8 +143,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\CreateSalonEmployeeResponse.cs",
               "ViewState": "AQIAAAsAAAAAAAAAAAAAwAoAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:45:29.386Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:45:29.386Z"
             },
             {
               "$type": "Document",
@@ -161,8 +155,7 @@
               "RelativeToolTip": "Hairhub.Service\\Services\\Services\\SalonEmployeeService.cs",
               "ViewState": "AQIAABcAAAAAAAAAAAAAwCYAAACjAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:50:15.217Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:50:15.217Z"
             },
             {
               "$type": "Document",
@@ -174,8 +167,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\GetSalonEmployeeResponse.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:49:57.929Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:49:57.929Z"
             },
             {
               "$type": "Document",
@@ -187,8 +179,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\UpdateSalonEmployeeRequest.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:45:15.22Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:45:15.22Z"
             },
             {
               "$type": "Document",
@@ -200,8 +191,7 @@
               "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\CreateSalonEmployeeRequest.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-29T09:45:07.739Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-05-29T09:45:07.739Z"
             }
           ]
         }

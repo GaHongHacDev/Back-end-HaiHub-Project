@@ -1,3 +1,4 @@
+
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.AppointmentDetails;
@@ -20,6 +21,10 @@ using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Feedbacks;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Dtos.Requests.Config;
+using Hairhub.Domain.Dtos.Requests.Voucher;
+using Hairhub.Domain.Dtos.Responses.Config;
+using Hairhub.Domain.Dtos.Responses.Voucher;
 
 namespace Hairhub.Service.Helpers
 {
@@ -100,6 +105,19 @@ namespace Hairhub.Service.Helpers
             CreateMap<AppointmentDetail, CreateAppointmentDetailResponse>().ReverseMap();
             CreateMap<UpdateAppointmentDetailRequest, AppointmentDetail>().ReverseMap();
             CreateMap<GetAppointmentResponse, AppointmentDetail>().ReverseMap();
+
+            //Voucher
+            CreateMap<CreateVoucherRequest, Voucher>();
+            CreateMap<Voucher, CreateVoucherResponse>();
+            CreateMap<UpdateVoucherRequest, Voucher>();
+            CreateMap<Voucher, UpdateVoucherResponse>();
+
+            //Config
+            CreateMap<CreateConfigRequest, Config>();
+            CreateMap<Config, CreateConfigResponse>();
+            CreateMap<UpdateConfigRequest, Config>();
+            CreateMap<Config, UpdateConfigResponse>();
         }
     }
 }
+
