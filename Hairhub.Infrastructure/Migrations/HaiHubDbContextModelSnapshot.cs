@@ -695,6 +695,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("service_name");
 
+                    b.Property<decimal?>("Time")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("time");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SalonInformationId");

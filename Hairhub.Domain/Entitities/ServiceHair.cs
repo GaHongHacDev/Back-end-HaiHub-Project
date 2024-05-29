@@ -16,6 +16,7 @@ namespace Hairhub.Domain.Entitities
         public string? Description { get; set; }
         public decimal? Price { get; set; }
         public string? Img { get; set; }
+        public decimal? Time { get; set; }
         public bool? IsActive { get; set; }
 
         public virtual SalonInformation SalonInformation { get; set; }

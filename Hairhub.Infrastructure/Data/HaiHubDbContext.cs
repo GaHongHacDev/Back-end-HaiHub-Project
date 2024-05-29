@@ -334,6 +334,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.ServiceName).HasColumnName("service_name").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false); 
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)").HasColumnName("price").IsRequired(false);
+                entity.Property(e => e.Time).HasColumnType("decimal(18, 2)").HasColumnName("time").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
