@@ -4838,40 +4838,19 @@
     ]
   },
   "packageFolders": {
-<<<<<<< HEAD
     "C:\\Users\\duong\\.nuget\\packages\\": {}
-=======
-    "C:\\Users\\flami\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
->>>>>>> f023a7cf76c7ba7290d18d1165ef213bcf0c971c
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
       "projectName": "Hairhub.Infrastructure",
       "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
       "packagesPath": "C:\\Users\\duong\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
-=======
-      "projectUniqueName": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
-      "projectName": "Hairhub.Infrastructure",
-      "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-      "outputPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
->>>>>>> f023a7cf76c7ba7290d18d1165ef213bcf0c971c
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-<<<<<<< HEAD
         "C:\\Users\\duong\\AppData\\Roaming\\NuGet\\NuGet.Config",
-=======
-        "C:\\Users\\flami\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
->>>>>>> f023a7cf76c7ba7290d18d1165ef213bcf0c971c
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4885,19 +4864,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-<<<<<<< HEAD
             "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
               "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
             },
             "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
               "projectPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
-=======
-            "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-              "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
-            },
-            "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
-              "projectPath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
->>>>>>> f023a7cf76c7ba7290d18d1165ef213bcf0c971c
             }
           }
         }
@@ -4958,12 +4929,16 @@
             "privateAssets": "all"
           }
         },
-<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
-=======
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
->>>>>>> f023a7cf76c7ba7290d18d1165ef213bcf0c971c
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

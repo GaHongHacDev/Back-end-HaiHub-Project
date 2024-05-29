@@ -295,7 +295,6 @@ D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\ref\H
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\MailKit.dll
 D:\Ky8\Exe201\Hairhub\Hairhub.API\bin\Debug\net8.0\MimeKit.dll
-<<<<<<< HEAD
 D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\appsettings.Development.json
 D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\appsettings.json
 D:\Summer-2024\EXE\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\Hairhub.API.exe
@@ -594,7 +593,6 @@ C:\Users\duong\Documents\EXE201\clone\Back-end-HaiHub-Project\Hairhub.API\obj\De
 C:\Users\duong\Documents\EXE201\clone\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.pdb
 C:\Users\duong\Documents\EXE201\clone\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.genruntimeconfig.cache
 C:\Users\duong\Documents\EXE201\clone\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\ref\Hairhub.API.dll
-=======
 >>>>>>> origin/master
 D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
 D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\MailKit.dll
