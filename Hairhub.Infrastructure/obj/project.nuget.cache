@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mpRsOu/gDcrkQ+/S/Wd8CXqr7bSYThlXGL19/YjU56ws/4/u9YKXwm4JtGzfAto1Nd67syTdvNZBh7IpfQYcIQ==",
+  "dgSpecHash": "4QLIuaa0JHxf42iK0MY7YJ9zUZFhnaZ3GbMyWuqdZ7htR0XrG7YiSzalT/lxNVmGdm7k9mRD1KACwmvcdUH6xA==",
   "success": true,
-  "projectFilePath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+  "projectFilePath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\flami\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\flami\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
@@ -151,12 +151,5 @@
     "C:\\Users\\flami\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\flami\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  "logs": []
 }
