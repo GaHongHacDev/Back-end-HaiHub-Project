@@ -20,7 +20,5 @@ namespace Hairhub.Domain.Dtos.Requests.SalonOwners
         public string? Img { get; set; }
         public string? BankAccount { get; set; }
         public string? BankName { get; set; }
-
-        public Account Account { get; set; }
     }
 }

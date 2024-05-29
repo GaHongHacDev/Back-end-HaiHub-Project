@@ -18,7 +18,5 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
         public string? Description { get; set; }
         public string? Img { get; set; }
         public bool? IsActive { get; set; }
-
-        public virtual SalonOwner SalonOwner { get; set; }
     }
 }

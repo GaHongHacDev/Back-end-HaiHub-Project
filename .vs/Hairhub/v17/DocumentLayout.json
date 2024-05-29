@@ -1,22 +1,50 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Ky8\\Exe201\\Hairhub\\",
+  "WorkspaceRootPath": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\responses\\saloninformations\\createsaloninformationresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\saloninformations\\createsaloninformationresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.domain\\dtos\\requests\\otps\\checkotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\requests\\otps\\checkotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\responses\\salonowners\\createsalonownerresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\salonowners\\createsalonownerresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\controllers\\otpcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\controllers\\otpcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\responses\\salonemployees\\createsalonemployeeresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\salonemployees\\createsalonemployeeresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\iservices\\iemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\iservices\\iemailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\requests\\saloninformations\\updatesaloninformationrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\requests\\saloninformations\\updatesaloninformationrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\requests\\saloninformations\\createsaloninformationrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\requests\\saloninformations\\createsaloninformationrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.service\\services\\services\\scheduleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\scheduleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.service\\services\\services\\saloninformationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\saloninformationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.service\\services\\services\\salonemployeeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\salonemployeeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\responses\\salonemployees\\getsalonemployeeresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\salonemployees\\getsalonemployeeresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\requests\\salonemployees\\updatesalonemployeerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\requests\\salonemployees\\updatesalonemployeerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|c:\\users\\duong\\documents\\exe201\\clone\\back-end-haihub-project\\hairhub.domain\\dtos\\requests\\salonemployees\\createsalonemployeerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\requests\\salonemployees\\createsalonemployeerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,62 +54,153 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CreateSalonInformationResponse.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonInformations\\CreateSalonInformationResponse.cs",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:54:02.352Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CreateSalonOwnerResponse.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonOwners\\CreateSalonOwnerResponse.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\SalonOwners\\CreateSalonOwnerResponse.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonOwners\\CreateSalonOwnerResponse.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonOwners\\CreateSalonOwnerResponse.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:53:51.941Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UpdateSalonInformationRequest.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\UpdateSalonInformationRequest.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\UpdateSalonInformationRequest.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\UpdateSalonInformationRequest.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\UpdateSalonInformationRequest.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAArAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:53:36.278Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CreateSalonInformationRequest.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\CreateSalonInformationRequest.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\CreateSalonInformationRequest.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\CreateSalonInformationRequest.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonInformations\\CreateSalonInformationRequest.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAA1wBMAAAArAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:51:34.009Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ScheduleService.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\ScheduleService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\ScheduleService.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\ScheduleService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\ScheduleService.cs",
+              "ViewState": "AQIAAFQAAAAAAAAAAAAowAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:51:58.508Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SalonInformationService.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\SalonInformationService.cs",
+              "ViewState": "AQIAABgAAAAAAAAAAAAYwCQAAABuAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:50:49.2Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "OtpController.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Controllers\\OtpController.cs",
-              "RelativeDocumentMoniker": "Hairhub.API\\Controllers\\OtpController.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Controllers\\OtpController.cs",
-              "RelativeToolTip": "Hairhub.API\\Controllers\\OtpController.cs",
-              "ViewState": "AQIAABgAAAAAAAAAAADwvygAAABMAAAA",
+              "Title": "CreateSalonEmployeeResponse.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\CreateSalonEmployeeResponse.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\CreateSalonEmployeeResponse.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\CreateSalonEmployeeResponse.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\CreateSalonEmployeeResponse.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAAwAoAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-19T19:19:39.584Z",
+              "WhenOpened": "2024-05-29T09:45:29.386Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IEmailService.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\IServices\\IEmailService.cs",
-              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\IServices\\IEmailService.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\IServices\\IEmailService.cs",
-              "RelativeToolTip": "Hairhub.Service\\Services\\IServices\\IEmailService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAZAAAA",
+              "DocumentIndex": 7,
+              "Title": "SalonEmployeeService.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\SalonEmployeeService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\SalonEmployeeService.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Service\\Services\\Services\\SalonEmployeeService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\SalonEmployeeService.cs",
+              "ViewState": "AQIAABcAAAAAAAAAAAAAwCYAAACjAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-19T19:16:47.37Z",
+              "WhenOpened": "2024-05-29T09:50:15.217Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CheckOtpRequest.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
-              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
-              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\Otps\\CheckOtpRequest.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAqwAkAAAAgAAAA",
+              "DocumentIndex": 8,
+              "Title": "GetSalonEmployeeResponse.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\GetSalonEmployeeResponse.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\GetSalonEmployeeResponse.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\GetSalonEmployeeResponse.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\SalonEmployees\\GetSalonEmployeeResponse.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-19T19:08:21.759Z",
+              "WhenOpened": "2024-05-29T09:49:57.929Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "EmailService.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\EmailService.cs",
-              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\EmailService.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\EmailService.cs",
-              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\EmailService.cs",
-              "ViewState": "AQIAAFQAAAAAAAAAAAAQwF4AAAAhAAAA",
+              "DocumentIndex": 9,
+              "Title": "UpdateSalonEmployeeRequest.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\UpdateSalonEmployeeRequest.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\UpdateSalonEmployeeRequest.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\UpdateSalonEmployeeRequest.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\UpdateSalonEmployeeRequest.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-19T19:04:02.102Z",
+              "WhenOpened": "2024-05-29T09:45:15.22Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "CreateSalonEmployeeRequest.cs",
+              "DocumentMoniker": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\CreateSalonEmployeeRequest.cs",
+              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\CreateSalonEmployeeRequest.cs",
+              "ToolTip": "C:\\Users\\duong\\Documents\\EXE201\\clone\\Back-end-HaiHub-Project\\Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\CreateSalonEmployeeRequest.cs",
+              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Requests\\SalonEmployees\\CreateSalonEmployeeRequest.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-29T09:45:07.739Z",
               "EditorCaption": ""
             }
           ]

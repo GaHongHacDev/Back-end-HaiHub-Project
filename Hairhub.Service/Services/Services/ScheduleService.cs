@@ -60,7 +60,7 @@ namespace Hairhub.Service.Services.Services
             return scheduleResponse;
         }
 
-        public async Task<bool> CreateSchedue(CreateScheduleRequest request)
+        public async Task<bool> CreateSchedule(CreateScheduleRequest request)
         {
             Schedule newSchedule = new Schedule()
             {
