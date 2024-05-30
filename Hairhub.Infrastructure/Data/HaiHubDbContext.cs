@@ -25,7 +25,7 @@ namespace Hairhub.Infrastructure
                            .SetBasePath(Directory.GetCurrentDirectory())
                            .AddJsonFile("appsettings.json", true, true)
                            .Build();
-            string cs = config["ConnectionStrings:DockerConnectionString"];
+            string cs = config["ConnectionStrings:DefaultConnectionString"];
             Console.WriteLine("*********************" + cs);
             if (!optionsBuilder.IsConfigured)
             {
@@ -49,6 +49,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<Admin> admins { get; set; }
         public virtual DbSet<Payment> payments { get; set; }
         public virtual DbSet<Config> configs { get; set; }
+        public virtual DbSet<ServiceEmployee> ServiceEmployees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -149,6 +150,42 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.SalonInformationId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_salon_information_salon_employee");
+            });
+
+            modelBuilder.Entity<ServiceEmployee>(entity =>
+            {
+                entity.ToTable("service_employee");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.SalonEmployeeId).HasColumnName("salon_employee_id").IsRequired(false);
+                entity.Property(e => e.ServiceHairId).HasColumnName("service_hair_id").IsRequired(false);
+
+                entity.HasOne(d => d.SalonEmployee)
+                      .WithMany(p => p.ServiceEmployees)
+                      .HasForeignKey(d => d.SalonEmployeeId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_salon_employee_service_employee");
+
+                entity.HasOne(d => d.ServiceHair)
+                      .WithMany(p => p.ServiceEmployees)
+                      .HasForeignKey(d => d.ServiceHairId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_service_hair_service_employee");
+            });
+
+            modelBuilder.Entity<ServiceHair>(entity =>
+            {
+                entity.ToTable("service_hair");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.ServiceName).HasColumnName("service_name").IsRequired(false);
+                entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
+                entity.Property(e => e.Price).HasColumnType("decimal(18, 2)").HasColumnName("price").IsRequired(false);
+                entity.Property(e => e.Time).HasColumnType("decimal(18, 2)").HasColumnName("time").IsRequired(false);
+                entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
+                entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
             });
 
             modelBuilder.Entity<SalonInformation>(entity =>
@@ -252,8 +289,8 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.ServiceHairId).HasColumnName("service_hair_id").IsRequired(false);
                 entity.Property(e => e.AppointmentId).HasColumnName("appointment_id").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
-                entity.Property(e => e.Date).HasColumnName("date").IsRequired(false);
-                entity.Property(e => e.Time).HasColumnName("time").IsRequired(false);
+                entity.Property(e => e.StartTime).HasColumnName("start_time").IsRequired(false);
+                entity.Property(e => e.EndTime).HasColumnName("end_time").IsRequired(false);
                 entity.Property(e => e.Status).HasColumnName("status").IsRequired(false);
 
                 entity.HasOne(d => d.SalonEmployee)
@@ -322,27 +359,6 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.AppointmentDetailId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_appointment_detail_feedback");
-            });
-
-            modelBuilder.Entity<ServiceHair>(entity =>
-            {
-                entity.ToTable("service_hair");
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
-                entity.Property(e => e.ServiceName).HasColumnName("service_name").IsRequired(false);
-                entity.Property(e => e.Description).HasColumnName("description").IsRequired(false); 
-                entity.Property(e => e.Price).HasColumnType("decimal(18, 2)").HasColumnName("price").IsRequired(false);
-                entity.Property(e => e.Time).HasColumnType("decimal(18, 2)").HasColumnName("time").IsRequired(false);
-                entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
-                entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
-
-                entity.HasOne(d => d.SalonInformation)
-                  .WithMany(p => p.ServiceHairs)
-                  .HasForeignKey(d => d.SalonInformationId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_salon_information_service_hair");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
