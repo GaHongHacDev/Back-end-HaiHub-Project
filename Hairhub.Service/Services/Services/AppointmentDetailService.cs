@@ -143,5 +143,49 @@ namespace Hairhub.Service.Services.Services
         }
         #endregion
 
+        /*
+        public async Task<AvailableEmployeeResponse> AvailableEmployeeBooking(AvailableEmployeeRequest availableEmployeeRequest)
+        {
+            AvailableEmployeeResponse result = new AvailableEmployeeResponse();
+
+            var timeBook = availableEmployeeRequest.BookDate;
+            var salonId = availableEmployeeRequest.SalonId;
+            var listServiceId = availableEmployeeRequest.ServiceHairIds;
+            DateTime startTime;
+            DateTime endTime = timeBook;
+            var ListEmployee = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == salonId);
+
+            //filter employee mà giờ đó rảnh và có thể thực hiện được service (Service time)
+            for(int i=0; i< listServiceId.Count(); i++)
+            {
+                result.Results[i] = new AvailableBooking();
+                var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id == listServiceId[0]);
+                startTime = endTime;
+                endTime = startTime.AddHours((double)serviceHair.Time);
+                result.Results[i].salonEmployees = new List<SalonEmployee>();
+                //Search available employee
+                foreach (var item in ListEmployee)
+                {
+                    var appointmentCheck = await _unitOfWork.GetRepository<AppointmentDetail>().SingleOrDefaultAsync(
+                                    predicate: x => x.SalonEmployeeId == item.Id && (startTime < x.EndTime || endTime > x.StartTime) && x.SalonEmployee);
+                    if (appointmentCheck == null)
+                    {
+                        result.Results[i].salonEmployees.Add(item);
+                    }
+                }
+                result.Results[i].ServiceHair = serviceHair;
+                result.Results[i].StartTime = startTime;
+                result.Results[i].EndTime = endTime;
+                result.Results[i].IsAnyOne = (result.Results[i].salonEmployees.Count>1)?true:false;
+                //if (result.Results[i].salonEmployees.Count==0)
+                //{
+                //    var appointments = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                //                    predicate: x => x.Salon == item.Id && (startTime < x.EndTime || endTime > x.StartTime));
+                //}
+            }
+            
+            return result;
+        }
+        */
     }
 }
