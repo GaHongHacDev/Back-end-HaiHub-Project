@@ -35,6 +35,7 @@ namespace Hairhub.Infrastructure
         }
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }
         public virtual DbSet<SalonOwner> salonowners { get; set; }
         public virtual DbSet<SalonEmployee> salonemployees { get; set; }
@@ -84,8 +85,6 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Username).HasMaxLength(64).HasColumnName("username").IsRequired(false);
                 entity.Property(e => e.Password).HasMaxLength(32).HasColumnName("password").IsRequired(false);
                 entity.Property(e => e.RoleId).HasMaxLength(64).HasColumnName("role_id").IsRequired(false);
-                entity.Property(e => e.Token).HasMaxLength(100).HasColumnName("token").IsRequired(false);
-                entity.Property(e => e.RefeshToken).HasMaxLength(100).HasColumnName("refesh_token").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
                 entity.HasOne(d => d.Role)
@@ -93,6 +92,25 @@ namespace Hairhub.Infrastructure
                     .HasForeignKey(d => d.RoleId)
                      .OnDelete(DeleteBehavior.ClientSetNull)
                      .HasConstraintName("FK_role_acount");
+            });
+
+            modelBuilder.Entity<RefreshTokenAccount>(entity =>
+            {
+                entity.ToTable("refresh_token_account");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.AccessToken).HasMaxLength(64).HasColumnName("access_token");
+                entity.Property(e => e.RefreshToken).HasMaxLength(32).HasColumnName("refresh_token");
+                entity.Property(e => e.Expires).HasMaxLength(64).HasColumnName("expires");
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.AccountId).HasColumnName("account_id");
+
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.RefreshTokenAccounts)
+                    .HasForeignKey(d => d.AccountId)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_account_refresh_token_account");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -384,7 +402,6 @@ namespace Hairhub.Infrastructure
             {
                 entity.ToTable("admin");
                 entity.HasKey(e => e.Id);
-
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.AccountId).HasColumnName("account_id").IsRequired(false);

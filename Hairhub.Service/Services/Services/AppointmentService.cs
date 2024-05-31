@@ -139,5 +139,48 @@ namespace Hairhub.Service.Services.Services
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
         }
+
+        public async Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest request)
+        {
+            GetAvailableTimeResponse result = new GetAvailableTimeResponse();
+            if (!request.IsAnyOne)
+            {
+                //Xử lý khi có Employee cố định
+                List<decimal> TimeSlot = generateTimeSlot(8, 17, (decimal)0.25);
+                var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(
+                                                predicate: x => x.SalonInformationId == request.SalonId && x.Id == request.SalonEmployeeId);
+                if (employee == null)
+                {
+                    throw new NotFoundException("Employee not found in salon, baber shop!");
+                }
+                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                                    predicate: x=>x.SalonEmployeeId == request.SalonEmployeeId 
+                                                    && x.StartTime.Value.Date == request.Day.Date
+                                                    && x.EndTime.Value.Date == request.Day.Date);
+                foreach (var item in appointmentDetails)
+                {
+                    decimal start = (decimal)item.StartTime.Value.TimeOfDay.TotalHours;
+                    decimal end = (decimal)item.EndTime.Value.TimeOfDay.TotalHours;
+
+                    TimeSlot.RemoveAll(slot => slot >= start && slot < end);
+                }
+            }
+            else
+            {
+                //Xủ lý khi chọn employee nào cũng được
+            }
+            return result;
+        }
+
+        private List<decimal> generateTimeSlot(decimal begin, decimal end, decimal step)
+        {
+            int count = (int)((end - begin) / step) + 1;
+            List<decimal> array = new List<decimal>();
+            for (int i = 0; i < count; i++)
+            {
+                array.Add(begin + i * step);
+            }
+            return array;
+        }
     }
 }
