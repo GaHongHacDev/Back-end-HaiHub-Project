@@ -38,20 +38,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("password");
 
-                    b.Property<string>("RefeshToken")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("refesh_token");
-
                     b.Property<Guid?>("RoleId")
                         .HasMaxLength(64)
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
-
-                    b.Property<string>("Token")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("token");
 
                     b.Property<string>("Username")
                         .HasMaxLength(64)
@@ -438,6 +428,45 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("payment", (string)null);
+                });
+
+            modelBuilder.Entity("Hairhub.Domain.Entitities.RefreshTokenAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasColumnName("access_token");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTime>("Expires")
+                        .HasMaxLength(64)
+                        .HasColumnType("datetime2")
+                        .HasColumnName("expires");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)")
+                        .HasColumnName("refresh_token");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("refresh_token_account", (string)null);
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Role", b =>
@@ -887,6 +916,17 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.RefreshTokenAccount", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
+                        .WithMany("RefreshTokenAccounts")
+                        .HasForeignKey("AccountId")
+                        .IsRequired()
+                        .HasConstraintName("FK_account_refresh_token_account");
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonEmployee", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
@@ -958,6 +998,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Admins");
 
                     b.Navigation("Customers");
+
+                    b.Navigation("RefreshTokenAccounts");
 
                     b.Navigation("SalonOwners");
                 });
