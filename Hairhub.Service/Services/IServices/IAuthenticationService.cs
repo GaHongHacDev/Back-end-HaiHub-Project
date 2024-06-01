@@ -11,7 +11,7 @@ namespace Hairhub.Service.Services.IServices
     public interface IAuthenticationService
     {
         public Task<LoginResponse> Login(string userName, string password);
-        public Task<string> Logout(string token);
         public Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest);
+        public Task<bool> Logout(LogoutRequest logoutRequest);
     }
 }

@@ -17,6 +17,7 @@ using Hairhub.Domain.Dtos.Responses.Otps;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -105,6 +106,17 @@ namespace Hairhub.Service.Services.Services
                 return false;
             }
             return true;
+        }
+
+        public async Task<bool> CheckExistEmail(CheckExistEmailResrequest checkExistEmailResrequest)
+        {
+            var emailSalon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Email.ToLower().Equals(checkExistEmailResrequest.Email.ToLower()));
+            var emailCustomer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Email.ToLower().Equals(checkExistEmailResrequest.Email.ToLower()));
+            if (emailSalon != null || emailCustomer!=null)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -10,7 +10,6 @@ namespace Hairhub.Domain.Entitities
 {
     public class ServiceEmployee
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid? ServiceHairId { get; set; }
         public Guid? SalonEmployeeId { get; set; }

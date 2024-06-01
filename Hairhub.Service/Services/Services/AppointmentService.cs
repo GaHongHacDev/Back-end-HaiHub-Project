@@ -12,6 +12,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -146,13 +147,19 @@ namespace Hairhub.Service.Services.Services
             if (!request.IsAnyOne)
             {
                 //Xử lý khi có Employee cố định
-                List<decimal> TimeSlot = generateTimeSlot(8, 17, (decimal)0.25);
                 var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(
                                                 predicate: x => x.SalonInformationId == request.SalonId && x.Id == request.SalonEmployeeId);
                 if (employee == null)
                 {
                     throw new NotFoundException("Employee not found in salon, baber shop!");
                 }
+                var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
+                                                    predicate: x=>x.EmployeeId == employee.Id 
+                                                                && x.Date.Equals(request.Day.DayOfWeek.ToString()));
+                var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute/60;
+                var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute/60;
+                List<decimal> TimeSlot = generateTimeSlot(startSchedule, endSchedule, (decimal)0.25);
+  
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
                                                     predicate: x=>x.SalonEmployeeId == request.SalonEmployeeId 
                                                     && x.StartTime.Value.Date == request.Day.Date
@@ -164,10 +171,44 @@ namespace Hairhub.Service.Services.Services
 
                     TimeSlot.RemoveAll(slot => slot >= start && slot < end);
                 }
+                result.TimeAvailables = TimeSlot;
             }
             else
             {
                 //Xủ lý khi chọn employee nào cũng được
+                var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(
+                                                predicate: x => x.SalonInformationId == request.SalonId);
+                if (employees == null)
+                {
+                    throw new NotFoundException("Employee not found in salon, baber shop!");
+                }
+                List<decimal> TimeSlot = new List<decimal>();
+
+                foreach (var employee in employees)
+                {   // Get schedule by id
+                    var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
+                                    predicate: x => x.EmployeeId == employee.Id
+                                     && x.Date.Equals(request.Day.DayOfWeek.ToString()));
+                    //Get Time work of employee
+                    var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
+                    var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60;
+                    //Define List time work
+                    List<decimal> TimeSlotEmployee = generateTimeSlot(startSchedule, endSchedule, (decimal)0.25);
+                    //Get appointment detail => Check available time
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                                        predicate: x => x.SalonEmployeeId == request.SalonEmployeeId
+                                                        && x.StartTime.Value.Date == request.Day.Date
+                                                        && x.EndTime.Value.Date == request.Day.Date);
+                    foreach (var item in appointmentDetails)
+                    {
+                        decimal start = (decimal)item.StartTime.Value.TimeOfDay.TotalHours;
+                        decimal end = (decimal)item.EndTime.Value.TimeOfDay.TotalHours;
+
+                        TimeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                    }
+                    TimeSlot = TimeSlot.Union(TimeSlotEmployee).ToList();
+                }
+                result.TimeAvailables = TimeSlot;
             }
             return result;
         }

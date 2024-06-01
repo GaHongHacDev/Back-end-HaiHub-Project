@@ -57,20 +57,22 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult LogOut()
+        [HttpDelete]
+        public async Task<IActionResult> LogOut(LogoutRequest logoutRequest)
         {
-            // Đọc token từ header X-Auth-Token
-            var token = Request.Headers["X-Auth-Token"].FirstOrDefault();
-
-            if (string.IsNullOrEmpty(token))
+            try
             {
-                return BadRequest("Token is missing");
+                bool isLogout = await _authenticationService.Logout(logoutRequest);
+                if (!isLogout)
+                {
+                    return BadRequest("Cannot logout account!");
+                }
+                return Ok("Logout successfully!");
             }
-
-            _authenticationService.Logout(token);
-
-            return Ok();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

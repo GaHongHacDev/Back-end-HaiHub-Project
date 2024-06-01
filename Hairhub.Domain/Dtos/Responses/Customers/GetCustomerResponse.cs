@@ -13,7 +13,7 @@ namespace Hairhub.Domain.Dtos.Responses.Customers
             
         }
 
-        public GetCustomerResponse(Guid? id, Guid? accountId, string? fullName, DateTime? dayOfBirth, string? gender, string? email, string? phone, string? address, string? humanId, string? img, string? bankAccount, string? bankName)
+        public GetCustomerResponse(Guid? id, Guid? accountId, string? fullName, DateTime? dayOfBirth, string? gender, string? email, string? phone, string? address, string? img, string? bankAccount, string? bankName)
         {
             Id = id;
             AccountId = accountId;
@@ -23,7 +23,6 @@ namespace Hairhub.Domain.Dtos.Responses.Customers
             Email = email;
             Phone = phone;
             Address = address;
-            HumanId = humanId;
             Img = img;
             BankAccount = bankAccount;
             BankName = bankName;
@@ -37,7 +36,6 @@ namespace Hairhub.Domain.Dtos.Responses.Customers
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
-        public string? HumanId { get; set; }
         public string? Img { get; set; }
         public string? BankAccount { get; set; }
         public string? BankName { get; set; }
