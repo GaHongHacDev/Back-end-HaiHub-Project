@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "EZrTNXiJTOb4cYs1jb2gxLbhn57qUoEFga8gJAPrK/OA1A6wA2Lmq5UFzJJHw9f91CHUqZ7/cFxCTxx2ZluYDw==",
+  "dgSpecHash": "C0ycSEIoioTBx0psK+ZA1iE5w+k7FxbCqTrpqUkLjAn1+65eDS+yRQlxYkHu96caR0BubQoiKhyZWZvIVLs1Yw==",
   "success": true,
-  "projectFilePath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
+  "projectFilePath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\flami\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.4\\microsoft.entityframeworkcore.8.0.4.nupkg.sha512",
     "C:\\Users\\flami\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\8.0.4\\microsoft.entityframeworkcore.abstractions.8.0.4.nupkg.sha512",

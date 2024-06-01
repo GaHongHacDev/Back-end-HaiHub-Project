@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "G5lK7okW2foWQckC8PvlVczFgT3teVLyvD3+MmAGs1WQWAbcUHv/IpTVBdaMb66Y2QR8E7f5B/f36QQcDazTKw==",
+  "dgSpecHash": "wmbHIGKDhqWOziS8Gx+sw6BeWFUBqzLGSWzJX2CcAm1ghmP9p56BFIIqr1Hg2T51k52ij7L6OcUU5wNX8+zgeg==",
   "success": true,
-  "projectFilePath": "D:\\Ky8\\Exe201\\Demo\\Back-end-HaiHub-Project\\Hairhub.API\\Hairhub.API.csproj",
+  "projectFilePath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Hairhub.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\flami\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\flami\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
