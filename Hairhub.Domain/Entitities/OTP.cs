@@ -9,7 +9,6 @@ namespace Hairhub.Domain.Entitities
 {
     public class OTP
     {
-        [Key]
         public Guid Id { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }

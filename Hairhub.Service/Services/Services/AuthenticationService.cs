@@ -10,6 +10,7 @@ using Hairhub.Service.Services.IServices;
 using System.Security.Cryptography;
 using Hairhub.Domain.Dtos.Requests.Authentication;
 using Hairhub.Domain.Dtos.Responses.Authentication;
+using Hairhub.Domain.Exceptions;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -45,7 +46,7 @@ namespace Hairhub.Service.Services.Services
                 AccountId = user.Id,
                 Expires = DateTime.UtcNow.AddDays(30)
             });
-            bool isInsert = await _unitOfWork.CommitAsync()>0;
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
             if (isInsert)
             {
                 throw new Exception("Cannot insert token to DB");
@@ -55,15 +56,15 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)
         {
-            var refreshTokenEntity =await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
-                                                predicate: x=>x.RefreshToken == refreshTokenRequest.RefreshToken
+            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
+                                                predicate: x => x.RefreshToken == refreshTokenRequest.RefreshToken
                                                 && x.IsActive == true);
             if (refreshTokenEntity == null)
             {
                 throw new Exception("RefreshToken not found or expired");
             }
 
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == refreshTokenEntity.AccountId);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == refreshTokenEntity.AccountId);
             if (account == null)
             {
                 throw new Exception("Account not found or expired");
@@ -72,7 +73,7 @@ namespace Hairhub.Service.Services.Services
             var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
             refreshTokenEntity.AccessToken = accessToken;
             await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(refreshTokenEntity);
-            bool isUpdate = await _unitOfWork.CommitAsync()>0;
+            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (!isUpdate)
             {
                 throw new Exception("Cannot insert new access token to DB");
@@ -80,7 +81,7 @@ namespace Hairhub.Service.Services.Services
             return new RefreshTokenResponse() { AccessToken = accessToken };
         }
 
-        private String GenerateToken(String username, String roleName)
+        private string GenerateToken(string username, string roleName)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuaration["JWTSettings:Key"]);
@@ -110,9 +111,16 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<string> Logout(string token)
+        public async Task<bool> Logout(LogoutRequest logoutRequest)
         {
-            return "";
+            var refreshTokens = await _unitOfWork.GetRepository<RefreshTokenAccount>().GetListAsync(predicate: x => x.RefreshToken.Equals(logoutRequest.RefreshToken));
+            if (refreshTokens == null)
+            {
+                throw new NotFoundException("Refresh token not found!");
+            }
+            _unitOfWork.GetRepository<RefreshTokenAccount>().DeleteRangeAsync(refreshTokens);
+            bool isDelete = await _unitOfWork.CommitAsync()>0;
+            return isDelete;
         }
     }
 }

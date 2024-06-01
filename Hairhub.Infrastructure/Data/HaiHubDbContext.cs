@@ -156,10 +156,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
                 entity.Property(e => e.FullName).HasMaxLength(128).HasColumnName("full_name").IsRequired(false);
                 entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender").IsRequired(false);
-                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth").IsRequired(false);
-                entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email").IsRequired(false);
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone").IsRequired(false);
-                entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
@@ -215,8 +212,6 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.OwnerId).HasColumnName("owner_id").IsRequired(false);
                 entity.Property(e => e.Name).HasMaxLength(100).HasColumnName("name").IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address").IsRequired(false);
-                entity.Property(e => e.EndOperationalHours).HasColumnName("end_operational_hours").IsRequired(false);
-                entity.Property(e => e.StartOperationalHours).HasColumnName("start_operational_hours").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.BusinessLicense).HasColumnName("business_license").IsRequired(false);
@@ -239,7 +234,9 @@ namespace Hairhub.Infrastructure
                 entity.ToTable("schedule");
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.EmployeeId).HasColumnName("employee_id").IsRequired(false);
+                entity.Property(e => e.SalonId).HasColumnName("salon_id").IsRequired(false);
                 entity.Property(e => e.Date).HasColumnName("date");
                 entity.Property(e => e.StartTime).HasColumnName("start_time").HasConversion(timeOnlyConverter);
                 entity.Property(e => e.EndTime).HasColumnName("end_time").HasConversion(timeOnlyConverter);
@@ -250,6 +247,11 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.EmployeeId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_employee_schedule");
+                entity.HasOne(d => d.SalonInformation)
+                      .WithMany(p => p.Schedules)
+                      .HasForeignKey(d => d.SalonId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_salon_information_schedule");
             });
 
             modelBuilder.Entity<Customer>(entity =>
@@ -265,7 +267,6 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email").IsRequired(false);
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone").IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address").IsRequired(false);
-                entity.Property(e => e.HumanId).HasMaxLength(64).HasColumnName("human_id").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.BankAccount).HasMaxLength(64).HasColumnName("bank_account").IsRequired(false);
                 entity.Property(e => e.BankName).HasMaxLength(64).HasColumnName("bank_name").IsRequired(false);
@@ -362,7 +363,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.CustomerId).HasColumnName("customer_id").IsRequired(false);
                 entity.Property(e => e.AppointmentDetailId).HasColumnName("appointment_detail_id").IsRequired(false);
-                entity.Property(e => e.Rating).HasColumnName("rating").IsRequired(false); 
+                entity.Property(e => e.Rating).HasColumnName("rating").IsRequired(false);
                 entity.Property(e => e.Comment).HasMaxLength(256).HasColumnName("comment").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
@@ -385,7 +386,7 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
 
-                entity.Property(e => e.Id).HasColumnName("id").HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(256).IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);

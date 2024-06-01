@@ -8,6 +8,6 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
 {
     public class GetAvailableTimeResponse
     {
-        List<Decimal> TimeAvailables { get; set; }
+        public List<decimal> TimeAvailables { get; set; }
     }
 }
