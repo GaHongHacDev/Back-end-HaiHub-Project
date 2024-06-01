@@ -63,7 +63,7 @@ namespace Hairhub.Service.Services.Services
         {
             var serviceHairs = await _unitOfWork.GetRepository<ServiceHair>()
            .GetPagingListAsync(
-               include: query => query.Include(s => s.SalonInformation),
+               include: query => query.Include(s => s.ServiceEmployees),
                page: page,
                size: size
            );
@@ -85,7 +85,7 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<ServiceHair>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonInformation)
+                    include: source => source.Include(s => s.ServiceEmployees)
                  );
             if (serviceHairResponse == null)
                 return null;

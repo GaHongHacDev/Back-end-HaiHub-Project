@@ -9,13 +9,10 @@ namespace Hairhub.Domain.Entitities
 {
     public class SalonInformation
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid? OwnerId { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
-        public DateTime? EndOperationalHours { get; set; }
-        public DateTime? StartOperationalHours { get; set; }
         public string? Description { get; set; }
         public string? Img { get; set; }
         public string? BusinessLicense {  get; set; }
@@ -23,7 +20,7 @@ namespace Hairhub.Domain.Entitities
 
         public virtual SalonOwner SalonOwner { get; set; }
         public virtual ICollection<SalonEmployee> SalonEmployees { get; set; }
-        public virtual ICollection<ServiceHair> ServiceHairs { get; set; }
         public virtual ICollection<Voucher> Vouchers { get; set; }
+        public virtual ICollection<Schedule> Schedules { get; set; }
     }
 }

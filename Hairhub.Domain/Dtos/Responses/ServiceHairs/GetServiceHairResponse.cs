@@ -13,6 +13,7 @@ namespace Hairhub.Domain.Dtos.Responses.ServiceHairs
         public string? ServiceName { get; set; }
         public string? Description { get; set; }
         public decimal? Price { get; set; }
+        public decimal? Time { get; set; }
         public bool? IsActive { get; set; }
     }
 }

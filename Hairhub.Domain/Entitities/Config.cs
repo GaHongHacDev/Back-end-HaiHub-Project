@@ -9,7 +9,6 @@ namespace Hairhub.Domain.Entitities
 {
     public class Config
     {
-        [Key]
         public Guid Id { get; set; }
         public decimal? CommissionRate { get; set; }
         public decimal? MaintenanceFee { get; set; }

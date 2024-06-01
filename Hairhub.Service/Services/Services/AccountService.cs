@@ -13,12 +13,14 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
 
-        public AccountService( IUnitOfWork unitOfWork, IMapper mapper)
+        public AccountService( IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
 
             this._unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         public async Task<bool> ActiveAccount(Guid id)
@@ -127,16 +129,16 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest)
         {
-            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
-            SalonOwner salonOwner = new SalonOwner();
             Guid accountId;
-            if (customer == null)
+            if (updateAccountRequest.RoleName.Equals(RoleEnum.SalonOwner.ToString())) // Salon Owner
             {
+                SalonOwner salonOwner = new SalonOwner();
                 salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id == id);
                 if (salonOwner == null)
                 {
-                    throw new NotFoundException("Salon owner or customer was not found!");
+                    throw new NotFoundException("Salon ownerwas not found!");
                 }
+                var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALON_AVATAR, salonOwner.Id.ToString());
                 accountId = (Guid)salonOwner.AccountId;
                 salonOwner.FullName = updateAccountRequest.FullName;
                 salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;
@@ -144,13 +146,19 @@ namespace Hairhub.Service.Services.Services
                 salonOwner.Email = updateAccountRequest.Email;
                 salonOwner.Phone = updateAccountRequest.Phone;
                 salonOwner.Address = updateAccountRequest.Address;
-                salonOwner.HumanId = updateAccountRequest.HumanId;
-                salonOwner.Img = updateAccountRequest.Img;
+                salonOwner.Img = urlImg;
                 salonOwner.BankAccount = updateAccountRequest.BankAccount;
                 salonOwner.BankName = updateAccountRequest.BankName;
+                _unitOfWork.GetRepository<SalonOwner>().UpdateAsync(salonOwner);
             }
             else
-            {
+            {  //Update Customer
+                var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                if (customer == null)
+                {
+                    throw new NotFoundException("Customer was not found!");
+                }
+                var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.CUSTOMER_AVATAR, customer.Id.ToString());
                 accountId = (Guid)customer.AccountId;
                 customer.FullName = updateAccountRequest.FullName;
                 customer.DayOfBirth = updateAccountRequest.DayOfBirth;
@@ -158,10 +166,10 @@ namespace Hairhub.Service.Services.Services
                 customer.Email = updateAccountRequest.Email;
                 customer.Phone = updateAccountRequest.Phone;
                 customer.Address = updateAccountRequest.Address;
-                customer.HumanId = updateAccountRequest.HumanId;
-                customer.Img = updateAccountRequest.Img;
+                customer.Img = urlImg;
                 customer.BankAccount = updateAccountRequest.BankAccount;
                 customer.BankName = updateAccountRequest.BankName;
+                _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
             }
             Account account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == accountId);
             if (account == null)
@@ -169,14 +177,6 @@ namespace Hairhub.Service.Services.Services
             //Update Account
             account.Username = updateAccountRequest.Username;
             account.Password = updateAccountRequest.Password;
-            if (customer != null)
-            {
-                _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
-            }
-            else
-            {
-                _unitOfWork.GetRepository<SalonOwner>().UpdateAsync(salonOwner);
-            }
             _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;

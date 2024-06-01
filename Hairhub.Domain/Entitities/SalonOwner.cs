@@ -9,7 +9,6 @@ namespace Hairhub.Domain.Entitities
 {
     public class SalonOwner
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid? AccountId { get; set; }
         public string? FullName { get; set; }

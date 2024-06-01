@@ -53,6 +53,8 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 // Add services to the container.
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
+
+//Setting Cors for all source
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,

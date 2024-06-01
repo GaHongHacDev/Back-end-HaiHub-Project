@@ -9,7 +9,6 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
 {
     public class CreateSalonEmployeeResponse
     {
-        public Guid Id { get; set; }
         public Guid? SalonInformationId { get; set; }
         public string? FullName { get; set; }
         public DateTime? DayOfBirth { get; set; }
