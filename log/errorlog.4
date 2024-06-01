@@ -1,321 +1,197 @@
-2024-05-27 15:55:27.49 Server      Microsoft SQL Server 2022 (RTM-CU13) (KB5036432) - 16.0.4125.3 (X64) 
+2024-05-27 16:25:00.76 Server      Microsoft SQL Server 2022 (RTM-CU13) (KB5036432) - 16.0.4125.3 (X64) 
 	May  1 2024 15:05:56 
 	Copyright (C) 2022 Microsoft Corporation
 	Developer Edition (64-bit) on Linux (Ubuntu 22.04.4 LTS) <X64>
-2024-05-27 15:55:27.49 Server      UTC adjustment: 0:00
-2024-05-27 15:55:27.49 Server      (c) Microsoft Corporation.
-2024-05-27 15:55:27.50 Server      All rights reserved.
-2024-05-27 15:55:27.50 Server      Server process ID is 536.
-2024-05-27 15:55:27.50 Server      Logging SQL Server messages in file '/var/opt/mssql/log/errorlog'.
-2024-05-27 15:55:27.51 Server      Registry startup parameters: 
+2024-05-27 16:25:00.76 Server      UTC adjustment: 0:00
+2024-05-27 16:25:00.77 Server      (c) Microsoft Corporation.
+2024-05-27 16:25:00.77 Server      All rights reserved.
+2024-05-27 16:25:00.77 Server      Server process ID is 532.
+2024-05-27 16:25:00.77 Server      Logging SQL Server messages in file '/var/opt/mssql/log/errorlog'.
+2024-05-27 16:25:00.77 Server      Registry startup parameters: 
 	 -d /var/opt/mssql/data/master.mdf
 	 -l /var/opt/mssql/data/mastlog.ldf
 	 -e /var/opt/mssql/log/errorlog
-2024-05-27 15:55:27.54 Server      SQL Server detected 1 sockets with 8 cores per socket and 16 logical processors per socket, 16 total logical processors; using 16 logical processors based on SQL Server licensing. This is an informational message; no user action is required.
-2024-05-27 15:55:27.55 Server      SQL Server is starting at normal priority base (=7). This is an informational message only. No user action is required.
-2024-05-27 15:55:27.56 Server      Detected 6120 MB of RAM. This is an informational message; no user action is required.
-2024-05-27 15:55:27.56 Server      Using conventional memory in the memory manager.
-2024-05-27 15:55:27.57 Server      Detected pause instruction latency: 86 cycles.
-2024-05-27 15:55:27.58 Server      SQL Server detected the following NUMA node configuration (NUMA Node number 0, Processor Group number 0, CPU Mask 0x000000000000ffff).
-2024-05-27 15:55:27.59 Server      Page exclusion bitmap is enabled.
-2024-05-27 15:55:27.72 Server      Buffer pool extension is not supported on Linux platform.
-2024-05-27 15:55:27.73 Server      Buffer Pool: Allocating 1048576 bytes for 857400 hashPages.
-2024-05-27 15:55:28.07 Server      Buffer pool extension is already disabled. No action is necessary.
-2024-05-27 15:55:28.86 Server      Installing Client TLS certificates to the store.
-2024-05-27 15:55:28.88 Server      CPU vectorization level(s) detected:  SSE SSE2 SSE3 SSSE3 SSE41 SSE42 AVX AVX2 POPCNT BMI1 BMI2
-2024-05-27 15:55:29.02 Server      Successfully initialized the TLS configuration. Allowed TLS protocol versions are ['1.0 1.1 1.2']. Allowed TLS ciphers are ['ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:!DHE-RSA-AES256-GCM-SHA384:!DHE-RSA-AES128-GCM-SHA256:!DHE-RSA-AES256-SHA:!DHE-RSA-AES128-SHA'].
-2024-05-27 15:55:29.10 Server      Query Store settings initialized with enabled = 1, 
-2024-05-27 15:55:29.14 Server      The maximum number of dedicated administrator connections for this instance is '1'
-2024-05-27 15:55:29.18 Server      Node configuration: node 0: CPU mask: 0x000000000000ffff:0 Active CPU mask: 0x000000000000ffff:0. This message provides a description of the NUMA configuration for this computer. This is an informational message only. No user action is required.
-2024-05-27 15:55:29.22 Server      Using dynamic lock allocation.  Initial allocation of 2500 Lock blocks and 5000 Lock Owner blocks per node.  This is an informational message only.  No user action is required.
-2024-05-27 15:55:29.23 Server      Lock partitioning is enabled.  This is an informational message only. No user action is required.
-2024-05-27 15:55:29.32 Server      CLR version v4.0.30319 loaded.
-2024-05-27 15:55:29.37 Server      In-Memory OLTP initialized on lowend machine.
-2024-05-27 15:55:29.78 Server      [INFO] Created Extended Events session 'hkenginexesession'
-2024-05-27 15:55:29.78 Server      Database Instant File Initialization: enabled. For security and performance considerations see the topic 'Database Instant File Initialization' in SQL Server Books Online. This is an informational message only. No user action is required.
-2024-05-27 15:55:29.82 Server      Total Log Writer threads: 2. This is an informational message; no user action is required.
-2024-05-27 15:55:29.85 Server      clwb is selected for pmem flush operation.
-2024-05-27 15:55:29.86 Server      Software Usage Metrics is disabled.
-2024-05-27 15:55:29.93 spid42s     [1]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:29.94 spid42s     Starting up database 'master'.
-2024-05-27 15:55:30.32 Server      Common language runtime (CLR) functionality initialized.
-2024-05-27 15:55:30.70 Server      External governance manager initialized
-2024-05-27 15:55:31.38 spid42s     [32762]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:31.39 spid42s     Starting up database 'model_replicatedmaster'.
-2024-05-27 15:55:31.40 spid45s     [32767]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:31.41 spid45s     Starting up database 'mssqlsystemresource'.
-2024-05-27 15:55:31.43 spid45s     The resource database build version is 16.00.4125. This is an informational message only. No user action is required.
-2024-05-27 15:55:31.50 spid45s     [3]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:31.50 spid45s     Starting up database 'model'.
-2024-05-27 15:55:31.91 spid53s     A self-generated certificate was successfully loaded for encryption.
-2024-05-27 15:55:31.91 spid53s     Server is listening on [ 'any' <ipv6> 1433] accept sockets 1.
-2024-05-27 15:55:31.92 spid53s     Server is listening on [ 'any' <ipv4> 1433] accept sockets 1.
-2024-05-27 15:55:31.93 Server      Server is listening on [ ::1 <ipv6> 1434] accept sockets 1.
-2024-05-27 15:55:31.93 Server      Server is listening on [ 127.0.0.1 <ipv4> 1434] accept sockets 1.
-2024-05-27 15:55:31.94 Server      Dedicated admin connection support was established for listening locally on port 1434.
-2024-05-27 15:55:31.95 spid53s     Server is listening on [ ::1 <ipv6> 1431] accept sockets 1.
-2024-05-27 15:55:31.96 spid53s     Server is listening on [ 127.0.0.1 <ipv4> 1431] accept sockets 1.
-2024-05-27 15:55:31.96 spid53s     SQL Server is now ready for client connections. This is an informational message; no user action is required.
-2024-05-27 15:55:32.38 spid42s     The tail of the log for database model_replicatedmaster is being rewritten to match the new sector size of 4096 bytes.  2560 bytes at offset 99840 in file /var/opt/mssql/data/model_replicatedmaster.ldf will be written.
-2024-05-27 15:55:32.44 spid42s     Converting database 'model_replicatedmaster' from version 927 to the current version 957.
-2024-05-27 15:55:32.45 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 927 to version 928.
-2024-05-27 15:55:32.49 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 928 to version 929.
-2024-05-27 15:55:32.59 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 929 to version 930.
-2024-05-27 15:55:32.84 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 930 to version 931.
-2024-05-27 15:55:32.86 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 931 to version 932.
-2024-05-27 15:55:32.89 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 932 to version 933.
-2024-05-27 15:55:32.91 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 933 to version 934.
-2024-05-27 15:55:32.94 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 934 to version 935.
-2024-05-27 15:55:32.96 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 935 to version 936.
-2024-05-27 15:55:32.98 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 936 to version 937.
-2024-05-27 15:55:32.99 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 937 to version 938.
-2024-05-27 15:55:33.01 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 938 to version 939.
-2024-05-27 15:55:33.03 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 939 to version 940.
-2024-05-27 15:55:33.04 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 940 to version 941.
-2024-05-27 15:55:33.06 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 941 to version 942.
-2024-05-27 15:55:33.08 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 942 to version 943.
-2024-05-27 15:55:33.62 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 943 to version 944.
-2024-05-27 15:55:33.66 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 944 to version 945.
-2024-05-27 15:55:33.72 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 945 to version 946.
-2024-05-27 15:55:33.74 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 946 to version 947.
-2024-05-27 15:55:33.77 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 947 to version 948.
-2024-05-27 15:55:33.79 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 948 to version 949.
-2024-05-27 15:55:33.81 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 949 to version 950.
-2024-05-27 15:55:33.83 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 950 to version 951.
-2024-05-27 15:55:33.87 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 951 to version 952.
-2024-05-27 15:55:33.89 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 952 to version 953.
-2024-05-27 15:55:33.91 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 953 to version 954.
-2024-05-27 15:55:33.93 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 954 to version 955.
-2024-05-27 15:55:33.95 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 955 to version 956.
-2024-05-27 15:55:34.25 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 956 to version 957.
-2024-05-27 15:55:34.44 spid42s     [32761]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:34.45 spid42s     Starting up database 'model_msdb'.
-2024-05-27 15:55:35.87 spid42s     Converting database 'model_msdb' from version 927 to the current version 957.
-2024-05-27 15:55:35.87 spid42s     Database 'model_msdb' running the upgrade step from version 927 to version 928.
-2024-05-27 15:55:35.90 spid42s     Database 'model_msdb' running the upgrade step from version 928 to version 929.
-2024-05-27 15:55:36.01 spid42s     Database 'model_msdb' running the upgrade step from version 929 to version 930.
-2024-05-27 15:55:36.05 spid42s     Database 'model_msdb' running the upgrade step from version 930 to version 931.
-2024-05-27 15:55:36.07 spid42s     Database 'model_msdb' running the upgrade step from version 931 to version 932.
-2024-05-27 15:55:36.09 spid42s     Database 'model_msdb' running the upgrade step from version 932 to version 933.
-2024-05-27 15:55:36.37 spid42s     Database 'model_msdb' running the upgrade step from version 933 to version 934.
-2024-05-27 15:55:36.39 spid42s     Database 'model_msdb' running the upgrade step from version 934 to version 935.
-2024-05-27 15:55:36.42 spid42s     Database 'model_msdb' running the upgrade step from version 935 to version 936.
-2024-05-27 15:55:36.45 spid42s     Database 'model_msdb' running the upgrade step from version 936 to version 937.
-2024-05-27 15:55:36.48 spid42s     Database 'model_msdb' running the upgrade step from version 937 to version 938.
-2024-05-27 15:55:36.51 spid42s     Database 'model_msdb' running the upgrade step from version 938 to version 939.
-2024-05-27 15:55:36.53 spid42s     Database 'model_msdb' running the upgrade step from version 939 to version 940.
-2024-05-27 15:55:36.55 spid42s     Database 'model_msdb' running the upgrade step from version 940 to version 941.
-2024-05-27 15:55:36.57 spid42s     Database 'model_msdb' running the upgrade step from version 941 to version 942.
-2024-05-27 15:55:36.59 spid42s     Database 'model_msdb' running the upgrade step from version 942 to version 943.
-2024-05-27 15:55:36.94 spid42s     Database 'model_msdb' running the upgrade step from version 943 to version 944.
-2024-05-27 15:55:36.96 spid42s     Database 'model_msdb' running the upgrade step from version 944 to version 945.
-2024-05-27 15:55:37.28 spid42s     Database 'model_msdb' running the upgrade step from version 945 to version 946.
-2024-05-27 15:55:37.32 spid42s     Database 'model_msdb' running the upgrade step from version 946 to version 947.
-2024-05-27 15:55:37.35 spid42s     Database 'model_msdb' running the upgrade step from version 947 to version 948.
-2024-05-27 15:55:37.38 spid42s     Database 'model_msdb' running the upgrade step from version 948 to version 949.
-2024-05-27 15:55:37.42 spid42s     Database 'model_msdb' running the upgrade step from version 949 to version 950.
-2024-05-27 15:55:37.46 spid42s     Database 'model_msdb' running the upgrade step from version 950 to version 951.
-2024-05-27 15:55:37.53 spid42s     Database 'model_msdb' running the upgrade step from version 951 to version 952.
-2024-05-27 15:55:37.57 spid42s     Database 'model_msdb' running the upgrade step from version 952 to version 953.
-2024-05-27 15:55:37.61 spid42s     Database 'model_msdb' running the upgrade step from version 953 to version 954.
-2024-05-27 15:55:37.65 spid42s     Database 'model_msdb' running the upgrade step from version 954 to version 955.
-2024-05-27 15:55:37.68 spid42s     Database 'model_msdb' running the upgrade step from version 955 to version 956.
-2024-05-27 15:55:37.76 spid42s     Database 'model_msdb' running the upgrade step from version 956 to version 957.
-2024-05-27 15:55:37.98 spid42s     Resource governor reconfiguration succeeded.
-2024-05-27 15:55:37.98 spid56s     Attribute synchronization initialized
-2024-05-27 15:55:37.99 spid42s     SQL Server Audit is starting the audits. This is an informational message. No user action is required.
-2024-05-27 15:55:37.99 spid56s     Attribute synchronization manager initialized
-2024-05-27 15:55:37.99 spid42s     SQL Server Audit has started the audits. This is an informational message. No user action is required.
-2024-05-27 15:55:38.01 spid42s     XE session 'system_health' started.
-2024-05-27 15:55:38.34 spid42s     XE session 'telemetry_xevents' started.
-2024-05-27 15:55:38.42 spid42s     SQL Trace ID 1 was started by login "sa".
-2024-05-27 15:55:38.44 spid42s     Server name is 'mssql-db'. This is an informational message only. No user action is required.
-2024-05-27 15:55:38.47 spid45s     Clearing tempdb database.
-2024-05-27 15:55:38.47 spid71s     Always On: The availability replica manager is starting. This is an informational message only. No user action is required.
-2024-05-27 15:55:38.47 spid74s     [4]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:38.48 spid71s     Always On: The availability replica manager is waiting for the instance of SQL Server to allow client connections. This is an informational message only. No user action is required.
-2024-05-27 15:55:38.48 spid74s     Starting up database 'msdb'.
-2024-05-27 15:55:39.91 spid43s     Using 'dbghelp.dll' version '4.0.5'
-2024-05-27 15:55:41.55 spid45s     [2]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 15:55:41.55 spid45s     Starting up database 'tempdb'.
-2024-05-27 15:55:47.51 spid45s     The tempdb database has 8 data file(s).
-2024-05-27 15:55:47.53 spid51s     The Service Broker endpoint is in disabled or stopped state.
-2024-05-27 15:55:47.53 spid51s     The Database Mirroring endpoint is in disabled or stopped state.
-2024-05-27 15:55:47.54 spid51s     Service Broker manager has started.
-2024-05-27 15:55:47.55 spid42s     Recovery is complete. This is an informational message only. No user action is required.
-2024-05-27 16:00:28.85 spid54      XE session 'telemetry_xevents' stopping.
-2024-05-27 16:00:28.86 spid54      XE session 'telemetry_xevents' started.
-2024-05-27 16:00:36.40 spid54      Attempting to load library 'xplog70.dll' into memory. This is an informational message only. No user action is required.
-2024-05-27 16:00:36.41 spid54      Using 'xplog70.dll' version '2022.160.4125' to execute extended stored procedure 'xp_msver'. This is an informational message only; no user action is required.
-2024-05-27 16:09:51.62 spid54      XE session 'telemetry_xevents' stopping.
-2024-05-27 16:09:51.64 spid54      XE session 'telemetry_xevents' started.
-2024-05-27 16:12:13.62 spid56      Attempting to load library 'xpsqlbot.dll' into memory. This is an informational message only. No user action is required.
-2024-05-27 16:12:13.62 spid56      Using 'xpsqlbot.dll' version '2022.160.4125' to execute extended stored procedure 'xp_qv'. This is an informational message only; no user action is required.
-2024-05-27 16:12:21.95 spid57      Attempting to load library 'xpstar.dll' into memory. This is an informational message only. No user action is required.
-2024-05-27 16:12:21.99 spid57      Using 'xpstar.dll' version '2022.160.4125' to execute extended stored procedure 'xp_instance_regread'. This is an informational message only; no user action is required.
-2024-05-27 16:12:38.93 spid56      Setting database option FILESTREAM NON_TRANSACTED_ACCESS to OFF for database 'HairHubDB'.
-2024-05-27 16:12:52.79 spid56      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:12:52.79 spid56      Starting up database 'HairHubDB'.
-2024-05-27 16:12:52.80 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:12:52.80 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:12:53.24 spid56      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:12:53.28 spid56      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:05.26 spid56      Setting database option COMPATIBILITY_LEVEL to 160 for database 'HairHubDB'.
-2024-05-27 16:13:09.98 spid56      Setting database option ANSI_NULL_DEFAULT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:09.99 spid56      Setting database option ANSI_NULLS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:09.99 spid56      Setting database option ANSI_PADDING to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.00 spid56      Setting database option ANSI_WARNINGS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.00 spid56      Setting database option ARITHABORT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.01 spid56      Setting database option AUTO_CLOSE to ON for database 'HairHubDB'.
-2024-05-27 16:13:10.04 spid56      Setting database option AUTO_SHRINK to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.05 spid56      Setting database option AUTO_UPDATE_STATISTICS to ON for database 'HairHubDB'.
-2024-05-27 16:13:10.05 spid56      Setting database option CURSOR_CLOSE_ON_COMMIT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.06 spid56      Setting database option CURSOR_DEFAULT to GLOBAL for database 'HairHubDB'.
-2024-05-27 16:13:10.06 spid56      Setting database option CONCAT_NULL_YIELDS_NULL to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.07 spid56      Setting database option NUMERIC_ROUNDABORT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.08 spid56      Setting database option QUOTED_IDENTIFIER to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.08 spid56      Setting database option RECURSIVE_TRIGGERS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.09 spid56      Setting database option ENABLE_BROKER to ON for database 'HairHubDB'.
-2024-05-27 16:13:10.09 spid56      Setting database option AUTO_UPDATE_STATISTICS_ASYNC to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.10 spid56      Setting database option DATE_CORRELATION_OPTIMIZATION to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.10 spid56      Setting database option TRUSTWORTHY to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.11 spid56      Setting database option ALLOW_SNAPSHOT_ISOLATION to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.11 spid56      Setting database option PARAMETERIZATION to SIMPLE for database 'HairHubDB'.
-2024-05-27 16:13:10.12 spid56      Setting database option READ_COMMITTED_SNAPSHOT to ON for database 'HairHubDB'.
-2024-05-27 16:13:10.23 spid56      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:13:10.23 spid56      Starting up database 'HairHubDB'.
-2024-05-27 16:13:10.23 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:13:10.24 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:13:10.69 spid56      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:10.75 spid5s      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:10.75 spid56      Setting database option HONOR_BROKER_PRIORITY to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.76 spid56      Setting database option RECOVERY to SIMPLE for database 'HairHubDB'.
-2024-05-27 16:13:10.78 spid56      Setting database option MULTI_USER to ON for database 'HairHubDB'.
-2024-05-27 16:13:10.79 spid56      Setting database option PAGE_VERIFY to CHECKSUM for database 'HairHubDB'.
-2024-05-27 16:13:10.79 spid56      Setting database option DB_CHAINING to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.79 spid56      Setting database option FILESTREAM NON_TRANSACTED_ACCESS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.81 spid56      Setting database option target_recovery_time to 60 for database 'HairHubDB'.
-2024-05-27 16:13:10.81 spid56      Setting database option delayed_durability to disabled for database 'HairHubDB'.
-2024-05-27 16:13:10.82 spid56      Setting database option accelerated_database_recovery to OFF for database 'HairHubDB'.
-2024-05-27 16:13:10.84 spid56      Setting database option query_store to on for database 'HairHubDB'.
-2024-05-27 16:13:10.84 spid56      Setting database option query_store to read_write for database 'HairHubDB'.
-2024-05-27 16:13:11.33 spid56      Setting database option READ_WRITE to ON for database 'HairHubDB'.
-2024-05-27 16:13:18.05 spid56      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:13:18.05 spid56      Starting up database 'HairHubDB'.
-2024-05-27 16:13:18.06 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:13:18.06 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:13:18.52 spid56      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:18.56 spid56      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:20.63 spid56      Setting database option ANSI_NULL_DEFAULT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.63 spid56      Setting database option ANSI_NULLS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.64 spid56      Setting database option ANSI_PADDING to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.65 spid56      Setting database option ANSI_WARNINGS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.65 spid56      Setting database option ARITHABORT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.66 spid56      Setting database option AUTO_CLOSE to ON for database 'HairHubDB'.
-2024-05-27 16:13:20.66 spid56      Setting database option AUTO_SHRINK to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.67 spid56      Setting database option AUTO_UPDATE_STATISTICS to ON for database 'HairHubDB'.
-2024-05-27 16:13:20.67 spid56      Setting database option CURSOR_CLOSE_ON_COMMIT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.68 spid56      Setting database option CURSOR_DEFAULT to GLOBAL for database 'HairHubDB'.
-2024-05-27 16:13:20.68 spid56      Setting database option CONCAT_NULL_YIELDS_NULL to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.69 spid56      Setting database option NUMERIC_ROUNDABORT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.69 spid56      Setting database option QUOTED_IDENTIFIER to OFF for database 'HairHubDB'.
-2024-05-27 16:13:20.70 spid56      Setting database option RECURSIVE_TRIGGERS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.59 spid56      Setting database option ENABLE_BROKER to ON for database 'HairHubDB'.
-2024-05-27 16:13:21.59 spid56      Setting database option AUTO_UPDATE_STATISTICS_ASYNC to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.60 spid56      Setting database option DATE_CORRELATION_OPTIMIZATION to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.60 spid56      Setting database option TRUSTWORTHY to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.61 spid56      Setting database option ALLOW_SNAPSHOT_ISOLATION to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.61 spid56      Setting database option PARAMETERIZATION to SIMPLE for database 'HairHubDB'.
-2024-05-27 16:13:21.62 spid56      Setting database option READ_COMMITTED_SNAPSHOT to ON for database 'HairHubDB'.
-2024-05-27 16:13:21.62 spid56      Setting database option HONOR_BROKER_PRIORITY to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.63 spid56      Setting database option RECOVERY to SIMPLE for database 'HairHubDB'.
-2024-05-27 16:13:21.63 spid56      Setting database option MULTI_USER to ON for database 'HairHubDB'.
-2024-05-27 16:13:21.64 spid56      Setting database option PAGE_VERIFY to CHECKSUM for database 'HairHubDB'.
-2024-05-27 16:13:21.64 spid56      Setting database option DB_CHAINING to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.65 spid56      Setting database option FILESTREAM NON_TRANSACTED_ACCESS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.66 spid56      Setting database option target_recovery_time to 60 for database 'HairHubDB'.
-2024-05-27 16:13:21.66 spid56      Setting database option delayed_durability to disabled for database 'HairHubDB'.
-2024-05-27 16:13:21.67 spid56      Setting database option accelerated_database_recovery to OFF for database 'HairHubDB'.
-2024-05-27 16:13:21.69 spid56      Setting database option query_store to on for database 'HairHubDB'.
-2024-05-27 16:13:21.70 spid56      Setting database option query_store to read_write for database 'HairHubDB'.
-2024-05-27 16:13:22.12 spid56      Setting database option READ_WRITE to ON for database 'HairHubDB'.
-2024-05-27 16:13:43.38 spid56      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:13:43.38 spid56      Starting up database 'HairHubDB'.
-2024-05-27 16:13:43.38 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:13:43.38 spid56      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:13:43.84 spid56      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:43.88 spid56      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:13:55.45 spid56      Setting database option ANSI_NULL_DEFAULT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.45 spid56      Setting database option ANSI_NULLS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.46 spid56      Setting database option ANSI_PADDING to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.46 spid56      Setting database option ANSI_WARNINGS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.47 spid56      Setting database option ARITHABORT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.47 spid56      Setting database option AUTO_CLOSE to ON for database 'HairHubDB'.
-2024-05-27 16:13:55.48 spid56      Setting database option AUTO_SHRINK to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.48 spid56      Setting database option AUTO_UPDATE_STATISTICS to ON for database 'HairHubDB'.
-2024-05-27 16:13:55.49 spid56      Setting database option CURSOR_CLOSE_ON_COMMIT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.49 spid56      Setting database option CURSOR_DEFAULT to GLOBAL for database 'HairHubDB'.
-2024-05-27 16:13:55.50 spid56      Setting database option CONCAT_NULL_YIELDS_NULL to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.50 spid56      Setting database option NUMERIC_ROUNDABORT to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.51 spid56      Setting database option QUOTED_IDENTIFIER to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.51 spid56      Setting database option RECURSIVE_TRIGGERS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.52 spid56      Setting database option ENABLE_BROKER to ON for database 'HairHubDB'.
-2024-05-27 16:13:55.52 spid56      Setting database option AUTO_UPDATE_STATISTICS_ASYNC to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.53 spid56      Setting database option DATE_CORRELATION_OPTIMIZATION to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.53 spid56      Setting database option TRUSTWORTHY to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.54 spid56      Setting database option ALLOW_SNAPSHOT_ISOLATION to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.54 spid56      Setting database option PARAMETERIZATION to SIMPLE for database 'HairHubDB'.
-2024-05-27 16:13:55.55 spid56      Setting database option READ_COMMITTED_SNAPSHOT to ON for database 'HairHubDB'.
-2024-05-27 16:13:55.55 spid56      Setting database option HONOR_BROKER_PRIORITY to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.55 spid56      Setting database option RECOVERY to SIMPLE for database 'HairHubDB'.
-2024-05-27 16:13:55.56 spid56      Setting database option MULTI_USER to ON for database 'HairHubDB'.
-2024-05-27 16:13:55.56 spid56      Setting database option PAGE_VERIFY to CHECKSUM for database 'HairHubDB'.
-2024-05-27 16:13:55.57 spid56      Setting database option DB_CHAINING to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.57 spid56      Setting database option FILESTREAM NON_TRANSACTED_ACCESS to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.59 spid56      Setting database option target_recovery_time to 60 for database 'HairHubDB'.
-2024-05-27 16:13:55.60 spid56      Setting database option delayed_durability to disabled for database 'HairHubDB'.
-2024-05-27 16:13:55.60 spid56      Setting database option accelerated_database_recovery to OFF for database 'HairHubDB'.
-2024-05-27 16:13:55.62 spid56      Setting database option query_store to on for database 'HairHubDB'.
-2024-05-27 16:13:55.63 spid56      Setting database option query_store to read_write for database 'HairHubDB'.
-2024-05-27 16:14:02.64 spid56      Setting database option READ_WRITE to ON for database 'HairHubDB'.
-2024-05-27 16:15:07.49 spid61      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:15:07.50 spid61      Starting up database 'HairHubDB'.
-2024-05-27 16:15:07.50 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:15:07.50 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:15:07.87 spid61      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:07.89 spid61      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:09.23 spid61      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:15:09.24 spid61      Starting up database 'HairHubDB'.
-2024-05-27 16:15:09.24 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:15:09.24 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:15:09.66 spid61      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:09.69 spid61      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:10.81 spid61      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:15:10.81 spid61      Starting up database 'HairHubDB'.
-2024-05-27 16:15:10.81 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:15:10.81 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:15:11.29 spid61      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:11.32 spid61      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:24.66 spid61      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:15:24.66 spid61      Starting up database 'HairHubDB'.
-2024-05-27 16:15:24.66 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:15:24.67 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:15:25.05 spid61      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:25.08 spid61      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:25.87 spid61      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:15:25.87 spid61      Starting up database 'HairHubDB'.
-2024-05-27 16:15:25.87 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:15:25.87 spid61      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:15:26.30 spid61      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:26.33 spid61      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:28.05 spid62      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
-2024-05-27 16:15:28.06 spid62      Starting up database 'HairHubDB'.
-2024-05-27 16:15:28.06 spid62      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
-2024-05-27 16:15:28.06 spid62      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
-2024-05-27 16:15:28.46 spid62      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:15:28.48 spid62      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
-2024-05-27 16:24:29.24 spid42s     Always On: The availability replica manager is going offline because SQL Server is shutting down. This is an informational message only. No user action is required.
-2024-05-27 16:24:29.25 spid42s     SQL Server is terminating in response to a 'stop' request from Service Control Manager. This is an informational message only. No user action is required.
-2024-05-27 16:24:29.27 spid42s     .NET Framework runtime has been stopped.
-2024-05-27 16:24:29.57 spid51s     Service Broker manager has shut down.
-2024-05-27 16:24:29.61 spid42s     SQL Trace was stopped due to server shutdown. Trace ID = '1'. This is an informational message only; no user action is required.
+2024-05-27 16:25:00.78 Server      SQL Server detected 1 sockets with 8 cores per socket and 16 logical processors per socket, 16 total logical processors; using 16 logical processors based on SQL Server licensing. This is an informational message; no user action is required.
+2024-05-27 16:25:00.79 Server      SQL Server is starting at normal priority base (=7). This is an informational message only. No user action is required.
+2024-05-27 16:25:00.79 Server      Detected 6120 MB of RAM. This is an informational message; no user action is required.
+2024-05-27 16:25:00.79 Server      Using conventional memory in the memory manager.
+2024-05-27 16:25:00.80 Server      Detected pause instruction latency: 58 cycles.
+2024-05-27 16:25:00.80 Server      SQL Server detected the following NUMA node configuration (NUMA Node number 0, Processor Group number 0, CPU Mask 0x000000000000ffff).
+2024-05-27 16:25:00.80 Server      Page exclusion bitmap is enabled.
+2024-05-27 16:25:00.91 Server      Buffer pool extension is not supported on Linux platform.
+2024-05-27 16:25:00.92 Server      Buffer Pool: Allocating 1048576 bytes for 857451 hashPages.
+2024-05-27 16:25:01.07 Server      Buffer pool extension is already disabled. No action is necessary.
+2024-05-27 16:25:01.45 Server      Installing Client TLS certificates to the store.
+2024-05-27 16:25:01.46 Server      CPU vectorization level(s) detected:  SSE SSE2 SSE3 SSSE3 SSE41 SSE42 AVX AVX2 POPCNT BMI1 BMI2
+2024-05-27 16:25:01.59 Server      Successfully initialized the TLS configuration. Allowed TLS protocol versions are ['1.0 1.1 1.2']. Allowed TLS ciphers are ['ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:!DHE-RSA-AES256-GCM-SHA384:!DHE-RSA-AES128-GCM-SHA256:!DHE-RSA-AES256-SHA:!DHE-RSA-AES128-SHA'].
+2024-05-27 16:25:01.64 Server      Query Store settings initialized with enabled = 1, 
+2024-05-27 16:25:01.66 Server      The maximum number of dedicated administrator connections for this instance is '1'
+2024-05-27 16:25:01.67 Server      Node configuration: node 0: CPU mask: 0x000000000000ffff:0 Active CPU mask: 0x000000000000ffff:0. This message provides a description of the NUMA configuration for this computer. This is an informational message only. No user action is required.
+2024-05-27 16:25:01.70 Server      Using dynamic lock allocation.  Initial allocation of 2500 Lock blocks and 5000 Lock Owner blocks per node.  This is an informational message only.  No user action is required.
+2024-05-27 16:25:01.70 Server      Lock partitioning is enabled.  This is an informational message only. No user action is required.
+2024-05-27 16:25:01.82 Server      CLR version v4.0.30319 loaded.
+2024-05-27 16:25:01.84 Server      In-Memory OLTP initialized on lowend machine.
+2024-05-27 16:25:02.01 Server      [INFO] Created Extended Events session 'hkenginexesession'
+2024-05-27 16:25:02.01 Server      Database Instant File Initialization: enabled. For security and performance considerations see the topic 'Database Instant File Initialization' in SQL Server Books Online. This is an informational message only. No user action is required.
+2024-05-27 16:25:02.04 Server      Total Log Writer threads: 2. This is an informational message; no user action is required.
+2024-05-27 16:25:02.06 Server      clwb is selected for pmem flush operation.
+2024-05-27 16:25:02.06 Server      Software Usage Metrics is disabled.
+2024-05-27 16:25:02.12 spid42s     [1]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:02.12 spid42s     Starting up database 'master'.
+2024-05-27 16:25:02.23 Server      Common language runtime (CLR) functionality initialized.
+2024-05-27 16:25:02.40 Server      External governance manager initialized
+2024-05-27 16:25:02.68 spid42s     [32762]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:02.68 spid45s     [32767]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:02.69 spid42s     Starting up database 'model_replicatedmaster'.
+2024-05-27 16:25:02.69 spid45s     Starting up database 'mssqlsystemresource'.
+2024-05-27 16:25:02.69 spid45s     The resource database build version is 16.00.4125. This is an informational message only. No user action is required.
+2024-05-27 16:25:02.75 spid45s     [3]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:02.76 spid45s     Starting up database 'model'.
+2024-05-27 16:25:03.07 spid53s     A self-generated certificate was successfully loaded for encryption.
+2024-05-27 16:25:03.07 spid53s     Server is listening on [ 'any' <ipv6> 1433] accept sockets 1.
+2024-05-27 16:25:03.07 spid53s     Server is listening on [ 'any' <ipv4> 1433] accept sockets 1.
+2024-05-27 16:25:03.08 Server      Server is listening on [ ::1 <ipv6> 1434] accept sockets 1.
+2024-05-27 16:25:03.08 Server      Server is listening on [ 127.0.0.1 <ipv4> 1434] accept sockets 1.
+2024-05-27 16:25:03.08 Server      Dedicated admin connection support was established for listening locally on port 1434.
+2024-05-27 16:25:03.09 spid53s     Server is listening on [ ::1 <ipv6> 1431] accept sockets 1.
+2024-05-27 16:25:03.09 spid53s     Server is listening on [ 127.0.0.1 <ipv4> 1431] accept sockets 1.
+2024-05-27 16:25:03.10 spid53s     SQL Server is now ready for client connections. This is an informational message; no user action is required.
+2024-05-27 16:25:03.21 spid42s     The tail of the log for database model_replicatedmaster is being rewritten to match the new sector size of 4096 bytes.  2560 bytes at offset 99840 in file /var/opt/mssql/data/model_replicatedmaster.ldf will be written.
+2024-05-27 16:25:03.24 spid42s     Converting database 'model_replicatedmaster' from version 927 to the current version 957.
+2024-05-27 16:25:03.25 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 927 to version 928.
+2024-05-27 16:25:03.26 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 928 to version 929.
+2024-05-27 16:25:03.29 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 929 to version 930.
+2024-05-27 16:25:03.40 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 930 to version 931.
+2024-05-27 16:25:03.41 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 931 to version 932.
+2024-05-27 16:25:03.42 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 932 to version 933.
+2024-05-27 16:25:03.43 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 933 to version 934.
+2024-05-27 16:25:03.44 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 934 to version 935.
+2024-05-27 16:25:03.45 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 935 to version 936.
+2024-05-27 16:25:03.46 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 936 to version 937.
+2024-05-27 16:25:03.47 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 937 to version 938.
+2024-05-27 16:25:03.48 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 938 to version 939.
+2024-05-27 16:25:03.49 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 939 to version 940.
+2024-05-27 16:25:03.50 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 940 to version 941.
+2024-05-27 16:25:03.51 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 941 to version 942.
+2024-05-27 16:25:03.52 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 942 to version 943.
+2024-05-27 16:25:03.76 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 943 to version 944.
+2024-05-27 16:25:03.77 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 944 to version 945.
+2024-05-27 16:25:03.78 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 945 to version 946.
+2024-05-27 16:25:03.79 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 946 to version 947.
+2024-05-27 16:25:03.81 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 947 to version 948.
+2024-05-27 16:25:03.82 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 948 to version 949.
+2024-05-27 16:25:03.83 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 949 to version 950.
+2024-05-27 16:25:03.84 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 950 to version 951.
+2024-05-27 16:25:03.86 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 951 to version 952.
+2024-05-27 16:25:03.87 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 952 to version 953.
+2024-05-27 16:25:03.88 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 953 to version 954.
+2024-05-27 16:25:03.89 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 954 to version 955.
+2024-05-27 16:25:03.90 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 955 to version 956.
+2024-05-27 16:25:04.04 spid42s     Database 'model_replicatedmaster' running the upgrade step from version 956 to version 957.
+2024-05-27 16:25:04.13 spid42s     [32761]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:04.14 spid42s     Starting up database 'model_msdb'.
+2024-05-27 16:25:04.74 spid42s     Converting database 'model_msdb' from version 927 to the current version 957.
+2024-05-27 16:25:04.74 spid42s     Database 'model_msdb' running the upgrade step from version 927 to version 928.
+2024-05-27 16:25:04.75 spid42s     Database 'model_msdb' running the upgrade step from version 928 to version 929.
+2024-05-27 16:25:04.81 spid42s     Database 'model_msdb' running the upgrade step from version 929 to version 930.
+2024-05-27 16:25:04.82 spid42s     Database 'model_msdb' running the upgrade step from version 930 to version 931.
+2024-05-27 16:25:04.84 spid42s     Database 'model_msdb' running the upgrade step from version 931 to version 932.
+2024-05-27 16:25:04.85 spid42s     Database 'model_msdb' running the upgrade step from version 932 to version 933.
+2024-05-27 16:25:04.98 spid42s     Database 'model_msdb' running the upgrade step from version 933 to version 934.
+2024-05-27 16:25:04.98 spid42s     Database 'model_msdb' running the upgrade step from version 934 to version 935.
+2024-05-27 16:25:04.99 spid42s     Database 'model_msdb' running the upgrade step from version 935 to version 936.
+2024-05-27 16:25:05.00 spid42s     Database 'model_msdb' running the upgrade step from version 936 to version 937.
+2024-05-27 16:25:05.01 spid42s     Database 'model_msdb' running the upgrade step from version 937 to version 938.
+2024-05-27 16:25:05.02 spid42s     Database 'model_msdb' running the upgrade step from version 938 to version 939.
+2024-05-27 16:25:05.03 spid42s     Database 'model_msdb' running the upgrade step from version 939 to version 940.
+2024-05-27 16:25:05.04 spid42s     Database 'model_msdb' running the upgrade step from version 940 to version 941.
+2024-05-27 16:25:05.05 spid42s     Database 'model_msdb' running the upgrade step from version 941 to version 942.
+2024-05-27 16:25:05.07 spid42s     Database 'model_msdb' running the upgrade step from version 942 to version 943.
+2024-05-27 16:25:05.22 spid42s     Database 'model_msdb' running the upgrade step from version 943 to version 944.
+2024-05-27 16:25:05.23 spid42s     Database 'model_msdb' running the upgrade step from version 944 to version 945.
+2024-05-27 16:25:05.37 spid42s     Database 'model_msdb' running the upgrade step from version 945 to version 946.
+2024-05-27 16:25:05.39 spid42s     Database 'model_msdb' running the upgrade step from version 946 to version 947.
+2024-05-27 16:25:05.40 spid42s     Database 'model_msdb' running the upgrade step from version 947 to version 948.
+2024-05-27 16:25:05.41 spid42s     Database 'model_msdb' running the upgrade step from version 948 to version 949.
+2024-05-27 16:25:05.43 spid42s     Database 'model_msdb' running the upgrade step from version 949 to version 950.
+2024-05-27 16:25:05.44 spid42s     Database 'model_msdb' running the upgrade step from version 950 to version 951.
+2024-05-27 16:25:05.46 spid42s     Database 'model_msdb' running the upgrade step from version 951 to version 952.
+2024-05-27 16:25:05.47 spid42s     Database 'model_msdb' running the upgrade step from version 952 to version 953.
+2024-05-27 16:25:05.48 spid42s     Database 'model_msdb' running the upgrade step from version 953 to version 954.
+2024-05-27 16:25:05.49 spid42s     Database 'model_msdb' running the upgrade step from version 954 to version 955.
+2024-05-27 16:25:05.50 spid42s     Database 'model_msdb' running the upgrade step from version 955 to version 956.
+2024-05-27 16:25:05.53 spid42s     Database 'model_msdb' running the upgrade step from version 956 to version 957.
+2024-05-27 16:25:05.64 spid42s     Resource governor reconfiguration succeeded.
+2024-05-27 16:25:05.64 spid61s     Attribute synchronization initialized
+2024-05-27 16:25:05.64 spid42s     SQL Server Audit is starting the audits. This is an informational message. No user action is required.
+2024-05-27 16:25:05.64 spid61s     Attribute synchronization manager initialized
+2024-05-27 16:25:05.64 spid42s     SQL Server Audit has started the audits. This is an informational message. No user action is required.
+2024-05-27 16:25:05.65 spid42s     XE session 'system_health' started.
+2024-05-27 16:25:05.79 spid42s     XE session 'telemetry_xevents' started.
+2024-05-27 16:25:05.85 spid42s     SQL Trace ID 1 was started by login "sa".
+2024-05-27 16:25:05.86 spid42s     Server name is 'mssql-db'. This is an informational message only. No user action is required.
+2024-05-27 16:25:05.89 spid76s     Always On: The availability replica manager is starting. This is an informational message only. No user action is required.
+2024-05-27 16:25:05.89 spid45s     Clearing tempdb database.
+2024-05-27 16:25:05.90 spid77s     [4]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:05.90 spid78s     [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:05.90 spid76s     Always On: The availability replica manager is waiting for the instance of SQL Server to allow client connections. This is an informational message only. No user action is required.
+2024-05-27 16:25:05.90 spid77s     Starting up database 'msdb'.
+2024-05-27 16:25:05.90 spid78s     Starting up database 'HairHubDB'.
+2024-05-27 16:25:05.91 spid78s     RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:25:05.91 spid78s     RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:25:06.43 spid78s     Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:25:06.50 spid78s     Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:25:07.12 spid43s     Using 'dbghelp.dll' version '4.0.5'
+2024-05-27 16:25:07.25 spid45s     [2]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:07.25 spid45s     Starting up database 'tempdb'.
+2024-05-27 16:25:11.47 spid45s     The tempdb database has 8 data file(s).
+2024-05-27 16:25:11.49 spid51s     The Service Broker endpoint is in disabled or stopped state.
+2024-05-27 16:25:11.49 spid51s     The Database Mirroring endpoint is in disabled or stopped state.
+2024-05-27 16:25:11.50 spid51s     Service Broker manager has started.
+2024-05-27 16:25:11.51 spid82s     [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:25:11.51 spid82s     Starting up database 'HairHubDB'.
+2024-05-27 16:25:11.51 spid42s     Recovery is complete. This is an informational message only. No user action is required.
+2024-05-27 16:25:11.51 spid82s     RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:25:11.52 spid82s     RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:25:11.99 spid82s     Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:25:12.02 spid82s     Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:45.63 spid80      Attempting to load library 'xplog70.dll' into memory. This is an informational message only. No user action is required.
+2024-05-27 16:26:45.64 spid80      Using 'xplog70.dll' version '2022.160.4125' to execute extended stored procedure 'xp_msver'. This is an informational message only; no user action is required.
+2024-05-27 16:26:46.04 spid80      Attempting to load library 'xpsqlbot.dll' into memory. This is an informational message only. No user action is required.
+2024-05-27 16:26:46.04 spid80      Using 'xpsqlbot.dll' version '2022.160.4125' to execute extended stored procedure 'xp_qv'. This is an informational message only; no user action is required.
+2024-05-27 16:26:47.38 spid83      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:26:47.38 spid83      Starting up database 'HairHubDB'.
+2024-05-27 16:26:47.38 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:26:47.39 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:26:47.83 spid83      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:47.86 spid83      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:49.27 spid83      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:26:49.28 spid83      Starting up database 'HairHubDB'.
+2024-05-27 16:26:49.28 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:26:49.28 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:26:49.71 spid83      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:49.73 spid83      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:52.38 spid83      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:26:52.38 spid83      Starting up database 'HairHubDB'.
+2024-05-27 16:26:52.38 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:26:52.39 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:26:52.86 spid83      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:52.89 spid83      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:53.68 spid83      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:26:53.68 spid83      Starting up database 'HairHubDB'.
+2024-05-27 16:26:53.69 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:26:53.69 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:26:54.14 spid83      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:26:54.17 spid83      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:27:17.06 spid83      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2024-05-27 16:27:17.06 spid83      Starting up database 'HairHubDB'.
+2024-05-27 16:27:17.06 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2024-05-27 16:27:17.07 spid83      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2024-05-27 16:27:17.62 spid83      Parallel redo is started for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:27:17.65 spid83      Parallel redo is shutdown for database 'HairHubDB' with worker pool size [8].
+2024-05-27 16:30:03.61 spid57      XE session 'telemetry_xevents' stopping.
+2024-05-27 16:30:03.62 spid57      XE session 'telemetry_xevents' started.
+2024-05-27 16:36:13.89 spid42s     Always On: The availability replica manager is going offline because SQL Server is shutting down. This is an informational message only. No user action is required.
+2024-05-27 16:36:13.90 spid42s     SQL Server is terminating in response to a 'stop' request from Service Control Manager. This is an informational message only. No user action is required.
+2024-05-27 16:36:13.90 spid42s     .NET Framework runtime has been stopped.
+2024-05-27 16:36:14.15 spid42s     SQL Trace was stopped due to server shutdown. Trace ID = '1'. This is an informational message only; no user action is required.
