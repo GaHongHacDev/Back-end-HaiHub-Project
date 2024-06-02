@@ -10,7 +10,7 @@ services:
       - demo
     environment:
       ACCEPT_EULA: 'Y'
-      MSSQL_SA_PASSWORD: 'Admin@123'
+      SA_PASSWORD: 'Admin@123'
       MSSQL_PID: 'Developer'
       MSSQL_TCP_PORT: 1433
     ports:
