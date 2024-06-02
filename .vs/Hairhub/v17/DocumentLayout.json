@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Ky8\\Exe201\\Hairhub\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{553C6AEA-93C5-467F-A0BD-21EE46806AD7}|docker-compose.dcproj|d:\\ky8\\exe201\\hairhub\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{553C6AEA-93C5-467F-A0BD-21EE46806AD7}|docker-compose.dcproj|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -30,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -58,7 +62,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "docker-compose.yml",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\docker-compose.yml",
+              "RelativeDocumentMoniker": "docker-compose.yml",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\docker-compose.yml",
+              "RelativeToolTip": "docker-compose.yml",
+              "ViewState": "AQIAABQAAAAAAAAAAAAAwBoAAAAKAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2024-06-02T17:18:58.755Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "SalonEmployee.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Entitities\\SalonEmployee.cs",
               "RelativeDocumentMoniker": "Hairhub.Domain\\Entitities\\SalonEmployee.cs",
@@ -71,7 +88,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MediaService.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\MediaService.cs",
               "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\MediaService.cs",
@@ -83,20 +100,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
               "RelativeDocumentMoniker": "Hairhub.API\\appsettings.json",
               "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
               "RelativeToolTip": "Hairhub.API\\appsettings.json",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAAA0AAAArAAAA",
+              "ViewState": "AQIAAAkAAAAAAAAAAADwvxUAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2024-06-01T20:06:28.245Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "HaiHubDbContext.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
               "RelativeDocumentMoniker": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
@@ -108,7 +125,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AccountService.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\AccountService.cs",
               "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\AccountService.cs",
