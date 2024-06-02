@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\Ky8\\Exe201\\Hairhub\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{553C6AEA-93C5-467F-A0BD-21EE46806AD7}|docker-compose.dcproj|d:\\ky8\\exe201\\hairhub\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{553C6AEA-93C5-467F-A0BD-21EE46806AD7}|docker-compose.dcproj|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\services\\mediaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\mediaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{84AFFC63-E774-40CB-94BB-2391520F1A89}|Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.infrastructure\\data\\haihubdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -55,27 +55,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
-              "RelativeDocumentMoniker": "Hairhub.API\\appsettings.json",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
-              "RelativeToolTip": "Hairhub.API\\appsettings.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAAA1AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2024-06-01T20:06:28.245Z",
+              "Title": "MediaService.cs",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\MediaService.cs",
+              "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\MediaService.cs",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\MediaService.cs",
+              "RelativeToolTip": "Hairhub.Service\\Services\\Services\\MediaService.cs",
+              "ViewState": "AQIAACEAAAAAAAAAAAAwwCsAAAA7AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-02T14:05:38.575Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "docker-compose.yml",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\docker-compose.yml",
-              "RelativeDocumentMoniker": "docker-compose.yml",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\docker-compose.yml",
-              "RelativeToolTip": "docker-compose.yml",
-              "ViewState": "AQIAAAoAAAAAAAAAAAAswBgAAAANAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
-              "WhenOpened": "2024-06-01T20:05:05.644Z",
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
+              "RelativeDocumentMoniker": "Hairhub.API\\appsettings.json",
+              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
+              "RelativeToolTip": "Hairhub.API\\appsettings.json",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAAsAAAAEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-06-01T20:06:28.245Z",
               "EditorCaption": ""
             },
             {
@@ -86,7 +86,7 @@
               "RelativeDocumentMoniker": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
               "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
               "RelativeToolTip": "Hairhub.Infrastructure\\Data\\HaiHubDbContext.cs",
-              "ViewState": "AQIAAAwAAAAAAAAAAAAAABUAAAABAAAA",
+              "ViewState": "AQIAABIAAAAAAAAAAAAAABUAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-01T20:06:47.416Z",
               "EditorCaption": ""
@@ -99,10 +99,9 @@
               "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\AccountService.cs",
               "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\AccountService.cs",
               "RelativeToolTip": "Hairhub.Service\\Services\\Services\\AccountService.cs",
-              "ViewState": "AQIAAHgAAAAAAAAAAAAowIAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAIAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-01T19:23:04.97Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-06-01T19:23:04.97Z"
             }
           ]
         },
