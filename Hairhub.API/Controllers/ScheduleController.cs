@@ -19,7 +19,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSchedules(int page, int size) {
+        public async Task<IActionResult> GetSchedules(int page=1, int size=10) {
             try
             {
                 var schedules = await _scheduleService.GetSchedules(page, size);

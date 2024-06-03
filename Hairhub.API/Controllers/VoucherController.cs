@@ -22,7 +22,7 @@ namespace Hairhub.API.Controllers
         
 
         [HttpGet]
-        public async Task<IActionResult> GetAllVoucher([FromQuery]int page, [FromQuery]int size) {
+        public async Task<IActionResult> GetAllVoucher([FromQuery]int page=1, [FromQuery]int size=10) {
             
             var listVoucher = await _voucherService.GetAllVoucherAsync(page, size);
             return Ok(listVoucher);        

@@ -1,0 +1,82 @@
+name: dockercompose12480514602510649397
+services:
+  hairhub.api:
+    build:
+      context: D:\Ky8\Exe201\Hairhub
+      dockerfile: Hairhub.API/Dockerfile
+    depends_on:
+      mssql:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ASPNETCORE_URLS: http://+:80
+    image: hairhubapi
+    networks:
+      demo: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\flami\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\flami\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  mssql:
+    container_name: mssql-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: Admin@123
+      MSSQL_TCP_PORT: "1433"
+    hostname: mssql-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    networks:
+      demo: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1455"
+        protocol: tcp
+    user: root
+    volumes:
+      - type: volume
+        source: mssql-data
+        target: /var/opt/mssql/data
+        volume: {}
+      - type: volume
+        source: mssql-log
+        target: /var/opt/mssql/log
+        volume: {}
+      - type: volume
+        source: mssql-secrets
+        target: /var/opt/mssql/secrets
+        volume: {}
+networks:
+  demo:
+    name: demo
+volumes:
+  mssql-data:
+    name: dockercompose12480514602510649397_mssql-data
+  mssql-log:
+    name: dockercompose12480514602510649397_mssql-log
+  mssql-secrets:
+    name: dockercompose12480514602510649397_mssql-secrets

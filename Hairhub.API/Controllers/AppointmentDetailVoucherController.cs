@@ -18,7 +18,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAppointmentDetailVouchers(int page, int size)
+        public async Task<IActionResult> GetAppointmentDetailVouchers(int page=1, int size = 10)
         {
             try
             {
