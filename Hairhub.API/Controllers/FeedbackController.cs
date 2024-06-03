@@ -20,7 +20,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFeedbacks(int page, int size)
+        public async Task<IActionResult> GetFeedbacks(int page=1, int size = 10)
         {
             try
             {
