@@ -69,7 +69,7 @@ namespace Hairhub.API.Controllers
                 {
                     return NotFound("Email không tồn tại!");
                 }
-                return Ok("Email hợp lệ!");
+                return Ok("Email đã tồn tại!");
             }
             catch (NotFoundException ex)
             {

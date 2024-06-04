@@ -115,12 +115,11 @@ namespace Hairhub.Service.Services.Services
             var email = checkExistEmailResrequest.Email.ToLower();
             var emailSalon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
             var emailCustomer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
-            var list = await _unitOfWork.GetRepository<Customer>().GetListAsync();
             if (emailSalon != null && emailCustomer!=null)
             {
-                throw new NotFoundException("Email không tồn tại!");
+                return true;
             }
-            return true;
+            return false;
         }
     }
 }
