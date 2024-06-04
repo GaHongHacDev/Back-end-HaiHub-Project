@@ -59,7 +59,7 @@ namespace Hairhub.Service.Services.Services
         {
             var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
                                                 predicate: x => x.RefreshToken == refreshTokenRequest.RefreshToken
-                                                && x.Expires <= DateTime.Now);
+                                                && x.Expires >= DateTime.Now);
             if (refreshTokenEntity == null)
             {
                 throw new Exception("RefreshToken not found or expired");
@@ -73,13 +73,13 @@ namespace Hairhub.Service.Services.Services
 
             var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
             refreshTokenEntity.AccessToken = accessToken;
-            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(refreshTokenEntity);
+            _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (!isUpdate)
             {
                 throw new Exception("Cannot insert new access token to DB");
             }
-            return new RefreshTokenResponse() { AccessToken = accessToken };
+            return new RefreshTokenResponse() { AccessToken = refreshTokenEntity.AccessToken, RefreshToken = refreshTokenEntity.RefreshToken };
         }
 
         private string GenerateToken(string username, string roleName)

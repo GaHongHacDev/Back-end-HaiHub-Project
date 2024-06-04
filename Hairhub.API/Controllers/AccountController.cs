@@ -136,7 +136,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> GetAcoountByUsernamePassword([FromRoute] Guid id)
+        public async Task<IActionResult> GetAcountById([FromRoute] Guid id)
         {
             try
             {
