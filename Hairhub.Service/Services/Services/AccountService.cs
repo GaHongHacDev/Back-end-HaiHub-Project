@@ -7,6 +7,7 @@ using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 
 namespace Hairhub.Service.Services.Services
@@ -16,13 +17,15 @@ namespace Hairhub.Service.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMediaService _mediaService;
+        private readonly IConfiguration _configuaration;
 
-        public AccountService( IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
+        public AccountService( IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IConfiguration configuaration)
         {
 
-            this._unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _mediaService = mediaService;
+            _configuaration = configuaration;
         }
 
         public async Task<bool> ActiveAccount(Guid id)
@@ -156,17 +159,19 @@ namespace Hairhub.Service.Services.Services
                 account.IsActive = true;
                 userInfor.Id = Guid.NewGuid();
                 userInfor.AccountId = account.Id;
+                userInfor.Img = _configuaration["Default:Avatar_Default"];
                 await _unitOfWork.GetRepository<Customer>().InsertAsync(userInfor);
             }
             else if (RoleEnum.SalonOwner.ToString().Equals(createAccountRequest.RoleName))
             {
-                var userInfor = _mapper.Map<SalonOwner>(createAccountRequest);
+                var salonInfo = _mapper.Map<SalonOwner>(createAccountRequest);
                 account.Id = Guid.NewGuid();
                 account.RoleId = role.RoleId;
                 account.IsActive = true;
-                userInfor.Id = Guid.NewGuid();
-                userInfor.AccountId = account.Id;
-                await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(userInfor);
+                salonInfo.Id = Guid.NewGuid();
+                salonInfo.AccountId = account.Id;
+                salonInfo.Img = _configuaration["Default:Avatar_Default"];
+                await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonInfo);
             }
             await _unitOfWork.GetRepository<Account>().InsertAsync(account);
             await _unitOfWork.CommitAsync();
