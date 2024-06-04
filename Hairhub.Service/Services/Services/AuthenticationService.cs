@@ -27,23 +27,23 @@ namespace Hairhub.Service.Services.Services
         public async Task<LoginResponse> Login(string userName, string password)
         {
 
-            var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
                 predicate: u => u.Username == userName && u.Password == password,
                 include: x => x.Include(a => a.Role));
             // return null if user not found
-            if (user == null)
+            if (account == null)
             {
                 return null;
             }
             // authentication successful so generate jwt token and refresh token
-            var accessToken = GenerateToken(user.Username, user.RoleId.ToString());
+            var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
             var refreshToken = GenerateRefreshToken();
             var newRefrehToken = new RefreshTokenAccount()
             {
                 Id = Guid.NewGuid(),
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                AccountId = user.Id,
+                AccountId = account.Id,
                 Expires = DateTime.UtcNow.AddDays(30),
             };
             await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken); 
@@ -52,7 +52,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Cannot insert token to DB");
             }
-            return new LoginResponse() { AccessToken = accessToken, RefreshToken = refreshToken };
+            return new LoginResponse() { AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id };
         }
 
         public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)

@@ -65,7 +65,7 @@ namespace Hairhub.API.Controllers
             try
             {
                 bool isExistEmail = await _emailService.CheckExistEmail(request);
-                if (isExistEmail)
+                if (!isExistEmail)
                 {
                     return NotFound("Email không tồn tại!");
                 }

@@ -123,7 +123,7 @@ namespace Hairhub.Service.Services.Services
                                     .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
                 if (salonOwner == null)
                 {
-                    throw new NotFoundException("Không tìm thấy salon owner với tài khoản này");
+                    throw new NotFoundException("Không tìm thấy customer với tài khoản này");
                 }
                 respose = _mapper.Map<GetAccountResponse>(salonOwner);
             }
