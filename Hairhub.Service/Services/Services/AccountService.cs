@@ -98,7 +98,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetAccountResponse> GetAccountById(Guid id)
         {
-            GetAccountResponse respose = new GetAccountResponse();
+            GetAccountResponse response = new GetAccountResponse();
             Account account = await _unitOfWork
                 .GetRepository<Account>()
                 .SingleOrDefaultAsync(
@@ -107,28 +107,32 @@ namespace Hairhub.Service.Services.Services
                  );
             if (account == null)
             {
-                throw new NotFoundException("Tài khoản hoặc mật khẩu không chính xác");
+                throw new NotFoundException("Tài khoản không tồn tại");
             }
-            if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString())){
+            if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString())){
                 Customer customer = await _unitOfWork.GetRepository<Customer>()
                                                     .SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
                 if (customer == null)
                 {
-                    throw new NotFoundException("Không tìm thấy customer với tài khoản này");
+                    throw new NotFoundException("Tài khoản không tồn tại");
                 }
-                respose = _mapper.Map<GetAccountResponse>(customer);
-            }else if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
+                response = _mapper.Map<GetAccountResponse>(customer);
+            }else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
             {
                 SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
                                     .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
                 if (salonOwner == null)
                 {
-                    throw new NotFoundException("Không tìm thấy customer với tài khoản này");
+                    throw new NotFoundException("Tài khoản không tồn tại");
                 }
-                respose = _mapper.Map<GetAccountResponse>(salonOwner);
+                response = _mapper.Map<GetAccountResponse>(salonOwner);
             }
-            respose = _mapper.Map<GetAccountResponse>(account);
-            return respose;
+            else
+            {
+                throw new NotFoundException("Role không tồn tại");
+            }
+            response = _mapper.Map(account, response);
+            return response;
         }
 
         public async Task<CreateAccountResponse> RegisterAccount(CreateAccountRequest createAccountRequest)
@@ -137,6 +141,11 @@ namespace Hairhub.Service.Services.Services
             if (role == null)
             {
                 throw new Exception("Role not found");
+            }
+            var userName = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Username.Equals(createAccountRequest.Username));
+            if (userName != null)
+            {
+                throw new Exception("Username đã tồn tại!");
             }
             var account = _mapper.Map<Account>(createAccountRequest);
             if (RoleEnum.Customer.ToString().Equals(createAccountRequest.RoleName))

@@ -82,8 +82,8 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.Username).HasMaxLength(64).HasColumnName("username").IsRequired(false);
-                entity.Property(e => e.Password).HasMaxLength(32).HasColumnName("password").IsRequired(false);
+                entity.Property(e => e.Username).HasMaxLength(50).HasColumnName("username").IsRequired(false);
+                entity.Property(e => e.Password).HasMaxLength(50).HasColumnName("password").IsRequired(false);
                 entity.Property(e => e.RoleId).HasMaxLength(64).HasColumnName("role_id").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
@@ -100,7 +100,7 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.AccessToken).HasMaxLength(250).HasColumnName("access_token");
+                entity.Property(e => e.AccessToken).HasMaxLength(515).HasColumnName("access_token");
                 entity.Property(e => e.RefreshToken).HasMaxLength(50).HasColumnName("refresh_token");
                 entity.Property(e => e.Expires).HasColumnName("expires");
                 entity.Property(e => e.AccountId).HasColumnName("account_id");

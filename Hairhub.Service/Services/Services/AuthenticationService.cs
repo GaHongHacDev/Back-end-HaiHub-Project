@@ -36,7 +36,7 @@ namespace Hairhub.Service.Services.Services
                 return null;
             }
             // authentication successful so generate jwt token and refresh token
-            var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
+            var accessToken = GenerateToken(account.Username, account.Role.RoleName);
             var refreshToken = GenerateRefreshToken();
             var newRefrehToken = new RefreshTokenAccount()
             {
