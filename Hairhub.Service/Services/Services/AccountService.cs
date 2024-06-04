@@ -6,6 +6,8 @@ using AutoMapper;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Hairhub.Service.Services.Services
 {
@@ -92,6 +94,41 @@ namespace Hairhub.Service.Services.Services
             accountCustomer.IsActive = false;
             _unitOfWork.GetRepository<Account>().UpdateAsync(accountCustomer);
             return await _unitOfWork.CommitAsync() > 0;
+        }
+
+        public async Task<GetAccountResponse> GetAccountById(Guid id)
+        {
+            GetAccountResponse respose = new GetAccountResponse();
+            Account account = await _unitOfWork
+                .GetRepository<Account>()
+                .SingleOrDefaultAsync(
+                    predicate: x => x.Id==id,
+                    include: source => source.Include(a => a.Role)
+                 );
+            if (account == null)
+            {
+                throw new NotFoundException("Tài khoản hoặc mật khẩu không chính xác");
+            }
+            if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString())){
+                Customer customer = await _unitOfWork.GetRepository<Customer>()
+                                                    .SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+                if (customer == null)
+                {
+                    throw new NotFoundException("Không tìm thấy customer với tài khoản này");
+                }
+                respose = _mapper.Map<GetAccountResponse>(customer);
+            }else if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
+            {
+                SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
+                                    .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                if (salonOwner == null)
+                {
+                    throw new NotFoundException("Không tìm thấy salon owner với tài khoản này");
+                }
+                respose = _mapper.Map<GetAccountResponse>(salonOwner);
+            }
+            respose = _mapper.Map<GetAccountResponse>(account);
+            return respose;
         }
 
         public async Task<CreateAccountResponse> RegisterAccount(CreateAccountRequest createAccountRequest)

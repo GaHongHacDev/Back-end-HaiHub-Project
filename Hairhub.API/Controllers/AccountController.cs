@@ -133,5 +133,28 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetAcoountByUsernamePassword([FromRoute] Guid id)
+        {
+            try
+            {
+                var accooutReponse = await _accountService.GetAccountById(id);
+                if (accooutReponse==null)
+                {
+                    return BadRequest("Cannot find this account!");
+                }
+                return Ok(accooutReponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
