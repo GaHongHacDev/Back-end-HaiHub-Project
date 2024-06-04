@@ -434,8 +434,8 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<string>("AccessToken")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("access_token");
 
                     b.Property<Guid>("AccountId")
@@ -443,18 +443,13 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("account_id");
 
                     b.Property<DateTime>("Expires")
-                        .HasMaxLength(64)
                         .HasColumnType("datetime2")
                         .HasColumnName("expires");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_active");
-
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("refresh_token");
 
                     b.HasKey("Id");

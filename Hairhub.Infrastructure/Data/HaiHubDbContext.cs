@@ -100,10 +100,9 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.AccessToken).HasMaxLength(64).HasColumnName("access_token");
-                entity.Property(e => e.RefreshToken).HasMaxLength(32).HasColumnName("refresh_token");
-                entity.Property(e => e.Expires).HasMaxLength(64).HasColumnName("expires");
-                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.AccessToken).HasMaxLength(250).HasColumnName("access_token");
+                entity.Property(e => e.RefreshToken).HasMaxLength(50).HasColumnName("refresh_token");
+                entity.Property(e => e.Expires).HasColumnName("expires");
                 entity.Property(e => e.AccountId).HasColumnName("account_id");
 
                 entity.HasOne(d => d.Account)

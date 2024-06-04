@@ -38,16 +38,17 @@ namespace Hairhub.Service.Services.Services
             // authentication successful so generate jwt token and refresh token
             var accessToken = GenerateToken(user.Username, user.RoleId.ToString());
             var refreshToken = GenerateRefreshToken();
-            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(new RefreshTokenAccount()
+            var newRefrehToken = new RefreshTokenAccount()
             {
-                Id = new Guid(accessToken),
+                Id = Guid.NewGuid(),
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 AccountId = user.Id,
-                Expires = DateTime.UtcNow.AddDays(30)
-            });
+                Expires = DateTime.UtcNow.AddDays(30),
+            };
+            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken); 
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
-            if (isInsert)
+            if (!isInsert)
             {
                 throw new Exception("Cannot insert token to DB");
             }
@@ -58,7 +59,7 @@ namespace Hairhub.Service.Services.Services
         {
             var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
                                                 predicate: x => x.RefreshToken == refreshTokenRequest.RefreshToken
-                                                && x.IsActive == true);
+                                                && x.Expires <= DateTime.Now);
             if (refreshTokenEntity == null)
             {
                 throw new Exception("RefreshToken not found or expired");
