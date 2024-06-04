@@ -11,6 +11,9 @@ using System.Security.Cryptography;
 using Hairhub.Domain.Dtos.Requests.Authentication;
 using Hairhub.Domain.Dtos.Responses.Authentication;
 using Hairhub.Domain.Exceptions;
+using Hairhub.Domain.Dtos.Responses.Accounts;
+using AutoMapper;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -18,11 +21,13 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuaration;
+        private readonly IMapper _mapper;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuaration)
+        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuaration, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _configuaration = configuaration;
+            _mapper = mapper;
         }
         public async Task<LoginResponse> Login(string userName, string password)
         {
@@ -53,6 +58,33 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Cannot insert token to DB");
             }
             return new LoginResponse() { AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id };
+        }
+        public async Task<FetchUserResponse> FetchUser(string accessToken)
+        {
+            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
+                .SingleOrDefaultAsync(
+                                        predicate: x=>x.AccessToken.Equals(accessToken) && x.Expires>=DateTime.Now,
+                                        include: x=>x.Include(y=>y.Account.Role));
+            if (refreshTokenEntity == null)
+            {
+                throw new NotFoundException("Không tìm thấy access token!");
+            }
+            var account = refreshTokenEntity.Account;
+            FetchUserResponse fetchUserResponse = new FetchUserResponse();
+            fetchUserResponse = _mapper.Map<FetchUserResponse>(account);
+            if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
+            {
+                var customer = await _unitOfWork.GetRepository<Customer>()
+                                                .SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+                fetchUserResponse = _mapper.Map(customer, fetchUserResponse);
+            }
+            else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
+            {
+                var salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
+                                                .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                fetchUserResponse = _mapper.Map(salonOwner, fetchUserResponse);
+            }
+            return fetchUserResponse;
         }
 
         public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)

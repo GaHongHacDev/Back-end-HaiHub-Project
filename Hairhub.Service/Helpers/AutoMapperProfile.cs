@@ -40,6 +40,9 @@ namespace Hairhub.Service.Helpers
             CreateMap<GetAccountResponse, Account>().ReverseMap();
             CreateMap<GetAccountResponse, Customer>().ReverseMap();
             CreateMap<GetAccountResponse, SalonOwner>().ReverseMap();
+            CreateMap<FetchUserResponse, Customer>().ReverseMap();
+            CreateMap<FetchUserResponse, SalonOwner>().ReverseMap();
+            CreateMap<FetchUserResponse, Account>().ReverseMap();
 
             //Customer
             CreateMap<GetCustomerResponse, Customer>().ReverseMap();
