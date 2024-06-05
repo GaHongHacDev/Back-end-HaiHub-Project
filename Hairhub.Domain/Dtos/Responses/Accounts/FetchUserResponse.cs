@@ -8,9 +8,9 @@ namespace Hairhub.Domain.Dtos.Responses.Accounts
 {
     public class FetchUserResponse
     {
+        public Guid AccountId { get; set; }
         public Guid? RoleId { get; set; }
         public string Username { get; set; }
-        public string Password { get; set; }
         public string FullName { get; set; }
         public DateTime DayOfBirth { get; set; }
         public string Gender { get; set; }
