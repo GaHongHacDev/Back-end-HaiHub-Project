@@ -20,6 +20,18 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
         public string? HumanId { get; set; }
         public string? Img { get; set; }
         public bool? IsActive { get; set; }
-        public SalonInformation SalonInformation { get; set; }
+        public SalonInformationSalonEmployeeResponse SalonInformation { get; set; }
+    }
+
+    public class SalonInformationSalonEmployeeResponse
+    {
+        public Guid Id { get; set; }
+        public Guid? OwnerId { get; set; }
+        public string? Name { get; set; }
+        public string? Address { get; set; }
+        public string? Description { get; set; }
+        public string? Img { get; set; }
+        public string? BusinessLicense { get; set; }
+        public bool? IsActive { get; set; }
     }
 }
