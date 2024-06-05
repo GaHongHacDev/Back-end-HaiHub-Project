@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\Ky8\\Exe201\\Hairhub\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\services\\accountservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\accountservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.domain\\dtos\\responses\\accounts\\fetchuserresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\accounts\\fetchuserresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|solutionrelative:hairhub.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DA93B68F-AC33-430D-919B-544CEFA38B78}|Hairhub.API\\Hairhub.API.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.api\\controllers\\authenticationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -21,14 +21,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\services\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.service\\services\\services\\accountservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{347E6AA0-E53E-44A1-84CC-C0729DE37B49}|Hairhub.Service\\Hairhub.Service.csproj|solutionrelative:hairhub.service\\services\\services\\accountservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|d:\\ky8\\exe201\\hairhub\\hairhub.domain\\dtos\\responses\\accounts\\getaccountresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BF88904F-E9B0-4783-A52E-23B433A89889}|Hairhub.Domain\\Hairhub.Domain.csproj|solutionrelative:hairhub.domain\\dtos\\responses\\accounts\\getaccountresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -66,18 +58,6 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "FetchUserResponse.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Responses\\Accounts\\FetchUserResponse.cs",
-              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\Accounts\\FetchUserResponse.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Responses\\Accounts\\FetchUserResponse.cs",
-              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\Accounts\\FetchUserResponse.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAsAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-04T18:05:22.554Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\Program.cs",
@@ -98,29 +78,18 @@
               "RelativeToolTip": "Hairhub.API\\Controllers\\AuthenticationController.cs",
               "ViewState": "AQIAAEYAAAAAAAAAAAAAAFwAAAAsAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-04T17:35:39.856Z"
+              "WhenOpened": "2024-06-04T17:35:39.856Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "GetAccountResponse.cs",
-              "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Responses\\Accounts\\GetAccountResponse.cs",
-              "RelativeDocumentMoniker": "Hairhub.Domain\\Dtos\\Responses\\Accounts\\GetAccountResponse.cs",
-              "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Dtos\\Responses\\Accounts\\GetAccountResponse.cs",
-              "RelativeToolTip": "Hairhub.Domain\\Dtos\\Responses\\Accounts\\GetAccountResponse.cs",
-              "ViewState": "AQIAAAgAAAAAAAAAAAAxwAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-04T17:07:29.088Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
               "RelativeDocumentMoniker": "Hairhub.API\\appsettings.json",
               "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.API\\appsettings.json",
               "RelativeToolTip": "Hairhub.API\\appsettings.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAACLAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2024-06-04T12:30:28.303Z",
               "EditorCaption": ""
@@ -139,15 +108,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
               "Title": "AccountService.cs",
               "DocumentMoniker": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\AccountService.cs",
               "RelativeDocumentMoniker": "Hairhub.Service\\Services\\Services\\AccountService.cs",
               "ToolTip": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Services\\Services\\AccountService.cs",
               "RelativeToolTip": "Hairhub.Service\\Services\\Services\\AccountService.cs",
-              "ViewState": "AQIAAAgAAAAAAAAAAAAAAA4AAAAxAAAA",
+              "ViewState": "AQIAALEAAAAAAAAAAAAcwMIAAABIAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-04T11:22:00.015Z"
+              "WhenOpened": "2024-06-04T11:22:00.015Z",
+              "EditorCaption": ""
             }
           ]
         },
