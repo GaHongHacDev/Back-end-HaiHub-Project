@@ -10,7 +10,6 @@ namespace Hairhub.Domain.Dtos.Responses.SalonOwners
     public class GetSalonOwnerResponse
     {
         public Guid Id { get; set; }
-        public Guid? AccountId { get; set; }
         public string? FullName { get; set; }
         public DateTime? DayOfBirth { get; set; }
         public string? Gender { get; set; }
@@ -21,6 +20,15 @@ namespace Hairhub.Domain.Dtos.Responses.SalonOwners
         public string? BankAccount { get; set; }
         public string? BankName { get; set; }
 
-        public Account Account { get; set; }
+        public AccountSalonOwnerResponse Account { get; set; }
+    }
+
+    public class AccountSalonOwnerResponse()
+    {
+        public Guid Id { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public Guid? RoleId { get; set; }
+        public bool? IsActive { get; set; }
     }
 }

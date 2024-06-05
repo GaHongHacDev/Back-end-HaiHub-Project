@@ -20,8 +20,15 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAllCustomer([FromQuery] int page=1, [FromQuery] int size=10) {
-            var customers = await _customerService.GetCustomers(page, size);
-            return Ok(customers);
+            try
+            {
+                var customers = await _customerService.GetCustomers(page, size);
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]

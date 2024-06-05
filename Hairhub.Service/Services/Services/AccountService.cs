@@ -99,6 +99,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<CreateAccountResponse> RegisterAccount(CreateAccountRequest createAccountRequest)
         {
+            CreateAccountResponse createAccountResponse = new CreateAccountResponse();
             var role = await _unitOfWork.GetRepository<Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(createAccountRequest.RoleName));
             if (role == null)
             {
@@ -120,6 +121,7 @@ namespace Hairhub.Service.Services.Services
                 userInfor.AccountId = account.Id;
                 userInfor.Img = _configuaration["Default:Avatar_Default"];
                 await _unitOfWork.GetRepository<Customer>().InsertAsync(userInfor);
+                createAccountResponse.Img = userInfor.Img;
             }
             else if (RoleEnum.SalonOwner.ToString().Equals(createAccountRequest.RoleName))
             {
@@ -131,10 +133,12 @@ namespace Hairhub.Service.Services.Services
                 salonInfo.AccountId = account.Id;
                 salonInfo.Img = _configuaration["Default:Avatar_Default"];
                 await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonInfo);
+                createAccountResponse.Img = salonInfo.Img;
             }
             await _unitOfWork.GetRepository<Domain.Entitities.Account>().InsertAsync(account);
             await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateAccountResponse>(createAccountRequest);
+            
+            return _mapper.Map(createAccountRequest, createAccountResponse);
         }
 
         public async Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest)
