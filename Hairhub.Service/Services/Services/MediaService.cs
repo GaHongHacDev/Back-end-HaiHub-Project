@@ -23,9 +23,9 @@ namespace Hairhub.Service.Services.Services
         public MediaService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _cloudName = _configuration["Cloudinary:CloudName"];
-            _apiKey = _configuration["Cloudinary:ApiKey"];
-            apiSecret = _configuration["Cloudinary:APISecret"];
+            _cloudName = _configuration["Cloudinary:cloud_name"];
+            _apiKey = _configuration["Cloudinary:api_key"];
+            apiSecret = _configuration["Cloudinary:api_secret"];
         }
         public async Task<string> UploadAnImage(IFormFile file, string pathFolder, string nameOfImg)
         {
@@ -63,6 +63,9 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<string> UploadAVideo(IFormFile file, string pathFolder, string nameOfImg)
         {
+            _cloudName = _configuration["Cloudinary:CloudName"];
+            _apiKey = _configuration["Cloudinary:ApiKey"];
+            apiSecret = _configuration["Cloudinary:APISecret"];
             if (file == null || file.Length == 0)
             {
                 throw new NotFoundException("No file uploaded!");
