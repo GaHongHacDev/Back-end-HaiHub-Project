@@ -21,18 +21,13 @@ namespace Hairhub.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            IConfiguration config = new ConfigurationBuilder()
-                           .SetBasePath(Directory.GetCurrentDirectory())
-                           .AddJsonFile("appsettings.json", true, true)
-                           .Build();
-            string cs = config["ConnectionStrings:DefaultConnectionString"];
-            Console.WriteLine("*********************" + cs);
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(cs);
-            }
-
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .Build();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
         }
+
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<RefreshTokenAccount> RefreshTokenAccounts { get; set; }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
+using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Exceptions;
@@ -7,6 +8,7 @@ using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -34,15 +36,29 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest)
+        public async Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest, CreateSalonInformationWithScheduleRequest request)
         {
             var owner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonInformationRequest.OwnerId));
             if (owner == null)
             {
                 throw new Exception("OwnerId not found");
             }
-            var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
+            var salonInformation = _mapper.Map<SalonInformation>(request);
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
+            foreach (var scheduleRequest in request.Schedules)
+            {
+                var newSchedule = new Schedule
+                {
+                    Id = Guid.NewGuid(),
+                    EmployeeId = scheduleRequest.EmployeeId,
+                    Date = scheduleRequest.Date,
+                    StartTime = scheduleRequest.StartTime,
+                    EndTime = scheduleRequest.EndTime,
+                    IsActive = true
+                };
+                await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
+            }
+
             await _unitOfWork.CommitAsync();
             return _mapper.Map<CreateSalonInformationResponse>(salonInformation);
         }
