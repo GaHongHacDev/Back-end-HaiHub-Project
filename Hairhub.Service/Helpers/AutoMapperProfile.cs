@@ -25,6 +25,7 @@ using Hairhub.Domain.Dtos.Requests.Config;
 using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Domain.Dtos.Responses.Config;
 using Hairhub.Domain.Dtos.Responses.Voucher;
+using Hairhub.Domain.Dtos.Requests.Schedule;
 
 namespace Hairhub.Service.Helpers
 {
@@ -89,6 +90,9 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<SalonOwnerSalonInformationResponse, SalonOwner>().ReverseMap();
+            CreateMap<CreateSalonInformationWithScheduleRequest, SalonInformation>()
+                .ForMember(dest => dest.Schedules, opt => opt.Ignore());
+            CreateMap<CreateScheduleRequest, Schedule>();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();
