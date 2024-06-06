@@ -149,9 +149,6 @@ namespace Hairhub.Service.Services.Services
                                                 include: x => x.Include(y => y.Role));
             if (account == null)
                 throw new NotFoundException($"Account was not found with id {id}");
-            //Update Account
-            account.Username = updateAccountRequest.Username;
-            account.Password = updateAccountRequest.Password;
             if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString())) // Salon Owner
             {
                 SalonOwner salonOwner = new SalonOwner();
@@ -193,7 +190,6 @@ namespace Hairhub.Service.Services.Services
                 customer.BankName = updateAccountRequest.BankName;
                 _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
             }
-            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
         }
