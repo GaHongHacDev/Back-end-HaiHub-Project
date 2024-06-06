@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {}
+    "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {}
   },
   "projects": {
-    "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+    "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
         "projectName": "Hairhub.Domain",
-        "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj",
+        "projectPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj",
         "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-        "outputPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\obj\\",
+        "outputPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -78,14 +78,14 @@
         }
       }
     },
-    "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
+    "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
         "projectName": "Hairhub.Infrastructure",
-        "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
+        "projectPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\Hairhub.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-        "outputPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Infrastructure\\obj\\",
+        "outputPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -106,11 +106,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               },
-              "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj": {
-                "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj"
+              "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj"
               }
             }
           }
@@ -175,14 +175,14 @@
         }
       }
     },
-    "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj": {
+    "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj",
+        "projectUniqueName": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
         "projectName": "Hairhub.Service",
-        "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\Hairhub.Service.csproj",
+        "projectPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Service\\Hairhub.Service.csproj",
         "packagesPath": "C:\\Users\\flami\\.nuget\\packages\\",
-        "outputPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Service\\obj\\",
+        "outputPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Service\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -203,8 +203,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj": {
-                "projectPath": "D:\\Ky8\\Exe201\\Hairhub\\Hairhub.Domain\\Hairhub.Domain.csproj"
+              "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj": {
+                "projectPath": "D:\\Ky8\\Exe201\\HairHubProject\\Back-end-HaiHub-Project\\Hairhub.Domain\\Hairhub.Domain.csproj"
               }
             }
           }
