@@ -35,6 +35,7 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<ISalonEmployeeService, SalonEmployeeService>();
             services.AddScoped<ISalonInformationService, SalonInformationService>();
             services.AddScoped<IServiceHairService, ServiceHairService>();
+            services.AddScoped<IMediaService, MediaService>();
             return services;
         }
         public static IServiceCollection AddDIRepositories(this IServiceCollection services)

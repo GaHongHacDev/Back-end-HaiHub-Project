@@ -58,5 +58,23 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CheckExistEmail([FromBody] CheckExistEmailResrequest request)
+        {
+            try
+            {
+                bool isExistEmail = await _emailService.CheckExistEmail(request);
+                if (isExistEmail)
+                {
+                    return BadRequest("Email is existed!");
+                }
+                return Ok("Email is valid!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

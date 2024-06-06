@@ -22,7 +22,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAppointmentDetail([FromQuery]                                                                                                               int page, [FromQuery] int size)
+        public async Task<IActionResult> GetAllAppointmentDetail([FromQuery]int page=1, [FromQuery] int size = 10)
         {
             var appointmentsResponse = await _appointmentDetailService.GetAllAppointmentDetail(page, size);
             return Ok(appointmentsResponse);

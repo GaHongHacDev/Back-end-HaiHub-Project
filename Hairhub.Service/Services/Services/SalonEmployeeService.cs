@@ -39,7 +39,7 @@ namespace Hairhub.Service.Services.Services
             var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonEmployeeRequest.SalonInformationId));
             if (salonInformation == null)
             {
-                throw new Exception("SalonInformationId not found");
+                throw new Exception($"salonInformation not found with id: {createSalonEmployeeRequest.SalonInformationId}");
             }
             var salonEmployee = _mapper.Map<SalonEmployee>(createSalonEmployeeRequest);
             await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(salonEmployee);

@@ -11,5 +11,6 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<bool> SendEmailAsync(SendOtpEmailRequest sendEmailRequest);
         Task<bool> CheckOtpEmail(CheckOtpRequest checkOtpRequest);
+        public Task<bool> CheckExistEmail(CheckExistEmailResrequest checkExistEmailResrequest);
     }
 }

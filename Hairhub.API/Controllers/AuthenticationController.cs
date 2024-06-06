@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
-using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Requests.Authentication;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Exceptions;
@@ -29,27 +29,50 @@ namespace Hairhub.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            var token = await _authenticationService.Login(loginRequest.Username, loginRequest.Password);
+            try
+            {
+                var loginResponse = await _authenticationService.Login(loginRequest.Username, loginRequest.Password);
 
-            if (token == null || String.IsNullOrWhiteSpace(token.ToString()))
-                return BadRequest(new { message = "User name or password is incorrect" });
-            return Ok(token);
+                if (loginResponse == null || String.IsNullOrWhiteSpace(loginResponse.ToString()))
+                    return Unauthorized(new { message = "User name or password is incorrect" });
+                return Ok(loginResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
-        public IActionResult LogOut()
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            // Đọc token từ header X-Auth-Token
-            var token = Request.Headers["X-Auth-Token"].FirstOrDefault();
-
-            if (string.IsNullOrEmpty(token))
+            try
             {
-                return BadRequest("Token is missing");
+                var refreshTokenResponse = await _authenticationService.RefreshToken(request);
+                return Ok(refreshTokenResponse);
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            _authenticationService.Logout(token);
-
-            return Ok();
+        [HttpDelete]
+        public async Task<IActionResult> LogOut(LogoutRequest logoutRequest)
+        {
+            try
+            {
+                bool isLogout = await _authenticationService.Logout(logoutRequest);
+                if (!isLogout)
+                {
+                    return BadRequest("Cannot logout account!");
+                }
+                return Ok("Logout successfully!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
