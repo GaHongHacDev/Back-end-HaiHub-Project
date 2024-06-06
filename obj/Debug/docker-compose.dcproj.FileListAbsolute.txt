@@ -38,3 +38,4 @@ D:\Ky8\Exe201\Hairhub\bin\Debug\Hairhub.Infrastructure.pdb
 D:\Ky8\Exe201\Hairhub\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
 D:\Ky8\Exe201\Hairhub\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 D:\Ky8\Exe201\Hairhub\obj\Debug\docker-c.35A3FFBA.Up2Date
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
