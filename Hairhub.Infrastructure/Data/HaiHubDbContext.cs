@@ -25,7 +25,7 @@ namespace Hairhub.Infrastructure
                            .SetBasePath(Directory.GetCurrentDirectory())
                            .AddJsonFile("appsettings.json", true, true)
                            .Build();
-            string cs = config["ConnectionStrings:DockerConnectionString"];
+            string cs = config["ConnectionStrings:DefaultConnectionString"];
             Console.WriteLine("*********************" + cs);
             if (!optionsBuilder.IsConfigured)
             {
