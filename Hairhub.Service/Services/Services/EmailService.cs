@@ -54,9 +54,11 @@ namespace Hairhub.Service.Services.Services
             emailBody = emailBody.Replace("{OTP}", otpKey);
             emailBody = emailBody.Replace("{PHONE_NUMBER}", _configuration["Project_HairHub:PHONE_NUMBER"]);
             emailBody = emailBody.Replace("{EMAIL_ADDRESS}", _configuration["Project_HairHub:EMAIL_ADDRESS"]);
-            
+            var emailHost = _configuration["EmailSetting:EmailHost"];
+            var userName = _configuration["EmailSetting:EmailUsername"];
+            var password = _configuration["EmailSetting:EmailPassword"];
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(_configuration["EmailSetting:EmailHost"]));
+            email.From.Add(MailboxAddress.Parse(emailHost));
             email.To.Add(MailboxAddress.Parse(sendEmailRequest.Email));
             email.Subject = _configuration.GetSection("EmailSetting")?["Subject"];
             email.Body = new TextPart(TextFormat.Html)
@@ -64,8 +66,8 @@ namespace Hairhub.Service.Services.Services
                 Text = emailBody
             };
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_configuration.GetSection("EmailSetting")?["EmailHost"], 587, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_configuration.GetSection("EmailSetting")?["EmailUsername"], _configuration.GetSection("EmailSetting")?["EmailPassword"]);
+            await smtp.ConnectAsync(emailHost, 587, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(userName, password);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
             //InserDB
@@ -110,13 +112,14 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CheckExistEmail(CheckExistEmailResrequest checkExistEmailResrequest)
         {
-            var emailSalon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Email.ToLower().Equals(checkExistEmailResrequest.Email.ToLower()));
-            var emailCustomer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Email.ToLower().Equals(checkExistEmailResrequest.Email.ToLower()));
-            if (emailSalon != null || emailCustomer!=null)
+            var email = checkExistEmailResrequest.Email.ToLower();
+            var emailSalon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
+            var emailCustomer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
+            if (emailSalon == null && emailCustomer==null)
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }

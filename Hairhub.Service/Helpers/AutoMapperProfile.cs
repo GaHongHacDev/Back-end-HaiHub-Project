@@ -37,28 +37,29 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateAccountRequest, SalonOwner>().ReverseMap();
             CreateMap<CreateAccountRequest, Account>().ReverseMap();
             CreateMap<CreateAccountRequest, CreateAccountResponse>().ReverseMap();
-            
+            CreateMap<GetAccountResponse, Account>().ReverseMap();
+            CreateMap<GetAccountResponse, Customer>().ReverseMap();
+            CreateMap<GetAccountResponse, SalonOwner>().ReverseMap();
+            CreateMap<FetchUserResponse, Customer>().ReverseMap();
+            CreateMap<FetchUserResponse, SalonOwner>().ReverseMap();
+            CreateMap<FetchUserResponse, Account>().ReverseMap();
+
             //Customer
             CreateMap<GetCustomerResponse, Customer>().ReverseMap();
             CreateMap<Customer, CustomerResponse>().ReverseMap();
 
             //Schedule
             CreateMap<Schedule, GetScheduleResponse>().ReverseMap();
-
             CreateMap<SalonEmployee, SalonEmployeeResponseS>().ReverseMap();
 
             //Feedback
             CreateMap<Feedback, GetFeedbackResponse>().ReverseMap();
-
             CreateMap<Customer, CustomerResponseF>().ReverseMap();
-
             CreateMap<AppointmentDetail, AppointmentDetailResponseF>().ReverseMap();
 
             //AppointmentDetailVoucher
             CreateMap<AppointmentDetailVoucher, GetAppointmentDetailVoucherResponse>().ReverseMap();
-
             CreateMap<Voucher, VoucherResponseA>().ReverseMap();
-
             CreateMap<Appointment, AppointmentResponseA>().ReverseMap();
 
             //Appointment
@@ -73,18 +74,21 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateSalonOwnerRequest, SalonOwner>().ReverseMap();
             CreateMap<CreateSalonOwnerResponse, SalonOwner>().ReverseMap();
             CreateMap<UpdateSalonOwnerRequest, SalonOwner>().ReverseMap();
+            CreateMap<Account, AccountSalonOwnerResponse> ().ReverseMap();
 
             //SalonEmployee
             CreateMap<GetSalonEmployeeResponse, SalonEmployee>().ReverseMap();
             CreateMap<CreateSalonEmployeeRequest, SalonEmployee>().ReverseMap();
             CreateMap<CreateSalonEmployeeResponse, SalonEmployee>().ReverseMap();
             CreateMap<UpdateSalonEmployeeRequest, SalonEmployee>().ReverseMap();
+            CreateMap<SalonInformationSalonEmployeeResponse, SalonInformation>().ReverseMap();
 
             //SalonInformation
             CreateMap<GetSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
+            CreateMap<SalonOwnerSalonInformationResponse, SalonOwner>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();

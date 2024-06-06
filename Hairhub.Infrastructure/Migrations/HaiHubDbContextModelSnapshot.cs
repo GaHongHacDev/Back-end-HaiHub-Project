@@ -34,8 +34,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Password")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("password");
 
                     b.Property<Guid?>("RoleId")
@@ -44,8 +44,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("role_id");
 
                     b.Property<string>("Username")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("username");
 
                     b.HasKey("Id");
@@ -434,8 +434,8 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<string>("AccessToken")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
+                        .HasMaxLength(515)
+                        .HasColumnType("nvarchar(515)")
                         .HasColumnName("access_token");
 
                     b.Property<Guid>("AccountId")
@@ -443,18 +443,13 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("account_id");
 
                     b.Property<DateTime>("Expires")
-                        .HasMaxLength(64)
                         .HasColumnType("datetime2")
                         .HasColumnName("expires");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_active");
-
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("refresh_token");
 
                     b.HasKey("Id");

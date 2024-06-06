@@ -74,5 +74,24 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("{accessToken}")]
+        public async Task<IActionResult> FetchUser( string accessToken)
+        {
+            try
+            {
+                var response = await _authenticationService.FetchUser(accessToken);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
