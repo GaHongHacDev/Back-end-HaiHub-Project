@@ -63,6 +63,11 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<CreateSalonInformationResponse>(salonInformation);
         }
 
+        public Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createAccountRequest)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<bool> DeleteSalonInformationById(Guid id)
         {
             var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == id);
