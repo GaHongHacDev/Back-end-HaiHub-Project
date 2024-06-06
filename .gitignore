@@ -1,2 +1,4 @@
 .vs/
 /Hairhub.Domain/Dtos/Responses/SalonInformations/GetSalonInformationResponse.cs
+/.vs/Hairhub/v17/.suo
+/Hairhub.API/obj/Debug/net8.0/Hairhub.API.csproj.AssemblyReference.cache
