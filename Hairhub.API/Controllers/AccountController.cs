@@ -48,12 +48,12 @@ namespace Hairhub.API.Controllers
                     return BadRequest("Account Id is null or empty!");
                 }
 
-                bool isUpdate = await _accountService.UpdateAccountById(id, updateAccountRequest);
-                if (!isUpdate)
+                var updateAccountResponse = await _accountService.UpdateAccountById(id, updateAccountRequest);
+                if (updateAccountResponse == null)
                 {
                     return BadRequest("Cannot update account");
                 }
-                return Ok("Update account successfully");
+                return Ok(updateAccountResponse);
             }
             catch (NotFoundException ex)
             {
