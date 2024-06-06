@@ -11,3 +11,4 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
     {
         public List<CreateScheduleRequest> Schedules { get; set; }
     }
+}
