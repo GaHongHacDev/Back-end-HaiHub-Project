@@ -57,6 +57,8 @@ namespace Hairhub.API.Controllers
                 return Ok(accoutResponse);
             }
             catch (NotFoundException ex)
+
+
             {
 
                 return NotFound(ex.Message);
