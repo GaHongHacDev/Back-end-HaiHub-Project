@@ -11,6 +11,7 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
     public class CreateSalonInformationRequest
     {
         public Guid? OwnerId { get; set; }
+        public string? Name { get; set; }
         public string? Address { get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
@@ -19,13 +20,13 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
         public string? Description { get; set; }
         public string? Img { get; set; }
         public bool? IsActive { get; set; }
-        public List<CreateSalonScheduleRequest> Schedules { get; set; }
+        public List<CreateSalonScheduleRequest> SalonInformationSchedules { get; set; }
     }
     public class CreateSalonScheduleRequest
     {
-        public Guid? SalonId { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public string Date {  get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
         public bool? IsActive { get; set; }
     }
 }
