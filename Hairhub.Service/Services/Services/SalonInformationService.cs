@@ -1,3 +1,4 @@
+
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
@@ -36,22 +37,21 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest, CreateSalonInformationWithScheduleRequest request)
+        public async Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest)
         {
             var owner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonInformationRequest.OwnerId));
             if (owner == null)
             {
                 throw new Exception("OwnerId not found");
             }
-            var salonInformation = _mapper.Map<SalonInformation>(request);
+            var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
-            foreach (var scheduleRequest in request.Schedules)
+            foreach (var scheduleRequest in createSalonInformationRequest.Schedules)
             {
                 var newSchedule = new Schedule
                 {
                     Id = Guid.NewGuid(),
-                    EmployeeId = scheduleRequest.EmployeeId,
-                    Date = scheduleRequest.Date,
+                    SalonId = scheduleRequest.SalonId,
                     StartTime = scheduleRequest.StartTime,
                     EndTime = scheduleRequest.EndTime,
                     IsActive = true
@@ -61,11 +61,6 @@ namespace Hairhub.Service.Services.Services
 
             await _unitOfWork.CommitAsync();
             return _mapper.Map<CreateSalonInformationResponse>(salonInformation);
-        }
-
-        public Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createAccountRequest)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<bool> DeleteSalonInformationById(Guid id)

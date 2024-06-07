@@ -1,4 +1,5 @@
-﻿using Hairhub.Domain.Entitities;
+﻿using Hairhub.Domain.Dtos.Requests.Schedule;
+using Hairhub.Domain.Entitities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,14 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
         public DateTime? StartOperationalHours { get; set; }
         public string? Description { get; set; }
         public string? Img { get; set; }
+        public bool? IsActive { get; set; }
+        public List<CreateSalonScheduleRequest> Schedules { get; set; }
+    }
+    public class CreateSalonScheduleRequest
+    {
+        public Guid? SalonId { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public bool? IsActive { get; set; }
     }
 }

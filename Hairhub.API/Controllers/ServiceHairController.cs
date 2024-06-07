@@ -44,6 +44,26 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{SalonInformationId:Guid}")]
+        public async Task<IActionResult> GetServiceHairBySalonInformationId([FromRoute] Guid? SalonInformationId)
+        {
+            try
+            {
+                var serviceHairResponse = await _serviceHairService.GetServiceHairBySalonInformationId(SalonInformationId);
+                if (serviceHairResponse == null)
+                {
+                    return NotFound("Cannot find ServiceHair by this SalonInformationId!");
+                }
+                return Ok(serviceHairResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CreateServiceHair([FromBody] CreateServiceHairRequest createServiceHairRequest)
         {
