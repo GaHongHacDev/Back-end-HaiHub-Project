@@ -45,11 +45,11 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSalonInformation([FromBody] CreateSalonInformationRequest createSalonInformationRequest, [FromBody] CreateSalonInformationWithScheduleRequest request)
+        public async Task<IActionResult> CreateSalonInformation([FromBody] CreateSalonInformationRequest createSalonInformationRequest)
         {
             try
             {
-                var accoutResponse = await _salonInformationService.CreateSalonInformation(createSalonInformationRequest, request);
+                var accoutResponse = await _salonInformationService.CreateSalonInformation(createSalonInformationRequest);
                 if (accoutResponse == null)
                 {
                     return BadRequest("Cannot create SalonInformation!");
