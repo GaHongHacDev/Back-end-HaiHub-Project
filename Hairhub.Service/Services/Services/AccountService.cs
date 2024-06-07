@@ -141,17 +141,15 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map(createAccountRequest, createAccountResponse);
         }
 
-        public async Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest)
+        public async Task<UpdateAccountResponse> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest)
         {
+            UpdateAccountResponse updateAccountResponse;
             var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>()
                                             .SingleOrDefaultAsync(
                                                 predicate: x => x.Id == id,
                                                 include: x => x.Include(y => y.Role));
             if (account == null)
                 throw new NotFoundException($"Account was not found with id {id}");
-            //Update Account
-            account.Username = updateAccountRequest.Username;
-            account.Password = updateAccountRequest.Password;
             if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString())) // Salon Owner
             {
                 SalonOwner salonOwner = new SalonOwner();
@@ -172,6 +170,7 @@ namespace Hairhub.Service.Services.Services
                 salonOwner.BankAccount = updateAccountRequest.BankAccount;
                 salonOwner.BankName = updateAccountRequest.BankName;
                 _unitOfWork.GetRepository<SalonOwner>().UpdateAsync(salonOwner);
+                updateAccountResponse = _mapper.Map<UpdateAccountResponse>(salonOwner);
             }
             else
             {  //Update Customer
@@ -192,10 +191,14 @@ namespace Hairhub.Service.Services.Services
                 customer.BankAccount = updateAccountRequest.BankAccount;
                 customer.BankName = updateAccountRequest.BankName;
                 _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
+                updateAccountResponse = _mapper.Map<UpdateAccountResponse>(customer);
             }
-            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
-            return isSuccessful;
+            if (!isSuccessful)
+            {
+                throw new Exception("Cannot update account, error in update database!");
+            }
+            return updateAccountResponse;
         }
     }
 }
