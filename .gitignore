@@ -1,4 +1,31 @@
+# Ignore Visual Studio specific files
 .vs/
-/Hairhub.Domain/Dtos/Responses/SalonInformations/GetSalonInformationResponse.cs
-/.vs/Hairhub/v17/.suo
-/Hairhub.API/obj/Debug/net8.0/Hairhub.API.csproj.AssemblyReference.cache
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.dtbcache.v2
+
+# Ignore build output directories
+[Bb]in/
+[Oo]bj/
+
+# Ignore NuGet packages
+*.nupkg
+packages/
+
+# Ignore project-related cache files
+*.cache
+*.log
+*.ilk
+*.pdb
+*.obj
+*.exe
+*.dll
+*.vspscc
+*.vssscc
+*.csproj.user
+
+# Ignore other unnecessary files
+Thumbs.db
+.DS_Store
