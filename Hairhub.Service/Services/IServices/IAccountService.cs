@@ -13,7 +13,7 @@ namespace Hairhub.Service.Services.IServices
     public interface IAccountService
     {
         Task<CreateAccountResponse> RegisterAccount(CreateAccountRequest createAccountRequest);
-        Task<bool> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest);
+        Task<UpdateAccountResponse> UpdateAccountById(Guid id, UpdateAccountRequest updateAccountRequest);
         Task<bool> DeleteAccountById(Guid id);
         Task<bool> ActiveAccount(Guid id);
         Task<bool> ChangePassword(Guid id, ChangePasswordRequest changePasswordRequest);

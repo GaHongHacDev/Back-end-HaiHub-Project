@@ -4,8 +4,6 @@ namespace Hairhub.Domain.Dtos.Requests.Accounts
 {
     public class UpdateAccountRequest
     {
-        public string? Username { get; set; }
-        public string? Password { get; set; }
         public string? FullName { get; set; }
         public DateTime? DayOfBirth { get; set; }
         public string? Gender { get; set; }

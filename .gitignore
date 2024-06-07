@@ -29,4 +29,4 @@ packages/
 # Ignore other unnecessary files
 Thumbs.db
 .DS_Store
-/.vs/Hairhub/v17/.suo
+/Hairhub.Domain/obj/Debug/net8.0/Hairhub.Domain.AssemblyInfo.cs
