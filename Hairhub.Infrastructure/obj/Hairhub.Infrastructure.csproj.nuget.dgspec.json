@@ -244,9 +244,17 @@
               "target": "Package",
               "version": "[4.6.0, )"
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[7.5.1, )"
+            },
+            "payOS": {
+              "target": "Package",
+              "version": "[1.0.5, )"
             }
           },
           "imports": [
