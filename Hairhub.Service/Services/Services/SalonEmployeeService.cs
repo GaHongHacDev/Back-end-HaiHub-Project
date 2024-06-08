@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Responses.SalonEmployees;
+using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
@@ -85,6 +86,19 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonEmployee>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
+                    include: source => source.Include(s => s.SalonInformation)
+                 );
+            if (salonEmployeeResponse == null)
+                return null;
+            return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
+        }
+
+        public async Task<GetSalonEmployeeResponse>? GetSalonEmployeeBySalonInformationId(Guid? SalonInformationId)
+        {
+            SalonEmployee salonEmployeeResponse = await _unitOfWork
+                .GetRepository<SalonEmployee>()
+                .SingleOrDefaultAsync(
+                    predicate: x => x.Id.Equals(SalonInformationId),
                     include: source => source.Include(s => s.SalonInformation)
                  );
             if (salonEmployeeResponse == null)
