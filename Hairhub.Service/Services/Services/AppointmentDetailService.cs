@@ -142,6 +142,5 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
         #endregion
-
     }
 }

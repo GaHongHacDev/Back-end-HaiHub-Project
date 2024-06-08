@@ -9,7 +9,6 @@ namespace Hairhub.Domain.Entitities
 {
     public class Payment
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid? CustomerId { get; set; }
         public decimal? TotalAmount { get; set; }

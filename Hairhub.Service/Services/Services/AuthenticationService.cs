@@ -7,6 +7,13 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Service.Services.IServices;
+using System.Security.Cryptography;
+using Hairhub.Domain.Dtos.Requests.Authentication;
+using Hairhub.Domain.Dtos.Responses.Authentication;
+using Hairhub.Domain.Exceptions;
+using Hairhub.Domain.Dtos.Responses.Accounts;
+using AutoMapper;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -14,24 +21,101 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuaration;
+        private readonly IMapper _mapper;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuaration)
+        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuaration, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _configuaration = configuaration;
+            _mapper = mapper;
         }
-        public async Task<string> Login(string userName, string password)
+        public async Task<LoginResponse> Login(string userName, string password)
         {
 
-            var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
                 predicate: u => u.Username == userName && u.Password == password,
                 include: x => x.Include(a => a.Role));
             // return null if user not found
-            if (user == null)
+            if (account == null)
             {
-                return string.Empty;
+                return null;
             }
-            // authentication successful so generate jwt token
+            // authentication successful so generate jwt token and refresh token
+            var accessToken = GenerateToken(account.Username, account.Role.RoleName);
+            var refreshToken = GenerateRefreshToken();
+            var newRefrehToken = new RefreshTokenAccount()
+            {
+                Id = Guid.NewGuid(),
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccountId = account.Id,
+                Expires = DateTime.UtcNow.AddDays(30),
+            };
+            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken); 
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            if (!isInsert)
+            {
+                throw new Exception("Cannot insert token to DB");
+            }
+            return new LoginResponse() { AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id };
+        }
+        public async Task<FetchUserResponse> FetchUser(string accessToken)
+        {
+            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
+                .SingleOrDefaultAsync(
+                                        predicate: x=>x.AccessToken.Equals(accessToken) && x.Expires>=DateTime.Now,
+                                        include: x=>x.Include(y=>y.Account.Role));
+            if (refreshTokenEntity == null)
+            {
+                throw new NotFoundException("Không tìm thấy access token!");
+            }
+            var account = refreshTokenEntity.Account;
+            FetchUserResponse fetchUserResponse = new FetchUserResponse();
+            fetchUserResponse = _mapper.Map<FetchUserResponse>(account);
+            if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
+            {
+                var customer = await _unitOfWork.GetRepository<Customer>()
+                                                .SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+                fetchUserResponse = _mapper.Map(customer, fetchUserResponse);
+            }
+            else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
+            {
+                var salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
+                                                .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                fetchUserResponse = _mapper.Map(salonOwner, fetchUserResponse);
+            }
+            return fetchUserResponse;
+        }
+
+        public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)
+        {
+            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
+                                                predicate: x => x.RefreshToken == refreshTokenRequest.RefreshToken
+                                                && x.Expires >= DateTime.Now);
+            if (refreshTokenEntity == null)
+            {
+                throw new Exception("RefreshToken not found or expired");
+            }
+
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == refreshTokenEntity.AccountId);
+            if (account == null)
+            {
+                throw new Exception("Account not found or expired");
+            }
+
+            var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
+            refreshTokenEntity.AccessToken = accessToken;
+            _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
+            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            if (!isUpdate)
+            {
+                throw new Exception("Cannot insert new access token to DB");
+            }
+            return new RefreshTokenResponse() { AccessToken = refreshTokenEntity.AccessToken, RefreshToken = refreshTokenEntity.RefreshToken };
+        }
+
+        private string GenerateToken(string username, string roleName)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuaration["JWTSettings:Key"]);
 
@@ -39,22 +123,37 @@ namespace Hairhub.Service.Services.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role.RoleName)
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, roleName)
                 }),
 
-                Expires = DateTime.UtcNow.AddMinutes(5),
+                Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            user.Token = tokenHandler.WriteToken(token);
-
-            return user.Token;
+            return tokenHandler.WriteToken(token);
         }
 
-        public async Task<string> Logout(string token)
+        private string GenerateRefreshToken()
         {
-            return "";
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        public async Task<bool> Logout(LogoutRequest logoutRequest)
+        {
+            var refreshTokens = await _unitOfWork.GetRepository<RefreshTokenAccount>().GetListAsync(predicate: x => x.RefreshToken.Equals(logoutRequest.RefreshToken));
+            if (refreshTokens == null)
+            {
+                throw new NotFoundException("Refresh token not found!");
+            }
+            _unitOfWork.GetRepository<RefreshTokenAccount>().DeleteRangeAsync(refreshTokens);
+            bool isDelete = await _unitOfWork.CommitAsync()>0;
+            return isDelete;
         }
     }
 }
