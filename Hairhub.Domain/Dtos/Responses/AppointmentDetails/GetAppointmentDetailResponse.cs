@@ -55,6 +55,9 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetails
             DiscountedPrice = discountedPrice;
             Status = status;
         }
+        public GetAppointmentDetailResponse()
+        {
+        }
 
         public Guid Id { get; set; }
         public Guid? SalonEmployeeId { get; set; }

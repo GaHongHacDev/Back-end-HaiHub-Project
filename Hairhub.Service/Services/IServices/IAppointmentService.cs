@@ -21,5 +21,6 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteAppoinmentById(Guid id);
         Task<bool> ActiveAppointment(Guid id);
         Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest getAvailableTimeRequest);
+        Task<IPaginate<GetAppointmentByAccountIdResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size);
     }
 }
