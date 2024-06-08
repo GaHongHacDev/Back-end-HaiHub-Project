@@ -1,5 +1,4 @@
-
-﻿using AutoMapper;
+using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;

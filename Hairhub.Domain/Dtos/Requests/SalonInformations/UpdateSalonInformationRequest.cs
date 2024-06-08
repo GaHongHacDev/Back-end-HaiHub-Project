@@ -10,6 +10,7 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
     public class UpdateSalonInformationRequest
     {
         public Guid? OwnerId { get; set; }
+        public string? Name { get; set; }
         public string? Address { get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
