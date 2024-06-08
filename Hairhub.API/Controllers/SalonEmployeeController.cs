@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
+using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
@@ -36,6 +37,25 @@ namespace Hairhub.API.Controllers
                 if (salonEmployeeResponse == null)
                 {
                     return NotFound("Cannot find this SalonEmployee!");
+                }
+                return Ok(salonEmployeeResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{SalonInformationId:Guid}")]
+        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid? SalonInformationId)
+        {
+            try
+            {
+                var salonEmployeeResponse = await _salonEmployeeService.GetSalonEmployeeBySalonInformationId(SalonInformationId);
+                if (salonEmployeeResponse == null)
+                {
+                    return NotFound("Cannot find ServiceHair by this SalonInformationId!");
                 }
                 return Ok(salonEmployeeResponse);
             }
