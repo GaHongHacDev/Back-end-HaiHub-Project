@@ -205,10 +205,12 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.OwnerId).HasColumnName("owner_id").IsRequired(false);
                 entity.Property(e => e.Name).HasMaxLength(100).HasColumnName("name").IsRequired(false);
-                entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.BusinessLicense).HasColumnName("business_license").IsRequired(false);
+                entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address").IsRequired(false);
+                entity.Property(e => e.Longitude).HasMaxLength(150).HasColumnName("longitude");
+                entity.Property(e => e.Latitude).HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
                 entity.HasOne(d => d.SalonOwner)
