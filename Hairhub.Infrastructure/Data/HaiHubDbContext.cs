@@ -25,7 +25,7 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
         }
 
         // DBSet<>
@@ -205,10 +205,12 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.OwnerId).HasColumnName("owner_id").IsRequired(false);
                 entity.Property(e => e.Name).HasMaxLength(100).HasColumnName("name").IsRequired(false);
-                entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.BusinessLicense).HasColumnName("business_license").IsRequired(false);
+                entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address").IsRequired(false);
+                entity.Property(e => e.Longitude).HasMaxLength(150).HasColumnName("longitude");
+                entity.Property(e => e.Latitude).HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
 
                 entity.HasOne(d => d.SalonOwner)
@@ -421,18 +423,27 @@ namespace Hairhub.Infrastructure
                 entity.ToTable("payment");
                 entity.HasKey(e => e.Id);
 
-
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.CustomerId).HasColumnName("customer_id").IsRequired(false);
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)").HasColumnName("total_amount").IsRequired(false);
                 entity.Property(e => e.PaymentDate).HasColumnName("payment_date").IsRequired(false);
                 entity.Property(e => e.MethodBanking).HasColumnName("method_banking").IsRequired(false);
+                entity.Property(e => e.SalonId).HasColumnName("salon_id").IsRequired(false);
+                entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
+                entity.Property(e => e.Status).HasColumnName("status");
+                entity.Property(e => e.PaymentCode).HasColumnName("payment_code");
 
                 entity.HasOne(d => d.Customer)
                       .WithMany(p => p.Payments)
                       .HasForeignKey(d => d.CustomerId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_customer_payment");
+
+                entity.HasOne(d => d.SalonInformation)
+                      .WithMany(p => p.Payments)
+                      .HasForeignKey(d => d.SalonId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_salon_payment");
             });
 
             modelBuilder.Entity<Config>(entity =>
