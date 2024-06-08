@@ -79,3 +79,4 @@ D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.As
 D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.CopyComplete
 D:\FPT\Sum2024\EXE201\Back-end-HaiHub-Project\bin\Debug\payos-lib-backend-dotnet.dll
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\payos-lib-backend-dotnet.dll

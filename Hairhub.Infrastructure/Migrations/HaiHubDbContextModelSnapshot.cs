@@ -406,13 +406,30 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
                     b.Property<string>("MethodBanking")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("method_banking");
 
+                    b.Property<int>("PaymentCode")
+                        .HasColumnType("int")
+                        .HasColumnName("payment_code");
+
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("payment_date");
+
+                    b.Property<Guid?>("SalonId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("salon_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("status");
 
                     b.Property<decimal?>("TotalAmount")
                         .HasColumnType("decimal(18, 2)")
@@ -421,6 +438,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("SalonId");
 
                     b.ToTable("payment", (string)null);
                 });
@@ -890,7 +909,14 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasForeignKey("CustomerId")
                         .HasConstraintName("FK_customer_payment");
 
+                    b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
+                        .WithMany("Payments")
+                        .HasForeignKey("SalonId")
+                        .HasConstraintName("FK_salon_payment");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("SalonInformation");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.RefreshTokenAccount", b =>
@@ -1025,6 +1051,8 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonInformation", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("SalonEmployees");
 
                     b.Navigation("Schedules");

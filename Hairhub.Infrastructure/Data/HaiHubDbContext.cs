@@ -25,7 +25,7 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
 
         // DBSet<>
@@ -428,8 +428,8 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.MethodBanking).HasColumnName("method_banking").IsRequired(false);
                 entity.Property(e => e.SalonId).HasColumnName("salon_id").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
-                entity.Property(e => e.Status).HasColumnName("status").IsRequired(false);
-                entity.Property(e => e.PaymentCode).HasColumnName("payment_code").IsRequired(false);
+                entity.Property(e => e.Status).HasColumnName("status");
+                entity.Property(e => e.PaymentCode).HasColumnName("payment_code");
 
                 entity.HasOne(d => d.Customer)
                       .WithMany(p => p.Payments)

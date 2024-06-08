@@ -18,7 +18,7 @@ namespace Hairhub.Domain.Entitities
 
         public Guid? SalonId { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public string Status { get; set; }
 
