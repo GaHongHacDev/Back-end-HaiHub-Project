@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;

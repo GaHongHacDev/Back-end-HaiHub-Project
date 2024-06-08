@@ -1,9 +1,10 @@
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.API.dll
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.API.deps.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.API.runtimeconfig.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\appsettings.Development.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\appsettings.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.API.exe
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.API.dll
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.Service.dll
@@ -36,5 +37,4 @@ D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.Service.p
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.Domain.pdb
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\bin\Debug\Hairhub.Infrastructure.pdb
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\obj\Debug\docker-c.35A3FFBA.Up2Date

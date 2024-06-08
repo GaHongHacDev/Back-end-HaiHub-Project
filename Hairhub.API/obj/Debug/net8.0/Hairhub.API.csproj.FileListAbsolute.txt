@@ -1,3 +1,11 @@
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.csproj.AssemblyReference.cache
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.GeneratedMSBuildEditorConfig.editorconfig
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.AssemblyInfoInputs.cache
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.AssemblyInfo.cs
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.csproj.CoreCompileInputs.cache
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.MvcApplicationPartsAssemblyInfo.cs
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.MvcApplicationPartsAssemblyInfo.cache
+D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.sourcelink.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\appsettings.Development.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\appsettings.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\Hairhub.API.exe
@@ -127,14 +135,6 @@ D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\Hairhub.Domain.pdb
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\Hairhub.Infrastructure.pdb
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\bin\Debug\net8.0\Hairhub.Service.pdb
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.csproj.AssemblyReference.cache
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.GeneratedMSBuildEditorConfig.editorconfig
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.AssemblyInfoInputs.cache
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.AssemblyInfo.cs
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.csproj.CoreCompileInputs.cache
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.MvcApplicationPartsAssemblyInfo.cs
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.MvcApplicationPartsAssemblyInfo.cache
-D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\Hairhub.API.sourcelink.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\staticwebassets.build.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\staticwebassets.development.json
 D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API\obj\Debug\net8.0\staticwebassets\msbuild.Hairhub.API.Microsoft.AspNetCore.StaticWebAssets.props
