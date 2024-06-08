@@ -44,8 +44,9 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpGet("GetBySalonInformationId")]
-        public async Task<IActionResult> GetServiceHairBySalonInformationId(Guid salonInformationId)
+        [HttpGet]
+        [Route("{salonInformationId:Guid}")]
+        public async Task<IActionResult> GetServiceHairBySalonInformationId([FromRoute]Guid salonInformationId)
         {
             try
             {

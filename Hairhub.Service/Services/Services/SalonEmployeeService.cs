@@ -93,16 +93,26 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
         }
 
-        public async Task<GetSalonEmployeeResponse> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
+        public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
         {
-            SalonEmployee salonEmployeeResponse = await _unitOfWork.GetRepository<SalonEmployee>()
-                                                                   .SingleOrDefaultAsync(
-                                                                        predicate: x => x.SalonInformationId.Equals(SalonInformationId),
-                                                                        include: source => source.Include(s => s.SalonInformation)
-                                                                    );
-            if (salonEmployeeResponse == null)
+            var salonEmployees = await _unitOfWork.GetRepository<SalonEmployee>()
+                                                    .GetPagingListAsync(
+                                                        predicate: x => x.SalonInformationId.Equals(SalonInformationId),
+                                                        include: query => query.Include(s => s.SalonInformation),
+                                                        page: page,
+                                                        size: size
+                                                    );
+            if (salonEmployees == null)
                 return null;
-            return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
+            var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()
+            {
+                Page = salonEmployees.Page,
+                Size = salonEmployees.Size,
+                Total = salonEmployees.Total,
+                TotalPages = salonEmployees.TotalPages,
+                Items = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items),
+            };
+            return salonEmployeeResponses;
         }
 
         public async Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest)
