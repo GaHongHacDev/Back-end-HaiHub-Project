@@ -21,6 +21,8 @@ namespace Hairhub.Domain.Entitities
         public virtual SalonOwner SalonOwner { get; set; }
         public virtual ICollection<SalonEmployee> SalonEmployees { get; set; }
         public virtual ICollection<Voucher> Vouchers { get; set; }
-        public virtual ICollection<Schedule> Schedules { get; set; }
+        public virtual ICollection<Schedule> Schedules { get; set; }        
+        public virtual ICollection<Payment> Payments {  get; set; } 
+
     }
 }

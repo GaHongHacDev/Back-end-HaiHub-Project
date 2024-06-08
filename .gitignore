@@ -35,3 +35,8 @@ Thumbs.db
 
 # Ignore all files in obj/Debug/net8.0 directories
 **/obj/Debug/net8.0/
+
+Hairhub.API/obj/
+Hairhub.Domain/obj/
+Hairhub.Infrastructure/obj/
+Hairhub.Service/obj/
