@@ -16,8 +16,6 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
         public string? Gender { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }
-        public string? Address { get; set; }
-        public string? HumanId { get; set; }
         public string? Img { get; set; }
         public bool? IsActive { get; set; }
         public SalonInformationSalonEmployeeResponse SalonInformation { get; set; }

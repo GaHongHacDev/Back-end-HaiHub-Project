@@ -2,6 +2,7 @@
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -14,11 +15,13 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
 
-        public ServiceHairService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ServiceHairService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         public async Task<bool> ActiveServiceHair(Guid id)
@@ -34,12 +37,20 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<CreateServiceHairResponse> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest)
+        public async Task<bool> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest)
         {
+            var existSalon = _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == createServiceHairRequest.SalonInformationId);
+            if (existSalon == null)
+            {
+                throw new NotFoundException($"Not found salon with id {createServiceHairRequest.SalonInformationId}");
+            }
             var serviceHair = _mapper.Map<ServiceHair>(createServiceHairRequest);
+            serviceHair.Id = Guid.NewGuid();
+            var url = await _mediaService.UploadAnImage(createServiceHairRequest.Img, MediaPath.SERVICEHAITR, serviceHair.Id.ToString());
+            serviceHair.Img = url;
             await _unitOfWork.GetRepository<ServiceHair>().InsertAsync(serviceHair);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateServiceHairResponse>(serviceHair);
+            bool isInsert = await _unitOfWork.CommitAsync()>0;
+            return isInsert;
         }
 
         public async Task<bool> DeleteServiceHairById(Guid id)

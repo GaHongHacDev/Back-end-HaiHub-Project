@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairhub.Infrastructure.Migrations
 {
     [DbContext(typeof(HaiHubDbContext))]
-    [Migration("20240608055452_New version DB.8.6.24")]
-    partial class NewversionDB8624
+    [Migration("20240608183059_New version DB9.6.24 - Add SalonInformationID to ServiceHair table")]
+    partial class NewversionDB9624AddSalonInformationIDtoServiceHairtable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -751,6 +751,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("price");
 
+                    b.Property<Guid>("SalonInformationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("salon_information_id");
+
                     b.Property<string>("ServiceName")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("service_name");
@@ -760,6 +764,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("time");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SalonInformationId");
 
                     b.ToTable("service_hair", (string)null);
                 });
@@ -1009,6 +1015,17 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("ServiceHair");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.ServiceHair", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
+                        .WithMany("ServiceHairs")
+                        .HasForeignKey("SalonInformationId")
+                        .IsRequired()
+                        .HasConstraintName("FK_salon_infor_service_hair");
+
+                    b.Navigation("SalonInformation");
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Voucher", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
@@ -1071,6 +1088,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("SalonEmployees");
 
                     b.Navigation("Schedules");
+
+                    b.Navigation("ServiceHairs");
 
                     b.Navigation("Vouchers");
                 });

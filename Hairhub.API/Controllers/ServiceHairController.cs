@@ -62,12 +62,12 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateServiceHair([FromBody] CreateServiceHairRequest createServiceHairRequest)
+        public async Task<IActionResult> CreateServiceHair([FromForm] CreateServiceHairRequest createServiceHairRequest)
         {
             try
             {
                 var accoutResponse = await _serviceHairService.CreateServiceHair(createServiceHairRequest);
-                if (accoutResponse == null)
+                if (!accoutResponse)
                 {
                     return BadRequest("Cannot create ServiceHair!");
                 }

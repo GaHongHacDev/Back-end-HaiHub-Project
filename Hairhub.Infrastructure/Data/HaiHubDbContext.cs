@@ -189,12 +189,19 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
                 entity.Property(e => e.ServiceName).HasColumnName("service_name").IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)").HasColumnName("price").IsRequired(false);
                 entity.Property(e => e.Time).HasColumnType("decimal(18, 2)").HasColumnName("time").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
+
+                entity.HasOne(d => d.SalonInformation)
+                      .WithMany(p => p.ServiceHairs)
+                      .HasForeignKey(d => d.SalonInformationId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_salon_infor_service_hair");
             });
 
             modelBuilder.Entity<SalonInformation>(entity =>

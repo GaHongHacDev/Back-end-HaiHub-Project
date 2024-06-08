@@ -35,17 +35,23 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<CreateSalonEmployeeResponse> CreateSalonEmployee(CreateSalonEmployeeRequest createSalonEmployeeRequest)
+        public async Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest request)
         {
-            var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonEmployeeRequest.SalonInformationId));
-            if (salonInformation == null)
+            //check exist salon
+            var existSalon = await _unitOfWork.GetRepository<SalonInformation>()
+                                        .SingleOrDefaultAsync(predicate: x=>x.Id == request.SalonInformationId);
+            if (existSalon==null)
             {
-                throw new Exception($"salonInformation not found with id: {createSalonEmployeeRequest.SalonInformationId}");
+                throw new NotFoundException($"Not found salon with id {request.SalonInformationId}");
             }
-            var salonEmployee = _mapper.Map<SalonEmployee>(createSalonEmployeeRequest);
-            await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(salonEmployee);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateSalonEmployeeResponse>(salonEmployee);
+            //create employee
+            foreach(var item in request.SalonEmployees)
+            {
+                var employee = _mapper.Map<SalonEmployee>(item);
+                employee.Id = Guid.NewGuid();
+
+            }
+            return true;
         }
 
         public async Task<bool> DeleteSalonEmployeeById(Guid id)
