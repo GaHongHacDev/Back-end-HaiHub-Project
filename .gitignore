@@ -30,3 +30,13 @@ packages/
 Thumbs.db
 .DS_Store
 /Hairhub.Domain/obj/Debug/net8.0/Hairhub.Domain.AssemblyInfo.cs
+# Ignore all files in obj/Debug directories
+**/obj/Debug/
+
+# Ignore all files in obj/Debug/net8.0 directories
+**/obj/Debug/net8.0/
+
+Hairhub.API/obj/
+Hairhub.Domain/obj/
+Hairhub.Infrastructure/obj/
+Hairhub.Service/obj/

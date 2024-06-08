@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
@@ -46,22 +47,17 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("{SalonInformationId:Guid}")]
-        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid? SalonInformationId)
+        [HttpGet("GetBySalonInformationId")]
+        public async Task<IActionResult> GetSalonEmployeesBySalonInformationId(Guid salonInformationId)
         {
             try
             {
-                var salonEmployeeResponse = await _salonEmployeeService.GetSalonEmployeeBySalonInformationId(SalonInformationId);
-                if (salonEmployeeResponse == null)
-                {
-                    return NotFound("Cannot find ServiceHair by this SalonInformationId!");
-                }
-                return Ok(salonEmployeeResponse);
+                var employees = await _salonEmployeeService.GetSalonEmployeesBySalonInformationId(salonInformationId);
+                return Ok(employees);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 

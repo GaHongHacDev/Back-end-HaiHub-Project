@@ -44,15 +44,17 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("OwnerId not found");
             }
             var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
+            salonInformation.Id = Guid.NewGuid();
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
-            foreach (var scheduleRequest in createSalonInformationRequest.Schedules)
+            foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
                 var newSchedule = new Schedule
                 {
                     Id = Guid.NewGuid(),
-                    SalonId = scheduleRequest.SalonId,
-                    StartTime = scheduleRequest.StartTime,
-                    EndTime = scheduleRequest.EndTime,
+                    Date = scheduleRequest.Date,
+                    SalonId = salonInformation.Id,
+                    StartTime = TimeOnly.Parse(scheduleRequest.StartTime),
+                    EndTime = TimeOnly.Parse(scheduleRequest.EndTime),
                     IsActive = true
                 };
                 await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);

@@ -93,17 +93,13 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
         }
 
-        public async Task<GetSalonEmployeeResponse>? GetSalonEmployeeBySalonInformationId(Guid? SalonInformationId)
+        public async Task<IEnumerable<GetSalonEmployeeResponse>> GetSalonEmployeesBySalonInformationId(Guid salonInformationId)
         {
-            SalonEmployee salonEmployeeResponse = await _unitOfWork
-                .GetRepository<SalonEmployee>()
-                .SingleOrDefaultAsync(
-                    predicate: x => x.Id.Equals(SalonInformationId),
-                    include: source => source.Include(s => s.SalonInformation)
-                 );
-            if (salonEmployeeResponse == null)
-                return null;
-            return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>()
+                .GetListAsync(predicate: e => e.SalonInformationId == salonInformationId,
+                              include: query => query.Include(e => e.SalonInformation));
+
+            return _mapper.Map<IEnumerable<GetSalonEmployeeResponse>>(employees);
         }
 
         public async Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest)
