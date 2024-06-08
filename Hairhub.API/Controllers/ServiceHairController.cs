@@ -44,24 +44,20 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("{SalonInformationId:Guid}")]
-        public async Task<IActionResult> GetServiceHairBySalonInformationId([FromRoute] Guid SalonInformationId)
+        [HttpGet("GetBySalonInformationId")]
+        public async Task<IActionResult> GetServiceHairBySalonInformationId(Guid salonInformationId)
         {
             try
             {
-                var serviceHairResponse = await _serviceHairService.GetServiceHairBySalonInformationId(SalonInformationId);
-                if (serviceHairResponse == null)
-                {
-                    return NotFound("Cannot find ServiceHair by this SalonInformationId!");
-                }
-                return Ok(serviceHairResponse);
+                var services = await _serviceHairService.GetServiceHairBySalonInformationId(salonInformationId);
+                return Ok(services);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
 
         [HttpPost]

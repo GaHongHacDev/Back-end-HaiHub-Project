@@ -36,11 +36,6 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<CreateServiceHairResponse> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest)
         {
-            var serviceHair1 = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createServiceHairRequest.SalonInformationId));
-            if (serviceHair1 == null)
-            {
-                throw new Exception("SalonInformationId not found");
-            }
             var serviceHair = _mapper.Map<ServiceHair>(createServiceHairRequest);
             await _unitOfWork.GetRepository<ServiceHair>().InsertAsync(serviceHair);
             await _unitOfWork.CommitAsync();
@@ -92,17 +87,13 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetServiceHairResponse>(serviceHairResponse);
         }
 
-        public async Task<GetServiceHairResponse>? GetServiceHairBySalonInformationId(Guid? SalonInformationId)
+        public async Task<IEnumerable<GetServiceHairResponse>> GetServiceHairBySalonInformationId(Guid salonInformationId)
         {
-            ServiceHair serviceHairResponse = await _unitOfWork
-                .GetRepository<ServiceHair>()
-                .SingleOrDefaultAsync(
-                    predicate: x => x.Id.Equals(SalonInformationId),
-                    include: source => source.Include(s => s.ServiceEmployees)
-                 );
-            if (serviceHairResponse == null)
-                return null;
-            return _mapper.Map<GetServiceHairResponse>(serviceHairResponse);
+            var services = await _unitOfWork.GetRepository<ServiceHair>()
+                .GetListAsync(predicate: s => s.ServiceEmployees.Any(se => se.SalonEmployee.SalonInformationId == salonInformationId),
+                              include: query => query.Include(s => s.ServiceEmployees));
+
+            return _mapper.Map<IEnumerable<GetServiceHairResponse>>(services);
         }
 
         public async Task<bool> UpdateServiceHairById(Guid id, UpdateServiceHairRequest updateServiceHairRequest)
