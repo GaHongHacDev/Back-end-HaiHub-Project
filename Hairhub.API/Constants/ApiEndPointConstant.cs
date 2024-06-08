@@ -32,6 +32,24 @@
         {
             public const string AppointmentsEndpoint = ApiEndpoint + "/appointments";
         }
+        public static class SalonOwner
+        {
+            public const string SalonOwnersEndpoint = ApiEndpoint + "/salonowners";
+        }
+        public static class SalonEmployee
+        {
+            public const string SalonEmployeesEndpoint = ApiEndpoint + "/salonemployees";
+        }
+
+        public static class SalonInformation
+        {
+            public const string SalonInformationsEndpoint = ApiEndpoint + "/saloninformations";
+        }
+
+        public static class ServiceHair
+        {
+            public const string ServiceHairsEndpoint = ApiEndpoint + "/servicehairs";
+        }
 
         public static class Voucher
         {
@@ -41,6 +59,29 @@
         public static class AppointmentDetail
         {
             public const string AppointmentDetailsEndpoint = ApiEndpoint + "/appointment_details";
+        }
+
+        public static class Role
+        {
+            public const string RolesEndpoint = ApiEndpoint + "/roles";
+            public const string RoleEndpoint = RolesEndpoint + "/{id}";
+        }
+        public static class Schedule
+        {
+            public const string SchedulesEndpoint = ApiEndpoint + "/roles";
+            public const string ScheduleEndpoint = SchedulesEndpoint + "/{id}";
+        }
+
+        public static class Feedback
+        {
+            public const string FeedbacksEndpoint = ApiEndpoint + "/roles";
+            public const string FeedbackEndpoint = FeedbacksEndpoint + "/{id}";
+        }
+
+        public static class AppointmentDetailVoucher
+        {
+            public const string AppointmentDetailVouchersEndpoint = ApiEndpoint + "/roles";
+            public const string AppointmentDetailVoucherEndpoint = AppointmentDetailVouchersEndpoint + "/{id}";
         }
 
         public static class Otp

@@ -9,7 +9,6 @@ namespace Hairhub.Domain.Entitities
 {
     public partial class Account
     {
-        [Key]
         public Guid Id { get; set; }
 
         public string? Username { get; set; }
@@ -20,12 +19,10 @@ namespace Hairhub.Domain.Entitities
 
         public bool? IsActive {  get; set; }
 
-        public string? Token { get; set; }
-        public string? RefeshToken { get; set; }
-
         public virtual Role Role { get; set; }
         public virtual ICollection<SalonOwner> SalonOwners { get; set; }
         public virtual ICollection<Customer> Customers { get; set; }
         public virtual ICollection<Admin> Admins { get; set; }
+        public virtual ICollection<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
     }
 }

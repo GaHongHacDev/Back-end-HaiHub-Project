@@ -9,14 +9,13 @@ namespace Hairhub.Domain.Entitities
 {
     public class AppointmentDetail
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid? SalonEmployeeId { get; set; }
         public Guid? ServiceHairId { get; set; }
         public Guid? AppointmentId { get; set; }
         public string? Description {  get; set; } 
-        public DateTime? Date {  get; set; }
-        public DateTime? Time { get; set; }
+        public DateTime? EndTime { get; set; }
+        public DateTime? StartTime { get; set; }
         public bool? Status { get; set; }
 
 

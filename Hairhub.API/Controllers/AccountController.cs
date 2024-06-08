@@ -39,7 +39,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromBody] UpdateAccountRequest updateAccountRequest)
+        public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromForm] UpdateAccountRequest updateAccountRequest)
         {
             try
             {
@@ -48,12 +48,12 @@ namespace Hairhub.API.Controllers
                     return BadRequest("Account Id is null or empty!");
                 }
 
-                bool isUpdate = await _accountService.UpdateAccountById(id, updateAccountRequest);
-                if (!isUpdate)
+                var updateAccountResponse = await _accountService.UpdateAccountById(id, updateAccountRequest);
+                if (updateAccountResponse == null)
                 {
                     return BadRequest("Cannot update account");
                 }
-                return Ok("Update account successfully");
+                return Ok(updateAccountResponse);
             }
             catch (NotFoundException ex)
             {
@@ -123,6 +123,29 @@ namespace Hairhub.API.Controllers
                     return BadRequest("Cannot delete this account!");
                 }
                 return Ok("Delete account successfully!");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetAccountById([FromRoute] Guid id)
+        {
+            try
+            {
+                var accooutReponse = await _accountService.GetAccountById(id);
+                if (accooutReponse==null)
+                {
+                    return BadRequest("Cannot find this account!");
+                }
+                return Ok(accooutReponse);
             }
             catch (NotFoundException ex)
             {
