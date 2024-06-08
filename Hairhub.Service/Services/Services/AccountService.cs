@@ -158,7 +158,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Salon ownerwas not found!");
                 }
-                var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALON_AVATAR, salonOwner.Id.ToString());
+                var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALONOWNER_AVATAR, salonOwner.Id.ToString());
                 salonOwner.AccountId = account.Id;
                 salonOwner.FullName = updateAccountRequest.FullName;
                 salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;

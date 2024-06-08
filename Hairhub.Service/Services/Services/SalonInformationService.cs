@@ -3,6 +3,7 @@ using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -47,6 +48,9 @@ namespace Hairhub.Service.Services.Services
             }
             var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
             salonInformation.Id = Guid.NewGuid();
+            string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
+            salonInformation.IsActive = true;
+            salonInformation.Img = url;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {

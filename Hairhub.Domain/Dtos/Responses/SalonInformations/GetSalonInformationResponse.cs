@@ -19,6 +19,8 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public DateTime? StartOperationalHours { get; set; }
         public string? Description { get; set; }
         public string? Img { get; set; }
+        public string? Longitude { get; set; }
+        public string? Latitude { get; set; }
         public bool? IsActive { get; set; }
 
         public virtual SalonOwnerSalonInformationResponse SalonOwner { get; set; }
