@@ -67,12 +67,12 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSalonEmployee([FromBody] CreateSalonEmployeeRequest createSalonEmployeeRequest)
+        public async Task<IActionResult> CreateSalonEmployee([FromForm] CreateSalonEmployeeRequest createSalonEmployeeRequest)
         {
             try
             {
                 var accoutResponse = await _salonEmployeeService.CreateSalonEmployee(createSalonEmployeeRequest);
-                if (accoutResponse == null)
+                if (!accoutResponse)
                 {
                     return BadRequest("Cannot create SalonEmployee!");
                 }

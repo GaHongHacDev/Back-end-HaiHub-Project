@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
@@ -74,7 +75,20 @@ namespace Hairhub.Service.Services.Services
             await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
+        }
 
+        public async Task<bool> CreateScheduleEmployee(CreateScheduleRequest request)
+        {
+            Schedule newSchedule = new Schedule()
+            {
+                Id = Guid.NewGuid(),
+                Date = request.Date,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                IsActive = true,
+            };
+            await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
+            return true;
         }
 
         public async Task<bool> UpdateSchedule(Guid id, UpdateScheduleRequest request)
