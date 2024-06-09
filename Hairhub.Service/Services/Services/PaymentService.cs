@@ -21,6 +21,8 @@ using Newtonsoft.Json.Linq;
 using Hairhub.Domain.Dtos.Responses.Voucher;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Net.NetworkInformation;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Requests.Appointments;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -31,13 +33,16 @@ namespace Hairhub.Service.Services.Services
         private readonly HttpClient _client;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _config;
-        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config)
+        private readonly IAppointmentService _apppointmentservice;
+
+        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IAppointmentService apppointmentservice)
         {
             _payOSSettings = settings.Value;
             //_payOS = new PayOS(_payOSSettings.ClientId, _payOSSettings.ApiKey, _payOSSettings.ChecksumKey);
             _client = client;
             _unitOfWork = unitOfWork;
             _config = config;
+            _apppointmentservice = apppointmentservice;
         }
 
         private string ComputeHmacSha256(string data, string checksumKey)
@@ -102,18 +107,19 @@ namespace Hairhub.Service.Services.Services
                     buyerAddress: request.buyerAddress,
                     expiredAt: (int)expiredAt.ToUnixTimeSeconds()
                 );
-                await SavePaymentInfo(new Payment
-                {
-                    Id = Guid.NewGuid(), // Generate new ID for the payment record
-                    CustomerId = request.items.CustomerId,
-                    TotalAmount = amount,
-                    PaymentDate = DateTime.UtcNow,
-                    MethodBanking = "PayOS",
-                    SalonId = request.items.SalonId,
-                    Description = description,
-                    Status = "Pending",
-                    PaymentCode = orderCode,
-                });
+                
+                //await SavePaymentInfo(new Payment
+                //{
+                //    Id = Guid.NewGuid(), // Generate new ID for the payment record
+                //    CustomerId = request.items.CustomerId,
+                //    TotalAmount = amount,
+                //    PaymentDate = DateTime.UtcNow,
+                //    MethodBanking = "PayOS",
+                //    SalonId = request.items.SalonId,
+                //    Description = description,
+                //    Status = "Pending",
+                //    PaymentCode = orderCode,
+                //});
                 paymentData.items.Add(new ItemData(request.buyerName, 1, amount ));
                 var createPaymentResult = await pos.createPaymentLink(paymentData);
 
@@ -128,35 +134,80 @@ namespace Hairhub.Service.Services.Services
         }
         
 
-        public async Task<string> GetPaymentInfo(string paymentLinkId)
+        public async Task<string> GetPaymentInfo(string paymentLinkId, CreateAppointmentRequest appointmentrequest)
         {
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentLinkId}";
+
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);
-                
+
                 var response = await _client.SendAsync(request);
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseObject = JObject.Parse(responseContent);
-                    var status = responseObject["data"]?["status"];
-                    if(status != null)
-                    {
-                        return status.ToString();
-                    } else
-                    {
-                        throw new Exception("Fail");
-                    }
-                } else
-                {
-                    throw new Exception("Fail to send");
-                }
+                    var status = responseObject["data"]?["status"]?.ToString();
+                    var paymentInfo = responseObject["data"];
 
-            }catch (Exception ex)
+                    if (status != null)
+                    {
+                        if (status == "PAID")
+                        {
+                            // Extract necessary details from the payment info
+                            var orderCode = paymentInfo["orderCode"]?.ToString();
+                            var amount = paymentInfo["amount"]?.ToString();
+                            var paymentDate = DateTime.Now;
+                            var customerId = appointmentrequest.CustomerId;
+                            var 
+                            Guid? salonEmployeeId = null;
+
+                            // Check if ListAppointmentDetail is not null and has at least one element
+                            if (appointmentrequest.ListAppointmentDetail != null && appointmentrequest.ListAppointmentDetail.Count > 0)
+                            {
+                                salonEmployeeId = appointmentrequest.ListAppointmentDetail[0].SalonEmployeeId;
+                            }
+
+                            // Save the transaction
+                            await SavePaymentInfo(new Payment
+                            {
+                                Id = Guid.NewGuid(), // Generate new ID for the payment record
+                                CustomerId = customerId,
+                                TotalAmount = int.Parse(amount),
+                                PaymentDate = paymentDate,
+                                MethodBanking = "PayOS",
+                                Description = "Payment received",
+                                PaymentCode = int.Parse(orderCode),
+                                SalonId = salonEmployeeId, // Assuming this should be saved
+                                Status = "Paid",
+                            });
+                            await _apppointmentservice.CreateAppointment(appointmentrequest);
+
+                            return "Payment has been successfully received and saved.";
+                        }
+                        else if (status == "pending")
+                        {
+                            return "Payment is still pending.";
+                        }
+                        else
+                        {
+                            return $"Payment status is {status}.";
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to retrieve payment status.");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to send request.");
+                }
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

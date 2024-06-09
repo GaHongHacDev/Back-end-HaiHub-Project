@@ -16,6 +16,8 @@ namespace Hairhub.Domain.Entitities
         public string? Description { get; set; }
         public string? Img { get; set; }
         public string? BusinessLicense {  get; set; }
+        public string Longitude {  get; set; }
+        public string Latitude {  get; set; }
         public bool? IsActive { get; set; }
 
         public virtual SalonOwner SalonOwner { get; set; }
