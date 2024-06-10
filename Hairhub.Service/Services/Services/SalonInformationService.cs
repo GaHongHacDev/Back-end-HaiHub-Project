@@ -93,6 +93,7 @@ namespace Hairhub.Service.Services.Services
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
            .GetPagingListAsync(
+                predicate: x=>x.IsActive==true,
                include: query => query.Include(s => s.SalonOwner),
                page: page,
                size: size
@@ -127,7 +128,7 @@ namespace Hairhub.Service.Services.Services
             SalonInformation salonInformation= await _unitOfWork
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.OwnerId.Equals(ownerId),
+                    predicate: x => x.OwnerId.Equals(ownerId) && x.IsActive==true,
                     include: source => source.Include(s => s.SalonOwner)
                  );
             var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
