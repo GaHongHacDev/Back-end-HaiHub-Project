@@ -11,6 +11,7 @@ namespace Hairhub.Domain.Enums
         public static string SALONOWNER_AVATAR = "SALON_OWNER/AVATAR";
         public static string CUSTOMER_AVATAR = "CUSTOMER/AVATAR";
         public static string SALON_AVATAR = "SALON_INFORMATION/AVATAR";
-        public static string SERVICEHAITR = "SERVICE_HAIR";
+        public static string SERVICE_HAIR = "SERVICE_HAIR";
+        public static string EMPLOYEE = "EMPLOYEE";
     }
 }

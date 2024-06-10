@@ -64,10 +64,10 @@ namespace Hairhub.Service.Services.Services
             AppointmentDetailVoucher newAppointmentDetailVoucher = new AppointmentDetailVoucher()
             {
                 Id = Guid.NewGuid(),
-                VoucherId = request.VoucherId,
-                AppointmentId = request.AppointmentId,
-                AppliedAmount = request.AppliedAmount,
-                AppliedDate = request.AppliedDate,
+                VoucherId = (Guid)request.VoucherId,
+                AppointmentId = (Guid)request.AppointmentId,
+                AppliedAmount = (decimal)request.AppliedAmount,
+                AppliedDate = (DateTime)request.AppliedDate,
                 
             };
             await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(newAppointmentDetailVoucher);
@@ -82,8 +82,8 @@ namespace Hairhub.Service.Services.Services
 
             if (appointmentDetailVoucher == null) throw new Exception("AppointmentDetailVoucher is not exist!!!");
 
-            appointmentDetailVoucher.AppliedAmount = request.AppliedAmount;
-            appointmentDetailVoucher.AppliedDate = request.AppliedDate;
+            appointmentDetailVoucher.AppliedAmount = (decimal)request.AppliedAmount;
+            appointmentDetailVoucher.AppliedDate = (DateTime)request.AppliedDate;
 
             _unitOfWork.GetRepository<AppointmentDetailVoucher>().UpdateAsync(appointmentDetailVoucher);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;

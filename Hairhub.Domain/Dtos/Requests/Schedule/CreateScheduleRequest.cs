@@ -9,7 +9,7 @@ namespace Hairhub.Domain.Dtos.Requests.Schedule
     public class CreateScheduleRequest
     {
         public Guid EmployeeId { get; set; }
-        public string Date { get; set; }
+        public string DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
 

@@ -57,7 +57,7 @@ namespace Hairhub.Service.Services.Services
                 var newSchedule = new Schedule
                 {
                     Id = Guid.NewGuid(),
-                    Date = scheduleRequest.Date,
+                    DayOfWeek = scheduleRequest.DayOfWeek,
                     SalonId = salonInformation.Id,
                     StartTime = TimeOnly.Parse(scheduleRequest.StartTime),
                     EndTime = TimeOnly.Parse(scheduleRequest.EndTime),

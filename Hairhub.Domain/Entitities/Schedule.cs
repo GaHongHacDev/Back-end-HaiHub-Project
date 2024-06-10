@@ -13,10 +13,10 @@ namespace Hairhub.Domain.Entitities
         public Guid Id { get; set; }
         public Guid? EmployeeId { get; set; }
         public Guid? SalonId { get; set; }
-        public string? Date { get; set; }
+        public string DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
-        public bool? IsActive {  get; set; }
+        public bool IsActive {  get; set; }
 
         public virtual SalonEmployee SalonEmployee { get; set; }
         public virtual SalonInformation SalonInformation { get; set; }

@@ -46,7 +46,7 @@ namespace Hairhub.Service.Services.Services
             }
             var serviceHair = _mapper.Map<ServiceHair>(createServiceHairRequest);
             serviceHair.Id = Guid.NewGuid();
-            var url = await _mediaService.UploadAnImage(createServiceHairRequest.Img, MediaPath.SERVICEHAITR, serviceHair.Id.ToString());
+            var url = await _mediaService.UploadAnImage(createServiceHairRequest.Img, MediaPath.SERVICE_HAIR, serviceHair.Id.ToString());
             serviceHair.Img = url;
             await _unitOfWork.GetRepository<ServiceHair>().InsertAsync(serviceHair);
             bool isInsert = await _unitOfWork.CommitAsync()>0;

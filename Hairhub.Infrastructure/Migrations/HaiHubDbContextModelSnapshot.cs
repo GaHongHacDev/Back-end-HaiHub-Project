@@ -29,21 +29,23 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("password");
 
-                    b.Property<Guid?>("RoleId")
+                    b.Property<Guid>("RoleId")
                         .HasMaxLength(64)
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("username");
@@ -62,20 +64,25 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("AccountId")
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("account_id");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
 
                     b.Property<string>("BankAccount")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("bank_account");
 
                     b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("bank_name");
 
                     b.Property<DateTime?>("DayOfBirth")
@@ -83,11 +90,15 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("day_of_birth");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
                         .HasColumnName("email");
 
                     b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("full_name");
 
                     b.Property<string>("Gender")
@@ -96,7 +107,9 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("gender");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
                         .HasColumnName("phone");
 
                     b.HasKey("Id");
@@ -113,27 +126,29 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("CustomerId")
+                    b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");
 
-                    b.Property<DateTime?>("Date")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
                         .HasColumnName("date");
 
-                    b.Property<decimal?>("DiscountedPrice")
+                    b.Property<decimal>("DiscountedPrice")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("discounted_price");
 
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_active");
-
-                    b.Property<decimal?>("OriginalPrice")
+                    b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("original_price");
 
-                    b.Property<decimal?>("TotalPrice")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("total_price");
 
@@ -151,32 +166,35 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("AppointmentId")
+                    b.Property<Guid>("AppointmentId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("appointment_id");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("EndTime")
+                    b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2")
                         .HasColumnName("end_time");
 
-                    b.Property<Guid?>("SalonEmployeeId")
+                    b.Property<Guid>("SalonEmployeeId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_employee_id");
 
-                    b.Property<Guid?>("ServiceHairId")
+                    b.Property<Guid>("ServiceHairId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("service_hair_id");
 
-                    b.Property<DateTime?>("StartTime")
+                    b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2")
                         .HasColumnName("start_time");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
                         .HasColumnName("status");
 
                     b.HasKey("Id");
@@ -197,22 +215,22 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<decimal?>("AppliedAmount")
+                    b.Property<decimal>("AppliedAmount")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("applied_amount");
 
-                    b.Property<DateTime?>("AppliedDate")
+                    b.Property<DateTime>("AppliedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("applied_date");
 
-                    b.Property<Guid?>("AppointmentId")
+                    b.Property<Guid>("AppointmentId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("appointment_detail_id");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("VoucherId")
+                    b.Property<Guid>("VoucherId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("voucher_id");
 
@@ -260,40 +278,33 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("AccountId")
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("account_id");
 
                     b.Property<string>("Address")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("address");
 
-                    b.Property<string>("BankAccount")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
-                        .HasColumnName("bank_account");
-
-                    b.Property<string>("BankName")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
-                        .HasColumnName("bank_name");
-
-                    b.Property<DateTime?>("DayOfBirth")
+                    b.Property<DateTime>("DayOfBirth")
                         .HasColumnType("datetime2")
                         .HasColumnName("day_of_birth");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("email");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
 
                     b.Property<string>("Gender")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("gender");
@@ -303,8 +314,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("img");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
                         .HasColumnName("phone");
 
                     b.HasKey("Id");
@@ -321,20 +332,20 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("AppointmentDetailId")
+                    b.Property<Guid>("AppointmentId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("appointment_detail_id");
+                        .HasColumnName("appointment_id");
 
                     b.Property<string>("Comment")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("comment");
 
-                    b.Property<Guid?>("CustomerId")
+                    b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
@@ -344,7 +355,7 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentDetailId");
+                    b.HasIndex("AppointmentId");
 
                     b.HasIndex("CustomerId");
 
@@ -402,15 +413,13 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("customer_id");
-
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
                     b.Property<string>("MethodBanking")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("method_banking");
 
@@ -418,28 +427,27 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("payment_code");
 
-                    b.Property<DateTime?>("PaymentDate")
+                    b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("payment_date");
 
-                    b.Property<Guid?>("SalonId")
+                    b.Property<Guid>("SalonOWnerID")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("salon_id");
+                        .HasColumnName("salon_owner_id");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("status");
 
-                    b.Property<decimal?>("TotalAmount")
+                    b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("total_amount");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("SalonId");
+                    b.HasIndex("SalonOWnerID");
 
                     b.ToTable("payment", (string)null);
                 });
@@ -482,7 +490,6 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     b.Property<Guid>("RoleId")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(64)
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
@@ -504,6 +511,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
@@ -514,10 +522,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("gender");
 
                     b.Property<string>("Img")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
@@ -526,7 +535,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("phone");
 
-                    b.Property<Guid?>("SalonInformationId")
+                    b.Property<Guid>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");
 
@@ -545,23 +554,22 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
 
-                    b.Property<string>("BusinessLicense")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("business_license");
-
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
                     b.Property<string>("Img")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
@@ -578,6 +586,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("longitude");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("name");
@@ -600,7 +609,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("AccountId")
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("account_id");
 
@@ -609,42 +618,31 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("address");
 
-                    b.Property<string>("BankAccount")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
-                        .HasColumnName("bank_account");
-
-                    b.Property<string>("BankName")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
-                        .HasColumnName("bank_name");
-
-                    b.Property<DateTime?>("DayOfBirth")
+                    b.Property<DateTime>("DayOfBirth")
                         .HasColumnType("datetime2")
                         .HasColumnName("day_of_birth");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("email");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("full_name");
 
                     b.Property<string>("Gender")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("gender");
 
-                    b.Property<string>("HumanId")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)")
-                        .HasColumnName("humand_id");
-
                     b.Property<string>("Img")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
 
                     b.Property<string>("Phone")
@@ -666,9 +664,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<string>("Date")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("date");
+                    b.Property<string>("DayOfWeek")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("day_of_week");
 
                     b.Property<Guid?>("EmployeeId")
                         .HasColumnType("uniqueidentifier")
@@ -679,7 +679,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("end_time");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
@@ -708,11 +708,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("SalonEmployeeId")
+                    b.Property<Guid>("SalonEmployeeId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_employee_id");
 
-                    b.Property<Guid?>("ServiceHairId")
+                    b.Property<Guid>("ServiceHairId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("service_hair_id");
 
@@ -733,18 +733,21 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
                     b.Property<string>("Img")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("price");
 
@@ -753,10 +756,12 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("salon_information_id");
 
                     b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(max)")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("service_name");
 
-                    b.Property<decimal?>("Time")
+                    b.Property<decimal>("Time")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("time");
 
@@ -767,6 +772,32 @@ namespace Hairhub.Infrastructure.Migrations
                     b.ToTable("service_hair", (string)null);
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.StaticFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("FeedbackId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("feed_back_id");
+
+                    b.Property<string>("Img")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("img");
+
+                    b.Property<string>("Video")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("video");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeedbackId");
+
+                    b.ToTable("static_file", (string)null);
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Voucher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -775,8 +806,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("code");
 
                     b.Property<DateTime?>("CreatedDate")
@@ -795,11 +826,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("expiry_date");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<bool?>("IsSystemCreated")
+                    b.Property<bool>("IsSystemCreated")
                         .HasColumnType("bit")
                         .HasColumnName("is_system_created");
 
@@ -811,7 +842,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("modified_date");
 
-                    b.Property<Guid?>("SalonInformationId")
+                    b.Property<Guid>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");
 
@@ -827,6 +858,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Role", "Role")
                         .WithMany("Accounts")
                         .HasForeignKey("RoleId")
+                        .IsRequired()
                         .HasConstraintName("FK_role_acount");
 
                     b.Navigation("Role");
@@ -837,6 +869,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
                         .WithMany("Admins")
                         .HasForeignKey("AccountId")
+                        .IsRequired()
                         .HasConstraintName("FK_account_admin");
 
                     b.Navigation("Account");
@@ -847,6 +880,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Customer", "Customer")
                         .WithMany("Appointments")
                         .HasForeignKey("CustomerId")
+                        .IsRequired()
                         .HasConstraintName("FK_customer_appointment");
 
                     b.Navigation("Customer");
@@ -857,16 +891,19 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Appointment", "Appointment")
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("AppointmentId")
+                        .IsRequired()
                         .HasConstraintName("FK_appointment_detail_appointment");
 
                     b.HasOne("Hairhub.Domain.Entitities.SalonEmployee", "SalonEmployee")
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("SalonEmployeeId")
+                        .IsRequired()
                         .HasConstraintName("FK_appointment_detail_salon_employee");
 
                     b.HasOne("Hairhub.Domain.Entitities.ServiceHair", "ServiceHair")
                         .WithMany("AppointmentDetails")
                         .HasForeignKey("ServiceHairId")
+                        .IsRequired()
                         .HasConstraintName("FK_appointment_detail_service_hair");
 
                     b.Navigation("Appointment");
@@ -881,11 +918,13 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Appointment", "Appointment")
                         .WithMany("AppointmentDetailVouchers")
                         .HasForeignKey("AppointmentId")
+                        .IsRequired()
                         .HasConstraintName("FK_appointment_detail_appointment_detail_voucher");
 
                     b.HasOne("Hairhub.Domain.Entitities.Voucher", "Voucher")
                         .WithMany("AppointmentDetailVouchers")
                         .HasForeignKey("VoucherId")
+                        .IsRequired()
                         .HasConstraintName("FK_voucher_appointment_detail_voucher");
 
                     b.Navigation("Appointment");
@@ -898,6 +937,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
                         .WithMany("Customers")
                         .HasForeignKey("AccountId")
+                        .IsRequired()
                         .HasConstraintName("FK_account_customer");
 
                     b.Navigation("Account");
@@ -905,36 +945,32 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Feedback", b =>
                 {
-                    b.HasOne("Hairhub.Domain.Entitities.AppointmentDetail", "AppointmentDetail")
+                    b.HasOne("Hairhub.Domain.Entitities.Appointment", "Appointment")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("AppointmentDetailId")
-                        .HasConstraintName("FK_appointment_detail_feedback");
+                        .HasForeignKey("AppointmentId")
+                        .IsRequired()
+                        .HasConstraintName("FK_appointment_feedback");
 
                     b.HasOne("Hairhub.Domain.Entitities.Customer", "Customer")
                         .WithMany("Feedbacks")
                         .HasForeignKey("CustomerId")
+                        .IsRequired()
                         .HasConstraintName("FK_customer_feedback");
 
-                    b.Navigation("AppointmentDetail");
+                    b.Navigation("Appointment");
 
                     b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Payment", b =>
                 {
-                    b.HasOne("Hairhub.Domain.Entitities.Customer", "Customer")
+                    b.HasOne("Hairhub.Domain.Entitities.SalonOwner", "SalonOwner")
                         .WithMany("Payments")
-                        .HasForeignKey("CustomerId")
-                        .HasConstraintName("FK_customer_payment");
+                        .HasForeignKey("SalonOWnerID")
+                        .IsRequired()
+                        .HasConstraintName("FK_salon_owner_payment");
 
-                    b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
-                        .WithMany("Payments")
-                        .HasForeignKey("SalonId")
-                        .HasConstraintName("FK_salon_payment");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("SalonInformation");
+                    b.Navigation("SalonOwner");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.RefreshTokenAccount", b =>
@@ -953,6 +989,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
                         .WithMany("SalonEmployees")
                         .HasForeignKey("SalonInformationId")
+                        .IsRequired()
                         .HasConstraintName("FK_salon_information_salon_employee");
 
                     b.Navigation("SalonInformation");
@@ -973,6 +1010,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
                         .WithMany("SalonOwners")
                         .HasForeignKey("AccountId")
+                        .IsRequired()
                         .HasConstraintName("FK_account_salon_owner");
 
                     b.Navigation("Account");
@@ -1000,11 +1038,13 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.SalonEmployee", "SalonEmployee")
                         .WithMany("ServiceEmployees")
                         .HasForeignKey("SalonEmployeeId")
+                        .IsRequired()
                         .HasConstraintName("FK_salon_employee_service_employee");
 
                     b.HasOne("Hairhub.Domain.Entitities.ServiceHair", "ServiceHair")
                         .WithMany("ServiceEmployees")
                         .HasForeignKey("ServiceHairId")
+                        .IsRequired()
                         .HasConstraintName("FK_service_hair_service_employee");
 
                     b.Navigation("SalonEmployee");
@@ -1023,11 +1063,23 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("SalonInformation");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.StaticFile", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.Feedback", "Feedback")
+                        .WithMany("StaticFiles")
+                        .HasForeignKey("FeedbackId")
+                        .HasConstraintName("FK_feedback_static_file");
+
+                    b.Navigation("Feedback");
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Voucher", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
                         .WithMany("Vouchers")
-                        .HasForeignKey("SalonInformationId");
+                        .HasForeignKey("SalonInformationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("SalonInformation");
                 });
@@ -1048,10 +1100,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("AppointmentDetailVouchers");
 
                     b.Navigation("AppointmentDetails");
-                });
 
-            modelBuilder.Entity("Hairhub.Domain.Entitities.AppointmentDetail", b =>
-                {
                     b.Navigation("Feedbacks");
                 });
 
@@ -1060,8 +1109,11 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Appointments");
 
                     b.Navigation("Feedbacks");
+                });
 
-                    b.Navigation("Payments");
+            modelBuilder.Entity("Hairhub.Domain.Entitities.Feedback", b =>
+                {
+                    b.Navigation("StaticFiles");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Role", b =>
@@ -1080,8 +1132,6 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonInformation", b =>
                 {
-                    b.Navigation("Payments");
-
                     b.Navigation("SalonEmployees");
 
                     b.Navigation("Schedules");
@@ -1093,6 +1143,8 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonOwner", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("SalonInformations");
                 });
 

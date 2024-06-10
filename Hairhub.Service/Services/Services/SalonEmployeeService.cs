@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
+using Hairhub.Domain.Dtos.Requests.Schedule;
+using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.SalonEmployees;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -15,11 +18,15 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
+        private readonly IScheduleService _scheduleService;
 
-        public SalonEmployeeService(IUnitOfWork unitOfWork, IMapper mapper)
+        public SalonEmployeeService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IScheduleService scheduleService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
+            _scheduleService = scheduleService;
         }
 
         public async Task<bool> ActiveSalonEmployee(Guid id)
@@ -49,9 +56,28 @@ namespace Hairhub.Service.Services.Services
             {
                 var employee = _mapper.Map<SalonEmployee>(item);
                 employee.Id = Guid.NewGuid();
-
+                var url = await _mediaService.UploadAnImage(item.ImgEmployee, MediaPath.EMPLOYEE, employee.Id.ToString());
+                employee.Img = url;
+                employee.SalonInformationId = request.SalonInformationId;
+                await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(employee);
+                //create schedule
+                foreach (var itemSchedule in item.ScheduleEmployees)
+                {
+                    var scheduleEmployee = new CreateScheduleRequest() {EmployeeId = employee.Id};
+                    _scheduleService.CreateScheduleEmployee(scheduleEmployee);
+                }
+                //create Service Employee
+                foreach(var itemServiceHair in item.ServiceHairId)
+                {
+                    ServiceEmployee srvEmployee = new ServiceEmployee();
+                    srvEmployee.Id = Guid.NewGuid();
+                    srvEmployee.ServiceHairId = itemServiceHair;
+                    srvEmployee.SalonEmployeeId = employee.Id;
+                    await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(srvEmployee);
+                }
             }
-            return true;
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            return isInsert;
         }
 
         public async Task<bool> DeleteSalonEmployeeById(Guid id)

@@ -59,7 +59,7 @@ namespace Hairhub.Service.Services.Services
             try
             {
                 
-                int amount = (int)request.items.TotalPrice;
+                int amount = (int)request.totalAmount;
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.description;
                 var clientId = _config["PayOS:ClientId"];
@@ -203,13 +203,13 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size)
-        {
-            IPaginate<ResponsePayment> payment = await _unitOfWork.GetRepository<Payment>()
-                .GetPagingListAsync(selector: x => new ResponsePayment(x.Id, x.CustomerId, x.TotalAmount, x.PaymentDate
-                , x.MethodBanking, x.SalonId, x.Description), page: page, size: size, orderBy: x => x.OrderBy(x => x.PaymentDate));
+        //public async Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size)
+        //{
+        //    IPaginate<ResponsePayment> payment = await _unitOfWork.GetRepository<Payment>()
+        //        .GetPagingListAsync(selector: x => new ResponsePayment(x.Id, x.CustomerId, x.TotalAmount, x.PaymentDate
+        //        , x.MethodBanking, x.SalonId, x.Description), page: page, size: size, orderBy: x => x.OrderBy(x => x.PaymentDate));
 
-            return payment;
-        }
+        //    return payment;
+        //}
     }
 }
