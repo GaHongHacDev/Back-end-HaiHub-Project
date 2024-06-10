@@ -1,7 +1,8 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
+using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
@@ -18,12 +19,14 @@ namespace Hairhub.Service.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMediaService _mediaService;
+        private readonly IScheduleService _scheduleService;
 
-        public SalonInformationService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
+        public SalonInformationService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IScheduleService scheduleService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _mediaService = mediaService;
+            _scheduleService = scheduleService;
         }
 
         public async Task<bool> ActiveSalonInformation(Guid id)
@@ -48,8 +51,8 @@ namespace Hairhub.Service.Services.Services
             }
             var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
             salonInformation.Id = Guid.NewGuid();
+            salonInformation.IsActive = false;
             string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
-            salonInformation.IsActive = true;
             salonInformation.Img = url;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
@@ -61,12 +64,16 @@ namespace Hairhub.Service.Services.Services
                     SalonId = salonInformation.Id,
                     StartTime = TimeOnly.Parse(scheduleRequest.StartTime),
                     EndTime = TimeOnly.Parse(scheduleRequest.EndTime),
-                    IsActive = true
+                    IsActive = scheduleRequest.IsActive
                 };
                 await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
             }
 
-            await _unitOfWork.CommitAsync();
+            bool isInsert = await _unitOfWork.CommitAsync()>0;
+            if (!isInsert)
+            {
+                throw new Exception("Không thể tạo salon");
+            }
             return _mapper.Map<CreateSalonInformationResponse>(salonInformation);
         }
 
@@ -86,6 +93,7 @@ namespace Hairhub.Service.Services.Services
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
            .GetPagingListAsync(
+                predicate: x=>x.IsActive==true,
                include: query => query.Include(s => s.SalonOwner),
                page: page,
                size: size
@@ -113,6 +121,25 @@ namespace Hairhub.Service.Services.Services
             if (salonInformationResponse == null)
                 return null;
             return _mapper.Map<GetSalonInformationResponse>(salonInformationResponse);
+        }
+
+        public async Task<GetSalonInformationResponse>? GetSalonByOwnerId(Guid ownerId)
+        {
+            SalonInformation salonInformation= await _unitOfWork
+                .GetRepository<SalonInformation>()
+                .SingleOrDefaultAsync(
+                    predicate: x => x.OwnerId.Equals(ownerId) && x.IsActive==true,
+                    include: source => source.Include(s => s.SalonOwner)
+                 );
+            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
+            if (salonInformation == null)
+                throw new NotFoundException($"Not found salon information with owner id {ownerId}");
+            var schedules = await _scheduleService.GetSalonSchedules(salonInformation.Id);
+            if (schedules.Any())
+            {
+                salonInforResponse.schedules = schedules;
+            }
+            return salonInforResponse;
         }
 
         public async Task<bool> UpdateSalonInformationById(Guid id, UpdateSalonInformationRequest updateSalonInformationRequest)

@@ -18,7 +18,6 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
         public IFormFile Img { get; set; }
         public string Longitude { get; set; }
         public string Latitude { get; set; }
-        public bool IsActive { get; set; }
         public List<CreateSalonScheduleRequest> SalonInformationSchedules { get; set; }
     }
     public class CreateSalonScheduleRequest
@@ -26,5 +25,6 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
         public string DayOfWeek {  get; set; }
         public string StartTime { get; set; }
         public string EndTime { get; set; }
+        public bool IsActive { get; set; }
     }
 }

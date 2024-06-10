@@ -24,26 +24,28 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> GetAllConfig([FromQuery] int page=1, [FromQuery] int size = 10)
         {
 
-            var listconfig = await _configservice.GetAllConfigAsync(page, size);
-            return Ok(listconfig);
+            //var listconfig = await _configservice.GetAllConfigAsync(page, size);
+            //return Ok(listconfig);
+            return Ok();
         }
         [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetConfigById([FromRoute] Guid id)
         {
-            try
-            {
-                var Config = await _configservice.GetConfigbyIdAsync(id);
-                if (Config == null)
-                {
-                    return NotFound("Cannont find this config!");
-                }
-                return Ok(Config);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            //try
+            //{
+            //    var Config = await _configservice.GetConfigbyIdAsync(id);
+            //    if (Config == null)
+            //    {
+            //        return NotFound("Cannont find this config!");
+            //    }
+            //    return Ok(Config);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(ex.Message);
+            //}
+            return Ok();
         }
         
 

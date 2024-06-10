@@ -28,8 +28,9 @@ namespace Hairhub.Service.Services.Services
         {
             var config = new Config()
             {
-                CommissionRate = request.CommissionRate,
-                MaintenanceFee = request.MaintenanceFee,
+                PakageName = request.PakageName,
+                PakageFee = request.PakageFee,
+                Description = request.Description,
                 DateCreate = request.DateCreate,
                 IsActive = request.IsActive,
             };
@@ -56,10 +57,10 @@ namespace Hairhub.Service.Services.Services
 
         }
 
-        public async Task<IPaginate<GetConfigResponse>> GetAllConfigAsync(int page, int size)
+ /*       public async Task<IPaginate<GetConfigResponse>> GetAllConfigAsync(int page, int size)
         {
             IPaginate<GetConfigResponse> config = await _unitofwork.GetRepository<Config>()
-                 .GetPagingListAsync(selector: x => new GetConfigResponse(x.CommissionRate, x.MaintenanceFee
+                 .GetPagingListAsync(selector: x => new GetConfigResponse(x.PakageName, x.PakageFee
                  , x.DateCreate, x.IsActive), page: page, size: size, orderBy: x => x.OrderBy(x => x.DateCreate));
 
             return config;
@@ -74,6 +75,7 @@ namespace Hairhub.Service.Services.Services
             if (configresponse == null) return null;
             return configresponse;
         }
+ */
 
         public async Task<UpdateConfigResponse> UpdateConfigAsync(Guid id, UpdateConfigRequest request)
         {
@@ -88,8 +90,9 @@ namespace Hairhub.Service.Services.Services
                 throw new KeyNotFoundException("Cannot Find Config");
             }
 
-            existConfig.CommissionRate = request.CommissionRate;
-            existConfig.MaintenanceFee = request.MaintenanceFee;
+            existConfig.PakageName = request.PakageName;
+            existConfig.PakageFee = request.PakageFee;
+            existConfig.Description = request.Description;
             existConfig.DateCreate = request.DateCreate;
             existConfig.IsActive = request.IsActive;
 

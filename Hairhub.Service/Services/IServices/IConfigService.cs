@@ -13,10 +13,10 @@ namespace Hairhub.Service.Services.IServices
 {
     public interface IConfigService
     {
-        Task<IPaginate<GetConfigResponse>> GetAllConfigAsync(int page, int size);
+        //Task<IPaginate<GetConfigResponse>> GetAllConfigAsync(int page, int size);
 
 
-        Task<GetConfigResponse>? GetConfigbyIdAsync(Guid id);
+       // Task<GetConfigResponse>? GetConfigbyIdAsync(Guid id);
 
         Task<CreateConfigResponse> CreateConfigAsync(CreateConfigRequest request);
 

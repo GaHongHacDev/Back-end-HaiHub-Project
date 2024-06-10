@@ -24,9 +24,9 @@ namespace Hairhub.Infrastructure
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
-                .Build(); 
-           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+                .Build();
+             optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
         }
 
         // DBSet<>
@@ -436,6 +436,7 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.ConfigId).HasColumnName("config_id");
                 entity.Property(e => e.SalonOWnerID).HasColumnName("salon_owner_id");
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)").HasColumnName("total_amount");
                 entity.Property(e => e.PaymentDate).HasColumnName("payment_date");
@@ -449,6 +450,12 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.SalonOWnerID)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_salon_owner_payment");
+
+                entity.HasOne(d => d.Config)
+                      .WithMany(p => p.Payments)
+                      .HasForeignKey(d => d.ConfigId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_config_payment");
             });
 
             modelBuilder.Entity<Config>(entity =>
@@ -457,10 +464,11 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate").IsRequired(false);
-                entity.Property(e => e.MaintenanceFee).HasColumnType("decimal(18, 2)").HasColumnName("maintenance_fee").IsRequired(false);
-                entity.Property(e => e.DateCreate).HasColumnName("date_create").IsRequired(false);
-                entity.Property(e => e.IsActive).HasColumnName("is_active").IsRequired(false);
+                entity.Property(e => e.PakageName).HasMaxLength(100).HasColumnName("pakage_name");
+                entity.Property(e => e.Description).HasMaxLength(100).HasColumnName("description");
+                entity.Property(e => e.PakageFee).HasColumnType("decimal(18, 2)").HasColumnName("pakage_fee");
+                entity.Property(e => e.DateCreate).HasColumnName("date_create");
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
         }
     }
