@@ -100,8 +100,13 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<SalonOwnerSalonInformationResponse, SalonOwner>().ReverseMap();
-            CreateMap<CreateScheduleRequest, Schedule>();
-            CreateMap<SalonInformationSchedule, SalonInformation>();
+            CreateMap<CreateScheduleRequest, Schedule>().ReverseMap(); 
+            CreateMap<SalonInformationSchedule, SalonInformation>().ReverseMap();
+            CreateMap<SalonInformation, SearchSalonByNameAddressServiceResponse>()
+                       .ForMember(dest => dest.Services, opt => opt.Ignore())
+                       .ForMember(dest => dest.Vouchers, opt => opt.Ignore());
+            CreateMap<SearchSalonServiceResponse, ServiceHair>().ReverseMap();
+            CreateMap<SearchSalonVoucherRespnse, Voucher>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();

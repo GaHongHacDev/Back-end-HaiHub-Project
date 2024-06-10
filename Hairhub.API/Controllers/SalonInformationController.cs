@@ -63,6 +63,30 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetSalonByServiceNameAddress(
+            [FromQuery] string? serviceName = null,
+            [FromQuery] string? salonAddress = null,
+            [FromQuery] string? salonName = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10)
+        {
+            try
+            {
+                var salonInformationResponse = await _salonInformationService.SearchSalonByNameAddressService(page, size, serviceName, salonAddress, salonName);
+                return Ok(salonInformationResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound("Cannot find this SalonInformation!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CreateSalonInformation([FromForm] CreateSalonInformationRequest createSalonInformationRequest)
         {
