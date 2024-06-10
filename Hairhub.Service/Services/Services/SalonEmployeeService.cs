@@ -76,6 +76,8 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(srvEmployee);
                 }
             }
+            existSalon.IsActive = true;
+            await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(existSalon);
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
