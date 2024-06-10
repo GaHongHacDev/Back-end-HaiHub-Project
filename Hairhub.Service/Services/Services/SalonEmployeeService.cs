@@ -63,7 +63,13 @@ namespace Hairhub.Service.Services.Services
                 //create schedule
                 foreach (var itemSchedule in item.ScheduleEmployees)
                 {
-                    var scheduleEmployee = new CreateScheduleRequest() {EmployeeId = employee.Id};
+                    var scheduleEmployee = new CreateScheduleRequest() 
+                                                {
+                                                    EmployeeId = employee.Id, 
+                                                    DayOfWeek=itemSchedule.Date, 
+                                                    EndTime= itemSchedule.EndTime, 
+                                                    StartTime= itemSchedule.StartTime
+                                                };
                     _scheduleService.CreateScheduleEmployee(scheduleEmployee);
                 }
                 //create Service Employee
@@ -77,7 +83,7 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             existSalon.IsActive = true;
-            await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(existSalon);
+            _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(existSalon);
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }

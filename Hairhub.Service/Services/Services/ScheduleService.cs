@@ -96,6 +96,7 @@ namespace Hairhub.Service.Services.Services
             Schedule newSchedule = new Schedule()
             {
                 Id = Guid.NewGuid(),
+                EmployeeId = request.EmployeeId,
                 DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
