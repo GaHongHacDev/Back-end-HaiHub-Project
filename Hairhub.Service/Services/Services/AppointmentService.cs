@@ -78,7 +78,7 @@ namespace Hairhub.Service.Services.Services
             }
             var appointment = _mapper.Map<Appointment>(createAccountRequest);
             appointment.Id = Guid.NewGuid();
-            appointment.IsActive = true;
+            appointment.Status = AppointmentStatus.Booking;
             appointment.Date = DateTime.Now;
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
             await _unitOfWork.CommitAsync();
@@ -124,7 +124,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Appoint not found!");
             }
-            appoinment.IsActive = false;
+            appoinment.Status = AppointmentStatus.Fail;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
@@ -137,7 +137,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Appoint not found!");
             }
-            appoinment.IsActive = true;
+            appoinment.Status = AppointmentStatus.Booking;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
@@ -157,20 +157,19 @@ namespace Hairhub.Service.Services.Services
                 }
                 var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
                                                     predicate: x=>x.EmployeeId == employee.Id 
-                                                                && x.Date.Equals(request.Day.DayOfWeek.ToString()));
+                                                                && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString()));
                 var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute/60;
                 var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute/60;
                 List<decimal> TimeSlot = generateTimeSlot(startSchedule, endSchedule, (decimal)0.25);
-  
+
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
-                                                    predicate: x=>x.SalonEmployeeId == request.SalonEmployeeId 
-                                                    && x.StartTime.Value.Date == request.Day.Date
-                                                    && x.EndTime.Value.Date == request.Day.Date);
+                                                                predicate: x => x.SalonEmployeeId == request.SalonEmployeeId
+                                                                && x.StartTime.Date == request.Day.Date
+                                                                && x.EndTime.Date == request.Day.Date);
                 foreach (var item in appointmentDetails)
                 {
-                    decimal start = (decimal)item.StartTime.Value.TimeOfDay.TotalHours;
-                    decimal end = (decimal)item.EndTime.Value.TimeOfDay.TotalHours;
-
+                    decimal start = (decimal)item.StartTime.TimeOfDay.TotalHours;
+                    decimal end = (decimal)item.EndTime.TimeOfDay.TotalHours;
                     TimeSlot.RemoveAll(slot => slot >= start && slot < end);
                 }
                 result.TimeAvailables = TimeSlot;
@@ -190,7 +189,7 @@ namespace Hairhub.Service.Services.Services
                 {   // Get schedule by id
                     var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
                                     predicate: x => x.EmployeeId == employee.Id
-                                     && x.Date.Equals(request.Day.DayOfWeek.ToString()));
+                                     && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString()));
                     //Get Time work of employee
                     var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
                     var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60;
@@ -199,13 +198,12 @@ namespace Hairhub.Service.Services.Services
                     //Get appointment detail => Check available time
                     var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
                                                         predicate: x => x.SalonEmployeeId == request.SalonEmployeeId
-                                                        && x.StartTime.Value.Date == request.Day.Date
-                                                        && x.EndTime.Value.Date == request.Day.Date);
+                                                        && x.StartTime.Date == request.Day.Date
+                                                        && x.EndTime.Date == request.Day.Date);
                     foreach (var item in appointmentDetails)
                     {
-                        decimal start = (decimal)item.StartTime.Value.TimeOfDay.TotalHours;
-                        decimal end = (decimal)item.EndTime.Value.TimeOfDay.TotalHours;
-
+                        decimal start = (decimal)item.StartTime.TimeOfDay.TotalHours;
+                        decimal end = (decimal)item.EndTime.TimeOfDay.TotalHours;
                         TimeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                     }
                     TimeSlot = TimeSlot.Union(TimeSlotEmployee).ToList();

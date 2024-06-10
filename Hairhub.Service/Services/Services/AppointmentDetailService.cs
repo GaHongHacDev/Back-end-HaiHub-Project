@@ -5,6 +5,7 @@ using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -136,7 +137,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Appoint not found!");
             }
-            appoinmentDetail.Status = false;
+            appoinmentDetail.Status = AppointmentStatus.Fail;
             _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(appoinmentDetail);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;

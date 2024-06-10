@@ -58,7 +58,7 @@ namespace Hairhub.Service.Services.Services
             try
             {
                 
-                int amount = (int)request.items.TotalPrice;
+                int amount = (int)request.totalAmount;
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.description;
                 var clientId = _config["PayOS:ClientId"];
@@ -102,18 +102,6 @@ namespace Hairhub.Service.Services.Services
                     buyerAddress: request.buyerAddress,
                     expiredAt: (int)expiredAt.ToUnixTimeSeconds()
                 );
-                await SavePaymentInfo(new Payment
-                {
-                    Id = Guid.NewGuid(), // Generate new ID for the payment record
-                    CustomerId = request.items.CustomerId,
-                    TotalAmount = amount,
-                    PaymentDate = DateTime.UtcNow,
-                    MethodBanking = "PayOS",
-                    SalonId = request.items.SalonId,
-                    Description = description,
-                    Status = "Pending",
-                    PaymentCode = orderCode,
-                });
                 paymentData.items.Add(new ItemData(request.buyerName, 1, amount ));
                 var createPaymentResult = await pos.createPaymentLink(paymentData);
 
@@ -162,13 +150,13 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size)
-        {
-            IPaginate<ResponsePayment> payment = await _unitOfWork.GetRepository<Payment>()
-                .GetPagingListAsync(selector: x => new ResponsePayment(x.Id, x.CustomerId, x.TotalAmount, x.PaymentDate
-                , x.MethodBanking, x.SalonId, x.Description), page: page, size: size, orderBy: x => x.OrderBy(x => x.PaymentDate));
+        //public async Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size)
+        //{
+        //    IPaginate<ResponsePayment> payment = await _unitOfWork.GetRepository<Payment>()
+        //        .GetPagingListAsync(selector: x => new ResponsePayment(x.Id, x.CustomerId, x.TotalAmount, x.PaymentDate
+        //        , x.MethodBanking, x.SalonId, x.Description), page: page, size: size, orderBy: x => x.OrderBy(x => x.PaymentDate));
 
-            return payment;
-        }
+        //    return payment;
+        //}
     }
 }

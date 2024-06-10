@@ -8,8 +8,8 @@ namespace Hairhub.Domain.Dtos.Requests.Feedbacks
 {
     public class CreateFeedbackRequest
     {
-        public Guid? CustomerId { get; set; }
-        public Guid? AppointmentDetailId { get; set; }
+        public Guid CustomerId { get; set; }
+        public Guid AppointmentId { get; set; }
         public int? Rating { get; set; }
         public string? Comment { get; set; }
     }

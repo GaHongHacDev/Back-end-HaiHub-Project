@@ -31,7 +31,7 @@ namespace Hairhub.Service.Services.Services
             var feedbacks = await _unitOfWork.GetRepository<Feedback>()
                 .GetPagingListAsync(
                 predicate: x => x.IsActive == true,
-                include: query => query.Include(s => s.Customer).Include(s => s.AppointmentDetail),
+                include: query => query.Include(s => s.Customer).Include(s => s.Appointment),
                 page: page,
                 size: size);
 
@@ -52,7 +52,7 @@ namespace Hairhub.Service.Services.Services
             var feedback = await _unitOfWork.GetRepository<Feedback>()
                 .SingleOrDefaultAsync(
                 predicate: predicate => predicate.Id.Equals(id),
-                include: query => query.Include(s => s.Customer).Include(s => s.AppointmentDetail));
+                include: query => query.Include(s => s.Customer).Include(s => s.Appointment));
 
             var feedbackResponse = _mapper.Map<GetFeedbackResponse>(feedback);
 
@@ -65,7 +65,7 @@ namespace Hairhub.Service.Services.Services
             {
                 Id = Guid.NewGuid(),
                 CustomerId = request.CustomerId,
-                AppointmentDetailId = request.AppointmentDetailId,
+                AppointmentId = request.AppointmentId,
                 Rating = request.Rating,
                 Comment = request.Comment,
                 IsActive = true,

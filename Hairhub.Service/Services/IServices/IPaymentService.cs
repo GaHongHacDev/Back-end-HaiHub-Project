@@ -16,6 +16,6 @@ namespace Hairhub.Service.Services.IServices
         Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request);
         Task<string> GetPaymentInfo(string paymentLinkId);
 
-        Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size);
+       // Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size);
     }
 }

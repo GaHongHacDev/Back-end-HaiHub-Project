@@ -10,14 +10,15 @@ namespace Hairhub.Domain.Entitities
     public class Feedback
     {
         public Guid Id { get; set; }
-        public Guid? CustomerId { get; set; }
-        public Guid? AppointmentDetailId { get; set; }
+        public Guid CustomerId { get; set; }
+        public Guid AppointmentId { get; set; }
         public int? Rating { get; set; }
         public string? Comment { get; set; }
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; }
 
         // Navigation properties
         public virtual Customer Customer { get; set; }
-        public virtual AppointmentDetail AppointmentDetail { get; set; }
+        public virtual Appointment Appointment { get; set; }
+        public virtual ICollection<StaticFile> StaticFiles { get; set; }
     }
 }

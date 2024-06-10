@@ -27,7 +27,7 @@ namespace Hairhub.Service.Services.Services
         {
             var voucherRequest = new Voucher()
             {
-                SalonInformationId = request.SalonInformationId,
+                SalonInformationId = (Guid)request.SalonInformationId,
                 Code = request.Code,
                 Description = request.Description,
                 MinimumOrderAmount = request.MinimumOrderAmount,

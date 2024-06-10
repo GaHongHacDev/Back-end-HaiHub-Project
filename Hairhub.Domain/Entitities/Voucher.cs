@@ -10,7 +10,7 @@ namespace Hairhub.Domain.Entitities
     public class Voucher
     {
         public Guid Id { get; set; }
-        public Guid? SalonInformationId { get; set; }
+        public Guid SalonInformationId { get; set; }
         public string? Code { get; set; }
         public string? Description { get; set; }
         public decimal? MinimumOrderAmount { get; set; }
@@ -18,8 +18,8 @@ namespace Hairhub.Domain.Entitities
         public DateTime? ExpiryDate { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        public bool? IsSystemCreated { get; set; }
-        public bool? IsActive { get; set; }
+        public bool IsSystemCreated { get; set; }
+        public bool IsActive { get; set; }
 
         // Navigation properties
         public virtual SalonInformation SalonInformation { get; set; }

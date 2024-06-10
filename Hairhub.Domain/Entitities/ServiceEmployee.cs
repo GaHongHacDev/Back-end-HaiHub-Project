@@ -11,8 +11,8 @@ namespace Hairhub.Domain.Entitities
     public class ServiceEmployee
     {
         public Guid Id { get; set; }
-        public Guid? ServiceHairId { get; set; }
-        public Guid? SalonEmployeeId { get; set; }
+        public Guid ServiceHairId { get; set; }
+        public Guid SalonEmployeeId { get; set; }
 
         public virtual ServiceHair ServiceHair { get; set; }
         public virtual SalonEmployee SalonEmployee { get; set; }

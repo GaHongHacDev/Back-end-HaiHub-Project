@@ -14,23 +14,8 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
 
         public string buyerPhone { get; set; }
         public string buyerAddress { get; set; }
-        public Appointment items { get; set; }
+        public decimal totalAmount { get; set; }
+        public Guid SalonOwnerId { get; set; }
 
     }
-
-    public class Appointment
-    {
-        public Guid Id { get; set; }
-        public DateTime? Date { get; set; }
-        public Decimal? TotalPrice { get; set; }
-        public Guid? CustomerId { get; set; }
-        public Decimal? OriginalPrice { get; set; }
-        public Decimal? DiscountedPrice { get; set; }
-        public bool? IsActive { get; set; }
-
-        public Guid? SalonId { get; set; }
-    }
-
-
-
 }

@@ -67,7 +67,7 @@ namespace Hairhub.Service.Services.Services
             {
                 Id = Guid.NewGuid(),
                 EmployeeId = request.EmployeeId,
-                Date = request.Date,
+                DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
                 IsActive = true,
@@ -82,7 +82,7 @@ namespace Hairhub.Service.Services.Services
             Schedule newSchedule = new Schedule()
             {
                 Id = Guid.NewGuid(),
-                Date = request.Date,
+                DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
                 IsActive = true,
@@ -98,7 +98,7 @@ namespace Hairhub.Service.Services.Services
 
             if (schedule == null) throw new Exception("Schedule is not exist!!!");
 
-            schedule.Date = request.Date;
+            schedule.DayOfWeek = request.DayOfWeek;
             schedule.StartTime = request.StartTime;
             schedule.EndTime = request.EndTime;
 
