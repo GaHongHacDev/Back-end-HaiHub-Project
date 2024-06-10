@@ -84,6 +84,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
+        [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateVoucher([FromRoute]Guid id, [FromBody]UpdateVoucherRequest request)
         {
             try

@@ -22,7 +22,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAppointment([FromQuery] int page=1, [FromQuery] int size=10)
+        public async Task<IActionResult> GetAllAppointment([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var appointmentsResponse = await _appointmentService.GetAllAppointment(page, size);
             return Ok(appointmentsResponse);
@@ -60,7 +60,7 @@ namespace Hairhub.API.Controllers
                 //return Ok(accoutResponse);
                 return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -141,6 +141,24 @@ namespace Hairhub.API.Controllers
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{AccountId:Guid}")]
+        public async Task<IActionResult> GetAppointmentByAccountId([FromRoute] Guid AccountId,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetAppointmentByAccountId(AccountId, page, size);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }

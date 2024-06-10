@@ -22,13 +22,20 @@ namespace Hairhub.Service.Services.Services
             _unitofwork = unitofwork;
             _mapper = mapper;
         }
-
+        public static string GenerateRandomCode(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
         public async Task<CreateVoucherResponse> CreateVoucherAsync(CreateVoucherRequest request)
         {
             var voucherRequest = new Voucher()
             {
-                SalonInformationId = request.SalonInformationId,
-                Code = request.Code,
+                Id = Guid.NewGuid(),
+                //SalonInformationId = request.SalonInformationId,
+                Code = GenerateRandomCode(10),
                 Description = request.Description,
                 MinimumOrderAmount = request.MinimumOrderAmount,
                 DiscountPercentage = request.DiscountPercentage,
@@ -97,9 +104,7 @@ namespace Hairhub.Service.Services.Services
         {
             var vouchermap = _mapper.Map<Voucher>(request);
             var existVoucher = await _unitofwork.GetRepository<Voucher>().SingleOrDefaultAsync(
-            predicate: e => e.Id == id,
-            orderBy: null,
-            include: null);
+            predicate: e => e.Id == id);
             
             if (existVoucher == null)
             {

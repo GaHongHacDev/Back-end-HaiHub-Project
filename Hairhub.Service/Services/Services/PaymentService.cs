@@ -53,11 +53,7 @@ namespace Hairhub.Service.Services.Services
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
-        private async Task SavePaymentInfo(Payment payment)
-        {
-            await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
-            await _unitOfWork.CommitAsync();
-        }
+        
         public async Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request)
         {
             try
@@ -158,33 +154,27 @@ namespace Hairhub.Service.Services.Services
                         if (status == "PAID")
                         {
                             // Extract necessary details from the payment info
-                            var orderCode = paymentInfo["orderCode"]?.ToString();
-                            var amount = paymentInfo["amount"]?.ToString();
-                            var paymentDate = DateTime.Now;
-                            var customerId = appointmentrequest.CustomerId;
-                            var 
-                            Guid? salonEmployeeId = null;
-
-                            // Check if ListAppointmentDetail is not null and has at least one element
-                            if (appointmentrequest.ListAppointmentDetail != null && appointmentrequest.ListAppointmentDetail.Count > 0)
-                            {
-                                salonEmployeeId = appointmentrequest.ListAppointmentDetail[0].SalonEmployeeId;
-                            }
+                            var orderCode = paymentInfo["orderCode"];
+                            var amount = paymentInfo["amount"];
+                            var payment = new Payment {
+                                Id = Guid.NewGuid(),
+                                PaymentCode = (int)orderCode,
+                                //CustomerId = appointmentrequest.CustomerId,
+                                TotalAmount = (int)amount,
+                                MethodBanking = "PayOS",
+                                Description = paymentInfo["transactions"][0]["description"]?.ToString(),
+                                Status = paymentInfo["status"]?.ToString(),
+                                PaymentDate = DateTime.Parse(paymentInfo["transactions"][0]["transactionDateTime"].ToString()),
+                                //SalonId = Guid.NewGuid(),
+                                };
 
                             // Save the transaction
-                            await SavePaymentInfo(new Payment
-                            {
-                                Id = Guid.NewGuid(), // Generate new ID for the payment record
-                                CustomerId = customerId,
-                                TotalAmount = int.Parse(amount),
-                                PaymentDate = paymentDate,
-                                MethodBanking = "PayOS",
-                                Description = "Payment received",
-                                PaymentCode = int.Parse(orderCode),
-                                SalonId = salonEmployeeId, // Assuming this should be saved
-                                Status = "Paid",
-                            });
-                            await _apppointmentservice.CreateAppointment(appointmentrequest);
+                            await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                            
+
+
+                           // await _apppointmentservice.CreateAppointment(appointmentrequest);
+                            _unitOfWork.Commit();
 
                             return "Payment has been successfully received and saved.";
                         }

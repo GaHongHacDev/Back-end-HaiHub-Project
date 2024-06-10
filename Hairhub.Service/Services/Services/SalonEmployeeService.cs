@@ -35,17 +35,23 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<CreateSalonEmployeeResponse> CreateSalonEmployee(CreateSalonEmployeeRequest createSalonEmployeeRequest)
+        public async Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest request)
         {
-            var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonEmployeeRequest.SalonInformationId));
-            if (salonInformation == null)
+            //check exist salon
+            var existSalon = await _unitOfWork.GetRepository<SalonInformation>()
+                                        .SingleOrDefaultAsync(predicate: x=>x.Id == request.SalonInformationId);
+            if (existSalon==null)
             {
-                throw new Exception($"salonInformation not found with id: {createSalonEmployeeRequest.SalonInformationId}");
+                throw new NotFoundException($"Not found salon with id {request.SalonInformationId}");
             }
-            var salonEmployee = _mapper.Map<SalonEmployee>(createSalonEmployeeRequest);
-            await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(salonEmployee);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateSalonEmployeeResponse>(salonEmployee);
+            //create employee
+            foreach(var item in request.SalonEmployees)
+            {
+                var employee = _mapper.Map<SalonEmployee>(item);
+                employee.Id = Guid.NewGuid();
+
+            }
+            return true;
         }
 
         public async Task<bool> DeleteSalonEmployeeById(Guid id)
@@ -93,17 +99,26 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
         }
 
-        public async Task<GetSalonEmployeeResponse>? GetSalonEmployeeBySalonInformationId(Guid? SalonInformationId)
+        public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
         {
-            SalonEmployee salonEmployeeResponse = await _unitOfWork
-                .GetRepository<SalonEmployee>()
-                .SingleOrDefaultAsync(
-                    predicate: x => x.Id.Equals(SalonInformationId),
-                    include: source => source.Include(s => s.SalonInformation)
-                 );
-            if (salonEmployeeResponse == null)
+            var salonEmployees = await _unitOfWork.GetRepository<SalonEmployee>()
+                                                    .GetPagingListAsync(
+                                                        predicate: x => x.SalonInformationId.Equals(SalonInformationId),
+                                                        include: query => query.Include(s => s.SalonInformation),
+                                                        page: page,
+                                                        size: size
+                                                    );
+            if (salonEmployees == null)
                 return null;
-            return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
+            var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()
+            {
+                Page = salonEmployees.Page,
+                Size = salonEmployees.Size,
+                Total = salonEmployees.Total,
+                TotalPages = salonEmployees.TotalPages,
+                Items = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items),
+            };
+            return salonEmployeeResponses;
         }
 
         public async Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest)

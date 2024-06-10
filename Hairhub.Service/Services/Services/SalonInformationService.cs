@@ -3,6 +3,7 @@ using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -16,11 +17,13 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
 
-        public SalonInformationService(IUnitOfWork unitOfWork, IMapper mapper)
+        public SalonInformationService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         public async Task<bool> ActiveSalonInformation(Guid id)
@@ -41,10 +44,13 @@ namespace Hairhub.Service.Services.Services
             var owner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonInformationRequest.OwnerId));
             if (owner == null)
             {
-                throw new Exception("OwnerId not found");
+                throw new NotFoundException("OwnerId not found");
             }
             var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
             salonInformation.Id = Guid.NewGuid();
+            string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
+            salonInformation.IsActive = true;
+            salonInformation.Img = url;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
