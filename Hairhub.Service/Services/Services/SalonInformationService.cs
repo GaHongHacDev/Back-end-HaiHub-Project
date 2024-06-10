@@ -54,6 +54,7 @@ namespace Hairhub.Service.Services.Services
             salonInformation.IsActive = false;
             string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             salonInformation.Img = url;
+            salonInformation.Rate = 0;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
@@ -154,5 +155,27 @@ namespace Hairhub.Service.Services.Services
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
         }
+    
+        public async Task<IPaginate<GetSalonInformationResponse>> SearchSalonByNameAddressService(int page, int size)
+        {
+            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+           .GetPagingListAsync(
+               predicate: x=>x.IsActive==true,
+               include: query => query.Include(s => s.SalonOwner),
+               page: page,
+               size: size
+           );
+
+            var salonInformationResponses = new Paginate<GetSalonInformationResponse>()
+            {
+                Page = salonInformations.Page,
+                Size = salonInformations.Size,
+                Total = salonInformations.Total,
+                TotalPages = salonInformations.TotalPages,
+                Items = _mapper.Map<IList<GetSalonInformationResponse>>(salonInformations.Items),
+            };
+            return salonInformationResponses;
+        }
+
     }
 }

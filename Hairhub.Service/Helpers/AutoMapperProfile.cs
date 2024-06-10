@@ -27,6 +27,7 @@ using Hairhub.Domain.Dtos.Responses.Config;
 using Hairhub.Domain.Dtos.Responses.Voucher;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.Payment;
+using Hairhub.Domain.Dtos.Responses.Authentication;
 
 namespace Hairhub.Service.Helpers
 {
@@ -45,8 +46,10 @@ namespace Hairhub.Service.Helpers
             CreateMap<FetchUserResponse, Customer>().ReverseMap();
             CreateMap<FetchUserResponse, SalonOwner>().ReverseMap();
             CreateMap<FetchUserResponse, Account>().ReverseMap(); 
-            CreateMap<UpdateAccountResponse, SalonOwner>().ReverseMap();
+            CreateMap<UpdateAccountResponse, SalonOwner>().ReverseMap(); 
             CreateMap<UpdateAccountResponse, Customer>().ReverseMap();
+            CreateMap<CustomerLoginResponse, Customer>().ReverseMap();
+            CreateMap<SalonOwnerLoginResponse, SalonOwner>().ReverseMap();
 
             //Customer
             CreateMap<GetCustomerResponse, Customer>().ReverseMap();

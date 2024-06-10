@@ -14,6 +14,7 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using AutoMapper;
 using Hairhub.Domain.Enums;
+using Hairhub.Domain.Dtos.Responses.Appointments;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -40,6 +41,20 @@ namespace Hairhub.Service.Services.Services
             {
                 return null;
             }
+            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+            if(salonOwner==null && customer == null)
+            {
+                throw new NotFoundException("Không tìm thấy tài khoản");
+            }
+            if (salonOwner == null)
+            {
+                salonOwner = new SalonOwner();
+            }
+            if(customer == null)
+            {
+                customer = new Customer();
+            }
             // authentication successful so generate jwt token and refresh token
             var accessToken = GenerateToken(account.Username, account.Role.RoleName);
             var refreshToken = GenerateRefreshToken();
@@ -57,7 +72,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Cannot insert token to DB");
             }
-            return new LoginResponse() { AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id };
+            return new LoginResponse() {
+                                        AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id, 
+                                        CustomerResponse = _mapper.Map<CustomerLoginResponse>(customer), 
+                                        SalonOwnerResponse = _mapper.Map<SalonOwnerLoginResponse>(salonOwner)
+                                        };
         }
         public async Task<FetchUserResponse> FetchUser(string accessToken)
         {
