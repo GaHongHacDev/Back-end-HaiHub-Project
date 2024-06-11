@@ -8,8 +8,7 @@ namespace Hairhub.Domain.Dtos.Requests.Voucher
 {
     public class CreateVoucherRequest
     {
-        
-        public Guid? SalonInformationId { get; set; }
+        public Guid SalonInformationId { get; set; }
         public string? Description { get; set; }
         public decimal? MinimumOrderAmount { get; set; }
         public decimal? DiscountPercentage { get; set; }

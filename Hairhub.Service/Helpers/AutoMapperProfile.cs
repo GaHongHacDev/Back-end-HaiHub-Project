@@ -27,6 +27,9 @@ using Hairhub.Domain.Dtos.Responses.Config;
 using Hairhub.Domain.Dtos.Responses.Voucher;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.Payment;
+using Hairhub.Domain.Dtos.Requests.Payment;
+using SalonOwner = Hairhub.Domain.Entitities.SalonOwner;
+using Config = Hairhub.Domain.Entitities.Config;
 
 namespace Hairhub.Service.Helpers
 {
@@ -121,22 +124,25 @@ namespace Hairhub.Service.Helpers
             CreateMap<GetAppointmentResponse, AppointmentDetail>().ReverseMap();
 
             //Voucher
-            CreateMap<CreateVoucherRequest, Voucher>();
-            CreateMap<Voucher, CreateVoucherResponse>();
-            CreateMap<UpdateVoucherRequest, Voucher>();
-            CreateMap<Voucher, UpdateVoucherResponse>();
+            CreateMap<CreateVoucherRequest, Voucher>().ReverseMap();
+            CreateMap<Voucher, CreateVoucherResponse>().ReverseMap();
+            CreateMap<UpdateVoucherRequest, Voucher>().ReverseMap();
+            CreateMap<Voucher, UpdateVoucherResponse>().ReverseMap();
+            CreateMap<GetVoucherResponse, Voucher>().ReverseMap();
+            CreateMap<Voucher, GetVoucherResponse>().ReverseMap();
 
             //Config
-            CreateMap<CreateConfigRequest, Config>();
-            CreateMap<Config, CreateConfigResponse>();
-            CreateMap<UpdateConfigRequest, Config>();
-            CreateMap<Config, UpdateConfigResponse>();
+            CreateMap<CreateConfigRequest, Config>().ReverseMap();
+            CreateMap<Config, CreateConfigResponse>().ReverseMap();
+            CreateMap<UpdateConfigRequest, Config>().ReverseMap();
+            CreateMap<Config, UpdateConfigResponse>().ReverseMap();
 
 
             //Payment
-            CreateMap<Customer, CustomerInformation>();
-            CreateMap<SalonInformation, SalonInfor>();
-
+            CreateMap<Payment, CreatePaymentRequest>().ReverseMap();
+            CreateMap<ResponsePayment, Payment>().ReverseMap();
+            CreateMap<Payment, SavePaymentInfor>().ReverseMap();
+            CreateMap<SavePaymentInfor, Payment>().ReverseMap();
 
         }
     }

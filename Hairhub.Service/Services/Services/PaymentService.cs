@@ -23,6 +23,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Net.NetworkInformation;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Appointments;
+using AutoMapper;
+using SalonOwner = Hairhub.Domain.Entitities.SalonOwner;
+using Hairhub.Domain.Dtos.Responses.ServiceHairs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -33,16 +37,15 @@ namespace Hairhub.Service.Services.Services
         private readonly HttpClient _client;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _config;
-        private readonly IAppointmentService _apppointmentservice;
+        private readonly IMapper _mapper;
 
-        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IAppointmentService apppointmentservice)
+        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper) 
         {
             _payOSSettings = settings.Value;
-            //_payOS = new PayOS(_payOSSettings.ClientId, _payOSSettings.ApiKey, _payOSSettings.ChecksumKey);
             _client = client;
             _unitOfWork = unitOfWork;
             _config = config;
-            _apppointmentservice = apppointmentservice;
+            _mapper = mapper;
         }
 
         private string ComputeHmacSha256(string data, string checksumKey)
@@ -57,11 +60,10 @@ namespace Hairhub.Service.Services.Services
         public async Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request)
         {
             try
-            {
-                
-                int amount = (int)request.totalAmount;
+            {                
+                int amount = (int)request.Configs.PackageFee;
                 var orderCode = new Random().Next(1, 1000000);
-                var description = request.description;
+                var description = request.Description;
                 var clientId = _config["PayOS:ClientId"];
                 var apikey = _config["PayOS:APIKey"];
                 var checksumkey = _config["PayOS:ChecksumKey"];
@@ -97,26 +99,14 @@ namespace Hairhub.Service.Services.Services
                     cancelUrl: returnurlfail,
                     returnUrl: returnurl,
                     signature: signature,
-                    buyerName: request.buyerName,
-                    buyerPhone: request.buyerPhone, // Provide a valid currency
-                    buyerEmail: request.buyerEmail,
-                    buyerAddress: request.buyerAddress,
+                    buyerName: request.SalonOwner.FullName,
+                    buyerPhone: request.SalonOwner.Phone, // Provide a valid currency
+                    buyerEmail: request.SalonOwner.Email,
+                    buyerAddress: request.SalonOwner.Address,
                     expiredAt: (int)expiredAt.ToUnixTimeSeconds()
                 );
                 
-                //await SavePaymentInfo(new Payment
-                //{
-                //    Id = Guid.NewGuid(), // Generate new ID for the payment record
-                //    CustomerId = request.items.CustomerId,
-                //    TotalAmount = amount,
-                //    PaymentDate = DateTime.UtcNow,
-                //    MethodBanking = "PayOS",
-                //    SalonId = request.items.SalonId,
-                //    Description = description,
-                //    Status = "Pending",
-                //    PaymentCode = orderCode,
-                //});
-                paymentData.items.Add(new ItemData(request.buyerName, 1, amount ));
+                paymentData.items.Add(new ItemData(request.SalonOwner.FullName, 1, amount ));
                 var createPaymentResult = await pos.createPaymentLink(paymentData);
 
                 return createPaymentResult; // Chú ý sử dụng PaymentLink thay vì paymentLink
@@ -130,7 +120,7 @@ namespace Hairhub.Service.Services.Services
         }
         
 
-        public async Task<string> GetPaymentInfo(string paymentLinkId, CreateAppointmentRequest appointmentrequest)
+        public async Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest)
         {
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentLinkId}";
 
@@ -141,7 +131,7 @@ namespace Hairhub.Service.Services.Services
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);
 
                 var response = await _client.SendAsync(request);
-
+                bool isStatus = false;
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -153,39 +143,20 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            // Extract necessary details from the payment info
-                            var orderCode = paymentInfo["orderCode"];
-                            var amount = paymentInfo["amount"];
-                            var payment = new Payment {
-                                Id = Guid.NewGuid(),
-                                PaymentCode = (int)orderCode,
-                                //CustomerId = appointmentrequest.CustomerId,
-                                TotalAmount = (int)amount,
-                                MethodBanking = "PayOS",
-                                Description = paymentInfo["transactions"][0]["description"]?.ToString(),
-                                Status = paymentInfo["status"]?.ToString(),
-                                PaymentDate = DateTime.Parse(paymentInfo["transactions"][0]["transactionDateTime"].ToString()),
-                                //SalonId = Guid.NewGuid(),
-                                };
-
+                            var payment = _mapper.Map<Payment>(createPaymentRequest);
+                            payment.Id = Guid.NewGuid();
+                            payment.TotalAmount = (int)paymentInfo["amount"];
+                            payment.PaymentCode = (int)paymentInfo["orderCode"];
+                            payment.PaymentDate = DateTime.Now;
+                            payment.MethodBanking = "PayOS";
+                            payment.Status = status;
                             // Save the transaction
                             await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                            isStatus = await _unitOfWork.CommitAsync() > 0;
+                            return isStatus;
                             
-
-
-                           // await _apppointmentservice.CreateAppointment(appointmentrequest);
-                            _unitOfWork.Commit();
-
-                            return "Payment has been successfully received and saved.";
                         }
-                        else if (status == "pending")
-                        {
-                            return "Payment is still pending.";
-                        }
-                        else
-                        {
-                            return $"Payment status is {status}.";
-                        }
+                        return isStatus;
                     }
                     else
                     {
@@ -203,13 +174,18 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        //public async Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size)
-        //{
-        //    IPaginate<ResponsePayment> payment = await _unitOfWork.GetRepository<Payment>()
-        //        .GetPagingListAsync(selector: x => new ResponsePayment(x.Id, x.CustomerId, x.TotalAmount, x.PaymentDate
-        //        , x.MethodBanking, x.SalonId, x.Description), page: page, size: size, orderBy: x => x.OrderBy(x => x.PaymentDate));
+        public async Task<IEnumerable<ResponsePayment>> GetPaymentBySalonOwnerID(Guid salonownerid)
+        {
+            var existingsalonowner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: e => e.Id == salonownerid);
+            if(existingsalonowner == null)
+            {
+                throw new Exception("Not found");
+            }
+            var payment = await _unitOfWork.GetRepository<Payment>()
+                .GetListAsync(predicate: s => s.SalonOWnerID == salonownerid,
+                              include: query => query.Include(s => s.SalonOwner));
 
-        //    return payment;
-        //}
+            return _mapper.Map<IEnumerable<ResponsePayment>>(payment);
+        }
     }
 }

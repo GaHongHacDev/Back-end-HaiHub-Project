@@ -16,8 +16,9 @@ namespace Hairhub.Service.Services.IServices
     public interface IPaymentService
     {
         Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request);
-        Task<string> GetPaymentInfo(string paymentLinkId, CreateAppointmentRequest request);
+        Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest);
 
-       // Task<IPaginate<ResponsePayment>> GetPaymant(int page, int size);
+        Task<IEnumerable<ResponsePayment>> GetPaymentBySalonOwnerID(Guid salonownerid);
+
     }
 }

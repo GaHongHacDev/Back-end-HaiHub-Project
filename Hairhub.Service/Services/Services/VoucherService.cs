@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.Voucher;
+using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Voucher;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Hairhub.Service.Services.Services
 {
-    public class VoucherService : IVoucherService
+    public class VoucherService :   IVoucherService
     {
         private readonly IUnitOfWork _unitofwork;
         private readonly IMapper _mapper;
@@ -24,107 +27,99 @@ namespace Hairhub.Service.Services.Services
         }
         public static string GenerateRandomCode(int length)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-        public async Task<CreateVoucherResponse> CreateVoucherAsync(CreateVoucherRequest request)
+        public async Task<bool> CreateVoucherAsync(CreateVoucherRequest request)
         {
-            var voucherRequest = new Voucher()
-            {
-                Id = Guid.NewGuid(),
-                //SalonInformationId = request.SalonInformationId,
-                Code = GenerateRandomCode(10),
-                Description = request.Description,
-                MinimumOrderAmount = request.MinimumOrderAmount,
-                DiscountPercentage = request.DiscountPercentage,
-                ExpiryDate = request.ExpiryDate,
-                CreatedDate = request.CreatedDate,
-                ModifiedDate = request.ModifiedDate,
-                IsSystemCreated = request.IsSystemCreated,
-                IsActive = request.IsActive,
-            };
+            var voucher = _mapper.Map<Voucher>(request);    
+            voucher.Id = Guid.NewGuid();
+            voucher.Code = GenerateRandomCode(10);
 
-            await _unitofwork.GetRepository<Voucher>().InsertAsync(voucherRequest);
-            await _unitofwork.CommitAsync();
+            await _unitofwork.GetRepository<Voucher>().InsertAsync(voucher);
+            bool isCreated = await _unitofwork.CommitAsync() > 0;
 
-            return _mapper.Map<CreateVoucherResponse>(voucherRequest);            
+            return isCreated;          
                 
         }
 
-        public async Task DeleteVoucherAsync(Guid id)
+        public async Task<bool> DeleteVoucherAsync(Guid id)
         {
             var existvoucher = await _unitofwork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: e => e.Id == id,
                orderBy: null,
                include: null);
             if (existvoucher == null)
             {
-                throw new Exception("Voucher Not Found");
+                throw new NotFoundException("Voucher not found!");
             }
-
             _unitofwork.GetRepository<Voucher>().DeleteAsync(existvoucher);
-            _unitofwork.Commit();
+            bool isDelete = await _unitofwork.CommitAsync() > 0;
+            return isDelete;
         }
 
-        public async Task<IPaginate<GetVoucherResponse>> GetAllVoucherAsync(int page, int size)
+        public async Task<IPaginate<GetVoucherResponse>> GetVoucherAsync(int page, int size)
         {
-            IPaginate<GetVoucherResponse> voucher = await _unitofwork.GetRepository<Voucher>()
-                .GetPagingListAsync(selector: x => new GetVoucherResponse(x.Id, x.SalonInformationId, 
-                x.Description, x.Code, x.MinimumOrderAmount, x.DiscountPercentage, x.ExpiryDate, x.CreatedDate
-                , x.ModifiedDate, x.IsSystemCreated, x.IsActive) , page: page, size: size, orderBy: x => x.OrderBy(x => x.CreatedDate));
+            var voucher = await _unitofwork.GetRepository<Voucher>()
+           .GetPagingListAsync(
+               include: query => query.Include(s => s.SalonInformation),
+               page: page,
+               size: size
+           );
 
-            return voucher;
+            var voucherResponses = new Paginate<GetVoucherResponse>()
+            {
+                Page = voucher.Page,
+                Size = voucher.Size,
+                Total = voucher.Total,
+                TotalPages = voucher.TotalPages,
+                Items = _mapper.Map<IList<GetVoucherResponse>>(voucher.Items),
+            };
+            return voucherResponses;
         }
 
         public async Task<GetVoucherResponse>? GetVoucherbyCodeAsync(string code)
         {
-            GetVoucherResponse voucherresponse = await _unitofwork.GetRepository<Voucher>().
-                SingleOrDefaultAsync(selector: x => new GetVoucherResponse(x.Id, x.SalonInformationId,
-                x.Description, x.Code, x.MinimumOrderAmount, x.DiscountPercentage, x.ExpiryDate, x.CreatedDate
-                , x.ModifiedDate, x.IsSystemCreated, x.IsActive), predicate: x => x.Code.Equals(code));
+            Voucher voucherResponse = await _unitofwork
+                .GetRepository<Voucher>()
+                .SingleOrDefaultAsync(
+                    predicate: x => x.Code.Equals(code)
+                 );
 
-            if (voucherresponse == null) return null;
-            return voucherresponse;
+            if (voucherResponse == null) return null;
+            return _mapper.Map<GetVoucherResponse>(voucherResponse);
 
         }
 
         public async Task<GetVoucherResponse>? GetVoucherbyIdAsync(Guid id)
         {
-            GetVoucherResponse voucherresponse = await _unitofwork.GetRepository<Voucher>().
-                SingleOrDefaultAsync(selector: x => new GetVoucherResponse(x.Id, x.SalonInformationId,
-                x.Description, x.Code, x.MinimumOrderAmount, x.DiscountPercentage, x.ExpiryDate, x.CreatedDate
-                , x.ModifiedDate, x.IsSystemCreated, x.IsActive), predicate: x => x.Id.Equals(id));
+            Voucher voucherResponse = await _unitofwork
+                .GetRepository<Voucher>()
+                .SingleOrDefaultAsync(
+                    predicate: x => x.Id.Equals(id)
+                 );
 
-            if (voucherresponse == null) return null;
-            return voucherresponse;
+            if (voucherResponse == null) return null;
+            return _mapper.Map<GetVoucherResponse>(voucherResponse);
         }
 
-        public async Task<UpdateVoucherResponse> UpdateVoucherAsync(Guid id, UpdateVoucherRequest request)
+        public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherRequest request)
         {
-            var vouchermap = _mapper.Map<Voucher>(request);
+            
             var existVoucher = await _unitofwork.GetRepository<Voucher>().SingleOrDefaultAsync(
             predicate: e => e.Id == id);
             
             if (existVoucher == null)
             {
-                throw new KeyNotFoundException("Cannot Find Voucher");
+                throw new Exception("Cannot Find Voucher");
             }
 
-            existVoucher.SalonInformationId = vouchermap.SalonInformationId;
-            existVoucher.Description = vouchermap.Description;
-            existVoucher.Code = vouchermap.Code;
-            existVoucher.MinimumOrderAmount = vouchermap.MinimumOrderAmount;
-            existVoucher.DiscountPercentage = vouchermap.DiscountPercentage;
-            existVoucher.ExpiryDate = vouchermap.ExpiryDate;
-            existVoucher.CreatedDate = vouchermap.CreatedDate;
-            existVoucher.ModifiedDate = vouchermap.ModifiedDate;
-            existVoucher.IsSystemCreated = vouchermap.IsSystemCreated;
-            existVoucher.IsActive = vouchermap.IsActive;
+            existVoucher = _mapper.Map<Voucher>(existVoucher);
 
             _unitofwork.GetRepository<Voucher>().UpdateAsync(existVoucher);
-            _unitofwork.Commit();
-            return _mapper.Map<UpdateVoucherResponse>(existVoucher);
+            bool isUpdate = await _unitofwork.CommitAsync()>0;
+            return isUpdate;
         }
     }
 }
