@@ -52,7 +52,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId)
         {
-            var salonInfo = _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == salonId);
+            var salonInfo = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == salonId);
             if(salonInfo == null)
             {
                 throw new NotFoundException($"Cannot find schedule with salon id {salonId}");
