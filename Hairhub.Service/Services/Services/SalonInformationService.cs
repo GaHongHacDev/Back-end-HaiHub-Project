@@ -11,6 +11,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Linq;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -158,6 +159,17 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "")
         {
+            if(serviceName==null && salonAddress==null && salonName == null)
+            {
+                return new Paginate<SearchSalonByNameAddressServiceResponse>()
+                {
+                    Page = page,
+                    Size = size,
+                    Total = 0,
+                    TotalPages = 0,
+                    Items = new List<SearchSalonByNameAddressServiceResponse>(),
+                };
+            }
             serviceName = serviceName ?? string.Empty;
             salonAddress = salonAddress ?? string.Empty;
             salonName = salonName ?? string.Empty;
@@ -207,6 +219,5 @@ namespace Hairhub.Service.Services.Services
                 Items = result,
             };
         }
-
     }
 }
