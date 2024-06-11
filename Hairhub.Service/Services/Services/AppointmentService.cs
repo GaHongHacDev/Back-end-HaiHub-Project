@@ -54,6 +54,39 @@ namespace Hairhub.Service.Services.Services
             return scheduleResponses;
         }
 
+        public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
+        {
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                               .GetPagingListAsync(
+                                                   predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
+                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer)
+                                                              || x.Status.Equals(AppointmentStatus.CancelBySalon)),
+                                                   include: query => query.Include(s => s.Customer),
+                                                   page: page,
+                                                   size: size
+                                               );
+            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
+            if (appointments != null)
+            {
+                foreach (var item in appointments.Items)
+                {
+                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
+                    if (apoointmentDetails != null)
+                    {
+                        item.AppointmentDetails = (ICollection<AppointmentDetail>)apoointmentDetails;
+                    }
+                }
+            }
+            return scheduleResponses;
+        }
+
         public async Task<GetAppointmentResponse>? GetAppointmentById(Guid id)
         {
             Appointment appointmentResponse = await _unitOfWork
@@ -86,16 +119,17 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("AppointmentDetail not found!");
             }
-            foreach(var item in createAccountRequest.ListAppointmentDetail)
+            foreach (var item in createAccountRequest.ListAppointmentDetail)
             {
                 try
                 {
                     await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
                 }
-                catch (NotFoundException ex) {
+                catch (NotFoundException ex)
+                {
                     throw new NotFoundException(ex.Message);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     throw new Exception(ex.Message);
                 }
@@ -156,10 +190,10 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Employee not found in salon, baber shop!");
                 }
                 var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
-                                                    predicate: x=>x.EmployeeId == employee.Id 
+                                                    predicate: x => x.EmployeeId == employee.Id
                                                                 && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString()));
-                var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute/60;
-                var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute/60;
+                var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
+                var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60;
                 List<decimal> TimeSlot = generateTimeSlot(startSchedule, endSchedule, (decimal)0.25);
 
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
@@ -226,7 +260,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<IPaginate<GetAppointmentByAccountIdResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size)
         {
-            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId==AccountId);
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == AccountId);
             if (customer == null)
             {
                 throw new NotFoundException($"Not found customer with id {AccountId}");
@@ -245,10 +279,10 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentByAccountIdResponse>>(appointments.Items),
             };
-            foreach ( var item in appointmentResponse.Items)
+            foreach (var item in appointmentResponse.Items)
             {
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x=>x.AppointmentId == item.Id);
+                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id);
                 item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
             }
             return appointmentResponse;

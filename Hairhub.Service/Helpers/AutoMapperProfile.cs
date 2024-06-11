@@ -120,7 +120,6 @@ namespace Hairhub.Service.Helpers
 
             //AppointmentDetail
             CreateMap<ServiceHairResponse, ServiceHair>().ReverseMap();
-            CreateMap<AppointmentResponse, Appointment>().ReverseMap();
             CreateMap<SalonEmployeeResponse, SalonEmployee>().ReverseMap();
             CreateMap<GetAppointmentDetailResponse, AppointmentDetail>().ReverseMap();
             CreateMap<CreateAppointmentDetailRequest, AppointmentDetail>().ReverseMap();
