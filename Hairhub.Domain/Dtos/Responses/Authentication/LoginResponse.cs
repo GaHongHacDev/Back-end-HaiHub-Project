@@ -11,6 +11,7 @@ namespace Hairhub.Domain.Dtos.Responses.Authentication
         public string AccessToken {  get; set; } 
         public string RefreshToken {  get; set; }
         public Guid AccountId { get; set; }
+        public string RoleName { get; set; }
         public CustomerLoginResponse? CustomerResponse {  get; set; }
         public SalonOwnerLoginResponse? SalonOwnerResponse {  get; set; }
     }

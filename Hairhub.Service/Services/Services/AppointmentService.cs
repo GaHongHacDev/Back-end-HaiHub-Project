@@ -87,6 +87,37 @@ namespace Hairhub.Service.Services.Services
             return scheduleResponses;
         }
 
+        public async Task<IPaginate<GetAppointmentResponse>> GetBookingAppointment(int page, int size, Guid CustomerId)
+        {
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                               .GetPagingListAsync(
+                                                   predicate: x => x.CustomerId == CustomerId && x.Status.Equals(AppointmentStatus.Booking),
+                                                   include: query => query.Include(s => s.Customer),
+                                                   page: page,
+                                                   size: size
+                                               );
+            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
+            if (appointments != null)
+            {
+                foreach (var item in appointments.Items)
+                {
+                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
+                    if (apoointmentDetails != null)
+                    {
+                        item.AppointmentDetails = (ICollection<AppointmentDetail>)apoointmentDetails;
+                    }
+                }
+            }
+            return scheduleResponses;
+        }
+
         public async Task<GetAppointmentResponse>? GetAppointmentById(Guid id)
         {
             Appointment appointmentResponse = await _unitOfWork

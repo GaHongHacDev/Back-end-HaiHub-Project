@@ -47,14 +47,6 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
-            if (salonOwner == null)
-            {
-                salonOwner = new SalonOwner();
-            }
-            if(customer == null)
-            {
-                customer = new Customer();
-            }
             // authentication successful so generate jwt token and refresh token
             var accessToken = GenerateToken(account.Username, account.Role.RoleName);
             var refreshToken = GenerateRefreshToken();
@@ -72,12 +64,14 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Cannot insert token to DB");
             }
-            return new LoginResponse() {
-                                        AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id, 
-                                        CustomerResponse = _mapper.Map<CustomerLoginResponse>(customer), 
-                                        SalonOwnerResponse = _mapper.Map<SalonOwnerLoginResponse>(salonOwner)
-                                        };
+            return new LoginResponse() 
+                        {
+                            AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id,  RoleName = account.Role?.RoleName,
+                            CustomerResponse = customer!=null?_mapper.Map<CustomerLoginResponse>(customer):null, 
+                            SalonOwnerResponse = salonOwner!=null?_mapper.Map<SalonOwnerLoginResponse>(salonOwner):null
+                        };
         }
+
         public async Task<FetchUserResponse> FetchUser(string accessToken)
         {
             var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
@@ -89,21 +83,19 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy access token!");
             }
             var account = refreshTokenEntity.Account;
-            FetchUserResponse fetchUserResponse = new FetchUserResponse();
-            fetchUserResponse = _mapper.Map<FetchUserResponse>(account);
-            if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
+            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            if (salonOwner == null && customer == null)
             {
-                var customer = await _unitOfWork.GetRepository<Customer>()
-                                                .SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
-                fetchUserResponse = _mapper.Map(customer, fetchUserResponse);
+                throw new NotFoundException("Không tìm thấy tài khoản");
             }
-            else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
+            return new FetchUserResponse()
             {
-                var salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
-                                                .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-                fetchUserResponse = _mapper.Map(salonOwner, fetchUserResponse);
-            }
-            return fetchUserResponse;
+                AccountId = account.Id,
+                RoleName = account.Role?.RoleName,
+                CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
+                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null
+            };
         }
 
         public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)
