@@ -94,5 +94,10 @@
             public const string ConfigEndpoint = ApiEndpoint + "/otps";
         }
 
+        public static class Payment
+        {
+            public const string PaymentEndpoint = ApiEndpoint + "/payment";
+        }
+
     }
     }

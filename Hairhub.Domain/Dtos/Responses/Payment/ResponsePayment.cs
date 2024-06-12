@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hairhub.Domain.Entitities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,52 +12,52 @@ namespace Hairhub.Domain.Dtos.Responses.Payment
     {
         public ResponsePayment() { }
 
-        public ResponsePayment(Guid? id, Guid? customerId, decimal? totalAmount,
-            DateTime? paymentDate, string? methodBanking, Guid? salonId,
-            string? description)
+        public ResponsePayment(Guid? id, Guid? configId, Guid? salonOWnerID,
+            decimal? totalAmount, DateTime? paymentDate, string? methodBanking,
+            string? description, string? status, int? paymentcode)
         {
             Id = id;
-            CustomerId = customerId;
+            ConfigId = configId;
+            SalonOWnerID = salonOWnerID;
             TotalAmount = totalAmount;
             PaymentDate = paymentDate;
             MethodBanking = methodBanking;
-            SalonId = salonId;
             Description = description;
+            Status = status;
+            PaymentCode = paymentcode;
         }
 
         public Guid? Id { get; set; }
-        public Guid? CustomerId { get; set; }
+        public Guid? ConfigId { get; set; }
+        public Guid? SalonOWnerID { get; set; }
         public decimal? TotalAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
         public string? MethodBanking { get; set; }
-        public Guid? SalonId { get; set; }
-        public string Description { get; set; }
-        public string Status { get; set; }
-        public int PaymentCode { get; set; }
+        public string? Description { get; set; }
+        public string? Status { get; set; }
+        public int? PaymentCode { get; set; }
 
         // Navigation properties
-        public virtual CustomerInformation Customer { get; set; }
-        public virtual SalonInfor SalonInformation { get; set; }
+        public  SalonOwner SalonOwners { get; set; }
+        public  Config Config { get; set; }
     }
 
-    public class CustomerInformation
+    public class SalonOwner
     {
         public Guid Id { get; set; }
-        public Guid? AccountId { get; set; }
-        public DateTime? DayOfBirth { get; set; }
-        public string? Gender { get; set; }
-        public string? FullName { get; set; }
-        public string? Email { get; set; }
+        public string FullName { get; set; }
+        public DateTime DayOfBirth { get; set; }
+        public string Gender { get; set; }
+        public string Email { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
     }
 
-    public class SalonInfor
+    public class Config
     {
         public Guid Id { get; set; }
-        public Guid? OwnerId { get; set; }
-        public string? Name { get; set; }
-        public string? Address { get; set; }
-        public string? Description { get; set; }
+        public string PakageName { get; set; }
+        public string Description { get; set; }
+        public decimal PakageFee { get; set; }
     }
 }

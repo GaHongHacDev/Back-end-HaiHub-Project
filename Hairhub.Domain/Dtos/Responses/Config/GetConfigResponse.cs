@@ -8,17 +8,20 @@ namespace Hairhub.Domain.Dtos.Responses.Config
 {
     public class GetConfigResponse
     {
-        public GetConfigResponse(decimal? commissionrate, decimal? maintenancefee, DateTime? datecreate, bool? isactive) { 
-            CommissionRate = commissionrate;
-            MaintenanceFee = maintenancefee;
+        public GetConfigResponse(string? packagename, decimal? packagefee,string? description , DateTime? datecreate, bool? isactive) { 
+            PackageName = packagename;
+            PackageFee = packagefee;
+            Description = description;
             DateCreate = datecreate;
             IsActive = isactive;
         
         
         }
 
-        public decimal? CommissionRate { get; set; }
-        public decimal? MaintenanceFee { get; set; }
+        public string? PackageName { get; set; }
+        public decimal? PackageFee { get; set; }
+
+        public string? Description { get; set; }
         public DateTime? DateCreate { get; set; }
         public bool? IsActive { get; set; }
     }

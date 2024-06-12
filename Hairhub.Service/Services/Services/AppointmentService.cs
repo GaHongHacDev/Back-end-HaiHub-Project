@@ -451,12 +451,12 @@ namespace Hairhub.Service.Services.Services
         public async Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest createAccountRequest)
         {
             //Check customer is exist
-            var customer = await _unitOfWork.GetRepository<Customer>()
-                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAccountRequest.CustomerId));
-            if (customer == null)
-            {
-                throw new Exception("CustomerId not found!");
-            }
+            //var customer = await _unitOfWork.GetRepository<Customer>()
+            //    .SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAccountRequest.CustomerId));
+            //if (customer == null)
+            //{
+            //    throw new Exception("CustomerId not found!");
+            //}
             var appointment = _mapper.Map<Appointment>(createAccountRequest);
             appointment.Id = Guid.NewGuid();
             appointment.Status = AppointmentStatus.Booking;

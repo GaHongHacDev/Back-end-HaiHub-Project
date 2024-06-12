@@ -12,16 +12,16 @@ namespace Hairhub.Service.Services.IServices
 {
     public interface IVoucherService
     {
-        Task<IPaginate<GetVoucherResponse>> GetAllVoucherAsync(int page, int size);
+        Task<IPaginate<GetVoucherResponse>> GetVoucherAsync(int page, int size);
 
         Task<GetVoucherResponse>? GetVoucherbyCodeAsync(string code);
 
         Task<GetVoucherResponse>? GetVoucherbyIdAsync(Guid id);
 
-        Task<CreateVoucherResponse> CreateVoucherAsync(CreateVoucherRequest request);
+        Task<bool> CreateVoucherAsync(CreateVoucherRequest request);
 
-        Task<UpdateVoucherResponse> UpdateVoucherAsync(Guid id,UpdateVoucherRequest request);
+        Task<bool> UpdateVoucherAsync(Guid id,UpdateVoucherRequest request);
 
-        Task DeleteVoucherAsync(Guid id);
+        Task<bool> DeleteVoucherAsync(Guid id);
     }
 }
