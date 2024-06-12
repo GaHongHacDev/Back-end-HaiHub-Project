@@ -60,6 +60,10 @@ namespace Hairhub.Service.Services.Services
                 employee.Img = url;
                 employee.SalonInformationId = request.SalonInformationId;
                 await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(employee);
+                if (item.ScheduleEmployees==null || item.ScheduleEmployees.Count==0)
+                {
+                    throw new NotFoundException("Không tìm thấy lịch làm việc của nhân viên");
+                }
                 //create schedule
                 foreach (var itemSchedule in item.ScheduleEmployees)
                 {
@@ -146,13 +150,20 @@ namespace Hairhub.Service.Services.Services
                                                   );
             if (salonEmployees == null)
                 return null;
+            var employeeResponse = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items);
+            foreach (var salonEmployee in employeeResponse)
+            {
+                var schedules = await _unitOfWork.GetRepository<Schedule>()
+                                                 .GetListAsync(predicate: x => x.EmployeeId == salonEmployee.Id);
+                salonEmployee.Schedules = _mapper.Map<List<ScheduleEmployeeResponse>>(schedules);
+            }
             var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()
             {
                 Page = salonEmployees.Page,
                 Size = salonEmployees.Size,
                 Total = salonEmployees.Total,
                 TotalPages = salonEmployees.TotalPages,
-                Items = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items),
+                Items = employeeResponse,
             };
             return salonEmployeeResponses;
         }
