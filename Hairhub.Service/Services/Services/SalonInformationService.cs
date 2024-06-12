@@ -130,7 +130,7 @@ namespace Hairhub.Service.Services.Services
             SalonInformation salonInformation = await _unitOfWork
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.OwnerId.Equals(ownerId) && x.IsActive == true,
+                    predicate: x => x.OwnerId.Equals(ownerId),
                     include: source => source.Include(s => s.SalonOwner)
                  );
             var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);

@@ -14,7 +14,7 @@ namespace Hairhub.Domain.Entitities
         public string FullName { get; set; }
         public string? Gender {get; set; }
         public string? Phone {  get; set; }
-        public string? Img { get; set; }
+        public string Img { get; set; }
         public bool IsActive { get; set; }
 
         public SalonInformation SalonInformation { get; set; }
