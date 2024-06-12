@@ -136,12 +136,14 @@ namespace Hairhub.Service.Services.Services
         public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
         {
             var salonEmployees = await _unitOfWork.GetRepository<SalonEmployee>()
-                                                    .GetPagingListAsync(
-                                                        predicate: x => x.SalonInformationId.Equals(SalonInformationId),
-                                                        include: query => query.Include(s => s.SalonInformation),
-                                                        page: page,
-                                                        size: size
-                                                    );
+                                                  .GetPagingListAsync(
+                                                      predicate: x => x.SalonInformationId.Equals(SalonInformationId),
+                                                      include: query => query.Include(s => s.Schedules)
+                                                                             .Include(s => s.ServiceEmployees)
+                                                                             .ThenInclude(se => se.ServiceHair),
+                                                      page: page,
+                                                      size: size
+                                                  );
             if (salonEmployees == null)
                 return null;
             var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()

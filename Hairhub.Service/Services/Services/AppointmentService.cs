@@ -276,7 +276,7 @@ namespace Hairhub.Service.Services.Services
             Decimal endTimeSalon = scheduleSolon.EndTime.Hour + (scheduleSolon.EndTime.Minute) / 60m;
             if (endTimeSalon < endTimeProcess)
             {
-                throw new Exception("Thời gian thực hiện service quá thời gian làm việc của salon, barber shop");
+                throw new Exception("Thời gian thực hiện dịch vụ quá thời gian làm việc của salon, barber shop");
             }
             //Get List Employee can implement this service hair
             List<EmployeeAvailable> listEmp = new List<EmployeeAvailable>();
@@ -339,6 +339,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException($"Không có nhân viên nào có thể phụ vụ vào thời gian{DateBooking.ToString()}");
             }
+            //Add list BookingDetail vào result
             bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()
             {
                 ServiceHairId = firstBookingDetail.ServiceHairId,
@@ -353,8 +354,101 @@ namespace Hairhub.Service.Services.Services
                 for (int i = 1; i < request.BookingDetail.Count(); i++)
                 {
                     var bookingDetail = request.BookingDetail[i];
-                    if (request.BookingDetail[i].IsAnyOne)
+                    if (bookingDetail.IsAnyOne)
                     {
+                        //Get Serrvice Hair
+                        serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
+                                                 .SingleOrDefaultAsync
+                                                  (
+                                                    predicate: x => x.Id == bookingDetail.ServiceHairId && x.SalonInformationId == request.SalonId
+                                                  );
+                        if (serviceHair == null)
+                        {
+                            throw new NotFoundException($"Không tìm thấy dịch vụ với id {bookingDetail.ServiceHairId} của salon id {request.SalonId} ");
+                        }
+                        //Get thời gian kết thúc sau khi thực hiện srv hair
+                        endTimeProcess = endTimeProcess + serviceHair.Time; //8.25 
+                        //check end time of schedule có đủ thời gian thực hiện srv hair không 
+                        if (endTimeSalon < endTimeProcess)
+                        {
+                            throw new Exception("Thời gian thực hiện dịch vụ quá thời gian làm việc của salon, barber shop");
+                        }
+                        //Get List Employee can implement this service hair
+                        listEmp = new List<EmployeeAvailable>();
+                        if (bookingDetail.IsAnyOne)
+                        {
+                            //Xủ lý khi chọn employee nào cũng được => IsAnyOne = true
+                            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(
+                                                            predicate: x => x.SalonInformationId == request.SalonId);
+                            if (employees == null)
+                            {
+                                throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop");
+                            }
+                            foreach (var employee in employees)
+                            {   // Get schedule by employee id
+                                var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
+                                                                   .SingleOrDefaultAsync
+                                                                    (
+                                                                        predicate: x => x.EmployeeId == employee.Id
+                                                                                    && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString())
+                                                                    );
+                                //Get Time work of employee
+                                var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
+                                var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60; //8.5 => 8h30
+                                //Get appointment detail => Check available time
+                                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                                          .GetListAsync
+                                                                           (
+                                                                                predicate: x => x.SalonEmployeeId == employee.Id
+                                                                                            && x.StartTime.Date == request.Day.Date && x.StartTime <= DateBooking
+                                                                                            && x.EndTime.Date == request.Day.Date && x.EndTime > DateBooking
+                                                                                            && x.Status.Equals(AppointmentStatus.Booking)
+                                                                           );
+                                if (appointmentDetails == null)
+                                {
+                                    listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //Xủ lý khi chọn employee cố định => IsAnyOne = false
+                            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(
+                                            predicate: x => x.Id == firstBookingDetail.SalonEmployeeId);
+                            if (employee == null)
+                            {
+                                throw new NotFoundException($"Không tìm thấy employee với id {firstBookingDetail.SalonEmployeeId}");
+                            }
+                            var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
+                                            predicate: x => x.EmployeeId == employee.Id
+                                             && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString()));
+                            //Get Time work of employee
+                            var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
+                            var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60; //8.5 => 8h30
+                                                                                                                   //Get appointment detail => Check available time
+                            var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                                                predicate: x => x.SalonEmployeeId == employee.Id
+                                                                && x.StartTime.Date == request.Day.Date && x.StartTime <= DateBooking
+                                                                && x.EndTime.Date == request.Day.Date && x.EndTime > DateBooking
+                                                                && x.Status.Equals(AppointmentStatus.Booking));
+                            if (appointmentDetails == null)
+                            {
+                                listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
+                            }
+                        }
+                        if (listEmp.Count == 0)
+                        {
+                            throw new NotFoundException($"Không có nhân viên nào có thể phụ vụ vào thời gian{DateBooking.ToString()}");
+                        }
+                        //Add list BookingDetail vào result
+                        bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()
+                        {
+                            ServiceHairId = firstBookingDetail.ServiceHairId,
+                            Employees = listEmp,
+                            StartTime = DateBooking,
+                            EndTime = DateBooking.AddHours((double)endTimeProcess),
+                            WaitingTime = 0
+                        });
                     }
                 }
             }
