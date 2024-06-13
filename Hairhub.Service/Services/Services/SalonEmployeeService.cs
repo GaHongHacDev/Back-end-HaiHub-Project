@@ -130,7 +130,8 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonEmployee>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonInformation)
+                    include: x => x.Include(se => se.ServiceEmployees)
+                       .ThenInclude(se => se.ServiceHair).Include(se => se.Schedules)
                  );
             if (salonEmployeeResponse == null)
                 return null;
@@ -150,20 +151,13 @@ namespace Hairhub.Service.Services.Services
                                                   );
             if (salonEmployees == null)
                 return null;
-            var employeeResponse = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items);
-            foreach (var salonEmployee in employeeResponse)
-            {
-                var schedules = await _unitOfWork.GetRepository<Schedule>()
-                                                 .GetListAsync(predicate: x => x.EmployeeId == salonEmployee.Id);
-                salonEmployee.Schedules = _mapper.Map<List<ScheduleEmployeeResponse>>(schedules);
-            }
             var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()
             {
                 Page = salonEmployees.Page,
                 Size = salonEmployees.Size,
                 Total = salonEmployees.Total,
                 TotalPages = salonEmployees.TotalPages,
-                Items = employeeResponse,
+                Items = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items),
             };
             return salonEmployeeResponses;
         }
