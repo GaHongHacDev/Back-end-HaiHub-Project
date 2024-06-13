@@ -43,7 +43,6 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = feedbacks.TotalPages,
                 Items = _mapper.Map<IList<GetFeedbackResponse>>(feedbacks.Items),
             };
-
             return feedbackResponses;
         }
 
