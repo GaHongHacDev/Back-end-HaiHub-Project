@@ -15,6 +15,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public string? Description { get; set; }
         public string? Img { get; set; }
         public string Address { get; set; }
+        public Decimal Rate { get; set; }
         public string Longitude { get; set; }
         public string Latitude { get; set; }
         public bool IsActive { get; set; }

@@ -47,6 +47,44 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{customerId:Guid}")]
+        public async Task<IActionResult> GetHistoryAppointmentByCustomterId([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetHistoryAppointmentByCustomerId(page, size,customerId);
+                if (appointmentResponse == null)
+                {
+                    return NotFound("Cannot find this appointment!");
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{customerId:Guid}")]
+        public async Task<IActionResult> GetBookingAppointment([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetBookingAppointment(page, size, customerId);
+                if (appointmentResponse == null)
+                {
+                    return NotFound("Không tìm thấy đơn đặt lịch");
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {

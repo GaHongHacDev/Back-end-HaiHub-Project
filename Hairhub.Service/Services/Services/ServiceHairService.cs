@@ -101,8 +101,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<IEnumerable<GetServiceHairResponse>> GetServiceHairBySalonInformationId(Guid salonInformationId)
         {
             var services = await _unitOfWork.GetRepository<ServiceHair>()
-                .GetListAsync(predicate: s => s.ServiceEmployees.Any(se => se.SalonEmployee.SalonInformationId == salonInformationId),
-                              include: query => query.Include(s => s.ServiceEmployees));
+                .GetListAsync(predicate: s => s.SalonInformationId == salonInformationId);
 
             return _mapper.Map<IEnumerable<GetServiceHairResponse>>(services);
         }

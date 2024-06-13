@@ -31,7 +31,6 @@ namespace Hairhub.Service.Services.Services
             _mapper = mapper;
         }
 
-        #region GetAllAppointmentDetail
         public async Task<IPaginate<GetAppointmentDetailResponse>> GetAllAppointmentDetail(int page, int size)
         {
             var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
@@ -50,9 +49,7 @@ namespace Hairhub.Service.Services.Services
             };
             return appointmentDetailResponses;
         }
-        #endregion
 
-        #region GetAppointmentDetailById
         public async Task<GetAppointmentDetailResponse>? GetAppointmentDetailById(Guid id)
         {
             var appointmentDetail = await _unitOfWork
@@ -65,7 +62,16 @@ namespace Hairhub.Service.Services.Services
                 return null;
             return _mapper.Map<GetAppointmentDetailResponse>(appointmentDetail);
         }
-        #endregion
+
+        public async Task<List<GetAppointmentDetailResponse>> GetAppointmentDetailByAppointmentId(Guid AppointmentId)
+        {
+            var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+           .GetListAsync(
+                predicate: x => x.AppointmentId == AppointmentId,
+               include: query => query.Include(s => s.SalonEmployee).Include(s => s.ServiceHair).Include(s => s.Appointment)
+           );
+            return _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
+        }
 
         #region CreateAppointment
         public async Task<CreateAppointmentDetailResponse> CreateAppointmentDetail(CreateAppointmentDetailRequest createAppointmentDetailRequest)

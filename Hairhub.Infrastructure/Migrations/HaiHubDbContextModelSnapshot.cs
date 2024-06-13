@@ -609,6 +609,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("owner_id");
 
+                    b.Property<decimal?>("Rate")
+                        .HasColumnType("decimal(18,1)")
+                        .HasColumnName("rate");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
