@@ -130,7 +130,8 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonEmployee>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonInformation)
+                    include: x => x.Include(se => se.ServiceEmployees)
+                       .ThenInclude(se => se.ServiceHair).Include(se => se.Schedules)
                  );
             if (salonEmployeeResponse == null)
                 return null;
