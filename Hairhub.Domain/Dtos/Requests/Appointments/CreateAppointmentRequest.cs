@@ -15,7 +15,7 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
         public Decimal OriginalPrice { get; set; }
         public Decimal DiscountedPrice { get; set; }
         public List<AppointmentDetailRequest>  AppointmentDetails { get; set; }
-        public List<Guid> VoucherIds { get; set; }
+        public List<Guid>? VoucherIds { get; set; }
     }
 
     public class AppointmentDetailRequest

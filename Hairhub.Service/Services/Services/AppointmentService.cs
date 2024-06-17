@@ -320,6 +320,12 @@ namespace Hairhub.Service.Services.Services
                         }
                     }
                 }
+
+                // Loại bỏ các thời gian không có nhân viên nào
+                availableTimesDict = availableTimesDict
+                    .Where(kvp => kvp.Value.Any())
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
                 // Convert dictionary to List<AvailableTime>
                 result.AvailableTimes = availableTimesDict.Select(kvp => new AvailableTime
                 {
@@ -556,28 +562,30 @@ namespace Hairhub.Service.Services.Services
             {
                 await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
             }
-            foreach (var item in request.VoucherIds)
+            if (request.VoucherIds != null)
             {
-                var voucher = await _unitOfWork.GetRepository<Voucher>()
-                                         .SingleOrDefaultAsync
-                                         (
-                                            predicate: x=> x.Id == item && x.ExpiryDate>DateTime.Now 
-                                                        && x.MinimumOrderAmount<=request.TotalPrice
-                                                        && x.IsActive == true
-                                         );
-                if(voucher == null)
+                foreach (var item in request.VoucherIds)
                 {
-                    throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
+                    var voucher = await _unitOfWork.GetRepository<Voucher>()
+                                             .SingleOrDefaultAsync
+                                             (
+                                                predicate: x => x.Id == item && x.ExpiryDate > DateTime.Now
+                                                            && x.MinimumOrderAmount <= request.TotalPrice
+                                                            && x.IsActive == true
+                                             );
+                    if (voucher == null)
+                    {
+                        throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
+                    }
+                    var appointmentVoucher = new AppointmentDetailVoucher()
+                    {
+                        Id = new Guid(),
+                        AppointmentId = appointment.Id,
+                        VoucherId = item
+                    };
+                    await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
                 }
-                var appointmentVoucher = new AppointmentDetailVoucher()
-                {
-                    Id = new Guid(),
-                    AppointmentId = appointment.Id,
-                    VoucherId = item
-                };
-                await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
-            }
-            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+            }            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
             await _unitOfWork.CommitAsync();
             return _mapper.Map<CreateAppointmentResponse>(appointment);
         }
