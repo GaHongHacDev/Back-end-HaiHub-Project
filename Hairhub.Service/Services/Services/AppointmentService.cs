@@ -504,6 +504,14 @@ namespace Hairhub.Service.Services.Services
 
         private Decimal ParseTimeToDecimal(DateTime Time)
         {
+            if (Time.Hour == null)
+            {
+                throw new Exception($"Cannot convert hour {Time}");
+            }
+            if (Time.Minute == null)
+            {
+                throw new Exception($"Cannot convert minute {Time}");
+            }
             int hours = Time.Hour;
             int minutes = Time.Minute;
             decimal decimalTime = hours + (minutes / 60.0m);
