@@ -445,17 +445,16 @@ namespace Hairhub.Service.Services.Services
                     if (startTimeProcess >= startScheduleEmp && endTimeProcess <= endScheduleEmp)
                     {
                         //Get appointment detail => Check available time
-                        var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                       .GetListAsync
-                                                        (
-                                                            predicate: x => x.SalonEmployeeId == employee.Id
-                                                            && x.StartTime.Date == request.Day.Date
-                                                            && x.EndTime.Date == request.Day.Date
-                                                            && ((ParseTimeToDecimal(x.StartTime) <= startTimeProcess && ParseTimeToDecimal(x.EndTime) > startTimeProcess)
-                                                            || (ParseTimeToDecimal(x.StartTime) < endTimeProcess && ParseTimeToDecimal(x.EndTime) >= endTimeProcess)
-                                                            || (ParseTimeToDecimal(x.StartTime) > startTimeProcess && ParseTimeToDecimal(x.StartTime) < endTimeProcess))
-                                                            && x.Status.Equals(AppointmentStatus.Booking)
-                                                        );
+                        var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
+                                                                               && x.StartTime.Date == request.Day.Date
+                                                                               && x.EndTime.Date == request.Day.Date
+                                                                               && x.Status.Equals(AppointmentStatus.Booking)))
+                                                        .ToList()
+                                                        .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
+                                                                 || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
+                                                                 || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
+                                                        .ToList();
                         if (appointmentDetails == null)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
