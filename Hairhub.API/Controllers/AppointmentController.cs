@@ -221,6 +221,24 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> CalculatePrice([FromBody]GetCalculatePriceRequest request)
+        {            
+            try
+            {
+                var result = await _appointmentService.CalculatePrice(request);
+                if (result == null)
+                {
+                    return NotFound("Không thể tìm thấy voucher này");
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
         {
             try

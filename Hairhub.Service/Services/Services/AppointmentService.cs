@@ -628,6 +628,40 @@ namespace Hairhub.Service.Services.Services
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
         }
+
+        public async Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest)
+        {
+            var existingVoucher = await _unitOfWork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: e => e.Id == calculatePriceRequest.VoucherId);
+            if (existingVoucher == null)
+            {
+                throw new NotFoundException("Voucher Not  Found");
+            }
+
+            decimal discountPercentage = existingVoucher != null ? existingVoucher.DiscountPercentage.GetValueOrDefault(0) / 100 : 0;
+            var serviceHairIds = calculatePriceRequest.ServiceHairId;
+            var services = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(predicate: s => serviceHairIds.Contains(s.Id));
+            decimal originalPriceService = 0; 
+
+            foreach (var service in services)
+            {
+                var finalPrice = service.Price;
+
+                if (finalPrice > 0)
+                {
+                    originalPriceService += finalPrice; 
+                }
+            }
+            decimal TotalPrice = originalPriceService - (discountPercentage * originalPriceService);
+            var response = new GetCalculatePriceResponse
+            {
+                OriginalPrice = originalPriceService,
+                DiscountedPrice = discountPercentage * originalPriceService,
+                TotalPrice = TotalPrice,
+            };
+
+            return response;
+
+        }
         #endregion
 
     }
