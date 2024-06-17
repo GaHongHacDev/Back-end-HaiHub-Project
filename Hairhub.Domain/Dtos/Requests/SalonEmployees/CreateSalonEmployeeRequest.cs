@@ -20,7 +20,7 @@ namespace Hairhub.Domain.Dtos.Requests.SalonEmployees
         public string Gender { get; set; }
         public string Phone { get; set; }
         public IFormFile ImgEmployee { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; };
         public List<Guid> ServiceHairId { get; set; }
         public List<ScheduleEmployee> ScheduleEmployees { get; set; }
     }
