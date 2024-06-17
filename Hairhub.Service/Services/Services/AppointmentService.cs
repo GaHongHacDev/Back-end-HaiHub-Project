@@ -373,7 +373,7 @@ namespace Hairhub.Service.Services.Services
                 listEmp = await CaculateBookingDetail(bookingDetail, request, startTimeProcess, endTimeProcess);
                 if (listEmp.Count == 0 && i == 0)
                 {
-                    throw new NotFoundException($"Không có nhân viên nào có thể phụ vụ vào thời gian {StartTimeBooking.ToString()}");
+                    throw new NotFoundException($"Không có nhân viên nào có thể phụ vụ vào thời gian {StartTimeBooking.Date}");
                 }
                 // Caculate waiting time for another time in services > 1
                 if (listEmp.Count == 0 && i > 0)
@@ -414,17 +414,25 @@ namespace Hairhub.Service.Services.Services
             if (bookingDetail.IsAnyOne)
             {
                 //Xủ lý khi chọn employee nào cũng được => IsAnyOne = true
-                var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(
-                                                predicate: x => x.SalonInformationId == request.SalonId);
+                var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync
+                                                  (
+                                                    predicate: x => x.SalonInformationId == request.SalonId &&
+                                                                    x.ServiceEmployees.Any(se => se.ServiceHairId == bookingDetail.ServiceHairId)
+                                                                    && x.IsActive==true
+                                                  );
                 if (employees == null)
                 {
-                    throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop");
+                    throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop có thể phục vụ dịch vụ này");
                 }
                 foreach (var employee in employees)
                 {   // Get schedule by id
                     var scheduleEmp = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(
                                     predicate: x => x.EmployeeId == employee.Id
-                                     && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString()));
+                                     && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString()) && x.IsActive == true);
+                    if (scheduleEmp == null)
+                    {
+                        continue;
+                    }
                     //Get Time work of employee
                     var startScheduleEmp = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
                     var endScheduleEmp = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60; //8.5 => 8h30

@@ -11,13 +11,15 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
     public class GetSalonInformationResponse
     {
         public Guid Id { get; set; }
+        public Guid? OwnerId { get; set; }
         public string Name { get; set; }
+        public string Address { get; set; }
         public string? Description { get; set; }
         public string? Img { get; set; }
-        public string Address { get; set; }
-        public Decimal Rate { get; set; }
+        public Decimal? Rate { get; set; }
         public string Longitude { get; set; }
         public string Latitude { get; set; }
+        public int TotalReviewer { get; set; }
         public bool IsActive { get; set; }
 
         public virtual SalonOwnerSalonInformationResponse SalonOwner { get; set; }

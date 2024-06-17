@@ -11,7 +11,6 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
         public DateTime Day { get; set; }
         public Decimal AvailableSlot { get; set; }
         public Guid SalonId { get; set; }
-        public string SalonName { get; set; }
         public List<BookingDetailRequest> BookingDetail { get; set; }
     }
 
@@ -21,5 +20,4 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
         public Guid SalonEmployeeId {  get; set; }
         public bool IsAnyOne {  get; set; }
     }
-
 }

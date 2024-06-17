@@ -56,6 +56,8 @@ namespace Hairhub.Service.Services.Services
             string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             salonInformation.Img = url;
             salonInformation.Rate = 0;
+            salonInformation.TotalRating = 0;
+            salonInformation.TotalReviewer = 0;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
@@ -130,12 +132,12 @@ namespace Hairhub.Service.Services.Services
             SalonInformation salonInformation = await _unitOfWork
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.OwnerId.Equals(ownerId),
+                    predicate: x => x.OwnerId == ownerId,
                     include: source => source.Include(s => s.SalonOwner)
                  );
-            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             if (salonInformation == null)
                 throw new NotFoundException($"Not found salon information with owner id {ownerId}");
+            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             var schedules = await _scheduleService.GetSalonSchedules(salonInformation.Id);
             if (schedules.Any())
             {

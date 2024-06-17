@@ -219,5 +219,23 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
+        {
+            try
+            {
+                var bookingResponse = await _appointmentService.BookAppointment(bookAppointmentRequest);
+                if (bookingResponse == null)
+                {
+                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                }
+                return Ok(bookingResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
