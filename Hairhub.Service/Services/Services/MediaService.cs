@@ -63,9 +63,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<string> UploadAVideo(IFormFile file, string pathFolder, string nameOfImg)
         {
-            _cloudName = _configuration["Cloudinary:CloudName"];
-            _apiKey = _configuration["Cloudinary:ApiKey"];
-            apiSecret = _configuration["Cloudinary:APISecret"];
+            
             if (file == null || file.Length == 0)
             {
                 throw new NotFoundException("No file uploaded!");
