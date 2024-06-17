@@ -72,8 +72,9 @@ namespace Hairhub.Service.Services.Services
                                                     EmployeeId = employee.Id, 
                                                     DayOfWeek=itemSchedule.Date, 
                                                     EndTime= itemSchedule.EndTime, 
-                                                    StartTime= itemSchedule.StartTime
-                                                };
+                                                    StartTime = itemSchedule.StartTime,
+                                                    IsActive = itemSchedule.IsActive
+                    };
                     _scheduleService.CreateScheduleEmployee(scheduleEmployee);
                 }
                 //create Service Employee
