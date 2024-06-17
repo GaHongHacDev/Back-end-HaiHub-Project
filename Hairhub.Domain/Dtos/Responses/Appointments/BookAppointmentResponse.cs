@@ -11,7 +11,7 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public DateTime Day {  get; set; }
         public Guid SalonId {  get; set; }
         public DateTime StartTime { get; set; }
-        public List<BookingDetailResponse> BookingDetailResponses { get; set; }
+        public List<BookingDetailResponse> BookingDetailResponses { get; set; } = new List<BookingDetailResponse>();
     }
 
     public class BookingDetailResponse
