@@ -17,7 +17,7 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
     public class BookingDetailRequest 
     {
         public Guid ServiceHairId { get; set; }
-        public Guid SalonEmployeeId {  get; set; }
+        public Guid? SalonEmployeeId { get; set; }
         public bool IsAnyOne {  get; set; }
     }
 }

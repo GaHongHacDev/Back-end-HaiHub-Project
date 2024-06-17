@@ -199,16 +199,6 @@ namespace Hairhub.Service.Services.Services
                     {
                         salon.Vouchers = _mapper.Map<List<SearchSalonVoucherRespnse>>(vouchers);
                     }
-                    // Get number of reviewer
-                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                              .GetListAsync(
-                                                                  predicate: x => x.SalonEmployee.SalonInformationId == salon.Id
-                                                              );
-                    var appointments = appointmentDetails.Select(ad => ad.AppointmentId).Distinct().ToList();
-                    var feedbackList = await _unitOfWork.GetRepository<Feedback>()
-                                                       .GetListAsync(predicate: fb => appointments.Contains(fb.AppointmentId));
-                    var totalFeedbackCount = feedbackList?.Count() ?? 0;
-                    salon.ReviewerQuantity = totalFeedbackCount;
                     result.Add(salon);
                 }
             }

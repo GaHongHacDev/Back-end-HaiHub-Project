@@ -30,7 +30,6 @@ namespace Hairhub.Service.Services.Services
         {
             var appointmentDetailVouchers = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
                 .GetPagingListAsync(
-                predicate: x => x.IsActive == true,
                 include: query => query.Include(s => s.Voucher).Include(s => s.Appointment),
                 page: page,
                 size: size);
@@ -66,8 +65,6 @@ namespace Hairhub.Service.Services.Services
                 Id = Guid.NewGuid(),
                 VoucherId = (Guid)request.VoucherId,
                 AppointmentId = (Guid)request.AppointmentId,
-                AppliedAmount = (decimal)request.AppliedAmount,
-                AppliedDate = (DateTime)request.AppliedDate,
                 
             };
             await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(newAppointmentDetailVoucher);
@@ -81,23 +78,6 @@ namespace Hairhub.Service.Services.Services
                 .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
 
             if (appointmentDetailVoucher == null) throw new Exception("AppointmentDetailVoucher is not exist!!!");
-
-            appointmentDetailVoucher.AppliedAmount = (decimal)request.AppliedAmount;
-            appointmentDetailVoucher.AppliedDate = (DateTime)request.AppliedDate;
-
-            _unitOfWork.GetRepository<AppointmentDetailVoucher>().UpdateAsync(appointmentDetailVoucher);
-            bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
-            return isSuccessful;
-        }
-
-        public async Task<bool> DeleteAppointmentDetailVoucher(Guid id)
-        {
-            var appointmentDetailVoucher = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
-                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
-
-            if (appointmentDetailVoucher == null) throw new Exception("AppointmentDetailVoucher is not exist!!!");
-
-            appointmentDetailVoucher.IsActive = false;
 
             _unitOfWork.GetRepository<AppointmentDetailVoucher>().UpdateAsync(appointmentDetailVoucher);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;

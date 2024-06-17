@@ -93,7 +93,7 @@ namespace Hairhub.API.Controllers
                 var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
                 if (accoutResponse == null)
                 {
-                    return BadRequest("Cannot create appointment!");
+                    return BadRequest("Không thể tạo lịch hẹn");
                 }
                 //return Ok(accoutResponse);
                 return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);

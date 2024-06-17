@@ -11,9 +11,6 @@ namespace Hairhub.Domain.Entitities
         public Guid Id { get; set; }
         public Guid VoucherId { get; set; }
         public Guid AppointmentId { get; set; }
-        public Decimal AppliedAmount { get; set; }
-        public DateTime AppliedDate { get; set; }
-        public bool IsActive { get; set; }
 
         public virtual Voucher Voucher { get; set; }
         public virtual Appointment Appointment { get; set; }

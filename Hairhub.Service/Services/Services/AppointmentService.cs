@@ -418,7 +418,7 @@ namespace Hairhub.Service.Services.Services
                                                   (
                                                     predicate: x => x.SalonInformationId == request.SalonId &&
                                                                     x.ServiceEmployees.Any(se => se.ServiceHairId == bookingDetail.ServiceHairId)
-                                                                    && x.IsActive==true
+                                                                    && x.IsActive == true
                                                   );
                 if (employees == null)
                 {
@@ -541,40 +541,43 @@ namespace Hairhub.Service.Services.Services
         #endregion
 
         #region Create Update Delete Active
-        public async Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest createAccountRequest)
+        public async Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest request)
         {
-            //Check customer is exist
-            //var customer = await _unitOfWork.GetRepository<Customer>()
-            //    .SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAccountRequest.CustomerId));
-            //if (customer == null)
-            //{
-            //    throw new Exception("CustomerId not found!");
-            //}
-            var appointment = _mapper.Map<Appointment>(createAccountRequest);
+            var appointment = _mapper.Map<Appointment>(request);
             appointment.Id = Guid.NewGuid();
             appointment.Status = AppointmentStatus.Booking;
-            appointment.Date = DateTime.Now;
+            appointment.CreatedDate = DateTime.Now;
+
+            if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
+            {
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+            foreach (var item in request.AppointmentDetails)
+            {
+                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+            }
+            foreach (var item in request.VoucherIds)
+            {
+                var voucher = await _unitOfWork.GetRepository<Voucher>()
+                                         .SingleOrDefaultAsync
+                                         (
+                                            predicate: x=> x.Id == item && x.ExpiryDate>DateTime.Now 
+                                                        && x.MinimumOrderAmount<=request.TotalPrice
+                                                        && x.IsActive == true
+                                         );
+                if(voucher == null)
+                {
+                    throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
+                }
+                var appointmentVoucher = new AppointmentDetailVoucher()
+                {
+                    Id = new Guid(),
+                    AppointmentId = appointment.Id,
+                    VoucherId = item
+                };
+                await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+            }
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
-            await _unitOfWork.CommitAsync();
-            if (createAccountRequest.ListAppointmentDetail == null || createAccountRequest.ListAppointmentDetail.Count == 0)
-            {
-                throw new NotFoundException("AppointmentDetail not found!");
-            }
-            foreach (var item in createAccountRequest.ListAppointmentDetail)
-            {
-                try
-                {
-                    await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
-                }
-                catch (NotFoundException ex)
-                {
-                    throw new NotFoundException(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-            }
             await _unitOfWork.CommitAsync();
             return _mapper.Map<CreateAppointmentResponse>(appointment);
         }
