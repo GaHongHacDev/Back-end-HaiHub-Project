@@ -53,7 +53,8 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateFeedback(CreateFeedbackRequest request)
+
+        public async Task<IActionResult> CreateFeedback([FromForm]CreateFeedbackRequest request)
         {
             try
             {

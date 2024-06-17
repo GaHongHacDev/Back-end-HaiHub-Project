@@ -201,5 +201,41 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetAvailableTime(getAvailableTimeRequest);
+                if (appointmentResponse == null)
+                {
+                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalculatePrice([FromBody]GetCalculatePriceRequest request)
+        {            
+            try
+            {
+                var result = await _appointmentService.CalculatePrice(request);
+                if (result == null)
+                {
+                    return NotFound("Không thể tìm thấy voucher này");
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
