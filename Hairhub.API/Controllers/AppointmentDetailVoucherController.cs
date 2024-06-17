@@ -78,20 +78,5 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpPatch]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> DeleteAppointmentDetailVoucher(Guid id)
-        {
-            try
-            {
-                var isSuccessfull = await _appointmentDetailVoucherService.DeleteAppointmentDetailVoucher(id);
-                return Ok(isSuccessfull);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
     }
 }

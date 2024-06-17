@@ -56,6 +56,8 @@ namespace Hairhub.Service.Services.Services
             string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             salonInformation.Img = url;
             salonInformation.Rate = 0;
+            salonInformation.TotalRating = 0;
+            salonInformation.TotalReviewer = 0;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
@@ -130,12 +132,12 @@ namespace Hairhub.Service.Services.Services
             SalonInformation salonInformation = await _unitOfWork
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.OwnerId.Equals(ownerId),
+                    predicate: x => x.OwnerId == ownerId,
                     include: source => source.Include(s => s.SalonOwner)
                  );
-            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             if (salonInformation == null)
                 throw new NotFoundException($"Not found salon information with owner id {ownerId}");
+            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             var schedules = await _scheduleService.GetSalonSchedules(salonInformation.Id);
             if (schedules.Any())
             {
@@ -197,16 +199,6 @@ namespace Hairhub.Service.Services.Services
                     {
                         salon.Vouchers = _mapper.Map<List<SearchSalonVoucherRespnse>>(vouchers);
                     }
-                    // Get number of reviewer
-                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                              .GetListAsync(
-                                                                  predicate: x => x.SalonEmployee.SalonInformationId == salon.Id
-                                                              );
-                    var appointments = appointmentDetails.Select(ad => ad.AppointmentId).Distinct().ToList();
-                    var feedbackList = await _unitOfWork.GetRepository<Feedback>()
-                                                       .GetListAsync(predicate: fb => appointments.Contains(fb.AppointmentId));
-                    var totalFeedbackCount = feedbackList?.Count() ?? 0;
-                    salon.ReviewerQuantity = totalFeedbackCount;
                     result.Add(salon);
                 }
             }
