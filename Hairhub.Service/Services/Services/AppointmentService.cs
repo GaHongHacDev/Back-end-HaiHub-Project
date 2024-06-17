@@ -637,7 +637,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Voucher Not  Found");
             }
 
-            decimal discountPercentage = existingVoucher != null ? existingVoucher.DiscountPercentage.GetValueOrDefault(0) / 100 : 0;
+            decimal discountPercentage = existingVoucher.DiscountPercentage / 100;
             var serviceHairIds = calculatePriceRequest.ServiceHairId;
             var services = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(predicate: s => serviceHairIds.Contains(s.Id));
             decimal originalPriceService = 0; 
