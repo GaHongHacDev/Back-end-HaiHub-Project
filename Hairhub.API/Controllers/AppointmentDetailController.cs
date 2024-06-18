@@ -90,7 +90,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {

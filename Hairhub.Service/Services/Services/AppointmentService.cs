@@ -325,7 +325,10 @@ namespace Hairhub.Service.Services.Services
                 availableTimesDict = availableTimesDict
                     .Where(kvp => kvp.Value.Any())
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
+                if (availableTimesDict==null || availableTimesDict.Count==0)
+                {
+                    throw new NotFoundException("Không có nhân viên nào có thể làm việc vào thời gian này");
+                }
                 // Convert dictionary to List<AvailableTime>
                 result.AvailableTimes = availableTimesDict.Select(kvp => new AvailableTime
                 {

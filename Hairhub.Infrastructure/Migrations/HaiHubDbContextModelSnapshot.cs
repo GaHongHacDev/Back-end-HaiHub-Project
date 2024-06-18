@@ -126,13 +126,13 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_date");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date");
 
                     b.Property<decimal>("DiscountedPrice")
                         .HasColumnType("decimal(18,2)")
@@ -141,6 +141,10 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("original_price");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -215,20 +219,9 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<decimal>("AppliedAmount")
-                        .HasColumnType("decimal(18, 2)")
-                        .HasColumnName("applied_amount");
-
-                    b.Property<DateTime>("AppliedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("applied_date");
-
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("appointment_detail_id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .HasColumnName("appointment_id");
 
                     b.Property<Guid>("VoucherId")
                         .HasColumnType("uniqueidentifier")
@@ -837,7 +830,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("code");
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_date");
 
@@ -845,11 +838,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
-                    b.Property<decimal?>("DiscountPercentage")
+                    b.Property<decimal>("DiscountPercentage")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("discount_percentage");
 
-                    b.Property<DateTime?>("ExpiryDate")
+                    b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("expiry_date");
 
@@ -861,7 +854,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_system_created");
 
-                    b.Property<decimal?>("MinimumOrderAmount")
+                    b.Property<decimal>("MinimumOrderAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("minimum_order_amount");
 
