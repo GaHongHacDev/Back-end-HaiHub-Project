@@ -325,7 +325,7 @@ namespace Hairhub.Service.Services.Services
                 availableTimesDict = availableTimesDict
                     .Where(kvp => kvp.Value.Any())
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                if (availableTimesDict==null || availableTimesDict.Count==0)
+                if (availableTimesDict == null || availableTimesDict.Count == 0)
                 {
                     throw new NotFoundException("Không có nhân viên nào có thể làm việc vào thời gian này");
                 }
@@ -364,7 +364,7 @@ namespace Hairhub.Service.Services.Services
                 var serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
                                          .SingleOrDefaultAsync
                                           (
-                                            predicate: x => x.Id == bookingDetail.ServiceHairId && x.SalonInformationId == request.SalonId
+                                            predicate: x => x.Id == bookingDetail.ServiceHairId && x.SalonInformationId == request.SalonId && x.IsActive == true
                                           );
                 if (serviceHair == null)
                 {
@@ -404,7 +404,7 @@ namespace Hairhub.Service.Services.Services
                 //Add list BookingDetail vào result
                 bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()
                 {
-                    ServiceHairId = serviceHair.Id,
+                    ServiceHair = _mapper.Map<ServiceHairAvalibale>(serviceHair),
                     Employees = listEmp,
                     StartTime = StartTimeBooking,
                     EndTime = StartTimeBooking.AddHours((double)serviceHair.Time),
@@ -458,7 +458,7 @@ namespace Hairhub.Service.Services.Services
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                                  || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                         .ToList();
-                        if (appointmentDetails == null || appointmentDetails.Count==0)
+                        if (appointmentDetails == null || appointmentDetails.Count == 0)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                         }
@@ -559,12 +559,19 @@ namespace Hairhub.Service.Services.Services
         #region Create Update Delete Active
         public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
-            var appointment = _mapper.Map<Appointment>(request);
-            appointment.Id = Guid.NewGuid();
-            appointment.Status = AppointmentStatus.Booking;
-            appointment.CreatedDate = DateTime.Now;
+            var appointment = new Appointment() 
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = request.CustomerId,
+                CreatedDate = DateTime.Now,
+                StartDate = request.StartDate,
+                TotalPrice = request.TotalPrice,
+                OriginalPrice = request.OriginalPrice,
+                DiscountedPrice = request.DiscountedPrice,
+                Status = AppointmentStatus.Booking,
+            };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
-            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+
             if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
             {
                 throw new NotFoundException("Không tìm thấy đơn đặt lịch");
@@ -573,32 +580,32 @@ namespace Hairhub.Service.Services.Services
             {
                 await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
             }
-            if (request.VoucherIds != null)
-            {
-                foreach (var item in request.VoucherIds)
-                {
-                    var voucher = await _unitOfWork.GetRepository<Voucher>()
-                                             .SingleOrDefaultAsync
-                                             (
-                                                predicate: x => x.Id == item && x.ExpiryDate > DateTime.Now
-                                                            && x.MinimumOrderAmount <= request.TotalPrice
-                                                            && x.IsActive == true
-                                             );
-                    if (voucher == null)
-                    {
-                        throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
-                    }
-                    var appointmentVoucher = new AppointmentDetailVoucher()
-                    {
-                        Id = new Guid(),
-                        AppointmentId = appointment.Id,
-                        VoucherId = item
-                    };
-                    await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
-                }
-            }            
-            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
-            //bool isInsert = await _unitOfWork.CommitAsync()>0;
+             if (request.VoucherIds != null && request.VoucherIds.Count>0)
+             {
+                 foreach (var item in request.VoucherIds)
+                 {
+                     var voucher = await _unitOfWork.GetRepository<Voucher>()
+                                              .SingleOrDefaultAsync
+                                              (
+                                                 predicate: x => x.Id == item && x.ExpiryDate > DateTime.Now
+                                                             && x.MinimumOrderAmount <= request.TotalPrice
+                                                             && x.IsActive == true
+                                              );
+                     if (voucher == null)
+                     {
+                         throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
+                     }
+                     var appointmentVoucher = new AppointmentDetailVoucher()
+                     {
+                         Id = new Guid(),
+                         AppointmentId = appointment.Id,
+                         VoucherId = item
+                     };
+                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                 }
+             }
+
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
 
@@ -652,7 +659,7 @@ namespace Hairhub.Service.Services.Services
             decimal discountPercentage = existingVoucher.DiscountPercentage / 100;
             var serviceHairIds = calculatePriceRequest.ServiceHairId;
             var services = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(predicate: s => serviceHairIds.Contains(s.Id));
-            decimal originalPriceService = 0; 
+            decimal originalPriceService = 0;
 
             foreach (var service in services)
             {
@@ -660,7 +667,7 @@ namespace Hairhub.Service.Services.Services
 
                 if (finalPrice > 0)
                 {
-                    originalPriceService += finalPrice; 
+                    originalPriceService += finalPrice;
                 }
             }
             decimal TotalPrice = originalPriceService - (discountPercentage * originalPriceService);
