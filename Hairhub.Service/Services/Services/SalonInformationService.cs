@@ -120,7 +120,7 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonOwner)
+                    include: source => source.Include(s => s.SalonOwner).Include(x=>x.Schedules)
                  );
             if (salonInformationResponse == null)
                 return null;

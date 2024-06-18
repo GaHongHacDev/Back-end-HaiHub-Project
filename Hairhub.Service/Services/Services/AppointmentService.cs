@@ -554,13 +554,14 @@ namespace Hairhub.Service.Services.Services
         #endregion
 
         #region Create Update Delete Active
-        public async Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest request)
+        public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
             var appointment = _mapper.Map<Appointment>(request);
             appointment.Id = Guid.NewGuid();
             appointment.Status = AppointmentStatus.Booking;
             appointment.CreatedDate = DateTime.Now;
-
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
             if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
             {
                 throw new NotFoundException("Không tìm thấy đơn đặt lịch");
@@ -592,9 +593,10 @@ namespace Hairhub.Service.Services.Services
                     };
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
                 }
-            }            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateAppointmentResponse>(appointment);
+            }            
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+            //bool isInsert = await _unitOfWork.CommitAsync()>0;
+            return isInsert;
         }
 
         public async Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest)

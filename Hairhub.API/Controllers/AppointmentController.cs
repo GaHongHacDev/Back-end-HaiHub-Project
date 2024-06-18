@@ -91,12 +91,11 @@ namespace Hairhub.API.Controllers
             try
             {
                 var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
-                if (accoutResponse == null)
+                if (accoutResponse == false)
                 {
                     return BadRequest("Không thể tạo lịch hẹn");
                 }
-                //return Ok(accoutResponse);
-                return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
+                return Ok("Tạo lịch hẹn thành công");
             }
             catch (NotFoundException ex)
             {
