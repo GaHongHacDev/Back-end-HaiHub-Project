@@ -214,7 +214,7 @@ namespace Hairhub.API.Controllers
                 return Ok(appointmentResponse);
             }catch(NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
