@@ -382,7 +382,14 @@ namespace Hairhub.Service.Services.Services
                 listEmp = await CaculateBookingDetail(bookingDetail, request, startTimeProcess, endTimeProcess);
                 if (listEmp.Count == 0 && i == 0)
                 {
-                    throw new NotFoundException($"Không có nhân viên nào có thể phụ vụ vào thời gian {StartTimeBooking.Date}");
+                    if (i == 0)
+                    {
+                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ thứ nhất - {serviceHair.ServiceName} vào {(int)request.AvailableSlot}:{(int)((request.AvailableSlot - (int)request.AvailableSlot) * 60)}");
+                    }
+                    else
+                    {
+                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ thứ {i + 1} - {serviceHair.ServiceName}");
+                    }
                 }
                 // Caculate waiting time for another time in services > 1
                 if (listEmp.Count == 0 && i > 0)
@@ -484,17 +491,16 @@ namespace Hairhub.Service.Services.Services
                 if (startTimeProcess >= startScheduleEmp && endTimeProcess <= endScheduleEmp)
                 {
                     //Get appointment detail => Check available time
-                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                       .GetListAsync
-                        (
-                            predicate: x => x.SalonEmployeeId == employee.Id
-                            && x.StartTime.Date == request.Day.Date
-                            && x.EndTime.Date == request.Day.Date
-                            && ((ParseTimeToDecimal(x.StartTime) <= startTimeProcess && ParseTimeToDecimal(x.EndTime) > startTimeProcess)
-                            || (ParseTimeToDecimal(x.StartTime) < endTimeProcess && ParseTimeToDecimal(x.EndTime) >= endTimeProcess)
-                            || (ParseTimeToDecimal(x.StartTime) > startTimeProcess && ParseTimeToDecimal(x.StartTime) < endTimeProcess))
-                            && x.Status.Equals(AppointmentStatus.Booking)
-                        );
+                    var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                    .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
+                                                                           && x.StartTime.Date == request.Day.Date
+                                                                           && x.EndTime.Date == request.Day.Date
+                                                                           && x.Status.Equals(AppointmentStatus.Booking)))
+                                                    .ToList()
+                                                    .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
+                                                             || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
+                                                             || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
+                                                    .ToList();
                     if (appointmentDetails == null)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
@@ -514,10 +520,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception($"Cannot convert minute {Time}");
             }
-            int hours = Time.Hour;
-            int minutes = Time.Minute;
-            decimal decimalTime = hours + (minutes / 60.0m);
-            return decimalTime;
+            return (decimal)(Time.Hour * 60 + Time.Minute);
         }
 
         private async Task<bool> CheckAppointmentBooking(Guid SalonId, DateTime Day, Decimal TimeSlot, bool IsAnyOne)
