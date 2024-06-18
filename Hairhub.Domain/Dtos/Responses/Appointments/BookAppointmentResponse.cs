@@ -18,9 +18,6 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
     {
         public ServiceHairAvalibale ServiceHair { get; set; }
         public List<EmployeeAvailable> Employees { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public Decimal WaitingTime { get; set; }
     }
 
     public class EmployeeAvailable
@@ -39,5 +36,8 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public string? Img { get; set; }
         public decimal Time { get; set; }
         public bool IsActive { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public Decimal WaitingTime { get; set; }
     }
 }

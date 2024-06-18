@@ -408,14 +408,15 @@ namespace Hairhub.Service.Services.Services
                         throw new Exception($"Không đủ thời gian hoặc thiếu nhân viên để thực hiện dịch vụ thứ {i + 1}");
                     }
                 }
+                var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
+                serviceHairResult.StartTime = StartTimeBooking;
+                serviceHairResult.EndTime = StartTimeBooking.AddHours((double)serviceHair.Time);
+                serviceHairResult.WaitingTime = waitingTime;
                 //Add list BookingDetail vào result
                 bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()
                 {
-                    ServiceHair = _mapper.Map<ServiceHairAvalibale>(serviceHair),
+                    ServiceHair = serviceHairResult,
                     Employees = listEmp,
-                    StartTime = StartTimeBooking,
-                    EndTime = StartTimeBooking.AddHours((double)serviceHair.Time),
-                    WaitingTime = waitingTime
                 });
             }
             bookingResponse.Day = request.Day;
