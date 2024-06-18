@@ -213,6 +213,9 @@ namespace Hairhub.API.Controllers
                     return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
                 }
                 return Ok(appointmentResponse);
+            }catch(NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
@@ -249,6 +252,10 @@ namespace Hairhub.API.Controllers
                     return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
                 }
                 return Ok(bookingResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
