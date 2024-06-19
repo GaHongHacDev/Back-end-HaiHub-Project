@@ -10,7 +10,7 @@ namespace Hairhub.Domain.Entitities
     public class Voucher
     {
         public Guid Id { get; set; }
-        public Guid SalonInformationId { get; set; }
+        public Guid? SalonInformationId { get; set; }
         public string? Code { get; set; }
         public string? Description { get; set; }
         public decimal MinimumOrderAmount { get; set; }

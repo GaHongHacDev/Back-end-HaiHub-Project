@@ -35,15 +35,13 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetails
     public class GetAppointmentDetailResponse
     {
         public Guid Id { get; set; }
-        public Guid? SalonEmployeeId { get; set; }
-        public Guid? ServiceHairId { get; set; }
-        public Guid? AppointmentId { get; set; }
+        public Guid SalonEmployeeId { get; set; }
+        public Guid ServiceHairId { get; set; }
+        public Guid AppointmentId { get; set; }
         public string? Description { get; set; }
-        public DateTime? Date { get; set; }
-        public DateTime? Time { get; set; }
-        public Decimal? OriginalPrice { get; set; }
-        public Decimal? DiscountedPrice { get; set; }
-        public bool? Status { get; set; }
+        public DateTime EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public string Status { get; set; }
 
         public SalonEmployeeResponse SalonEmployeeResponse { get; set; }
         public ServiceHairResponse ServiceHairResponse { get; set; }

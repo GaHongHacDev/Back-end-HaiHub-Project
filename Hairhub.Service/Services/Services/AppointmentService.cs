@@ -12,6 +12,7 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -69,7 +70,7 @@ namespace Hairhub.Service.Services.Services
                                                    page: page,
                                                    size: size
                                                );
-            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
@@ -77,21 +78,21 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointments != null)
+            if (appointmentResponse != null && appointmentResponse.Items.Count>0)
             {
-                foreach (var item in appointments.Items)
+                foreach (var item in appointmentResponse.Items)
                 {
                     var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
                     if (apoointmentDetails != null)
                     {
-                        item.AppointmentDetails = (ICollection<AppointmentDetail>)apoointmentDetails;
+                        item.AppoinmentDetails = apoointmentDetails;
                     }
                 }
             }
-            return scheduleResponses;
+            return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetBookingAppointment(int page, int size, Guid CustomerId)
+        public async Task<IPaginate<GetAppointmentResponse>> GetBookingAppointmentByCustomerId(int page, int size, Guid CustomerId)
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                .GetPagingListAsync(
@@ -100,7 +101,7 @@ namespace Hairhub.Service.Services.Services
                                                    page: page,
                                                    size: size
                                                );
-            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
@@ -108,18 +109,18 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointments != null)
+            if (appointmentResponse != null && appointmentResponse.Items.Count!=0)
             {
-                foreach (var item in appointments.Items)
+                foreach (var item in appointmentResponse.Items)
                 {
-                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
+                    List<GetAppointmentDetailResponse> apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
                     if (apoointmentDetails != null)
                     {
-                        item.AppointmentDetails = (ICollection<AppointmentDetail>)apoointmentDetails;
+                        item.AppoinmentDetails = apoointmentDetails;
                     }
                 }
             }
-            return scheduleResponses;
+            return appointmentResponse;
         }
 
         public async Task<GetAppointmentResponse>? GetAppointmentById(Guid id)
@@ -162,6 +163,72 @@ namespace Hairhub.Service.Services.Services
                                                     .GetListAsync(predicate: x => x.AppointmentId == item.Id);
                 item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
             }
+            return appointmentResponse;
+        }
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status)
+        {
+            // Tạo biểu thức điều kiện ban đầu cho SalonId
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            if (!string.IsNullOrEmpty(status))
+            {
+                predicate = predicate.And(x => x.Status.Equals(status));
+            }
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetPagingListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails),
+                    page: page,
+                    size: size
+                );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
+            if (appointmentResponse != null && appointmentResponse.Items.Count>0)
+            {
+                foreach (var item in appointmentResponse.Items)
+                {
+                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
+                    if (apoointmentDetails != null)
+                    {
+                        item.AppoinmentDetails = apoointmentDetails;
+                    }
+                }
+            }
+            return appointmentResponse;
+        }
+
+
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status)
+        {
+            // Tạo biểu thức điều kiện ban đầu cho SalonId
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.Id == EmployeeId));
+            if (!string.IsNullOrEmpty(Status))
+            {
+                predicate = predicate.And(x => x.Status.Equals(Status));
+            }
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                  .GetPagingListAsync(
+                      predicate: predicate,
+                      include: query => query.Include(a => a.Customer)
+                                             .Include(a => a.AppointmentDetails)
+                                                 .ThenInclude(ad => ad.SalonEmployee),
+                      page: page,
+                      size: size
+                  );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
             return appointmentResponse;
         }
 
@@ -591,13 +658,13 @@ namespace Hairhub.Service.Services.Services
                      var voucher = await _unitOfWork.GetRepository<Voucher>()
                                               .SingleOrDefaultAsync
                                               (
-                                                 predicate: x => x.Id == item && x.ExpiryDate > DateTime.Now
+                                                 predicate: x => x.Id == item && x.ExpiryDate >= DateTime.Now
                                                              && x.MinimumOrderAmount <= request.TotalPrice
                                                              && x.IsActive == true
                                               );
                      if (voucher == null)
                      {
-                         throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
+                         throw new NotFoundException("Voucher Không phù hợp");
                      }
                      var appointmentVoucher = new AppointmentDetailVoucher()
                      {
@@ -685,6 +752,7 @@ namespace Hairhub.Service.Services.Services
             return response;
 
         }
+
         #endregion
 
     }

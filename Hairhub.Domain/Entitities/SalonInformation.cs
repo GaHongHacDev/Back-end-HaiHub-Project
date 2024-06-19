@@ -20,12 +20,13 @@ namespace Hairhub.Domain.Entitities
         public string Latitude {  get; set; }
         public int TotalRating {  get; set; }
         public int TotalReviewer {  get; set; }
-        public bool IsActive { get; set; }
+        public string Status { get; set; }
 
         public virtual SalonOwner SalonOwner { get; set; }
         public virtual ICollection<SalonEmployee> SalonEmployees { get; set; }
         public virtual ICollection<Voucher> Vouchers { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }  
         public virtual ICollection<ServiceHair> ServiceHairs { get; set; }
+        public virtual ICollection<Approval> Approvals { get; set; }
     }
 }
