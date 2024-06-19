@@ -51,16 +51,16 @@ namespace Hairhub.Service.Services.Services
         }
 
         public async Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId)
-        {
-            var salonInfo = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == salonId);
-            if(salonInfo == null)
-            {
-                throw new NotFoundException($"Cannot find schedule with salon id {salonId}");
-            }
+        {;
             var schedules = await _unitOfWork.GetRepository<Schedule>()
             .GetListAsync(
+                predicate: x=>x.SalonId == salonId,
                 include: query => query.Include(s => s.SalonInformation)
             );
+            if (schedules == null)
+            {
+                throw new NotFoundException($"Không tìm thấy lịch của salon với id {salonId}");
+            }
             return _mapper.Map<List<GetScheduleResponse>>(schedules);
         }
 

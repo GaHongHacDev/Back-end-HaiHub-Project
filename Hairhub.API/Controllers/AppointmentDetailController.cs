@@ -47,7 +47,7 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpPost]
+      /*  [HttpPost]
         public async Task<IActionResult> CreateAppointmentDetail([FromBody] CreateAppointmentDetailRequest createAppointmentRequest)
         {
             try
@@ -68,7 +68,7 @@ namespace Hairhub.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
+        }*/
 
         [HttpPut]
         [Route("{id:Guid}")]

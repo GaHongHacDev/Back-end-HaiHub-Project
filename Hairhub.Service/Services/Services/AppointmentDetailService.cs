@@ -74,49 +74,25 @@ namespace Hairhub.Service.Services.Services
         }
 
         #region CreateAppointment
-        public async Task<CreateAppointmentDetailResponse> CreateAppointmentDetail(CreateAppointmentDetailRequest createAppointmentDetailRequest)
+
+        public async Task<bool> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest)
         {
             var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.SalonEmployeeId));
             if (salonEmployee == null)
             {
-                throw new Exception("Salon employee not found!");
+                throw new Exception("Không tìm thấy nhân viên salon, barber shop");
             }
             var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.ServiceHairId));
             if (serviceHair == null)
             {
-                throw new Exception("Service hair not found!");
-            }
-            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.AppointmentId));
-            if (appointment == null)
-            {
-                throw new Exception("Appointment not found!");
-            }
-
-            var appointmentDetail = _mapper.Map<AppointmentDetail>(createAppointmentDetailRequest);
-            appointmentDetail.Id = Guid.NewGuid();
-            await _unitOfWork.GetRepository<AppointmentDetail>().InsertAsync(appointmentDetail);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateAppointmentDetailResponse>(appointmentDetail);
-        }
-
-        public async Task<CreateAppointmentDetailResponse> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest)
-        {
-            var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.SalonEmployeeId));
-            if (salonEmployee == null)
-            {
-                throw new Exception("Salon employee not found!");
-            }
-            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.ServiceHairId));
-            if (serviceHair == null)
-            {
-                throw new Exception("Service hair not found!");
+                throw new Exception("Không tìm thấy dịch vụ cắt tóc");
             }
 
             var appointmentDetail = _mapper.Map<AppointmentDetail>(createAppointmentDetailRequest);
             appointmentDetail.Id = Guid.NewGuid();
             appointmentDetail.AppointmentId = appointmentId;
             await _unitOfWork.GetRepository<AppointmentDetail>().InsertAsync(appointmentDetail);
-            return _mapper.Map<CreateAppointmentDetailResponse>(appointmentDetail);
+            return true;
         }
         #endregion
 

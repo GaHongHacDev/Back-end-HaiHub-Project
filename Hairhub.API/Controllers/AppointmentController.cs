@@ -93,7 +93,7 @@ namespace Hairhub.API.Controllers
                 var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
                 if (accoutResponse == null)
                 {
-                    return BadRequest("Cannot create appointment!");
+                    return BadRequest("Không thể tạo lịch hẹn");
                 }
                 //return Ok(accoutResponse);
                 return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
@@ -231,6 +231,24 @@ namespace Hairhub.API.Controllers
                     return NotFound("Không thể tìm thấy voucher này");
                 }
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
+        {
+            try
+            {
+                var bookingResponse = await _appointmentService.BookAppointment(bookAppointmentRequest);
+                if (bookingResponse == null)
+                {
+                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                }
+                return Ok(bookingResponse);
             }
             catch (Exception ex)
             {

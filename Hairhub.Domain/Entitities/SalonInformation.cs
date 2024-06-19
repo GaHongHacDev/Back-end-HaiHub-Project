@@ -18,7 +18,7 @@ namespace Hairhub.Domain.Entitities
         public Decimal? Rate { get; set; }
         public string Longitude {  get; set; }
         public string Latitude {  get; set; }
-            public int TotalRating {  get; set; }
+        public int TotalRating {  get; set; }
         public int TotalReviewer {  get; set; }
         public bool IsActive { get; set; }
 

@@ -26,8 +26,10 @@ namespace Hairhub.Infrastructure
                 .AddJsonFile("appsettings.json")
                 .Build();
 
+
             //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+
 
         }
 
@@ -281,7 +283,8 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.CustomerId).HasColumnName("customer_id");
-                entity.Property(e => e.Date).HasColumnName("date");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+                entity.Property(e => e.StartDate).HasColumnName("start_date");
                 entity.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)").HasColumnName("total_price");
                 entity.Property(e => e.OriginalPrice).HasColumnName("original_price").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.DiscountedPrice).HasColumnName("discounted_price").HasColumnType("decimal(18,2)");
@@ -333,10 +336,8 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.AppliedAmount).HasColumnType("decimal(18, 2)").HasColumnName("applied_amount");
-                entity.Property(e => e.AppliedDate).HasColumnName("applied_date");
                 entity.Property(e => e.VoucherId).HasColumnName("voucher_id");
-                entity.Property(e => e.AppointmentId).HasColumnName("appointment_detail_id");
+                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
 
                 entity.HasOne(d => d.Voucher)
                       .WithMany(p => p.AppointmentDetailVouchers)
@@ -403,10 +404,10 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(250).IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
-                entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
-                entity.Property(e => e.DiscountPercentage).HasColumnName("discount_percentage").HasColumnType("decimal(18,2)").IsRequired(false);
-                entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date").IsRequired(false);
-                entity.Property(e => e.CreatedDate).HasColumnName("created_date").IsRequired(false);
+                entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.DiscountPercentage).HasColumnName("discount_percentage").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
                 entity.Property(e => e.ModifiedDate).HasColumnName("modified_date").IsRequired(false);
                 entity.Property(e => e.IsSystemCreated).HasColumnName("is_system_created");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");

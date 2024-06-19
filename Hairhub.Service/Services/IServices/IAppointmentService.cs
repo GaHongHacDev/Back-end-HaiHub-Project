@@ -26,5 +26,6 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetAppointmentResponse>> GetBookingAppointment(int page, int size, Guid CustomerId);
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
+        Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
     }
 }
