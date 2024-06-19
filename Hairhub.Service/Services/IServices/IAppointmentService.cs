@@ -22,5 +22,10 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> ActiveAppointment(Guid id);
         Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest getAvailableTimeRequest);
         Task<IPaginate<GetAppointmentByAccountIdResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size);
+        Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId);
+        Task<IPaginate<GetAppointmentResponse>> GetBookingAppointment(int page, int size, Guid CustomerId);
+
+        Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
+        Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
     }
 }

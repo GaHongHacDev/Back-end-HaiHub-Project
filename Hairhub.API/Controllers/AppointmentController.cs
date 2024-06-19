@@ -47,6 +47,44 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{customerId:Guid}")]
+        public async Task<IActionResult> GetHistoryAppointmentByCustomterId([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetHistoryAppointmentByCustomerId(page, size,customerId);
+                if (appointmentResponse == null)
+                {
+                    return NotFound("Cannot find this appointment!");
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{customerId:Guid}")]
+        public async Task<IActionResult> GetBookingAppointment([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetBookingAppointment(page, size, customerId);
+                if (appointmentResponse == null)
+                {
+                    return NotFound("Không tìm thấy đơn đặt lịch");
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {
@@ -55,7 +93,7 @@ namespace Hairhub.API.Controllers
                 var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
                 if (accoutResponse == null)
                 {
-                    return BadRequest("Cannot create appointment!");
+                    return BadRequest("Không thể tạo lịch hẹn");
                 }
                 //return Ok(accoutResponse);
                 return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
@@ -159,6 +197,60 @@ namespace Hairhub.API.Controllers
             {
                 return NotFound(ex.Message);
             }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetAvailableTime(getAvailableTimeRequest);
+                if (appointmentResponse == null)
+                {
+                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalculatePrice([FromBody]GetCalculatePriceRequest request)
+        {            
+            try
+            {
+                var result = await _appointmentService.CalculatePrice(request);
+                if (result == null)
+                {
+                    return NotFound("Không thể tìm thấy voucher này");
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
+        {
+            try
+            {
+                var bookingResponse = await _appointmentService.BookAppointment(bookAppointmentRequest);
+                if (bookingResponse == null)
+                {
+                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                }
+                return Ok(bookingResponse);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

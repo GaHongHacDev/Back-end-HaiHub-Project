@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Voucher;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Hairhub.Service.Services.Services
 {
-    public class VoucherService :   IVoucherService
+    public class VoucherService : IVoucherService
     {
         private readonly IUnitOfWork _unitofwork;
         private readonly IMapper _mapper;
@@ -104,6 +105,61 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetVoucherResponse>(voucherResponse);
         }
 
+        public async Task<GetVoucherResponse?> GetVoucherbySalonId(Guid id)
+        {
+            Voucher voucherResponse = await _unitofwork
+                .GetRepository<Voucher>()
+                .SingleOrDefaultAsync(
+                    predicate: x => x.SalonInformationId.Equals(id),
+                    include: query => query.Include(s => s.SalonInformation)
+                 );
+
+            if (voucherResponse == null) return null;
+            return _mapper.Map<GetVoucherResponse>(voucherResponse);
+        }
+
+        public async Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size)
+        {
+            var voucher = await _unitofwork.GetRepository<Voucher>()
+          .GetPagingListAsync(
+                predicate: x => x.SalonInformationId.Equals(id) && (x.IsSystemCreated || x.IsSystemCreated == true),
+              include: query => query.Include(s => s.SalonInformation),
+              page: page,
+              size: size
+          );
+
+            var voucherResponses = new Paginate<GetVoucherResponse>()
+            {
+                Page = voucher.Page,
+                Size = voucher.Size,
+                Total = voucher.Total,
+                TotalPages = voucher.TotalPages,
+                Items = _mapper.Map<IList<GetVoucherResponse>>(voucher.Items),
+            };
+            return voucherResponses;
+        }
+
+        public async Task<IPaginate<GetVoucherResponse?>> GetVouchersByExpiredDate(Guid salonId, int page, int size)
+        {
+            var now = DateTime.UtcNow;
+            var voucher = await _unitofwork.GetRepository<Voucher>()
+          .GetPagingListAsync(
+              predicate: x => x.SalonInformationId.Equals(salonId) && x.ExpiryDate > now,
+              include: query => query.Include(s => s.SalonInformation),
+              page: page,
+              size: size
+          );
+
+            var voucherResponses = new Paginate<GetVoucherResponse>()
+            {
+                Page = voucher.Page,
+                Size = voucher.Size,
+                Total = voucher.Total,
+                TotalPages = voucher.TotalPages,
+                Items = _mapper.Map<IList<GetVoucherResponse>>(voucher.Items),
+            };
+            return voucherResponses;
+        }
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherRequest request)
         {
             
@@ -115,7 +171,7 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Cannot Find Voucher");
             }
 
-            existVoucher = _mapper.Map<Voucher>(existVoucher);
+            existVoucher = _mapper.Map<Voucher>(request);
 
             _unitofwork.GetRepository<Voucher>().UpdateAsync(existVoucher);
             bool isUpdate = await _unitofwork.CommitAsync()>0;

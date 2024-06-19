@@ -60,10 +60,20 @@ namespace Hairhub.Service.Services.Services
                 employee.Img = url;
                 employee.SalonInformationId = request.SalonInformationId;
                 await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(employee);
+                if (item.ScheduleEmployees==null || item.ScheduleEmployees.Count==0)
+                {
+                    throw new NotFoundException("Không tìm thấy lịch làm việc của nhân viên");
+                }
                 //create schedule
                 foreach (var itemSchedule in item.ScheduleEmployees)
                 {
-                    var scheduleEmployee = new CreateScheduleRequest() {EmployeeId = employee.Id};
+                    var scheduleEmployee = new CreateScheduleRequest() 
+                                                {
+                                                    EmployeeId = employee.Id, 
+                                                    DayOfWeek=itemSchedule.Date, 
+                                                    EndTime= itemSchedule.EndTime, 
+                                                    StartTime= itemSchedule.StartTime
+                                                };
                     _scheduleService.CreateScheduleEmployee(scheduleEmployee);
                 }
                 //create Service Employee
@@ -76,6 +86,8 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(srvEmployee);
                 }
             }
+            existSalon.IsActive = true;
+            _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(existSalon);
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
@@ -118,7 +130,8 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonEmployee>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonInformation)
+                    include: x => x.Include(se => se.ServiceEmployees)
+                       .ThenInclude(se => se.ServiceHair).Include(se => se.Schedules)
                  );
             if (salonEmployeeResponse == null)
                 return null;
@@ -128,12 +141,14 @@ namespace Hairhub.Service.Services.Services
         public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
         {
             var salonEmployees = await _unitOfWork.GetRepository<SalonEmployee>()
-                                                    .GetPagingListAsync(
-                                                        predicate: x => x.SalonInformationId.Equals(SalonInformationId),
-                                                        include: query => query.Include(s => s.SalonInformation),
-                                                        page: page,
-                                                        size: size
-                                                    );
+                                                  .GetPagingListAsync(
+                                                      predicate: x => x.SalonInformationId.Equals(SalonInformationId),
+                                                      include: query => query.Include(s => s.Schedules)
+                                                                             .Include(s => s.ServiceEmployees)
+                                                                             .ThenInclude(se => se.ServiceHair),
+                                                      page: page,
+                                                      size: size
+                                                  );
             if (salonEmployees == null)
                 return null;
             var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()

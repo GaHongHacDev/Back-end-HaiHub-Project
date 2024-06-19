@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hairhub.Domain.Dtos.Responses.Authentication;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,14 +10,8 @@ namespace Hairhub.Domain.Dtos.Responses.Accounts
     public class FetchUserResponse
     {
         public Guid AccountId { get; set; }
-        public Guid? RoleId { get; set; }
-        public string Username { get; set; }
-        public string FullName { get; set; }
-        public DateTime DayOfBirth { get; set; }
-        public string Gender { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string? Address { get; set; }
-        public string? Img { get; set; }
+        public string RoleName { get; set; }
+        public CustomerLoginResponse? CustomerResponse { get; set; }
+        public SalonOwnerLoginResponse? SalonOwnerResponse { get; set; }
     }
 }

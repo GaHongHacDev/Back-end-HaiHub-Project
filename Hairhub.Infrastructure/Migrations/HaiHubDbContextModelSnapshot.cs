@@ -536,6 +536,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("gender");
 
                     b.Property<string>("Img")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
@@ -608,6 +609,18 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("owner_id");
+
+                    b.Property<decimal?>("Rate")
+                        .HasColumnType("decimal(18,1)")
+                        .HasColumnName("rate");
+
+                    b.Property<int>("TotalRating")
+                        .HasColumnType("int")
+                        .HasColumnName("total_rating");
+
+                    b.Property<int>("TotalReviewer")
+                        .HasColumnType("int")
+                        .HasColumnName("total_reviewer");
 
                     b.HasKey("Id");
 

@@ -16,9 +16,9 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<IPaginate<GetAppointmentDetailResponse>> GetAllAppointmentDetail(int page, int size);
         Task<GetAppointmentDetailResponse>? GetAppointmentDetailById(Guid id);
-        Task<CreateAppointmentDetailResponse> CreateAppointmentDetail(CreateAppointmentDetailRequest createAppointmentDetailRequest);
-        Task<CreateAppointmentDetailResponse> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest);
+        Task<bool> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest);
         Task<bool> UpdateAppointmentDetailById(Guid id, UpdateAppointmentDetailRequest updateAppointmentDetailRequest);
         Task<bool> DeleteAppoinmentDetailById(Guid id);
+        Task<List<GetAppointmentDetailResponse>> GetAppointmentDetailByAppointmentId(Guid AppointmentId);
     }
 }

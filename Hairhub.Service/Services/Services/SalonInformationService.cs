@@ -11,6 +11,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Linq;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -54,6 +55,9 @@ namespace Hairhub.Service.Services.Services
             salonInformation.IsActive = false;
             string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             salonInformation.Img = url;
+            salonInformation.Rate = 0;
+            salonInformation.TotalRating = 0;
+            salonInformation.TotalReviewer = 0;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
@@ -69,7 +73,7 @@ namespace Hairhub.Service.Services.Services
                 await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
             }
 
-            bool isInsert = await _unitOfWork.CommitAsync()>0;
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
             if (!isInsert)
             {
                 throw new Exception("Không thể tạo salon");
@@ -93,7 +97,7 @@ namespace Hairhub.Service.Services.Services
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
            .GetPagingListAsync(
-                predicate: x=>x.IsActive==true,
+                predicate: x => x.IsActive == true,
                include: query => query.Include(s => s.SalonOwner),
                page: page,
                size: size
@@ -125,15 +129,15 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetSalonInformationResponse>? GetSalonByOwnerId(Guid ownerId)
         {
-            SalonInformation salonInformation= await _unitOfWork
+            SalonInformation salonInformation = await _unitOfWork
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.OwnerId.Equals(ownerId) && x.IsActive==true,
+                    predicate: x => x.OwnerId == ownerId,
                     include: source => source.Include(s => s.SalonOwner)
                  );
-            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             if (salonInformation == null)
                 throw new NotFoundException($"Not found salon information with owner id {ownerId}");
+            var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             var schedules = await _scheduleService.GetSalonSchedules(salonInformation.Id);
             if (schedules.Any())
             {
@@ -153,6 +157,59 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
+        }
+
+        public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "")
+        {
+            if(serviceName==null && salonAddress==null && salonName == null)
+            {
+                return new Paginate<SearchSalonByNameAddressServiceResponse>()
+                {
+                    Page = page,
+                    Size = size,
+                    Total = 0,
+                    TotalPages = 0,
+                    Items = new List<SearchSalonByNameAddressServiceResponse>(),
+                };
+            }
+            serviceName = serviceName ?? string.Empty;
+            salonAddress = salonAddress ?? string.Empty;
+            salonName = salonName ?? string.Empty;
+
+            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+                                                     .GetListAsync(
+                                                         predicate: x => x.IsActive == true && x.Name.ToLower().Contains(salonName.ToLower()) && x.Address.ToLower().Contains(salonAddress.ToLower()),
+                                                         include: query => query.Include(s => s.SalonOwner)
+                                                     );
+            var listSalon = _mapper.Map<List<SearchSalonByNameAddressServiceResponse>>(salonInformations);
+            var result = new List<SearchSalonByNameAddressServiceResponse>();
+
+            foreach (var salon in listSalon)
+            {
+                var services = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(
+                    predicate: x => x.ServiceName.ToLower().Contains(serviceName.ToLower()) && x.SalonInformationId == salon.Id);
+
+                if (services != null && services.Any())
+                {
+                    // Get Service
+                    salon.Services = _mapper.Map<List<SearchSalonServiceResponse>>(services);
+                    // Get voucher
+                    var vouchers = await _unitOfWork.GetRepository<Voucher>().GetListAsync(predicate: x => x.SalonInformationId == salon.Id);
+                    if (vouchers != null)
+                    {
+                        salon.Vouchers = _mapper.Map<List<SearchSalonVoucherRespnse>>(vouchers);
+                    }
+                    result.Add(salon);
+                }
+            }
+            return new Paginate<SearchSalonByNameAddressServiceResponse>()
+            {
+                Page = page,
+                Size = size,
+                Total = result.Count,
+                TotalPages = (int)Math.Ceiling((double)result.Count / size),
+                Items = result,
+            };
         }
     }
 }
