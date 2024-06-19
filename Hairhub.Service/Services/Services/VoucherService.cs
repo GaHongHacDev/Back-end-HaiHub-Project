@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Voucher;
@@ -121,7 +122,7 @@ namespace Hairhub.Service.Services.Services
         {
             var voucher = await _unitofwork.GetRepository<Voucher>()
           .GetPagingListAsync(
-                predicate: x => x.SalonInformationId.Equals(id),
+                predicate: x => x.SalonInformationId.Equals(id) && (x.IsSystemCreated || x.IsSystemCreated == true),
               include: query => query.Include(s => s.SalonInformation),
               page: page,
               size: size
@@ -138,6 +139,27 @@ namespace Hairhub.Service.Services.Services
             return voucherResponses;
         }
 
+        public async Task<IPaginate<GetVoucherResponse?>> GetVouchersByExpiredDate(Guid salonId, int page, int size)
+        {
+            var now = DateTime.UtcNow;
+            var voucher = await _unitofwork.GetRepository<Voucher>()
+          .GetPagingListAsync(
+              predicate: x => x.SalonInformationId.Equals(salonId) && x.ExpiryDate > now,
+              include: query => query.Include(s => s.SalonInformation),
+              page: page,
+              size: size
+          );
+
+            var voucherResponses = new Paginate<GetVoucherResponse>()
+            {
+                Page = voucher.Page,
+                Size = voucher.Size,
+                Total = voucher.Total,
+                TotalPages = voucher.TotalPages,
+                Items = _mapper.Map<IList<GetVoucherResponse>>(voucher.Items),
+            };
+            return voucherResponses;
+        }
         public async Task<bool> UpdateVoucherAsync(Guid id, UpdateVoucherRequest request)
         {
             

@@ -20,7 +20,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public string Latitude { get; set; }
         public int TotalRating { get; set; }
         public int TotalReviewer { get; set; }
-        public bool IsActive { get; set; }
+        public string Status { get; set; }
 
         public CreateSalonOwnerSalonInformationResponse SalonOwnerResponse { get; set; }
     }

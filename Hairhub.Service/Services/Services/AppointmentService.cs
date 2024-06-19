@@ -721,32 +721,42 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest)
         {
-            var existingVoucher = await _unitOfWork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: e => e.Id == calculatePriceRequest.VoucherId);
-            if (existingVoucher == null)
+
+
+
+            decimal discountPercentage = 0;
+            decimal originalPriceService = 0;
+
+            if (calculatePriceRequest.VoucherId.HasValue)
             {
-                throw new NotFoundException("Voucher Not  Found");
+                var existingVoucher = await _unitOfWork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: e => e.Id == calculatePriceRequest.VoucherId.Value);
+                if (existingVoucher == null)
+                {
+                    throw new NotFoundException("Voucher Not Found");
+                }
+                discountPercentage = existingVoucher.DiscountPercentage / 100;
             }
 
-            decimal discountPercentage = existingVoucher.DiscountPercentage / 100;
             var serviceHairIds = calculatePriceRequest.ServiceHairId;
             var services = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(predicate: s => serviceHairIds.Contains(s.Id));
-            decimal originalPriceService = 0;
 
             foreach (var service in services)
             {
                 var finalPrice = service.Price;
-
                 if (finalPrice > 0)
                 {
                     originalPriceService += finalPrice;
                 }
             }
-            decimal TotalPrice = originalPriceService - (discountPercentage * originalPriceService);
+
+            decimal discountedPrice = discountPercentage * originalPriceService;
+            decimal totalPrice = originalPriceService - discountedPrice;
+
             var response = new GetCalculatePriceResponse
             {
                 OriginalPrice = originalPriceService,
-                DiscountedPrice = discountPercentage * originalPriceService,
-                TotalPrice = TotalPrice,
+                DiscountedPrice = discountedPrice,
+                TotalPrice = totalPrice,
             };
 
             return response;

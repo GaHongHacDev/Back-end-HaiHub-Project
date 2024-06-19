@@ -13,6 +13,7 @@ namespace Hairhub.Domain.Entitities
         public Guid AdminId {  get; set; }
         public string? ReasonReject {  get; set; }
         public DateTime CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
 
         public virtual SalonInformation SalonInformation { get; set; }
         public virtual Admin Admin { get; set; }

@@ -94,6 +94,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_id");
                 entity.Property(e => e.ReasonReject).HasMaxLength(50).HasColumnName("reason_reject");
                 entity.Property(e => e.CreateDate).HasColumnName("create_date");
+                entity.Property(e => e.UpdateDate).HasColumnName("update_date").IsRequired(false);
 
                 entity.HasOne(d => d.Admin)
                     .WithMany(p => p.Approvals)
@@ -254,7 +255,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Latitude).HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.TotalRating).HasColumnName("total_rating");
                 entity.Property(e => e.TotalReviewer).HasColumnName("total_reviewer");
-                entity.Property(e => e.Status).HasColumnName("status");
+                entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
 
                 entity.HasOne(d => d.SalonOwner)
                       .WithMany(p => p.SalonInformations)

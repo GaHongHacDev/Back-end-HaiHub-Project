@@ -154,6 +154,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("SalonInformation not found!");
             }
             salonInformation = _mapper.Map<SalonInformation>(updateSalonInformationRequest);
+            salonInformation.Status = SalonStatus.Edited;
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
