@@ -609,7 +609,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception($"Cannot convert minute {Time}");
             }
-            return (decimal)(Time.Hour + Time.Minute/60);
+            return (decimal)(Time.Hour + Time.Minute/60m);
         }
 
         private async Task<bool> CheckAppointmentBooking(Guid SalonId, DateTime Day, Decimal TimeSlot, bool IsAnyOne)
