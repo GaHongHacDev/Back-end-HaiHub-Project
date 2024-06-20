@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
@@ -48,6 +50,19 @@ namespace Hairhub.Service.Services.Services
             return scheduleResponses;
         }
 
+        public async Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId)
+        {;
+            var schedules = await _unitOfWork.GetRepository<Schedule>()
+            .GetListAsync(
+                predicate: x=>x.SalonId == salonId,
+                include: query => query.Include(s => s.SalonInformation)
+            );
+            if (schedules == null)
+            {
+                throw new NotFoundException($"Không tìm thấy lịch của salon với id {salonId}");
+            }
+            return _mapper.Map<List<GetScheduleResponse>>(schedules);
+        }
 
         public async Task<GetScheduleResponse> GetScheduleById(Guid id)
         {
@@ -66,7 +81,7 @@ namespace Hairhub.Service.Services.Services
             {
                 Id = Guid.NewGuid(),
                 EmployeeId = request.EmployeeId,
-                Date = request.Date,
+                DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
                 IsActive = true,
@@ -74,7 +89,21 @@ namespace Hairhub.Service.Services.Services
             await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
+        }
 
+        public async Task<bool> CreateScheduleEmployee(CreateScheduleRequest request)
+        {
+            Schedule newSchedule = new Schedule()
+            {
+                Id = Guid.NewGuid(),
+                EmployeeId = request.EmployeeId,
+                DayOfWeek = request.DayOfWeek,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                IsActive = request.IsActive,
+            };
+            await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
+            return true;
         }
 
         public async Task<bool> UpdateSchedule(Guid id, UpdateScheduleRequest request)
@@ -84,7 +113,7 @@ namespace Hairhub.Service.Services.Services
 
             if (schedule == null) throw new Exception("Schedule is not exist!!!");
 
-            schedule.Date = request.Date;
+            schedule.DayOfWeek = request.DayOfWeek;
             schedule.StartTime = request.StartTime;
             schedule.EndTime = request.EndTime;
 

@@ -47,27 +47,32 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpGet("GetBySalonInformationId")]
-        public async Task<IActionResult> GetSalonEmployeesBySalonInformationId(Guid salonInformationId)
+        [HttpGet]
+        [Route("{SalonInformationId:Guid}")]
+        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid SalonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var employees = await _salonEmployeeService.GetSalonEmployeesBySalonInformationId(salonInformationId);
-                return Ok(employees);
+                var salonEmployeeResponse = await _salonEmployeeService.GetSalonEmployeeBySalonInformationId(SalonInformationId, page, size);
+                if (salonEmployeeResponse == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy dịch vụ" });
+                }
+                return Ok(salonEmployeeResponse);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSalonEmployee([FromBody] CreateSalonEmployeeRequest createSalonEmployeeRequest)
+        public async Task<IActionResult> CreateSalonEmployee([FromForm] CreateSalonEmployeeRequest createSalonEmployeeRequest)
         {
             try
             {
                 var accoutResponse = await _salonEmployeeService.CreateSalonEmployee(createSalonEmployeeRequest);
-                if (accoutResponse == null)
+                if (!accoutResponse)
                 {
                     return BadRequest("Cannot create SalonEmployee!");
                 }
@@ -76,7 +81,7 @@ namespace Hairhub.API.Controllers
             catch (NotFoundException ex)
             {
 
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -104,7 +109,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -128,7 +133,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {
@@ -152,7 +157,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

@@ -1,5 +1,4 @@
-﻿using Hairhub.Domain.Dtos.Requests.Accounts;
-using Hairhub.Domain.Dtos.Requests.Appointments;
+﻿using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using Hairhub.Domain.Dtos.Responses.Customers;
@@ -14,12 +13,20 @@ namespace Hairhub.Service.Services.IServices
 {
     public interface IAppointmentService
     {
+        //Get
         Task<IPaginate<GetAppointmentResponse>> GetAllAppointment(int page, int size);
         Task<GetAppointmentResponse>? GetAppointmentById(Guid id);
-        Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest createAccountRequest);
+        Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest getAvailableTimeRequest);
+        Task<IPaginate<GetAppointmentByAccountIdResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size);
+        Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId);
+        Task<IPaginate<GetAppointmentResponse>> GetBookingAppointmentByCustomerId(int page, int size, Guid CustomerId);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid SalonId, string? Status);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status);
+        Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
+        Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
+        Task<bool> CreateAppointment(CreateAppointmentRequest request);
         Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest);
         Task<bool> DeleteAppoinmentById(Guid id);
         Task<bool> ActiveAppointment(Guid id);
-        Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest getAvailableTimeRequest);
     }
 }

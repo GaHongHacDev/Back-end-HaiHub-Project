@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
+using Hairhub.Domain.Dtos.Requests.Schedule;
+using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.SalonEmployees;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -15,11 +18,15 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
+        private readonly IScheduleService _scheduleService;
 
-        public SalonEmployeeService(IUnitOfWork unitOfWork, IMapper mapper)
+        public SalonEmployeeService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IScheduleService scheduleService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
+            _scheduleService = scheduleService;
         }
 
         public async Task<bool> ActiveSalonEmployee(Guid id)
@@ -35,17 +42,55 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<CreateSalonEmployeeResponse> CreateSalonEmployee(CreateSalonEmployeeRequest createSalonEmployeeRequest)
+        public async Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest request)
         {
-            var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createSalonEmployeeRequest.SalonInformationId));
-            if (salonInformation == null)
+            //check exist salon
+            var existSalon = await _unitOfWork.GetRepository<SalonInformation>()
+                                        .SingleOrDefaultAsync(predicate: x=>x.Id == request.SalonInformationId);
+            if (existSalon==null)
             {
-                throw new Exception($"salonInformation not found with id: {createSalonEmployeeRequest.SalonInformationId}");
+                throw new NotFoundException($"Not found salon with id {request.SalonInformationId}");
             }
-            var salonEmployee = _mapper.Map<SalonEmployee>(createSalonEmployeeRequest);
-            await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(salonEmployee);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateSalonEmployeeResponse>(salonEmployee);
+            //create employee
+            foreach(var item in request.SalonEmployees)
+            {
+                var employee = _mapper.Map<SalonEmployee>(item);
+                employee.Id = Guid.NewGuid();
+                var url = await _mediaService.UploadAnImage(item.ImgEmployee, MediaPath.EMPLOYEE, employee.Id.ToString());
+                employee.Img = url;
+                employee.SalonInformationId = request.SalonInformationId;
+                await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(employee);
+                if (item.ScheduleEmployees==null || item.ScheduleEmployees.Count==0)
+                {
+                    throw new NotFoundException("Không tìm thấy lịch làm việc của nhân viên");
+                }
+                //create schedule
+                foreach (var itemSchedule in item.ScheduleEmployees)
+                {
+                    var scheduleEmployee = new CreateScheduleRequest() 
+                                                {
+                                                    EmployeeId = employee.Id, 
+                                                    DayOfWeek=itemSchedule.Date, 
+                                                    EndTime= itemSchedule.EndTime, 
+                                                    StartTime = itemSchedule.StartTime,
+                                                    IsActive = itemSchedule.IsActive
+                    };
+                    _scheduleService.CreateScheduleEmployee(scheduleEmployee);
+                }
+                //create Service Employee
+                foreach(var itemServiceHair in item.ServiceHairId)
+                {
+                    ServiceEmployee srvEmployee = new ServiceEmployee();
+                    srvEmployee.Id = Guid.NewGuid();
+                    srvEmployee.ServiceHairId = itemServiceHair;
+                    srvEmployee.SalonEmployeeId = employee.Id;
+                    await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(srvEmployee);
+                }
+            }
+            existSalon.Status = SalonStatus.Pending;
+            _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(existSalon);
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            return isInsert;
         }
 
         public async Task<bool> DeleteSalonEmployeeById(Guid id)
@@ -86,20 +131,36 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonEmployee>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonInformation)
+                    include: x => x.Include(se => se.ServiceEmployees)
+                       .ThenInclude(se => se.ServiceHair).Include(se => se.Schedules)
                  );
             if (salonEmployeeResponse == null)
                 return null;
             return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
         }
 
-        public async Task<IEnumerable<GetSalonEmployeeResponse>> GetSalonEmployeesBySalonInformationId(Guid salonInformationId)
+        public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
         {
-            var employees = await _unitOfWork.GetRepository<SalonEmployee>()
-                .GetListAsync(predicate: e => e.SalonInformationId == salonInformationId,
-                              include: query => query.Include(e => e.SalonInformation));
-
-            return _mapper.Map<IEnumerable<GetSalonEmployeeResponse>>(employees);
+            var salonEmployees = await _unitOfWork.GetRepository<SalonEmployee>()
+                                                  .GetPagingListAsync(
+                                                      predicate: x => x.SalonInformationId.Equals(SalonInformationId),
+                                                      include: query => query.Include(s => s.Schedules)
+                                                                             .Include(s => s.ServiceEmployees)
+                                                                             .ThenInclude(se => se.ServiceHair),
+                                                      page: page,
+                                                      size: size
+                                                  );
+            if (salonEmployees == null)
+                return null;
+            var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()
+            {
+                Page = salonEmployees.Page,
+                Size = salonEmployees.Size,
+                Total = salonEmployees.Total,
+                TotalPages = salonEmployees.TotalPages,
+                Items = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items),
+            };
+            return salonEmployeeResponses;
         }
 
         public async Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest)

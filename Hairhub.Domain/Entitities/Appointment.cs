@@ -11,17 +11,19 @@ namespace Hairhub.Domain.Entitities
     {
         [Key]
         public Guid Id { get; set; }
-        public DateTime? Date { get; set; }
-        public Decimal? TotalPrice { get; set; }
-        public Guid? CustomerId { get; set; }
-        public Decimal? OriginalPrice { get; set; }
-        public Decimal? DiscountedPrice { get; set; }
-        public bool? IsActive { get; set; }
+        public Guid CustomerId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public Decimal TotalPrice { get; set; }
+        public Decimal OriginalPrice { get; set; }
+        public Decimal DiscountedPrice { get; set; }
+        public string Status { get; set; }
 
 
         public virtual Customer Customer { get; set; }
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; }
         public virtual ICollection<AppointmentDetailVoucher> AppointmentDetailVouchers { get; set; }
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
 
     }
 }

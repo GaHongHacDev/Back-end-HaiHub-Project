@@ -158,17 +158,15 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Salon ownerwas not found!");
                 }
-                var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALON_AVATAR, salonOwner.Id.ToString());
+                var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALONOWNER_AVATAR, salonOwner.Id.ToString());
                 salonOwner.AccountId = account.Id;
                 salonOwner.FullName = updateAccountRequest.FullName;
-                salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;
+                salonOwner.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth;
                 salonOwner.Gender = updateAccountRequest.Gender;
                 salonOwner.Email = updateAccountRequest.Email;
                 salonOwner.Phone = updateAccountRequest.Phone;
                 salonOwner.Address = updateAccountRequest.Address;
                 salonOwner.Img = urlImg;
-                salonOwner.BankAccount = updateAccountRequest.BankAccount;
-                salonOwner.BankName = updateAccountRequest.BankName;
                 _unitOfWork.GetRepository<SalonOwner>().UpdateAsync(salonOwner);
                 updateAccountResponse = _mapper.Map<UpdateAccountResponse>(salonOwner);
             }
@@ -182,14 +180,12 @@ namespace Hairhub.Service.Services.Services
                 var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.CUSTOMER_AVATAR, customer.Id.ToString());
                 customer.AccountId = account.Id;
                 customer.FullName = updateAccountRequest.FullName;
-                customer.DayOfBirth = updateAccountRequest.DayOfBirth;
+                customer.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth;
                 customer.Gender = updateAccountRequest.Gender;
                 customer.Email = updateAccountRequest.Email;
                 customer.Phone = updateAccountRequest.Phone;
                 customer.Address = updateAccountRequest.Address;
                 customer.Img = urlImg;
-                customer.BankAccount = updateAccountRequest.BankAccount;
-                customer.BankName = updateAccountRequest.BankName;
                 _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
                 updateAccountResponse = _mapper.Map<UpdateAccountResponse>(customer);
             }

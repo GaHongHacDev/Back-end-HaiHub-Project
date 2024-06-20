@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration.Annotations;
+using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Feedbacks;
 using Hairhub.Domain.Dtos.Responses.Feedbacks;
+using Hairhub.Domain.Dtos.Responses.Payment;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
@@ -19,11 +23,14 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public FeedbackService(IUnitOfWork _unitOfWork, IMapper _mapper)
+        private readonly ISalonInformationService _salonInformationService;
+        private readonly IMediaService _mediaservice;
+        public FeedbackService(IUnitOfWork _unitOfWork, IMapper _mapper, ISalonInformationService salonInformationService, IMediaService mediaservice)
         {
             this._unitOfWork = _unitOfWork;
             this._mapper = _mapper;
+            _salonInformationService = salonInformationService;
+            _mediaservice = mediaservice;
         }
 
         public async Task<IPaginate<GetFeedbackResponse>> GetFeedbacks(int page, int size)
@@ -31,7 +38,7 @@ namespace Hairhub.Service.Services.Services
             var feedbacks = await _unitOfWork.GetRepository<Feedback>()
                 .GetPagingListAsync(
                 predicate: x => x.IsActive == true,
-                include: query => query.Include(s => s.Customer).Include(s => s.AppointmentDetail),
+                include: query => query.Include(s => s.Customer).Include(s => s.Appointment),
                 page: page,
                 size: size);
 
@@ -43,7 +50,6 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = feedbacks.TotalPages,
                 Items = _mapper.Map<IList<GetFeedbackResponse>>(feedbacks.Items),
             };
-
             return feedbackResponses;
         }
 
@@ -52,7 +58,7 @@ namespace Hairhub.Service.Services.Services
             var feedback = await _unitOfWork.GetRepository<Feedback>()
                 .SingleOrDefaultAsync(
                 predicate: predicate => predicate.Id.Equals(id),
-                include: query => query.Include(s => s.Customer).Include(s => s.AppointmentDetail));
+                include: query => query.Include(s => s.Customer).Include(s => s.Appointment));
 
             var feedbackResponse = _mapper.Map<GetFeedbackResponse>(feedback);
 
@@ -61,19 +67,56 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CreateFeedback(CreateFeedbackRequest request)
         {
-            Feedback newFeedback = new Feedback()
+            try
             {
-                Id = Guid.NewGuid(),
-                CustomerId = request.CustomerId,
-                AppointmentDetailId = request.AppointmentDetailId,
-                Rating = request.Rating,
-                Comment = request.Comment,
-                IsActive = true,
-            };
-            await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
-            bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
-            return isSuccessful;
+
+                Feedback newFeedback = new Feedback()
+                {
+                    Id = Guid.NewGuid(),
+                    CustomerId = request.CustomerId,
+                    AppointmentId = request.AppointmentId,
+                    Rating = request.Rating,
+                    Comment = request.Comment,
+                    IsActive = true,
+                };
+                var urlImg = await _mediaservice.UploadAnImage(request.Img, MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString());
+                var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
+                StaticFile staticFile = new StaticFile()
+                {
+                    Id = Guid.NewGuid(),
+                    FeedbackId = newFeedback.Id,
+                    Img = urlImg,
+                    Video = urlVideo,
+                };
+                var existingSalon = await _salonInformationService.GetSalonInformationById(request.SalonId);
+                if (existingSalon == null)
+                {
+                    
+                    return false;
+                }                
+                int totalRating = existingSalon.TotalRating;
+                int totalReview = existingSalon.TotalReviewer + 1;
+                existingSalon.Rate = (int)(totalRating + request.Rating) / totalReview;
+                existingSalon.TotalReviewer = totalReview;
+                existingSalon.TotalRating = (int)(totalRating + request.Rating);
+
+                var salon = _mapper.Map<SalonInformation>(existingSalon);
+
+                _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
+                await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
+                await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+
+                bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
+                return isSuccessful;
+            }
+            catch (Exception ex)
+            {
+                
+                throw new Exception(ex.Message);
+            }
         }
+
+        
         public async Task<bool> UpdateFeedback(Guid id, UpdateFeedbackRequest request)
         {
             var feedback = await _unitOfWork.GetRepository<Feedback>()

@@ -12,9 +12,9 @@ namespace Hairhub.Service.Services.IServices
     public interface ISalonEmployeeService
     {
         Task<IPaginate<GetSalonEmployeeResponse>> GetAllSalonEmployee(int page, int size);
-        Task<GetSalonEmployeeResponse>? GetSalonEmployeeById(Guid id);
-        Task<IEnumerable<GetSalonEmployeeResponse>> GetSalonEmployeesBySalonInformationId(Guid salonInformationId);
-        Task<CreateSalonEmployeeResponse> CreateSalonEmployee(CreateSalonEmployeeRequest createAccountRequest);
+        Task<GetSalonEmployeeResponse> GetSalonEmployeeById(Guid id);
+        Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size);
+        Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest createAccountRequest);
         Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest);
         Task<bool> DeleteSalonEmployeeById(Guid id);
         Task<bool> ActiveSalonEmployee(Guid id);

@@ -6,6 +6,7 @@ using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Hairhub.API.Controllers
 {
@@ -24,7 +25,7 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> GetAllConfig([FromQuery] int page=1, [FromQuery] int size = 10)
         {
 
-            var listconfig = await _configservice.GetAllConfigAsync(page, size);
+            var listconfig = await _configservice.GetConfigAsync(page, size);
             return Ok(listconfig);
         }
         [HttpGet]
@@ -33,12 +34,12 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var Config = await _configservice.GetConfigbyIdAsync(id);
-                if (Config == null)
+                var config = await _configservice.GetConfigbyIdAsync(id);
+                if (config == null)
                 {
-                    return NotFound("Cannont find this config!");
+                    return BadRequest("Cannont find this config!");
                 }
-                return Ok(Config);
+                return Ok(config);
             }
             catch (Exception ex)
             {
@@ -68,16 +69,21 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
+        [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateConfig([FromRoute] Guid id, [FromBody]UpdateConfigRequest request)
         {
             try
             {
-                var result = await _configservice.UpdateConfigAsync(id, request);
-                if (result == null)
+                if(id == null)
                 {
-                    return NotFound("Cannot Update Config");
+                    return BadRequest("Config Id is null or empty");
                 }
-                return Ok(result);
+                bool isUpdate = await _configservice.UpdateConfigAsync(id, request);
+                if (!isUpdate)
+                {
+                    return BadRequest("Cannot update ServiceHair");
+                }
+                return Ok("Update ServiceHair successfully");
             }
             catch (Exception ex)
             {
@@ -85,13 +91,17 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteConfig([FromRoute] Guid id)
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> DeleteConfig([FromRoute]Guid id)
         {
             try
             {
-                await _configservice.DeleteConfigAsync(id);
-                return Ok(new { Message = "Config deleted successfully." });
-
+                var isDelete = await _configservice.DeleteConfigAsync(id);
+                if (!isDelete)
+                {
+                    return BadRequest("Cannot Delete the Config!!");
+                }
+                return Ok("Deleted successfully!");
             }
             catch (Exception ex)
             {
