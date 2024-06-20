@@ -172,7 +172,7 @@ namespace Hairhub.Service.Services.Services
             foreach (var item in appointmentResponse.Items)
             {
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id);
+                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x=>x.Include(x=>x.SalonEmployee).Include(y=>y.ServiceHair));
                 item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
             }
             return appointmentResponse;
