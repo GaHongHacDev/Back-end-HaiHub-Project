@@ -55,7 +55,7 @@ namespace Hairhub.Service.Services.Services
 
             if (approvals == null)
             {
-                throw new NotFoundException($"Không tìm thấy phê duyệt của salon với id {salonId}");
+                throw new NotFoundException($"Salon information with id {salonId} not found");
             }
 
             return _mapper.Map<List<GetApprovalResponse>>(approvals);
