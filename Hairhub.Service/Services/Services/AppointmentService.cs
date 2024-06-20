@@ -48,7 +48,7 @@ namespace Hairhub.Service.Services.Services
                size: size
            );
 
-            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
@@ -56,7 +56,19 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            return scheduleResponses;
+
+            if (appointmentResponse != null && appointmentResponse.Items.Count != 0)
+            {
+                foreach (var item in appointmentResponse.Items)
+                {
+                    List<GetAppointmentDetailResponse> apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
+                    if (apoointmentDetails != null)
+                    {
+                        item.AppoinmentDetails = apoointmentDetails;
+                    }
+                }
+            }
+            return appointmentResponse;
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
