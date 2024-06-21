@@ -31,6 +31,8 @@ using Hairhub.Domain.Dtos.Requests.Payment;
 using SalonOwner = Hairhub.Domain.Entitities.SalonOwner;
 using Config = Hairhub.Domain.Entitities.Config;
 using Hairhub.Domain.Dtos.Responses.Authentication;
+using Hairhub.Domain.Dtos.Requests.Approval;
+using Hairhub.Domain.Dtos.Responses.Approval;
 
 namespace Hairhub.Service.Helpers
 {
@@ -152,6 +154,16 @@ namespace Hairhub.Service.Helpers
             CreateMap<ResponsePayment, Payment>().ReverseMap();
             CreateMap<Payment, SavePaymentInfor>().ReverseMap();
             CreateMap<SavePaymentInfor, Payment>().ReverseMap();
+
+            //Approval
+            CreateMap<CreateApprovalRequest, Approval>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => DateTime.UtcNow));
+
+            CreateMap<UpdateApprovalRequest, Approval>()
+                .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate ?? DateTime.UtcNow));
+
+            CreateMap<Approval, GetApprovalResponse>();
 
         }
     }
