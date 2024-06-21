@@ -43,7 +43,10 @@ namespace Hairhub.Service.Services.Services
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
            .GetPagingListAsync(
-               include: query => query.Include(s => s.Customer),
+              include: query => query.Include(a => a.Customer)
+                                    .Include(a => a.AppointmentDetails)
+                                        .ThenInclude(ad => ad.SalonEmployee)
+                                            .ThenInclude(se => se.SalonInformation),
                page: page,
                size: size
            );
@@ -61,11 +64,9 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    List<GetAppointmentDetailResponse> apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
-                    if (apoointmentDetails != null)
-                    {
-                        item.AppoinmentDetails = apoointmentDetails;
-                    }
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 }
             }
             return appointmentResponse;
@@ -78,10 +79,14 @@ namespace Hairhub.Service.Services.Services
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
                                                               || x.Status.Equals(AppointmentStatus.CancelByCustomer)
                                                               || x.Status.Equals(AppointmentStatus.CancelBySalon)),
-                                                   include: query => query.Include(s => s.Customer),
+                                                   include: query => query.Include(a => a.Customer)
+                                                                           .Include(a => a.AppointmentDetails)
+                                                                                .ThenInclude(ad => ad.SalonEmployee)
+                                                                                    .ThenInclude(se => se.SalonInformation),
                                                    page: page,
                                                    size: size
                                                );
+            
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
@@ -94,11 +99,9 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
-                    if (apoointmentDetails != null)
-                    {
-                        item.AppoinmentDetails = apoointmentDetails;
-                    }
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 }
             }
             return appointmentResponse;
@@ -109,7 +112,10 @@ namespace Hairhub.Service.Services.Services
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && x.Status.Equals(AppointmentStatus.Booking),
-                                                   include: query => query.Include(s => s.Customer),
+                                                   include: query => query.Include(a => a.Customer)
+                                                                           .Include(a => a.AppointmentDetails)
+                                                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                                                   .ThenInclude(se => se.SalonInformation),
                                                    page: page,
                                                    size: size
                                                );
@@ -125,11 +131,9 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    List<GetAppointmentDetailResponse> apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
-                    if (apoointmentDetails != null)
-                    {
-                        item.AppoinmentDetails = apoointmentDetails;
-                    }
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 }
             }
             return appointmentResponse;
@@ -137,18 +141,25 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetAppointmentResponse>? GetAppointmentById(Guid id)
         {
-            Appointment appointmentResponse = await _unitOfWork
+            Appointment appointment = await _unitOfWork
                 .GetRepository<Appointment>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(a => a.Customer)
+                    include: query => query.Include(a => a.Customer)
+                                            .Include(a => a.AppointmentDetails)
+                                                .ThenInclude(ad => ad.SalonEmployee)
+                                                    .ThenInclude(se => se.SalonInformation)
                  );
-            if (appointmentResponse == null)
+            if (appointment == null)
                 return null;
-            return _mapper.Map<GetAppointmentResponse>(appointmentResponse);
+            var appointmentResponse = _mapper.Map<GetAppointmentResponse>(appointment);
+                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                    .GetListAsync(predicate: x => x.AppointmentId == appointmentResponse.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+            appointmentResponse.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
+            return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentByAccountIdResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size)
         {
             var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == AccountId);
             if (customer == null)
@@ -156,18 +167,22 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Not found customer with id {AccountId}");
             }
             var appointments = await _unitOfWork.GetRepository<Appointment>()
-           .GetPagingListAsync(
-               page: page,
-               size: size
-           );
-
-            var appointmentResponse = new Paginate<GetAppointmentByAccountIdResponse>()
+                .GetPagingListAsync(
+                    predicate: x => x.CustomerId == customer.Id,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    page: page,
+                    size: size
+                );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
                 Total = appointments.Total,
                 TotalPages = appointments.TotalPages,
-                Items = _mapper.Map<IList<GetAppointmentByAccountIdResponse>>(appointments.Items),
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
             foreach (var item in appointmentResponse.Items)
             {
@@ -189,7 +204,9 @@ namespace Hairhub.Service.Services.Services
                 .GetPagingListAsync(
                     predicate: predicate,
                     include: query => query.Include(a => a.Customer)
-                                           .Include(a => a.AppointmentDetails),
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
                     page: page,
                     size: size
                 );
@@ -205,11 +222,9 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
-                    if (apoointmentDetails != null)
-                    {
-                        item.AppoinmentDetails = apoointmentDetails;
-                    }
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 }
             }
             return appointmentResponse;
@@ -218,7 +233,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status)
         {
-            // Tạo biểu thức điều kiện ban đầu cho SalonId
+            // Tạo biểu thức điều kiện ban đầu cho employeeId
             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.Id == EmployeeId));
             if (!string.IsNullOrEmpty(Status))
             {
@@ -226,12 +241,15 @@ namespace Hairhub.Service.Services.Services
             }
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                   .GetPagingListAsync(
-                      predicate: predicate,
-                      include: query => query.Include(a => a.Customer)
-                                             .Include(a => a.AppointmentDetails)
-                                                 .ThenInclude(ad => ad.SalonEmployee),
-                      page: page,
-                      size: size
+                        predicate: predicate,
+                        include: query => query.Include(a => a.Customer)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.ServiceHair),
+                        page: page,
+                        size: size
                   );
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {

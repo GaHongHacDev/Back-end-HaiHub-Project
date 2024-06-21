@@ -56,7 +56,7 @@ namespace Hairhub.Service.Helpers
 
             //Customer
             CreateMap<GetCustomerResponse, Customer>().ReverseMap();
-            CreateMap<Customer, CustomerResponse>().ReverseMap();
+            CreateMap<CustomerAppointment, Customer>().ReverseMap();
 
             //Schedule
             CreateMap<Schedule, GetScheduleResponse>().ReverseMap(); 
@@ -74,11 +74,11 @@ namespace Hairhub.Service.Helpers
             CreateMap<Appointment, AppointmentResponseA>().ReverseMap();
 
             //Appointment
-            CreateMap<GetAppointmentResponse, Appointment>().ReverseMap();
             CreateMap<CreateAppointmentRequest, Appointment>().ReverseMap();
             CreateMap<CreateAppointmentResponse, Appointment>().ReverseMap();
-            CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap(); 
-            CreateMap<GetAppointmentByAccountIdResponse, Appointment>().ReverseMap();
+            CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap();
+            CreateMap<Appointment, GetAppointmentResponse>()
+                .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation));
 
             //SalonOwner
             CreateMap<GetSalonOwnerResponse, SalonOwner>().ReverseMap();
@@ -110,6 +110,7 @@ namespace Hairhub.Service.Helpers
                        .ForMember(dest => dest.Vouchers, opt => opt.Ignore());
             CreateMap<SearchSalonServiceResponse, ServiceHair>().ReverseMap();
             CreateMap<SearchSalonVoucherRespnse, Voucher>().ReverseMap();
+            CreateMap<AppointmentSalon, SalonInformation>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();
