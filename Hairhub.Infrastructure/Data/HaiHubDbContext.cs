@@ -459,7 +459,7 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.ConfigId).HasColumnName("config_id");
+                entity.Property(e => e.ConfigId).HasColumnName("config_id").IsRequired(false); ;
                 entity.Property(e => e.SalonOWnerID).HasColumnName("salon_owner_id");
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)").HasColumnName("total_amount");
                 entity.Property(e => e.PaymentDate).HasColumnName("payment_date");

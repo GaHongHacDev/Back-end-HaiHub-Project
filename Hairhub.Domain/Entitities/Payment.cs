@@ -11,7 +11,7 @@ namespace Hairhub.Domain.Entitities
     public class Payment
     {
         public Guid Id { get; set; }
-        public Guid ConfigId { get; set; }
+        public Guid? ConfigId { get; set; }
         public Guid SalonOWnerID { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime PaymentDate { get; set; }
