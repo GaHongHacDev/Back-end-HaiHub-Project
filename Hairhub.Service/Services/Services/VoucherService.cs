@@ -172,7 +172,7 @@ namespace Hairhub.Service.Services.Services
             }
 
             existVoucher = _mapper.Map<Voucher>(request);
-
+            existVoucher.Id = id;
             _unitofwork.GetRepository<Voucher>().UpdateAsync(existVoucher);
             bool isUpdate = await _unitofwork.CommitAsync()>0;
             return isUpdate;
