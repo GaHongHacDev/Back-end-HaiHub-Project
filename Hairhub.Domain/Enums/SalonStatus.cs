@@ -14,5 +14,6 @@ namespace Hairhub.Domain.Enums
         public static string Edited = "EDITED";
         public static string Unavailable = "UNAVAILABLE";
         public static string Creating = "CREATING";
+        public static string Disabled = "DISABLED";
     }
 }

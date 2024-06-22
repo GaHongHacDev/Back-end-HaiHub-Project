@@ -432,6 +432,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_date");
+
                     b.Property<string>("MethodBanking")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -448,6 +452,10 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<Guid>("SalonOWnerID")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_owner_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
 
                     b.Property<string>("Status")
                         .IsRequired()

@@ -467,6 +467,8 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
                 entity.Property(e => e.PaymentCode).HasColumnName("payment_code");
+                entity.Property(e => e.StartDate).HasColumnName("start_date");
+                entity.Property(e => e.EndDate).HasColumnName("end_date");
 
                 entity.HasOne(d => d.SalonOwner)
                       .WithMany(p => p.Payments)

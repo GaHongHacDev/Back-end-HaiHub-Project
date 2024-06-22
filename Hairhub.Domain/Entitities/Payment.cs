@@ -19,6 +19,8 @@ namespace Hairhub.Domain.Entitities
         public string? Description { get; set; }
         public string Status { get; set; }
         public int PaymentCode { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         // Navigation properties
         public virtual SalonOwner SalonOwner { get; set; }
