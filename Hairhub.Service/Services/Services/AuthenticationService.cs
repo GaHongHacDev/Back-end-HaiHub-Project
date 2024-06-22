@@ -43,7 +43,8 @@ namespace Hairhub.Service.Services.Services
             }
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
-            if(salonOwner==null && customer == null)
+            Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+            if (salonOwner==null && customer == null && admin==null)
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
@@ -68,8 +69,9 @@ namespace Hairhub.Service.Services.Services
                         {
                             AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id,  RoleName = account.Role?.RoleName,
                             CustomerResponse = customer!=null?_mapper.Map<CustomerLoginResponse>(customer):null, 
-                            SalonOwnerResponse = salonOwner!=null?_mapper.Map<SalonOwnerLoginResponse>(salonOwner):null
-                        };
+                            SalonOwnerResponse = salonOwner!=null?_mapper.Map<SalonOwnerLoginResponse>(salonOwner):null,
+                            AdminResponse = admin!=null?_mapper.Map<AdminLoginResponse>(admin): null
+            };
         }
 
         public async Task<FetchUserResponse> FetchUser(string accessToken)
@@ -85,7 +87,8 @@ namespace Hairhub.Service.Services.Services
             var account = refreshTokenEntity.Account;
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            if (salonOwner == null && customer == null)
+            Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            if (salonOwner == null && customer == null && admin==null)
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
@@ -94,7 +97,8 @@ namespace Hairhub.Service.Services.Services
                 AccountId = account.Id,
                 RoleName = account.Role?.RoleName,
                 CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
-                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null
+                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
+                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null
             };
         }
 

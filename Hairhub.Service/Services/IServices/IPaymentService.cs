@@ -22,5 +22,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IPaginate<ResponsePayment>> GetPayments(int page, int size);
 
+
+        Task<ResponsePayment> CreateFirstTimePayment(Guid salonownerid);
+
     }
 }

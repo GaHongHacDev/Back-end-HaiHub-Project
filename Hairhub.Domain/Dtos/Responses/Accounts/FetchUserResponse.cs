@@ -13,5 +13,6 @@ namespace Hairhub.Domain.Dtos.Responses.Accounts
         public string RoleName { get; set; }
         public CustomerLoginResponse? CustomerResponse { get; set; }
         public SalonOwnerLoginResponse? SalonOwnerResponse { get; set; }
+        public AdminLoginResponse? AdminResponse { get; set; }
     }
 }

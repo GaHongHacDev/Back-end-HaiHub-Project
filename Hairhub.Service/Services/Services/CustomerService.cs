@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -26,9 +27,11 @@ namespace Hairhub.Service.Services.Services
         public async Task<IPaginate<GetCustomerResponse>> GetCustomers(int page, int size)
         {
             var customerEntities = await _unitOfWork.GetRepository<Customer>()
-            .GetPagingListAsync(
-                page: page,
-                size: size);
+           .GetPagingListAsync(
+               include: query => query.Include(s => s.Account),
+               page: page,
+               size: size
+           );
 
             var paginateResponse = new Paginate<GetCustomerResponse>
             {
@@ -49,7 +52,7 @@ namespace Hairhub.Service.Services.Services
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id)
                  );
-            if (customerEntity == null) 
+            if (customerEntity == null)
                 return null;
 
             return _mapper.Map<GetCustomerResponse>(customerEntity);

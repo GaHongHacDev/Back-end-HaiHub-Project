@@ -37,7 +37,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("SalonInformation not found!");
             }
-            salonInformation.IsActive = true;
+            salonInformation.Status = SalonStatus.Approved;
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
@@ -52,7 +52,7 @@ namespace Hairhub.Service.Services.Services
             }
             var salonInformation = _mapper.Map<SalonInformation>(createSalonInformationRequest);
             salonInformation.Id = Guid.NewGuid();
-            salonInformation.IsActive = false;
+            salonInformation.Status = SalonStatus.Creating;
             string url = await _mediaService.UploadAnImage(createSalonInformationRequest.Img, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             salonInformation.Img = url;
             salonInformation.Rate = 0;
@@ -97,7 +97,7 @@ namespace Hairhub.Service.Services.Services
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
            .GetPagingListAsync(
-                predicate: x => x.IsActive == true,
+                predicate: x => x.Status.Equals(SalonStatus.Approved),
                include: query => query.Include(s => s.SalonOwner),
                page: page,
                size: size
@@ -120,7 +120,7 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonOwner)
+                    include: source => source.Include(s => s.SalonOwner).Include(x=>x.Schedules)
                  );
             if (salonInformationResponse == null)
                 return null;
@@ -154,6 +154,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("SalonInformation not found!");
             }
             salonInformation = _mapper.Map<SalonInformation>(updateSalonInformationRequest);
+            salonInformation.Status = SalonStatus.Edited;
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
@@ -178,7 +179,7 @@ namespace Hairhub.Service.Services.Services
 
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
                                                      .GetListAsync(
-                                                         predicate: x => x.IsActive == true && x.Name.ToLower().Contains(salonName.ToLower()) && x.Address.ToLower().Contains(salonAddress.ToLower()),
+                                                         predicate: x => x.Status.Equals(SalonStatus.Approved) && x.Name.ToLower().Contains(salonName.ToLower()) && x.Address.ToLower().Contains(salonAddress.ToLower()),
                                                          include: query => query.Include(s => s.SalonOwner)
                                                      );
             var listSalon = _mapper.Map<List<SearchSalonByNameAddressServiceResponse>>(salonInformations);

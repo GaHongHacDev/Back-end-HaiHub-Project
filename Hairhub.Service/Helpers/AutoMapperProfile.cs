@@ -31,6 +31,8 @@ using Hairhub.Domain.Dtos.Requests.Payment;
 using SalonOwner = Hairhub.Domain.Entitities.SalonOwner;
 using Config = Hairhub.Domain.Entitities.Config;
 using Hairhub.Domain.Dtos.Responses.Authentication;
+using Hairhub.Domain.Dtos.Requests.Approval;
+using Hairhub.Domain.Dtos.Responses.Approval;
 
 namespace Hairhub.Service.Helpers
 {
@@ -38,6 +40,9 @@ namespace Hairhub.Service.Helpers
     {
         public AutoMapperProfile()
         {
+            //Admin 
+            CreateMap<AdminLoginResponse, Admin>().ReverseMap();
+
             //Account
             CreateMap<CreateAccountRequest, Customer>().ReverseMap();
             CreateMap<CreateAccountRequest, SalonOwner>().ReverseMap();
@@ -56,7 +61,7 @@ namespace Hairhub.Service.Helpers
 
             //Customer
             CreateMap<GetCustomerResponse, Customer>().ReverseMap();
-            CreateMap<Customer, CustomerResponse>().ReverseMap();
+            CreateMap<CustomerAppointment, Customer>().ReverseMap();
 
             //Schedule
             CreateMap<Schedule, GetScheduleResponse>().ReverseMap(); 
@@ -74,19 +79,18 @@ namespace Hairhub.Service.Helpers
             CreateMap<Appointment, AppointmentResponseA>().ReverseMap();
 
             //Appointment
-            CreateMap<GetAppointmentResponse, Appointment>().ReverseMap();
             CreateMap<CreateAppointmentRequest, Appointment>().ReverseMap();
             CreateMap<CreateAppointmentResponse, Appointment>().ReverseMap();
-            CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap(); 
-            CreateMap<AppointmentDetailRequest, AppointmentDetail>().ReverseMap();
-            CreateMap<GetAppointmentByAccountIdResponse, Appointment>().ReverseMap();
+            CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap();
+            CreateMap<Appointment, GetAppointmentResponse>()
+                .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation));
 
             //SalonOwner
             CreateMap<GetSalonOwnerResponse, SalonOwner>().ReverseMap();
             CreateMap<CreateSalonOwnerRequest, SalonOwner>().ReverseMap();
             CreateMap<CreateSalonOwnerResponse, SalonOwner>().ReverseMap();
             CreateMap<UpdateSalonOwnerRequest, SalonOwner>().ReverseMap();
-            CreateMap<Account, AccountSalonOwnerResponse> ().ReverseMap();
+            CreateMap<Account, AccountResponse> ().ReverseMap();
 
             //SalonEmployee
             CreateMap<SalonEmployee, GetSalonEmployeeResponse>()
@@ -111,12 +115,14 @@ namespace Hairhub.Service.Helpers
                        .ForMember(dest => dest.Vouchers, opt => opt.Ignore());
             CreateMap<SearchSalonServiceResponse, ServiceHair>().ReverseMap();
             CreateMap<SearchSalonVoucherRespnse, Voucher>().ReverseMap();
+            CreateMap<AppointmentSalon, SalonInformation>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();
             CreateMap<CreateServiceHairRequest, ServiceHair>().ReverseMap();
             CreateMap<CreateServiceHairResponse, ServiceHair>().ReverseMap();
             CreateMap<UpdateServiceHairRequest, ServiceHair>().ReverseMap();
+            CreateMap<ServiceHairAvalibale, ServiceHair>().ReverseMap();
 
             //OTP
             CreateMap<SendOtpEmailRequest, OTP>().ReverseMap();
@@ -151,6 +157,16 @@ namespace Hairhub.Service.Helpers
             CreateMap<ResponsePayment, Payment>().ReverseMap();
             CreateMap<Payment, SavePaymentInfor>().ReverseMap();
             CreateMap<SavePaymentInfor, Payment>().ReverseMap();
+
+            //Approval
+            CreateMap<CreateApprovalRequest, Approval>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => DateTime.UtcNow));
+
+            CreateMap<UpdateApprovalRequest, Approval>()
+                .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate ?? DateTime.UtcNow));
+
+            CreateMap<Approval, GetApprovalResponse>();
 
         }
     }

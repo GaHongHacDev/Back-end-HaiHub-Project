@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Hairhub.Domain.Entitities;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +16,7 @@ namespace Hairhub.Domain.Dtos.Responses.Authentication
         public string RoleName { get; set; }
         public CustomerLoginResponse? CustomerResponse {  get; set; }
         public SalonOwnerLoginResponse? SalonOwnerResponse {  get; set; }
+        public AdminLoginResponse? AdminResponse {  get; set; }
     }
 
     public class CustomerLoginResponse
@@ -39,5 +42,14 @@ namespace Hairhub.Domain.Dtos.Responses.Authentication
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public string? Img { get; set; }
+    }
+
+    public class AdminLoginResponse
+    {
+        public Guid Id { get; set; }
+        public Guid AccountId { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string img { get; set; }
     }
 }

@@ -56,7 +56,7 @@ namespace Hairhub.API.Controllers
                 var salonEmployeeResponse = await _salonEmployeeService.GetSalonEmployeeBySalonInformationId(SalonInformationId, page, size);
                 if (salonEmployeeResponse == null)
                 {
-                    return NotFound("Cannot find ServiceHair by this SalonInformationId!");
+                    return NotFound(new { message = "Không tìm thấy dịch vụ" });
                 }
                 return Ok(salonEmployeeResponse);
             }
@@ -81,7 +81,7 @@ namespace Hairhub.API.Controllers
             catch (NotFoundException ex)
             {
 
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {
@@ -157,7 +157,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

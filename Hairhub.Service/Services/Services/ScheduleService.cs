@@ -100,7 +100,7 @@ namespace Hairhub.Service.Services.Services
                 DayOfWeek = request.DayOfWeek,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
-                IsActive = true,
+                IsActive = request.IsActive,
             };
             await _unitOfWork.GetRepository<Schedule>().InsertAsync(newSchedule);
             return true;

@@ -77,23 +77,32 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest)
         {
-            var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.SalonEmployeeId));
+            var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == createAppointmentDetailRequest.SalonEmployeeId);
             if (salonEmployee == null)
             {
-                throw new Exception("Không tìm thấy nhân viên salon, barber shop");
+                throw new NotFoundException("Không tìm thấy nhân viên salon, barber shop");
             }
-            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id.Equals(createAppointmentDetailRequest.ServiceHairId));
+            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id == createAppointmentDetailRequest.ServiceHairId);
             if (serviceHair == null)
             {
-                throw new Exception("Không tìm thấy dịch vụ cắt tóc");
+                throw new NotFoundException("Không tìm thấy dịch vụ cắt tóc");
             }
 
-            var appointmentDetail = _mapper.Map<AppointmentDetail>(createAppointmentDetailRequest);
-            appointmentDetail.Id = Guid.NewGuid();
-            appointmentDetail.AppointmentId = appointmentId;
+            var appointmentDetail = new AppointmentDetail()
+            {
+                Id = Guid.NewGuid(),
+                AppointmentId = appointmentId,
+                Status = AppointmentStatus.Booking,
+                Description = createAppointmentDetailRequest.Description,
+                EndTime = createAppointmentDetailRequest.EndTime,
+                StartTime = createAppointmentDetailRequest.StartTime,
+                ServiceHairId = createAppointmentDetailRequest.ServiceHairId,
+                SalonEmployeeId = createAppointmentDetailRequest.SalonEmployeeId,
+            };
             await _unitOfWork.GetRepository<AppointmentDetail>().InsertAsync(appointmentDetail);
             return true;
         }
+
         #endregion
 
         #region UpdateAppointmentById

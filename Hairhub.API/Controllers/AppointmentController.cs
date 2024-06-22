@@ -37,7 +37,7 @@ namespace Hairhub.API.Controllers
                 var appointmentResponse = await _appointmentService.GetAppointmentById(id);
                 if (appointmentResponse == null)
                 {
-                    return NotFound("Cannot find this appointment!");
+                    return NotFound(new { message = "Cannot find this appointment!" });
                 }
                 return Ok(appointmentResponse);
             }
@@ -56,7 +56,44 @@ namespace Hairhub.API.Controllers
                 var appointmentResponse = await _appointmentService.GetHistoryAppointmentByCustomerId(page, size,customerId);
                 if (appointmentResponse == null)
                 {
-                    return NotFound("Cannot find this appointment!");
+                    return NotFound(new { message = "Cannot find this appointment!" });
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status ,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status);
+                if (appointmentResponse == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{employeeId:Guid}")]
+        public async Task<IActionResult> GetAppointmentEmployeeByStatus([FromRoute] Guid employeeId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetAppointmentEmployeeByStatus(page, size, employeeId, status);
+                if (appointmentResponse == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
                 }
                 return Ok(appointmentResponse);
             }
@@ -68,14 +105,14 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{customerId:Guid}")]
-        public async Task<IActionResult> GetBookingAppointment([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetBookingAppointmentCustomer([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetBookingAppointment(page, size, customerId);
+                var appointmentResponse = await _appointmentService.GetBookingAppointmentByCustomerId(page, size, customerId);
                 if (appointmentResponse == null)
                 {
-                    return NotFound("Không tìm thấy đơn đặt lịch");
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
                 }
                 return Ok(appointmentResponse);
             }
@@ -91,16 +128,15 @@ namespace Hairhub.API.Controllers
             try
             {
                 var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
-                if (accoutResponse == null)
+                if (accoutResponse == false)
                 {
-                    return BadRequest("Không thể tạo lịch hẹn");
+                    return NotFound(new { message = "Không thể tạo lịch hẹn" });
                 }
-                //return Ok(accoutResponse);
-                return CreatedAtAction(nameof(GetAppointmentById), new { id = accoutResponse.Id }, accoutResponse);
+                return Ok("Tạo lịch hẹn thành công");
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -114,21 +150,16 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if (id == null)
-                {
-                    return BadRequest("Apointment Id is null or empty!");
-                }
-
                 bool isUpdate = await _appointmentService.UpdateAppointmentById(id, updateAppointmentRequest);
                 if (!isUpdate)
                 {
-                    return BadRequest("Cannot update appointment");
+                    return BadRequest(new {message = "Không thể cập nhật đơn đặt lịch"});
                 }
-                return Ok("Update appointment successfully");
+                return Ok("Cập nhật đơn đặt lịch thành công");
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -152,7 +183,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {
@@ -176,7 +207,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -195,7 +226,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -210,9 +241,12 @@ namespace Hairhub.API.Controllers
                 var appointmentResponse = await _appointmentService.GetAvailableTime(getAvailableTimeRequest);
                 if (appointmentResponse == null)
                 {
-                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                    return NotFound(new { message = "Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này" });
                 }
                 return Ok(appointmentResponse);
+            }catch(NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -228,7 +262,7 @@ namespace Hairhub.API.Controllers
                 var result = await _appointmentService.CalculatePrice(request);
                 if (result == null)
                 {
-                    return NotFound("Không thể tìm thấy voucher này");
+                    return NotFound(new { message = "Không thể tìm thấy voucher này" });
                 }
                 return Ok(result);
             }
@@ -246,9 +280,13 @@ namespace Hairhub.API.Controllers
                 var bookingResponse = await _appointmentService.BookAppointment(bookAppointmentRequest);
                 if (bookingResponse == null)
                 {
-                    return NotFound("Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này");
+                    return NotFound(new { message = "Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này" });
                 }
                 return Ok(bookingResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

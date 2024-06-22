@@ -25,16 +25,14 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
             //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
-
-
         }
 
         // DBSet<>
         public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }
         public virtual DbSet<SalonOwner> salonowners { get; set; }
@@ -47,7 +45,6 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<Feedback> feedbacks { get; set; }
         public virtual DbSet<ServiceHair> services { get; set; }
         public virtual DbSet<Voucher> vouchers { get; set; }
-        public virtual DbSet<Admin> admins { get; set; }
         public virtual DbSet<Payment> payments { get; set; }
         public virtual DbSet<Config> configs { get; set; }
         public virtual DbSet<ServiceEmployee> ServiceEmployees { get; set; }
@@ -85,6 +82,49 @@ namespace Hairhub.Infrastructure
                     .HasForeignKey(d => d.RoleId)
                      .OnDelete(DeleteBehavior.ClientSetNull)
                      .HasConstraintName("FK_role_acount");
+            });
+
+            modelBuilder.Entity<Approval>(entity =>
+            {
+                entity.ToTable("approval");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.AdminId).HasColumnName("admin_id");
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_id");
+                entity.Property(e => e.ReasonReject).HasMaxLength(50).HasColumnName("reason_reject");
+                entity.Property(e => e.CreateDate).HasColumnName("create_date");
+                entity.Property(e => e.UpdateDate).HasColumnName("update_date").IsRequired(false);
+
+                entity.HasOne(d => d.Admin)
+                    .WithMany(p => p.Approvals)
+                    .HasForeignKey(d => d.AdminId)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_approval_admin");
+
+                entity.HasOne(d => d.SalonInformation)
+                     .WithMany(p => p.Approvals)
+                     .HasForeignKey(d => d.SalonInformationId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_approval_salon_information");
+            });
+
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.ToTable("admin");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.AccountId).HasColumnName("account_id");
+                entity.Property(e => e.FullName).HasColumnName("full_name");
+                entity.Property(e => e.Email).HasMaxLength(50).HasColumnName("email");
+                entity.Property(e => e.img).HasColumnName("img");
+
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.Admins)
+                    .HasForeignKey(d => d.AccountId)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_admin_account");
             });
 
             modelBuilder.Entity<RefreshTokenAccount>(entity =>
@@ -215,7 +255,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Latitude).HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.TotalRating).HasColumnName("total_rating");
                 entity.Property(e => e.TotalReviewer).HasColumnName("total_reviewer");
-                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
 
                 entity.HasOne(d => d.SalonOwner)
                       .WithMany(p => p.SalonInformations)
@@ -413,29 +453,6 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
-            modelBuilder.Entity<Admin>(entity =>
-            {
-                entity.ToTable("admin");
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.AccountId).HasColumnName("account_id");
-                entity.Property(e => e.FullName).HasMaxLength(100).HasColumnName("full_name");
-                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender").IsRequired(false);
-                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth").IsRequired(false);
-                entity.Property(e => e.Email).HasMaxLength(150).HasColumnName("email");
-                entity.Property(e => e.Phone).HasMaxLength(15).HasColumnName("phone");
-                entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address").IsRequired(false);
-                entity.Property(e => e.BankAccount).HasMaxLength(100).HasColumnName("bank_account");
-                entity.Property(e => e.BankName).HasMaxLength(100).HasColumnName("bank_name");
-
-                entity.HasOne(d => d.Account)
-                  .WithMany(p => p.Admins)
-                  .HasForeignKey(d => d.AccountId)
-                  .OnDelete(DeleteBehavior.ClientSetNull)
-                  .HasConstraintName("FK_account_admin");
-            });
-
             modelBuilder.Entity<Payment>(entity =>
             {
                 entity.ToTable("payment");
@@ -450,6 +467,8 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
                 entity.Property(e => e.PaymentCode).HasColumnName("payment_code");
+                entity.Property(e => e.StartDate).HasColumnName("start_date");
+                entity.Property(e => e.EndDate).HasColumnName("end_date");
 
                 entity.HasOne(d => d.SalonOwner)
                       .WithMany(p => p.Payments)

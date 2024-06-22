@@ -8,8 +8,7 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
 {
     public class UpdateAppointmentRequest
     {
-        public DateTime? Date { get; set; }
-        public Decimal? TotalPrice { get; set; }
-        public bool? IsActive { get; set; }
+        public Guid CustomerId { get; set; }
+        public string Status { get; set; }
     }
 }

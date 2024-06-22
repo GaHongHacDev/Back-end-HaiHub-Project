@@ -12,6 +12,7 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -42,12 +43,15 @@ namespace Hairhub.Service.Services.Services
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
            .GetPagingListAsync(
-               include: query => query.Include(s => s.Customer),
+              include: query => query.Include(a => a.Customer)
+                                    .Include(a => a.AppointmentDetails)
+                                        .ThenInclude(ad => ad.SalonEmployee)
+                                            .ThenInclude(se => se.SalonInformation),
                page: page,
                size: size
            );
 
-            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
@@ -55,7 +59,17 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            return scheduleResponses;
+
+            if (appointmentResponse != null && appointmentResponse.Items.Count != 0)
+            {
+                foreach (var item in appointmentResponse.Items)
+                {
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
+                }
+            }
+            return appointmentResponse;
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
@@ -65,11 +79,15 @@ namespace Hairhub.Service.Services.Services
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
                                                               || x.Status.Equals(AppointmentStatus.CancelByCustomer)
                                                               || x.Status.Equals(AppointmentStatus.CancelBySalon)),
-                                                   include: query => query.Include(s => s.Customer),
+                                                   include: query => query.Include(a => a.Customer)
+                                                                           .Include(a => a.AppointmentDetails)
+                                                                                .ThenInclude(ad => ad.SalonEmployee)
+                                                                                    .ThenInclude(se => se.SalonInformation),
                                                    page: page,
                                                    size: size
                                                );
-            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
@@ -77,30 +95,31 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointments != null)
+            if (appointmentResponse != null && appointmentResponse.Items.Count>0)
             {
-                foreach (var item in appointments.Items)
+                foreach (var item in appointmentResponse.Items)
                 {
-                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
-                    if (apoointmentDetails != null)
-                    {
-                        item.AppointmentDetails = (ICollection<AppointmentDetail>)apoointmentDetails;
-                    }
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 }
             }
-            return scheduleResponses;
+            return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetBookingAppointment(int page, int size, Guid CustomerId)
+        public async Task<IPaginate<GetAppointmentResponse>> GetBookingAppointmentByCustomerId(int page, int size, Guid CustomerId)
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && x.Status.Equals(AppointmentStatus.Booking),
-                                                   include: query => query.Include(s => s.Customer),
+                                                   include: query => query.Include(a => a.Customer)
+                                                                           .Include(a => a.AppointmentDetails)
+                                                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                                                   .ThenInclude(se => se.SalonInformation),
                                                    page: page,
                                                    size: size
                                                );
-            var scheduleResponses = new Paginate<GetAppointmentResponse>()
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
@@ -108,34 +127,39 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointments != null)
+            if (appointmentResponse != null && appointmentResponse.Items.Count!=0)
             {
-                foreach (var item in appointments.Items)
+                foreach (var item in appointmentResponse.Items)
                 {
-                    var apoointmentDetails = await _appointmentDetailService.GetAppointmentDetailByAppointmentId(item.Id);
-                    if (apoointmentDetails != null)
-                    {
-                        item.AppointmentDetails = (ICollection<AppointmentDetail>)apoointmentDetails;
-                    }
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 }
             }
-            return scheduleResponses;
+            return appointmentResponse;
         }
 
         public async Task<GetAppointmentResponse>? GetAppointmentById(Guid id)
         {
-            Appointment appointmentResponse = await _unitOfWork
+            Appointment appointment = await _unitOfWork
                 .GetRepository<Appointment>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(a => a.Customer)
+                    include: query => query.Include(a => a.Customer)
+                                            .Include(a => a.AppointmentDetails)
+                                                .ThenInclude(ad => ad.SalonEmployee)
+                                                    .ThenInclude(se => se.SalonInformation)
                  );
-            if (appointmentResponse == null)
+            if (appointment == null)
                 return null;
-            return _mapper.Map<GetAppointmentResponse>(appointmentResponse);
+            var appointmentResponse = _mapper.Map<GetAppointmentResponse>(appointment);
+                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                    .GetListAsync(predicate: x => x.AppointmentId == appointmentResponse.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+            appointmentResponse.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
+            return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentByAccountIdResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size)
         {
             var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == AccountId);
             if (customer == null)
@@ -143,25 +167,98 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Not found customer with id {AccountId}");
             }
             var appointments = await _unitOfWork.GetRepository<Appointment>()
-           .GetPagingListAsync(
-               page: page,
-               size: size
-           );
-
-            var appointmentResponse = new Paginate<GetAppointmentByAccountIdResponse>()
+                .GetPagingListAsync(
+                    predicate: x => x.CustomerId == customer.Id,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    page: page,
+                    size: size
+                );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
                 Size = appointments.Size,
                 Total = appointments.Total,
                 TotalPages = appointments.TotalPages,
-                Items = _mapper.Map<IList<GetAppointmentByAccountIdResponse>>(appointments.Items),
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
             foreach (var item in appointmentResponse.Items)
             {
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id);
+                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x=>x.Include(x=>x.SalonEmployee).Include(y=>y.ServiceHair));
                 item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
             }
+            return appointmentResponse;
+        }
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status)
+        {
+            // Tạo biểu thức điều kiện ban đầu cho SalonId
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            if (!string.IsNullOrEmpty(status))
+            {
+                predicate = predicate.And(x => x.Status.Equals(status));
+            }
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetPagingListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    page: page,
+                    size: size
+                );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
+            if (appointmentResponse != null && appointmentResponse.Items.Count>0)
+            {
+                foreach (var item in appointmentResponse.Items)
+                {
+                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+                    item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
+                }
+            }
+            return appointmentResponse;
+        }
+
+
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status)
+        {
+            // Tạo biểu thức điều kiện ban đầu cho employeeId
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.Id == EmployeeId));
+            if (!string.IsNullOrEmpty(Status))
+            {
+                predicate = predicate.And(x => x.Status.Equals(Status));
+            }
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                  .GetPagingListAsync(
+                        predicate: predicate,
+                        include: query => query.Include(a => a.Customer)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.ServiceHair),
+                        page: page,
+                        size: size
+                  );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
             return appointmentResponse;
         }
 
@@ -246,6 +343,14 @@ namespace Hairhub.Service.Services.Services
                         }
                     }
                 }
+                // Loại bỏ các thời gian không có nhân viên nào
+                availableTimesDict = availableTimesDict
+                    .Where(kvp => kvp.Value.Any())
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                if (availableTimesDict == null || availableTimesDict.Count == 0)
+                {
+                    throw new NotFoundException("Không có nhân viên nào có thể làm việc vào thời gian này");
+                }
                 // Convert dictionary to List<AvailableTime>
                 result.AvailableTimes = availableTimesDict.Select(kvp => new AvailableTime
                 {
@@ -306,6 +411,7 @@ namespace Hairhub.Service.Services.Services
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
+                        await Console.Out.WriteLineAsync(start + " : "+ end);
                         timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                     }
 
@@ -325,7 +431,10 @@ namespace Hairhub.Service.Services.Services
                 availableTimesDict = availableTimesDict
                     .Where(kvp => kvp.Value.Any())
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
+                if (availableTimesDict == null || availableTimesDict.Count == 0)
+                {
+                    throw new NotFoundException("Không có nhân viên nào có thể làm việc vào thời gian này");
+                }
                 // Convert dictionary to List<AvailableTime>
                 result.AvailableTimes = availableTimesDict.Select(kvp => new AvailableTime
                 {
@@ -361,7 +470,7 @@ namespace Hairhub.Service.Services.Services
                 var serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
                                          .SingleOrDefaultAsync
                                           (
-                                            predicate: x => x.Id == bookingDetail.ServiceHairId && x.SalonInformationId == request.SalonId
+                                            predicate: x => x.Id == bookingDetail.ServiceHairId && x.SalonInformationId == request.SalonId && x.IsActive == true
                                           );
                 if (serviceHair == null)
                 {
@@ -379,7 +488,14 @@ namespace Hairhub.Service.Services.Services
                 listEmp = await CaculateBookingDetail(bookingDetail, request, startTimeProcess, endTimeProcess);
                 if (listEmp.Count == 0 && i == 0)
                 {
-                    throw new NotFoundException($"Không có nhân viên nào có thể phụ vụ vào thời gian {StartTimeBooking.Date}");
+                    if (i == 0)
+                    {
+                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ thứ nhất - {serviceHair.ServiceName} vào {(int)request.AvailableSlot}:{(int)((request.AvailableSlot - (int)request.AvailableSlot) * 60)}");
+                    }
+                    else
+                    {
+                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ thứ {i + 1} - {serviceHair.ServiceName}");
+                    }
                 }
                 // Caculate waiting time for another time in services > 1
                 if (listEmp.Count == 0 && i > 0)
@@ -398,14 +514,15 @@ namespace Hairhub.Service.Services.Services
                         throw new Exception($"Không đủ thời gian hoặc thiếu nhân viên để thực hiện dịch vụ thứ {i + 1}");
                     }
                 }
+                var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
+                serviceHairResult.StartTime = StartTimeBooking;
+                serviceHairResult.EndTime = StartTimeBooking.AddHours((double)serviceHair.Time);
+                serviceHairResult.WaitingTime = waitingTime;
                 //Add list BookingDetail vào result
                 bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()
                 {
-                    ServiceHairId = serviceHair.Id,
+                    ServiceHair = serviceHairResult,
                     Employees = listEmp,
-                    StartTime = StartTimeBooking,
-                    EndTime = StartTimeBooking.AddHours((double)serviceHair.Time),
-                    WaitingTime = waitingTime
                 });
             }
             bookingResponse.Day = request.Day;
@@ -445,18 +562,17 @@ namespace Hairhub.Service.Services.Services
                     if (startTimeProcess >= startScheduleEmp && endTimeProcess <= endScheduleEmp)
                     {
                         //Get appointment detail => Check available time
-                        var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                       .GetListAsync
-                                                        (
-                                                            predicate: x => x.SalonEmployeeId == employee.Id
-                                                            && x.StartTime.Date == request.Day.Date
-                                                            && x.EndTime.Date == request.Day.Date
-                                                            && ((ParseTimeToDecimal(x.StartTime) <= startTimeProcess && ParseTimeToDecimal(x.EndTime) > startTimeProcess)
-                                                            || (ParseTimeToDecimal(x.StartTime) < endTimeProcess && ParseTimeToDecimal(x.EndTime) >= endTimeProcess)
-                                                            || (ParseTimeToDecimal(x.StartTime) > startTimeProcess && ParseTimeToDecimal(x.StartTime) < endTimeProcess))
-                                                            && x.Status.Equals(AppointmentStatus.Booking)
-                                                        );
-                        if (appointmentDetails == null)
+                        var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                        .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
+                                                                               && x.StartTime.Date == request.Day.Date
+                                                                               && x.EndTime.Date == request.Day.Date
+                                                                               && x.Status.Equals(AppointmentStatus.Booking)))
+                                                        .ToList()
+                                                        .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
+                                                                 || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
+                                                                 || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
+                                                        .ToList();
+                        if (appointmentDetails == null || appointmentDetails.Count == 0)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                         }
@@ -482,18 +598,17 @@ namespace Hairhub.Service.Services.Services
                 if (startTimeProcess >= startScheduleEmp && endTimeProcess <= endScheduleEmp)
                 {
                     //Get appointment detail => Check available time
-                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                       .GetListAsync
-                        (
-                            predicate: x => x.SalonEmployeeId == employee.Id
-                            && x.StartTime.Date == request.Day.Date
-                            && x.EndTime.Date == request.Day.Date
-                            && ((ParseTimeToDecimal(x.StartTime) <= startTimeProcess && ParseTimeToDecimal(x.EndTime) > startTimeProcess)
-                            || (ParseTimeToDecimal(x.StartTime) < endTimeProcess && ParseTimeToDecimal(x.EndTime) >= endTimeProcess)
-                            || (ParseTimeToDecimal(x.StartTime) > startTimeProcess && ParseTimeToDecimal(x.StartTime) < endTimeProcess))
-                            && x.Status.Equals(AppointmentStatus.Booking)
-                        );
-                    if (appointmentDetails == null)
+                    var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                    .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
+                                                                           && x.StartTime.Date == request.Day.Date
+                                                                           && x.EndTime.Date == request.Day.Date
+                                                                           && x.Status.Equals(AppointmentStatus.Booking)))
+                                                    .ToList()
+                                                    .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
+                                                             || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
+                                                             || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
+                                                    .ToList();
+                    if (appointmentDetails == null || appointmentDetails.Count==0)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                     }
@@ -504,10 +619,15 @@ namespace Hairhub.Service.Services.Services
 
         private Decimal ParseTimeToDecimal(DateTime Time)
         {
-            int hours = Time.Hour;
-            int minutes = Time.Minute;
-            decimal decimalTime = hours + (minutes / 60.0m);
-            return decimalTime;
+            if (Time.Hour == null)
+            {
+                throw new Exception($"Cannot convert hour {Time}");
+            }
+            if (Time.Minute == null)
+            {
+                throw new Exception($"Cannot convert minute {Time}");
+            }
+            return (decimal)(Time.Hour + Time.Minute/60m);
         }
 
         private async Task<bool> CheckAppointmentBooking(Guid SalonId, DateTime Day, Decimal TimeSlot, bool IsAnyOne)
@@ -547,12 +667,20 @@ namespace Hairhub.Service.Services.Services
         #endregion
 
         #region Create Update Delete Active
-        public async Task<CreateAppointmentResponse> CreateAppointment(CreateAppointmentRequest request)
+        public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
-            var appointment = _mapper.Map<Appointment>(request);
-            appointment.Id = Guid.NewGuid();
-            appointment.Status = AppointmentStatus.Booking;
-            appointment.CreatedDate = DateTime.Now;
+            var appointment = new Appointment() 
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = request.CustomerId,
+                CreatedDate = DateTime.Now,
+                StartDate = request.StartDate,
+                TotalPrice = request.TotalPrice,
+                OriginalPrice = request.OriginalPrice,
+                DiscountedPrice = request.DiscountedPrice,
+                Status = AppointmentStatus.Booking,
+            };
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
             if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
             {
@@ -562,43 +690,63 @@ namespace Hairhub.Service.Services.Services
             {
                 await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
             }
-            if (request.VoucherIds != null)
-            {
-                foreach (var item in request.VoucherIds)
-                {
-                    var voucher = await _unitOfWork.GetRepository<Voucher>()
-                                             .SingleOrDefaultAsync
-                                             (
-                                                predicate: x => x.Id == item && x.ExpiryDate > DateTime.Now
-                                                            && x.MinimumOrderAmount <= request.TotalPrice
-                                                            && x.IsActive == true
-                                             );
-                    if (voucher == null)
-                    {
-                        throw new NotFoundException("Voucher không tồn tại hoặc đã hết hạn");
-                    }
-                    var appointmentVoucher = new AppointmentDetailVoucher()
-                    {
-                        Id = new Guid(),
-                        AppointmentId = appointment.Id,
-                        VoucherId = item
-                    };
-                    await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
-                }
-            }            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<CreateAppointmentResponse>(appointment);
+             if (request.VoucherIds != null && request.VoucherIds.Count>0)
+             {
+                 foreach (var item in request.VoucherIds)
+                 {
+                     var voucher = await _unitOfWork.GetRepository<Voucher>()
+                                              .SingleOrDefaultAsync
+                                              (
+                                                 predicate: x => x.Id == item && x.ExpiryDate >= DateTime.Now
+                                                             && x.MinimumOrderAmount <= request.TotalPrice
+                                                             && x.IsActive == true
+                                              );
+                     if (voucher == null)
+                     {
+                         throw new NotFoundException("Voucher Không phù hợp");
+                     }
+                     var appointmentVoucher = new AppointmentDetailVoucher()
+                     {
+                         Id = new Guid(),
+                         AppointmentId = appointment.Id,
+                         VoucherId = item
+                     };
+                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                 }
+             }
+
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            return isInsert;
         }
 
         public async Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest)
         {
-            var appoinment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            var appoinment = await _unitOfWork.GetRepository<Appointment>()
+                                              .SingleOrDefaultAsync
+                                              (
+                                                predicate: x => x.Id == id && updateAppointmentRequest.CustomerId == x.CustomerId,
+                                                include: x => x.Include(x=>x.AppointmentDetails)
+                                              ); 
             if (appoinment == null)
             {
-                throw new NotFoundException("Appoint not found!");
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
             }
-            appoinment = _mapper.Map<Appointment>(updateAppointmentRequest);
+
+            if (!updateAppointmentRequest.Status.Equals(AppointmentStatus.Successed) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Fail)
+                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelByCustomer) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelBySalon)
+                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Booking))
+            {
+                throw new Exception("Status không tồn tại");
+            }
+            foreach (var item in appoinment.AppointmentDetails)
+            {
+                item.Status = updateAppointmentRequest.Status;
+                _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(item);
+            }
+
+            appoinment.Status = updateAppointmentRequest.Status;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
         }
@@ -672,6 +820,7 @@ namespace Hairhub.Service.Services.Services
             return response;
 
         }
+
         #endregion
 
     }
