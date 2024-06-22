@@ -150,17 +150,12 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if (id == null)
-                {
-                    return BadRequest("Apointment Id is null or empty!");
-                }
-
                 bool isUpdate = await _appointmentService.UpdateAppointmentById(id, updateAppointmentRequest);
                 if (!isUpdate)
                 {
-                    return BadRequest("Cannot update appointment");
+                    return BadRequest(new {message = "Không thể cập nhật đơn đặt lịch"});
                 }
-                return Ok("Update appointment successfully");
+                return Ok("Cập nhật đơn đặt lịch thành công");
             }
             catch (NotFoundException ex)
             {

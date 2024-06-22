@@ -721,13 +721,32 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest)
         {
-            var appoinment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            var appoinment = await _unitOfWork.GetRepository<Appointment>()
+                                              .SingleOrDefaultAsync
+                                              (
+                                                predicate: x => x.Id == id && updateAppointmentRequest.CustomerId == x.CustomerId,
+                                                include: x => x.Include(x=>x.AppointmentDetails)
+                                              ); 
             if (appoinment == null)
             {
-                throw new NotFoundException("Appoint not found!");
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
             }
-            appoinment = _mapper.Map<Appointment>(updateAppointmentRequest);
+
+            if (!updateAppointmentRequest.Status.Equals(AppointmentStatus.Successed) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Fail)
+                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelByCustomer) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelBySalon)
+                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Booking))
+            {
+                throw new Exception("Status không tồn tại");
+            }
+            foreach (var item in appoinment.AppointmentDetails)
+            {
+                item.Status = updateAppointmentRequest.Status;
+                _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(item);
+            }
+
+            appoinment.Status = updateAppointmentRequest.Status;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
         }
