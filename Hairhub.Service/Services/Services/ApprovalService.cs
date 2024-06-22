@@ -87,7 +87,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Salon information with id {request.SalonInformationId} not found");
             }
 
-            if (request.Status != SalonStatus.Approved && request.Status != SalonStatus.)
+            if (request.Status != SalonStatus.Approved && request.Status != SalonStatus.Rejected)
             {
                 throw new ArgumentException("Invalid status value. Allowed values are 'approved' or 'rejected'.");
             }
