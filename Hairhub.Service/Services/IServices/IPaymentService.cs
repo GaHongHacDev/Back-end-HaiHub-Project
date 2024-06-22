@@ -20,5 +20,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IEnumerable<ResponsePayment>> GetPaymentBySalonOwnerID(Guid salonownerid);
 
+        Task<IPaginate<ResponsePayment>> GetPayments(int page, int size);
+
     }
 }

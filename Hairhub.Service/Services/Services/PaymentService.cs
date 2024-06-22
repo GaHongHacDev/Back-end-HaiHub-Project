@@ -27,6 +27,7 @@ using AutoMapper;
 using SalonOwner = Hairhub.Domain.Entitities.SalonOwner;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Microsoft.EntityFrameworkCore;
+using Hairhub.Domain.Dtos.Responses.Customers;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -186,6 +187,26 @@ namespace Hairhub.Service.Services.Services
                               include: query => query.Include(s => s.SalonOwner));
 
             return _mapper.Map<IEnumerable<ResponsePayment>>(payment);
+        }
+
+        public async Task<IPaginate<ResponsePayment>> GetPayments(int page, int size)
+        {
+
+            var payments = await _unitOfWork.GetRepository<Payment>()
+            .GetPagingListAsync(
+                page: page,
+                size: size);
+
+            var paginateResponse = new Paginate<ResponsePayment>
+            {
+                Page = payments.Page,
+                Size = payments.Size,
+                Total = payments.Total,
+                TotalPages = payments.TotalPages,
+                Items = _mapper.Map<IList<ResponsePayment>>(payments.Items)
+            };
+
+            return paginateResponse;
         }
     }
 }
