@@ -25,9 +25,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
 
         // DBSet<>
@@ -90,7 +90,7 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.AdminId).HasColumnName("staff_id");
+                entity.Property(e => e.AdminId).HasColumnName("admin_id");
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_id");
                 entity.Property(e => e.ReasonReject).HasMaxLength(50).HasColumnName("reason_reject");
                 entity.Property(e => e.CreateDate).HasColumnName("create_date");

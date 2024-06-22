@@ -217,7 +217,7 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<Guid>("AdminId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("staff_id");
+                        .HasColumnName("admin_id");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2")
