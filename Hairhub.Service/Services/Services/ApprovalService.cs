@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Hairhub.Domain.Dtos.Requests.Approval;
 using Hairhub.Domain.Dtos.Responses.Approval;
 using Hairhub.Domain.Specifications;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -86,7 +87,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Salon information with id {request.SalonInformationId} not found");
             }
 
-            if (request.Status != "approved" && request.Status != "rejected")
+            if (request.Status != SalonStatus.Approved && request.Status != SalonStatus.)
             {
                 throw new ArgumentException("Invalid status value. Allowed values are 'approved' or 'rejected'.");
             }
@@ -98,7 +99,7 @@ namespace Hairhub.Service.Services.Services
                 Id = Guid.NewGuid(),
                 SalonInformationId = request.SalonInformationId,
                 AdminId = request.AdminId,
-                ReasonReject = request.Status == "rejected" ? request.ReasonReject : null,
+                ReasonReject = request.Status == SalonStatus.Rejected ? request.ReasonReject : null,
                 CreateDate = DateTime.UtcNow
             };
 
@@ -130,7 +131,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Salon information with id {request.SalonInformationId} not found");
             }
 
-            if (request.Status != "approved" && request.Status != "rejected")
+            if (request.Status != SalonStatus.Approved && request.Status != SalonStatus.Rejected)
             {
                 throw new ArgumentException("Invalid status value. Allowed values are 'approved' or 'rejected'.");
             }
@@ -139,7 +140,7 @@ namespace Hairhub.Service.Services.Services
 
             approval.SalonInformationId = request.SalonInformationId;
             approval.AdminId = request.AdminId;
-            approval.ReasonReject = request.Status == "rejected" ? request.ReasonReject : null;
+            approval.ReasonReject = request.Status == SalonStatus.Rejected ? request.ReasonReject : null;
             approval.UpdateDate = request.UpdateDate ?? DateTime.UtcNow;
 
             _unitOfWork.GetRepository<Approval>().UpdateAsync(approval);
