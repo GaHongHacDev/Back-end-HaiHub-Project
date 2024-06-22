@@ -44,10 +44,9 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> GetListPayment([FromRoute]Guid id)
+        public async Task<IActionResult> GetPayments(int page=1, int size = 10)
         {
-            var result = await _paymentservice.GetPaymentBySalonOwnerID(id);
+            var result = await _paymentservice.GetPayments(page, size);
             if (result == null)
             {
                 return BadRequest();
@@ -56,9 +55,10 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPayments(int page, int size)
+        [Route("{ownerId:Guid}")]
+        public async Task<IActionResult> GetPaymentByOwnerId([FromRoute] Guid ownerId, int page=1, int size=10)
         {
-            var result = await _paymentservice.GetPayments(page, size);
+            var result = await _paymentservice.GetPaymentBySalonOwnerID(ownerId, page, size);
             if (result == null)
             {
                 return BadRequest();

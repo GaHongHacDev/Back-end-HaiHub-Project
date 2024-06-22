@@ -423,7 +423,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("ConfigId")
+                    b.Property<Guid?>("ConfigId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("config_id");
 
@@ -1025,7 +1025,6 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Config", "Config")
                         .WithMany("Payments")
                         .HasForeignKey("ConfigId")
-                        .IsRequired()
                         .HasConstraintName("FK_config_payment");
 
                     b.HasOne("Hairhub.Domain.Entitities.SalonOwner", "SalonOwner")
