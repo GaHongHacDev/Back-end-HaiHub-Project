@@ -115,10 +115,10 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.AccountId).HasColumnName("staff_id");
-                entity.Property(e => e.FullName).HasColumnName("salon_id");
-                entity.Property(e => e.Email).HasMaxLength(50).HasColumnName("reason_reject");
-                entity.Property(e => e.img).HasColumnName("create_date");
+                entity.Property(e => e.AccountId).HasColumnName("account_id");
+                entity.Property(e => e.FullName).HasColumnName("full_name");
+                entity.Property(e => e.Email).HasMaxLength(50).HasColumnName("email");
+                entity.Property(e => e.img).HasColumnName("img");
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Admins)

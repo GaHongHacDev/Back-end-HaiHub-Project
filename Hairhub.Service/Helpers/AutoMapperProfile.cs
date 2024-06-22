@@ -40,6 +40,9 @@ namespace Hairhub.Service.Helpers
     {
         public AutoMapperProfile()
         {
+            //Admin 
+            CreateMap<AdminLoginResponse, Admin>().ReverseMap();
+
             //Account
             CreateMap<CreateAccountRequest, Customer>().ReverseMap();
             CreateMap<CreateAccountRequest, SalonOwner>().ReverseMap();

@@ -66,23 +66,23 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("staff_id");
+                        .HasColumnName("account_id");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
-                        .HasColumnName("reason_reject");
+                        .HasColumnName("email");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("salon_id");
+                        .HasColumnName("full_name");
 
                     b.Property<string>("img")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("create_date");
+                        .HasColumnName("img");
 
                     b.HasKey("Id");
 
