@@ -93,12 +93,32 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<IPaginate<GetSalonInformationResponse>> GetAllSalonInformation(int page, int size)
+        public async Task<IPaginate<GetSalonInformationResponse>> GetAllApprovedSalonInformation(int page, int size)
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
            .GetPagingListAsync(
                 predicate: x => x.Status.Equals(SalonStatus.Approved),
-               include: query => query.Include(s => s.SalonOwner),
+               include: query => query.Include(s => s.SalonOwner).Include(x => x.Schedules),
+               page: page,
+               size: size
+           );
+
+            var salonInformationResponses = new Paginate<GetSalonInformationResponse>()
+            {
+                Page = salonInformations.Page,
+                Size = salonInformations.Size,
+                Total = salonInformations.Total,
+                TotalPages = salonInformations.TotalPages,
+                Items = _mapper.Map<IList<GetSalonInformationResponse>>(salonInformations.Items),
+            };
+            return salonInformationResponses;
+        }
+
+        public async Task<IPaginate<GetSalonInformationResponse>> GetAllSalonByAdmin(int page, int size)
+        {
+            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+           .GetPagingListAsync(
+               include: query => query.Include(s => s.SalonOwner).Include(x=>x.Schedules),
                page: page,
                size: size
            );

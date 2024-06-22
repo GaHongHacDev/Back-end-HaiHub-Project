@@ -21,7 +21,14 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllSalonInformation([FromQuery] int page=1, [FromQuery] int size=10)
         {
-            var salonInformationsResponse = await _salonInformationService.GetAllSalonInformation(page, size);
+            var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformation(page, size);
+            return Ok(salonInformationsResponse);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllSalonByAdmin([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            var salonInformationsResponse = await _salonInformationService.GetAllSalonByAdmin(page, size);
             return Ok(salonInformationsResponse);
         }
 
