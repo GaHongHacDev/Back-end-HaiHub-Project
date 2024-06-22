@@ -54,5 +54,16 @@ namespace Hairhub.API.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPayments(int page, int size)
+        {
+            var result = await _paymentservice.GetPayments(page, size);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
     }
 }
