@@ -13,6 +13,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Domain.Entitities;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Domain.Dtos.Requests.Otps;
+using Microsoft.Extensions.Configuration;
 
 
 namespace Hairhub.Service.Services.Services
@@ -21,33 +22,24 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<BackgroundWorkerService> _logger;
-        private readonly IUnitOfWork _uow;
+        private readonly IConfiguration _configuration;
+        
 
-        public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IUnitOfWork uow)
+        public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IConfiguration configuration)
         {
             _scopeFactory = scopeFactory;
             _logger = logger;
-            _uow = uow;
+            _configuration = configuration;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("BackgroundWorkerService is starting.");
-            await ExecuteAsync(cancellationToken);
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("BackgroundWorkerService is stopping.");
-            await Task.CompletedTask;
-        }
+        
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 await CheckAndExpireAccounts(stoppingToken);
-                await Task.Delay(TimeSpan.FromDays(1), stoppingToken); // Check every hour
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Check every hour
             }
         }
 
@@ -55,30 +47,32 @@ namespace Hairhub.Service.Services.Services
         {
             using (var scope = _scopeFactory.CreateScope())
             {
-                
+                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-                var salons = await _uow.GetRepository<SalonInformation>().GetListAsync();
+                var salons = await uow.GetRepository<SalonInformation>().GetListAsync();
 
                 foreach (var salon in salons)
                 {
-                    var latestPayment = await _uow.GetRepository<Payment>().SingleOrDefaultAsync(
-                        predicate: p => p.Id == salon.SalonOwner.Id,
-                        orderBy: o => o.OrderByDescending(p => p.EndDate)
-                    );
+                    var latestPayment = await uow.GetRepository<Payment>()
+                .SingleOrDefaultAsync(
+                    predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
+                    orderBy: o => o.OrderByDescending(o => o.EndDate) 
+                   
+                );
 
                     if (latestPayment != null)
                     {
                         if (latestPayment.EndDate > DateTime.Now)
                         {
-                            
                             continue;
                         }
-                        var daysToExpiry = (latestPayment.EndDate - DateTime.Now).TotalDays;
+
+                        var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
 
                         if (daysToExpiry < 3 && daysToExpiry > 0)
                         {
-                            await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName);
+                            await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
                         }
 
                         if (latestPayment.EndDate < DateTime.Now && salon.Status != "DISABLED")
@@ -90,6 +84,8 @@ namespace Hairhub.Service.Services.Services
 
                 _logger.LogInformation("Expired salons checked and updated at: {time}", DateTimeOffset.Now);
             }
-        }        
+        }
+
+
     }
 }

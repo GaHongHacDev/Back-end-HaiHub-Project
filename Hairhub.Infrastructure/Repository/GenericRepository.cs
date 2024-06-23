@@ -154,6 +154,7 @@ namespace Hairhub.Infrastructure.Repository
             _dbSet.RemoveRange(entities);
         }
 
+        
         #endregion
     }
 }

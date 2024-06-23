@@ -61,7 +61,10 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHostedService<BackgroundWorkerService>();
 builder.Services.AddDbContext<HaiHubDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.EnableSensitiveDataLogging(); // Thêm dòng này
+});
 
 //Setting Cors for all source
 builder.Services.AddCors(options =>

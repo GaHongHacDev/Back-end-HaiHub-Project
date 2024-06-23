@@ -70,5 +70,6 @@ namespace Hairhub.Service.Repositories.IRepositories
 
         void DeleteAsync(T entity);
         void DeleteRangeAsync(IEnumerable<T> entities);
+        
     }
 }

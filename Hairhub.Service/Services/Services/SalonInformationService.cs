@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
+using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
+using Hairhub.Domain.Dtos.Responses.Appointments;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
@@ -9,6 +11,7 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Linq;
@@ -93,16 +96,69 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<IPaginate<GetSalonInformationResponse>> GetAllSalonInformation(int page, int size)
+        public async Task<IPaginate<GetSalonInformationResponse>> GetAllApprovedSalonInformation(int page, int size)
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
            .GetPagingListAsync(
                 predicate: x => x.Status.Equals(SalonStatus.Approved),
-               include: query => query.Include(s => s.SalonOwner),
+               include: query => query.Include(s => s.SalonOwner).Include(x => x.Schedules),
                page: page,
                size: size
            );
 
+            var salonInformationResponses = new Paginate<GetSalonInformationResponse>()
+            {
+                Page = salonInformations.Page,
+                Size = salonInformations.Size,
+                Total = salonInformations.Total,
+                TotalPages = salonInformations.TotalPages,
+                Items = _mapper.Map<IList<GetSalonInformationResponse>>(salonInformations.Items),
+            };
+            return salonInformationResponses;
+        }
+
+        public async Task<IPaginate<GetSalonInformationResponse>> GetAllSalonByAdmin(int page, int size)
+        {
+            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+           .GetPagingListAsync(
+               include: query => query.Include(s => s.SalonOwner).Include(x => x.Schedules),
+               page: page,
+               size: size
+           );
+
+            var salonInformationResponses = new Paginate<GetSalonInformationResponse>()
+            {
+                Page = salonInformations.Page,
+                Size = salonInformations.Size,
+                Total = salonInformations.Total,
+                TotalPages = salonInformations.TotalPages,
+                Items = _mapper.Map<IList<GetSalonInformationResponse>>(salonInformations.Items),
+            };
+            return salonInformationResponses;
+        }
+
+        public async Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? status, int page, int size)
+        {
+            IPaginate<SalonInformation> salonInformations;
+            if (status == null || String.IsNullOrWhiteSpace(status))
+            {
+                salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+                                                        .GetPagingListAsync(
+                                                           include: query => query.Include(s => s.SalonOwner),
+                                                           page: page,
+                                                           size: size
+                                                        );
+            }
+            else
+            {
+                salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+                                        .GetPagingListAsync(
+                                            predicate: x => x.Status.Equals(status),
+                                           include: query => query.Include(s => s.SalonOwner),
+                                           page: page,
+                                           size: size
+                                        );
+            }
             var salonInformationResponses = new Paginate<GetSalonInformationResponse>()
             {
                 Page = salonInformations.Page,
@@ -120,7 +176,7 @@ namespace Hairhub.Service.Services.Services
                 .GetRepository<SalonInformation>()
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id.Equals(id),
-                    include: source => source.Include(s => s.SalonOwner).Include(x=>x.Schedules)
+                    include: source => source.Include(s => s.SalonOwner).Include(x => x.Schedules)
                  );
             if (salonInformationResponse == null)
                 return null;
@@ -162,7 +218,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "")
         {
-            if(serviceName==null && salonAddress==null && salonName == null)
+            if (serviceName == null && salonAddress == null && salonName == null)
             {
                 return new Paginate<SearchSalonByNameAddressServiceResponse>()
                 {
