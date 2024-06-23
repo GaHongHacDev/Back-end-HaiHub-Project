@@ -25,9 +25,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
 
         // DBSet<>
@@ -328,7 +328,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)").HasColumnName("total_price");
                 entity.Property(e => e.OriginalPrice).HasColumnName("original_price").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.DiscountedPrice).HasColumnName("discounted_price").HasColumnType("decimal(18,2)");
-                entity.Property(e => e.Status).HasMaxLength(15).HasColumnName("status");
+                entity.Property(e => e.Status).HasMaxLength(25).HasColumnName("status");
 
                 entity.HasOne(d => d.Customer)
                       .WithMany(p => p.Appointments)
@@ -349,7 +349,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.StartTime).HasColumnName("start_time");
                 entity.Property(e => e.EndTime).HasColumnName("end_time");
-                entity.Property(e => e.Status).HasMaxLength(15).HasColumnName("status");
+                entity.Property(e => e.Status).HasMaxLength(25).HasColumnName("status");
 
                 entity.HasOne(d => d.SalonEmployee)
                       .WithMany(p => p.AppointmentDetails)
