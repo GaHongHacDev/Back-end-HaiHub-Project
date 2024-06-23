@@ -441,7 +441,7 @@ namespace Hairhub.Infrastructure
 
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(250).IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)");
