@@ -25,6 +25,7 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _configuration;
         
 
+
         public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IConfiguration configuration)
         {
             _scopeFactory = scopeFactory;
@@ -32,7 +33,6 @@ namespace Hairhub.Service.Services.Services
             _configuration = configuration;
         }
 
-        
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -45,47 +45,53 @@ namespace Hairhub.Service.Services.Services
 
         private async Task CheckAndExpireAccounts(CancellationToken stoppingToken)
         {
-            using (var scope = _scopeFactory.CreateScope())
+            try
             {
-                var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-
-                var salons = await uow.GetRepository<SalonInformation>().GetListAsync();
-
-                foreach (var salon in salons)
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    var latestPayment = await uow.GetRepository<Payment>()
-                .SingleOrDefaultAsync(
-                    predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
-                    orderBy: o => o.OrderByDescending(o => o.EndDate) 
-                   
-                );
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-                    if (latestPayment != null)
+                    var salons = await uow.GetRepository<SalonInformation>().GetListAsync();
+
+                    foreach (var salon in salons)
                     {
-                        if (latestPayment.EndDate > DateTime.Now)
-                        {
-                            continue;
-                        }
+                        var latestPayment = await uow.GetRepository<Payment>()
+                            .SingleOrDefaultAsync(
+                                predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
+                                orderBy: o => o.OrderByDescending(o => o.EndDate)
+                            );
 
-                        var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
-
-                        if (daysToExpiry < 3 && daysToExpiry > 0)
+                        if (latestPayment != null)
                         {
-                            await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
-                        }
+                            if (latestPayment.EndDate > DateTime.Now)
+                            {
+                                continue;
+                            }
 
-                        if (latestPayment.EndDate < DateTime.Now && salon.Status != "DISABLED")
-                        {
-                            salon.Status = "DISABLED";
+                            var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
+
+                            if (daysToExpiry < 3 && daysToExpiry > 0)
+                            {
+                                await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
+                            }
+
+                            if (latestPayment.EndDate < DateTime.Now && salon.Status != "DISABLED")
+                            {
+                                salon.Status = "DISABLED";
+                            }
                         }
                     }
-                }
 
-                _logger.LogInformation("Expired salons checked and updated at: {time}", DateTimeOffset.Now);
+                    _logger.LogInformation("Expired salons checked and updated at: {time}", DateTimeOffset.Now);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
+                // Thực hiện xử lý lỗi tại đây nếu cần thiết
             }
         }
-
 
     }
 }

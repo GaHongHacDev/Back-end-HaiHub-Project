@@ -58,7 +58,6 @@ builder.Services.AddHttpContextAccessor();
 
 
 //Add Background Service 
-
 builder.Services.AddHostedService<BackgroundWorkerService>();
 builder.Services.AddDbContext<HaiHubDbContext>(options =>
 {
