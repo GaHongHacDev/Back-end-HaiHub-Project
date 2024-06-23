@@ -16,6 +16,7 @@ using Hairhub.Domain.Dtos.Requests.Otps;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -39,12 +40,57 @@ namespace Hairhub.Service.Services.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await CheckAndExpireAccounts(stoppingToken);
-                await Task.Delay(TimeSpan.FromDays(1), stoppingToken); // Check every hour
+                // Calculate delay time until next midnight
+                var now = DateTime.Now;
+                var nextMidnight = now.Date.AddDays(1); // Next midnight
+                var delayTime = nextMidnight - now;
+
+                // Wait until next midnight
+                await Task.Delay(delayTime, stoppingToken);
+
+                await ExecuteExpriredSalon(stoppingToken);
+                await ExecuteExpriredAppointment(stoppingToken);
+
+
+            }
+        }
+        private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
+        {
+            try
+            {
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+                    var appontments = await uow.GetRepository<Appointment>().GetListAsync(
+                        predicate: x => x.Status.Equals(AppointmentStatus.Booking) 
+                                && x.StartDate.Date == DateTime.Now.AddDays(-1).Date,
+                        include: x => x.Include(s => s.AppointmentDetails)
+                    );
+
+                    foreach (var appointment in appontments)
+                    {
+                        foreach(var appointmentDetail in appointment.AppointmentDetails)
+                        {
+                            appointmentDetail.Status = AppointmentStatus.Successed;
+                            uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
+                        }
+                        appointment.Status = AppointmentStatus.Successed;
+                        uow.GetRepository<Appointment>().UpdateAsync(appointment);
+                    }
+                    uow.CommitAsync();
+                    _logger.LogInformation("Expired salappointment checked and updated at: {time}", DateTimeOffset.Now);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
+                // Thực hiện xử lý lỗi tại đây nếu cần thiết
             }
         }
 
-        private async Task CheckAndExpireAccounts(CancellationToken stoppingToken)
+        private async Task ExecuteExpriredSalon(CancellationToken stoppingToken)
         {
             try
             {
