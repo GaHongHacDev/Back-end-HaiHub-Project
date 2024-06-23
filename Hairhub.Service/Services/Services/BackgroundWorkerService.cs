@@ -14,7 +14,8 @@ using Hairhub.Domain.Entitities;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Domain.Dtos.Requests.Otps;
 using Microsoft.Extensions.Configuration;
-
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -39,7 +40,7 @@ namespace Hairhub.Service.Services.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 await CheckAndExpireAccounts(stoppingToken);
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Check every hour
+                await Task.Delay(TimeSpan.FromDays(1), stoppingToken); // Check every hour
             }
         }
 
@@ -52,7 +53,9 @@ namespace Hairhub.Service.Services.Services
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-                    var salons = await uow.GetRepository<SalonInformation>().GetListAsync();
+                    var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
+                        include: x => x.Include(s => s.SalonOwner)
+                    );
 
                     foreach (var salon in salons)
                     {
@@ -79,6 +82,8 @@ namespace Hairhub.Service.Services.Services
                             if (latestPayment.EndDate < DateTime.Now && salon.Status != "DISABLED")
                             {
                                 salon.Status = "DISABLED";
+                                uow.GetRepository<SalonInformation>().UpdateAsync(salon);
+                                uow.CommitAsync();
                             }
                         }
                     }

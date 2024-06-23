@@ -31,6 +31,16 @@ namespace Hairhub.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
+        {
+            var result = await _paymentservice.CreateFirstTimePayment(createFirstTimePaymentRequest);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<IActionResult> GetStatusPayment(string ordercode, [FromBody] SavePaymentInfor paymentrequest)
@@ -59,19 +69,6 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> GetPaymentByOwnerId([FromRoute] Guid ownerId, int page=1, int size=10)
         {
             var result = await _paymentservice.GetPaymentBySalonOwnerID(ownerId, page, size);
-            if (result == null)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
-
-
-        [HttpPost]
-        [Route("{ownerId:Guid}")]
-        public async Task<IActionResult> GetPaymentByOwnerId([FromRoute]Guid ownerId)
-        {
-            var result = await _paymentservice.CreateFirstTimePayment(ownerId);
             if (result == null)
             {
                 return BadRequest();
