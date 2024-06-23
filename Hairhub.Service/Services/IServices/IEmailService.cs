@@ -12,7 +12,6 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> SendEmailAsync(SendOtpEmailRequest sendEmailRequest);
         Task<bool> CheckOtpEmail(CheckOtpRequest checkOtpRequest);
         public Task<bool> CheckExistEmail(CheckExistEmailResrequest checkExistEmailResrequest);
-
-        Task<bool> SendEmailAsyncNotifyOfExpired(string email, string fullname);
+        Task<bool> SendEmailAsyncNotifyOfExpired(string emailIndividual, string fullname, int REMAINING_DAY, DateTime EXPIRATION_DATE, string LINK_PAYMENT);
     }
 }

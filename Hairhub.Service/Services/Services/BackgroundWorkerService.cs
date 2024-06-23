@@ -13,6 +13,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Domain.Entitities;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Domain.Dtos.Requests.Otps;
+using Microsoft.Extensions.Configuration;
 
 
 namespace Hairhub.Service.Services.Services
@@ -22,12 +23,14 @@ namespace Hairhub.Service.Services.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<BackgroundWorkerService> _logger;
         private readonly IUnitOfWork _uow;
+        private readonly IConfiguration _configuration;
 
-        public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IUnitOfWork uow)
+        public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IUnitOfWork uow, IConfiguration configuration)
         {
             _scopeFactory = scopeFactory;
             _logger = logger;
             _uow = uow;
+            _configuration = configuration;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -74,11 +77,11 @@ namespace Hairhub.Service.Services.Services
                             
                             continue;
                         }
-                        var daysToExpiry = (latestPayment.EndDate - DateTime.Now).TotalDays;
+                        var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
 
                         if (daysToExpiry < 3 && daysToExpiry > 0)
                         {
-                            await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName);
+                            await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
                         }
 
                         if (latestPayment.EndDate < DateTime.Now && salon.Status != "DISABLED")

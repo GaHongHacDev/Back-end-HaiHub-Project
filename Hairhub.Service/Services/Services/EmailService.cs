@@ -91,12 +91,13 @@ namespace Hairhub.Service.Services.Services
         }
 
 
-        public async Task<bool> SendEmailAsyncNotifyOfExpired(string emailIndividual, string  fullname)
+        public async Task<bool> SendEmailAsyncNotifyOfExpired(string emailIndividual, string  fullname, int REMAINING_DAY, DateTime EXPIRATION_DATE, string LINK_PAYMENT)
         {  
-            var emailBody = _configuration["EmailSetting:EmailBody"];
-            emailBody = emailBody.Replace("{PROJECT_NAME}", _configuration["Project_HairHub:PROJECT_NAME"]);
-            emailBody = emailBody.Replace("{FULL_NAME}", fullname);
-            emailBody = emailBody.Replace("{EXPIRE_TIME}", "2");
+            var emailBody = _configuration["EmailPayment:EmailBody"];
+            emailBody = emailBody.Replace("{FULL_NAME_OWNER}", fullname);
+            emailBody = emailBody.Replace("{REMAINING_DAY}", REMAINING_DAY.ToString());
+            emailBody = emailBody.Replace("{EXPIRATION_DATE}", EXPIRATION_DATE.Date.ToString());
+            emailBody = emailBody.Replace("{LINK_PAYMENT}", LINK_PAYMENT);
             emailBody = emailBody.Replace("{PHONE_NUMBER}", _configuration["Project_HairHub:PHONE_NUMBER"]);
             emailBody = emailBody.Replace("{EMAIL_ADDRESS}", _configuration["Project_HairHub:EMAIL_ADDRESS"]);
             var emailHost = _configuration["EmailSetting:EmailHost"];
@@ -105,7 +106,7 @@ namespace Hairhub.Service.Services.Services
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(emailHost));
             email.To.Add(MailboxAddress.Parse(emailIndividual));
-            email.Subject = _configuration.GetSection("EmailSetting")?["Subject"];
+            email.Subject = _configuration.GetSection("EmailPayment")?["Subject"];
             email.Body = new TextPart(TextFormat.Html)
             {
                 Text = emailBody
