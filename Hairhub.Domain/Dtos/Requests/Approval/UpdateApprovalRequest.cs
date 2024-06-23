@@ -8,7 +8,6 @@ namespace Hairhub.Domain.Dtos.Requests.Approval
 {
     public class UpdateApprovalRequest
     {
-        public Guid Id { get; set; }
         public Guid SalonInformationId { get; set; }
         public Guid AdminId { get; set; }
         public string? ReasonReject { get; set; }
