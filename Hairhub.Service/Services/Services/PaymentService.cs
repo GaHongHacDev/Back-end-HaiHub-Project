@@ -227,8 +227,9 @@ namespace Hairhub.Service.Services.Services
             return paginateResponse;
         }
 
-        public async Task<bool> CreateFirstTimePayment(Guid salonownerid)
+        public async Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
         {
+            Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
            var firstPayment = new Payment { 
                Id = Guid.NewGuid(),
                Description = "Miễn phí 1 tháng đầu tiên",
