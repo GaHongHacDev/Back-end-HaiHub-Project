@@ -226,5 +226,26 @@ namespace Hairhub.Service.Services.Services
 
             return paginateResponse;
         }
+
+        public async Task<bool> CreateFirstTimePayment(Guid salonownerid)
+        {
+           var firstPayment = new Payment { 
+               Id = Guid.NewGuid(),
+               Description = "Miễn phí 1 tháng đầu tiên",
+               StartDate = DateTime.Now,
+               EndDate = DateTime.Now.AddDays(30),
+               PaymentDate = DateTime.Now,
+               SalonOWnerID = salonownerid,
+               MethodBanking = "None",
+               PaymentCode = new Random().Next(1, 1000000),
+               Status = "PAID",
+               TotalAmount = 0,
+            };
+            
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
+
+        }
     }
 }

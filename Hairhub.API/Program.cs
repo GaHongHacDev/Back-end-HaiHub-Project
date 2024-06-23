@@ -2,10 +2,12 @@ using BirthdayParty.WebApi.Constants;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
+using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.ComponentModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +55,13 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 // Add services to the container.
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
+
+
+//Add Background Service 
+
+builder.Services.AddHostedService<BackgroundWorkerService>();
+builder.Services.AddDbContext<HaiHubDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //Setting Cors for all source
 builder.Services.AddCors(options =>
