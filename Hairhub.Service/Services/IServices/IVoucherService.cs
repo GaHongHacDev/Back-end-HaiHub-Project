@@ -13,7 +13,7 @@ namespace Hairhub.Service.Services.IServices
     public interface IVoucherService
     {
         Task<IPaginate<GetVoucherResponse>> GetVoucherAsync(int page, int size);
-
+        Task<IPaginate<GetVoucherResponse>> GetAdminVoucher(int page, int size);
         Task<GetVoucherResponse>? GetVoucherbyCodeAsync(string code);
 
         Task<GetVoucherResponse>? GetVoucherbyIdAsync(Guid id);

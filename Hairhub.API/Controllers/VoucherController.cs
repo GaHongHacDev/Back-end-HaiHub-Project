@@ -27,6 +27,7 @@ namespace Hairhub.API.Controllers
             var listVoucher = await _voucherService.GetVoucherAsync(page, size);
             return Ok(listVoucher);        
         }
+
         [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetVoucherById([FromRoute] Guid id)
@@ -45,6 +46,15 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAdminVoucher([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+
+            var listVoucher = await _voucherService.GetAdminVoucher(page, size);
+            return Ok(listVoucher);
+        }
+
         [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetVoucherBySalonId([FromRoute] Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
@@ -63,8 +73,8 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpGet]
-        
         public async Task<IActionResult> GetVoucherByCode(string code)
         {
             try

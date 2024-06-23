@@ -60,6 +60,26 @@ namespace Hairhub.Service.Services.Services
             return isDelete;
         }
 
+        public async Task<IPaginate<GetVoucherResponse>> GetAdminVoucher(int page, int size)
+        {
+            var voucher = await _unitofwork.GetRepository<Voucher>()
+           .GetPagingListAsync(
+                predicate: x=>x.IsSystemCreated==true,
+               page: page,
+               size: size
+           );
+
+            var voucherResponses = new Paginate<GetVoucherResponse>()
+            {
+                Page = voucher.Page,
+                Size = voucher.Size,
+                Total = voucher.Total,
+                TotalPages = voucher.TotalPages,
+                Items = _mapper.Map<IList<GetVoucherResponse>>(voucher.Items),
+            };
+            return voucherResponses;
+        }
+
         public async Task<IPaginate<GetVoucherResponse>> GetVoucherAsync(int page, int size)
         {
             var voucher = await _unitofwork.GetRepository<Voucher>()

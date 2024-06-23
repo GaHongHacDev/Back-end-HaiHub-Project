@@ -33,6 +33,13 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetSalonByStatus([FromQuery]string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(status, page, size);
+            return Ok(salonInformationsResponse);
+        }
+
+        [HttpGet]
         [Route("{id:Guid}")]
         public async Task<IActionResult> GetSalonInformationById([FromRoute] Guid id)
         {
