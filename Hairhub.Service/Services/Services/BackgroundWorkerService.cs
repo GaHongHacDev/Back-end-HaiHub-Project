@@ -47,8 +47,10 @@ namespace Hairhub.Service.Services.Services
 
                 // Wait until next midnight
                 await Task.Delay(delayTime, stoppingToken);
-
+                // Check Payment expired
                 await ExecuteExpriredSalon(stoppingToken);
+
+                //Check status appointment
                 await ExecuteExpriredAppointment(stoppingToken);
 
 
