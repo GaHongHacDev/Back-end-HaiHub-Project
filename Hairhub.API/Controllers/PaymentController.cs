@@ -65,5 +65,19 @@ namespace Hairhub.API.Controllers
             }
             return Ok(result);
         }
+
+
+        [HttpPost]
+        [Route("{ownerId:Guid}")]
+        public async Task<IActionResult> GetPaymentByOwnerId([FromRoute]Guid ownerId)
+        {
+            var result = await _paymentservice.CreateFirstTimePayment(ownerId);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
+
     }
 }
