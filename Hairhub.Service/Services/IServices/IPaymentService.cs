@@ -17,13 +17,14 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request);
         Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest);
-
-        Task<IEnumerable<ResponsePayment>> GetPaymentBySalonOwnerID(Guid salonownerid);
-
         Task<IPaginate<ResponsePayment>> GetPayments(int page, int size);
 
 
+
         Task<ResponsePayment> CreateFirstTimePayment(Guid salonownerid);
+
+
+        Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size);
 
     }
 }

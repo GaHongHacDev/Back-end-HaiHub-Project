@@ -28,6 +28,7 @@ using SalonOwner = Hairhub.Domain.Entitities.SalonOwner;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Domain.Dtos.Responses.Customers;
+using CloudinaryDotNet.Actions;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -40,7 +41,7 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
-        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper) 
+        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper)
         {
             _payOSSettings = settings.Value;
             _client = client;
@@ -57,11 +58,11 @@ namespace Hairhub.Service.Services.Services
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
-        
+
         public async Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request)
         {
             try
-            {                
+            {
                 int amount = (int)request.Configs.PackageFee;
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.Description;
@@ -106,8 +107,8 @@ namespace Hairhub.Service.Services.Services
                     buyerAddress: request.SalonOwner.Address,
                     expiredAt: (int)expiredAt.ToUnixTimeSeconds()
                 );
-                
-                paymentData.items.Add(new ItemData(request.SalonOwner.FullName, 1, amount ));
+
+                paymentData.items.Add(new ItemData(request.SalonOwner.FullName, 1, amount));
                 var createPaymentResult = await pos.createPaymentLink(paymentData);
 
                 return createPaymentResult; // Chú ý sử dụng PaymentLink thay vì paymentLink
@@ -119,7 +120,7 @@ namespace Hairhub.Service.Services.Services
                 throw;
             }
         }
-        
+
 
         public async Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest)
         {
@@ -155,7 +156,7 @@ namespace Hairhub.Service.Services.Services
                             await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
                             isStatus = await _unitOfWork.CommitAsync() > 0;
                             return isStatus;
-                            
+
                         }
                         return isStatus;
                     }
@@ -175,18 +176,32 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<IEnumerable<ResponsePayment>> GetPaymentBySalonOwnerID(Guid salonownerid)
+        public async Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size)
         {
-            var existingsalonowner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: e => e.Id == salonownerid);
-            if(existingsalonowner == null)
+            var existingsalonowner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: e => e.Id == ownerid);
+            if (existingsalonowner == null)
             {
                 throw new Exception("Not found");
             }
-            var payment = await _unitOfWork.GetRepository<Payment>()
-                .GetListAsync(predicate: s => s.SalonOWnerID == salonownerid,
-                              include: query => query.Include(s => s.SalonOwner));
+            var payments = await _unitOfWork.GetRepository<Payment>()
+             .GetPagingListAsync(
+                 include: query => query.Include(x => x.SalonOwner)
+                         .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
+                         .Include(x => x.Config),
+                 predicate: x => x.SalonOWnerID == ownerid,
+                 page: page,
+                 size: size);
 
-            return _mapper.Map<IEnumerable<ResponsePayment>>(payment);
+            var paginateResponse = new Paginate<ResponsePayment>
+            {
+                Page = payments.Page,
+                Size = payments.Size,
+                Total = payments.Total,
+                TotalPages = payments.TotalPages,
+                Items = _mapper.Map<IList<ResponsePayment>>(payments.Items)
+            };
+
+            return paginateResponse;
         }
 
         public async Task<IPaginate<ResponsePayment>> GetPayments(int page, int size)
@@ -194,6 +209,9 @@ namespace Hairhub.Service.Services.Services
 
             var payments = await _unitOfWork.GetRepository<Payment>()
             .GetPagingListAsync(
+                include: query => query.Include(x => x.SalonOwner)
+                                        .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
+                                        .Include(x => x.Config),
                 page: page,
                 size: size);
 
@@ -207,6 +225,27 @@ namespace Hairhub.Service.Services.Services
             };
 
             return paginateResponse;
+        }
+
+        public async Task<bool> CreateFirstTimePayment(Guid salonownerid)
+        {
+           var firstPayment = new Payment { 
+               Id = Guid.NewGuid(),
+               Description = "Miễn phí 1 tháng đầu tiên",
+               StartDate = DateTime.Now,
+               EndDate = DateTime.Now.AddDays(30),
+               PaymentDate = DateTime.Now,
+               SalonOWnerID = salonownerid,
+               MethodBanking = "None",
+               PaymentCode = new Random().Next(1, 1000000),
+               Status = "PAID",
+               TotalAmount = 0,
+            };
+            
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
+
         }
     }
 }
