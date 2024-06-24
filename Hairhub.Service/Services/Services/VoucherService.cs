@@ -35,26 +35,29 @@ namespace Hairhub.Service.Services.Services
         }
         public async Task<bool> CreateVoucherAsync(CreateVoucherRequest request)
         {
-            try
+            var existingsalon = await _unitofwork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: e => e.Id == request.SalonInformationId);
+            if(existingsalon == null)
             {
-                var salon = _unitofwork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == request.SalonInformationId);
-                if (salon == null)
-                {
-                    throw new NotFoundException("Không tìm thấy salon, barber shop");
-                }
-                var voucher = _mapper.Map<Voucher>(request);
-                voucher.Id = Guid.NewGuid();
-                voucher.Code = GenerateRandomCode(10);
+                var voucherbyAdmin = _mapper.Map<Voucher>(request);
+                voucherbyAdmin.Id = Guid.NewGuid();
+                voucherbyAdmin.SalonInformationId = null;
+                voucherbyAdmin.Code = GenerateRandomCode(10);
+                voucherbyAdmin.IsSystemCreated = true;
+                await _unitofwork.GetRepository<Voucher>().InsertAsync(voucherbyAdmin);
+                bool isSystemCreated = await _unitofwork.CommitAsync() > 0;
+                return isSystemCreated;
+            }
 
-                await _unitofwork.GetRepository<Voucher>().InsertAsync(voucher);
-                bool isCreated = await _unitofwork.CommitAsync() > 0;
-                return isCreated;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-       
+
+
+            var voucher = _mapper.Map<Voucher>(request);    
+            voucher.Id = Guid.NewGuid();
+            voucher.Code = GenerateRandomCode(10);
+            voucher.IsSystemCreated = false;
+            await _unitofwork.GetRepository<Voucher>().InsertAsync(voucher);
+            bool isCreated = await _unitofwork.CommitAsync() > 0;
+
+            return isCreated;          
                 
         }
 
