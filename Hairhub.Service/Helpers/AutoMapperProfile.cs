@@ -54,8 +54,6 @@ namespace Hairhub.Service.Helpers
             CreateMap<FetchUserResponse, Customer>().ReverseMap();
             CreateMap<FetchUserResponse, SalonOwner>().ReverseMap();
             CreateMap<FetchUserResponse, Account>().ReverseMap(); 
-            CreateMap<UpdateAccountResponse, SalonOwner>().ReverseMap(); 
-            CreateMap<UpdateAccountResponse, Customer>().ReverseMap();
             CreateMap<CustomerLoginResponse, Customer>().ReverseMap();
             CreateMap<SalonOwnerLoginResponse, SalonOwner>().ReverseMap();
 
@@ -141,7 +139,6 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateVoucherRequest, Voucher>().ReverseMap();
             CreateMap<Voucher, CreateVoucherResponse>().ReverseMap();
             CreateMap<UpdateVoucherRequest, Voucher>().ReverseMap();
-            CreateMap<Voucher, UpdateVoucherResponse>().ReverseMap();
             CreateMap<GetVoucherResponse, Voucher>().ReverseMap();
             CreateMap<Voucher, GetVoucherResponse>().ReverseMap();
 
@@ -149,7 +146,6 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateConfigRequest, Config>().ReverseMap();
             CreateMap<Config, CreateConfigResponse>().ReverseMap();
             CreateMap<UpdateConfigRequest, Config>().ReverseMap();
-            CreateMap<Config, UpdateConfigResponse>().ReverseMap();
 
 
             //Payment

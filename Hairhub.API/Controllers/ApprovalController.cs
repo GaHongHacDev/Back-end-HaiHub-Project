@@ -49,7 +49,7 @@ namespace Hairhub.API.Controllers
             {
                 return CreatedAtAction(nameof(GetApprovalById), new { id = request.SalonInformationId }, request);
             }
-            return BadRequest("Failed to create approval");
+            return BadRequest(new { message = "Duyệt thành công" });
         }
 
         [HttpPut("{id}")]
@@ -59,7 +59,7 @@ namespace Hairhub.API.Controllers
             {
                 return NoContent();
             }
-            return BadRequest("Failed to update approval");
+            return BadRequest(new { message = "Cập nhật đơn duyệt thất bại" });
         }
 
         [HttpDelete("{id}")]
@@ -69,7 +69,7 @@ namespace Hairhub.API.Controllers
             {
                 return NoContent();
             }
-            return NotFound("Approval not found");
+            return NotFound(new { message = "Approval not found" });
         }
     }
 }

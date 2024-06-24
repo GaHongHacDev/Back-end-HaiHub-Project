@@ -51,7 +51,6 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAdminVoucher([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-
             var listVoucher = await _voucherService.GetAdminVoucher(page, size);
             return Ok(listVoucher);
         }

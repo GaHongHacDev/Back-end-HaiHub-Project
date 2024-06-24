@@ -15,6 +15,7 @@ using Hairhub.Domain.Dtos.Responses.Accounts;
 using AutoMapper;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Dtos.Responses.Appointments;
+using CloudinaryDotNet.Core;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -30,11 +31,11 @@ namespace Hairhub.Service.Services.Services
             _configuaration = configuaration;
             _mapper = mapper;
         }
-        public async Task<LoginResponse> Login(string userName, string password)
+        public async Task<LoginResponse> Login(string phone, string password)
         {
 
             var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
-                predicate: u => u.Username == userName && u.Password == password,
+                predicate: u => u.Phone == phone && u.Password == password,
                 include: x => x.Include(a => a.Role));
             // return null if user not found
             if (account == null)
@@ -49,7 +50,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
             // authentication successful so generate jwt token and refresh token
-            var accessToken = GenerateToken(account.Username, account.Role.RoleName);
+            var accessToken = GenerateToken(account.Phone, account.Role.RoleName);
             var refreshToken = GenerateRefreshToken();
             var newRefrehToken = new RefreshTokenAccount()
             {
@@ -118,7 +119,7 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Account not found or expired");
             }
 
-            var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
+            var accessToken = GenerateToken(account.Phone, account.RoleId.ToString());
             refreshTokenEntity.AccessToken = accessToken;
             _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;

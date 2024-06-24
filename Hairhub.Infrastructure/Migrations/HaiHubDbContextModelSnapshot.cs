@@ -39,16 +39,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("password");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("phone");
+
                     b.Property<Guid>("RoleId")
                         .HasMaxLength(64)
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("username");
 
                     b.HasKey("Id");
 
@@ -78,6 +78,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("full_name");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("img")
                         .IsRequired()
@@ -297,12 +301,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("address");
 
-                    b.Property<DateTime>("DayOfBirth")
+                    b.Property<DateTime?>("DayOfBirth")
                         .HasColumnType("datetime2")
                         .HasColumnName("day_of_birth");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("email");
@@ -314,7 +317,6 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("full_name");
 
                     b.Property<string>("Gender")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("gender");
@@ -324,8 +326,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("img");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("phone");
 
                     b.HasKey("Id");
@@ -556,6 +558,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("phone");
@@ -608,9 +611,9 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("name");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("phone");
 
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uniqueidentifier")
@@ -657,12 +660,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("address");
 
-                    b.Property<DateTime>("DayOfBirth")
+                    b.Property<DateTime?>("DayOfBirth")
                         .HasColumnType("datetime2")
                         .HasColumnName("day_of_birth");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("email");
@@ -674,7 +676,6 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("full_name");
 
                     b.Property<string>("Gender")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("gender");
@@ -685,8 +686,9 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("img");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("phone");
 
                     b.HasKey("Id");
