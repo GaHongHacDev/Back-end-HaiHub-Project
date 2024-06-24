@@ -66,9 +66,9 @@ namespace Hairhub.API.Controllers
              }
          }
 
-        /*[HttpPut]
+        [HttpPut]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> UpdateAppointment([FromRoute] Guid id, [FromBody] ConfirmReportRequest confirmReportRequest)
+        public async Task<IActionResult> ConfirmReport([FromRoute] Guid id, [FromBody] ConfirmReportRequest confirmReportRequest)
         {
             try
             {
@@ -88,6 +88,5 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-       */
     }
 }
