@@ -2,6 +2,7 @@
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Voucher;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
@@ -105,7 +106,11 @@ namespace Hairhub.API.Controllers
                 }
                 return Ok("Creted Successfully");
 
-            } catch (Exception ex)
+            }catch(NotFoundException ex)
+            {
+                return NotFound(new { message=ex.Message});
+            } 
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

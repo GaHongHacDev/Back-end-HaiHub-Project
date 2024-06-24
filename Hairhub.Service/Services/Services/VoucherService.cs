@@ -35,14 +35,26 @@ namespace Hairhub.Service.Services.Services
         }
         public async Task<bool> CreateVoucherAsync(CreateVoucherRequest request)
         {
-            var voucher = _mapper.Map<Voucher>(request);    
-            voucher.Id = Guid.NewGuid();
-            voucher.Code = GenerateRandomCode(10);
+            try
+            {
+                var salon = _unitofwork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == request.SalonInformationId);
+                if (salon == null)
+                {
+                    throw new NotFoundException("Không tìm thấy salon, barber shop");
+                }
+                var voucher = _mapper.Map<Voucher>(request);
+                voucher.Id = Guid.NewGuid();
+                voucher.Code = GenerateRandomCode(10);
 
-            await _unitofwork.GetRepository<Voucher>().InsertAsync(voucher);
-            bool isCreated = await _unitofwork.CommitAsync() > 0;
-
-            return isCreated;          
+                await _unitofwork.GetRepository<Voucher>().InsertAsync(voucher);
+                bool isCreated = await _unitofwork.CommitAsync() > 0;
+                return isCreated;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+       
                 
         }
 
