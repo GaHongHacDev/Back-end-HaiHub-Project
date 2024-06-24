@@ -11,6 +11,6 @@ namespace Hairhub.Domain.Enums
         Admin,
         SalonOwner,
         SalonEmployee,
-        Customer
+        Customer,
     }
 }

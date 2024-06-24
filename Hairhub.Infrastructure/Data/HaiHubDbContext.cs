@@ -47,6 +47,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<Voucher> vouchers { get; set; }
         public virtual DbSet<Payment> payments { get; set; }
         public virtual DbSet<Config> configs { get; set; }
+        public virtual DbSet<Report> reports { get; set; }
         public virtual DbSet<ServiceEmployee> ServiceEmployees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -255,6 +256,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Latitude).HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.TotalRating).HasColumnName("total_rating");
                 entity.Property(e => e.TotalReviewer).HasColumnName("total_reviewer");
+                entity.Property(e => e.NumberOfReported).HasColumnName("number_of_reported");
                 entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
 
                 entity.HasOne(d => d.SalonOwner)
@@ -308,6 +310,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Phone).HasMaxLength(50).HasColumnName("phone").IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(250).HasColumnName("address").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
+                entity.Property(e => e.NumberOfReported).HasColumnName("number_of_report").IsRequired(false);
 
                 entity.HasOne(d => d.Account)
                       .WithMany(p => p.Customers)
@@ -328,6 +331,8 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)").HasColumnName("total_price");
                 entity.Property(e => e.OriginalPrice).HasColumnName("original_price").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.DiscountedPrice).HasColumnName("discounted_price").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.IsReportByCustomer).HasColumnName("is_report_by_customer");
+                entity.Property(e => e.IsReportBySalon).HasColumnName("is_report_by_salon");
                 entity.Property(e => e.Status).HasMaxLength(25).HasColumnName("status");
 
                 entity.HasOne(d => d.Customer)
@@ -424,6 +429,7 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
+                entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
 
@@ -432,6 +438,12 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.FeedbackId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_feedback_static_file");
+
+                entity.HasOne(d => d.Report)
+                      .WithMany(p => p.StaticFiles)
+                      .HasForeignKey(d => d.FeedbackId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_report_static_file");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
@@ -495,6 +507,39 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.DateCreate).HasColumnName("date_create");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
+
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("report");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.SalonId).HasColumnName("salon_id").IsRequired(false);
+                entity.Property(e => e.CustomerId).HasColumnName("customer_id").IsRequired(false);
+                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
+                entity.Property(e => e.RoleNameReport).HasMaxLength(50).HasColumnName("role_name_report");
+                entity.Property(e => e.CreateDate).HasColumnName("create_date");
+                entity.Property(e => e.TimeConfirm).HasColumnName("time_confirm").IsRequired(false);
+                entity.Property(e => e.DescriptionAdmin).HasMaxLength(255).HasColumnName("description_admin").IsRequired(false);
+                entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
+
+                entity.HasOne(d => d.SalonInformation)
+                      .WithMany(p => p.Report)
+                      .HasForeignKey(d => d.SalonId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_salon_report");
+                entity.HasOne(d => d.Customer)
+                      .WithMany(p => p.Report)
+                      .HasForeignKey(d => d.CustomerId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_customer_report");
+                entity.HasOne(d => d.Appointment)
+                      .WithMany(p => p.Report)
+                      .HasForeignKey(d => d.AppointmentId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_report");
+            });
+
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Hairhub.Domain.Entitities
         public Decimal TotalPrice { get; set; }
         public Decimal OriginalPrice { get; set; }
         public Decimal DiscountedPrice { get; set; }
+        public bool? IsReportByCustomer {  get; set; }
+        public bool? IsReportBySalon { get; set; }
         public string Status { get; set; }
 
 
@@ -24,6 +26,6 @@ namespace Hairhub.Domain.Entitities
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; }
         public virtual ICollection<AppointmentDetailVoucher> AppointmentDetailVouchers { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
-
+        public virtual ICollection<Report> Report { get; set; }
     }
 }

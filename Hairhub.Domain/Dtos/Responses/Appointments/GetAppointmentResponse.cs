@@ -11,6 +11,8 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public Decimal TotalPrice { get; set; }
         public Decimal OriginalPrice { get; set; }
         public Decimal DiscountedPrice { get; set; }
+        public bool? IsReportByCustomer { get; set; }
+        public bool? IsReportBySalon { get; set; }
         public string Status { get; set; }
         public List<GetAppointmentDetailResponse> AppointmentDetails { get; set; } = new List<GetAppointmentDetailResponse>();
         public AppointmentSalon SalonInformation { get; set; }

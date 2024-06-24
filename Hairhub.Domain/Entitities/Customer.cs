@@ -18,9 +18,11 @@ namespace Hairhub.Domain.Entitities
         public string? Email { get; set; }
         public string? Address { get; set; }
         public string? Img { get; set; }
+        public int? NumberOfReported { get; set; }
 
         public Account Account { get; set; }
         public virtual ICollection<Appointment> Appointments { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
+        public virtual ICollection<Report> Report { get; set; }
     }
 }

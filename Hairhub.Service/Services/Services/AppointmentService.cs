@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Actions;
-using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Appointments;
-using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Appointments;
-using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
@@ -14,13 +10,6 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -78,7 +67,7 @@ namespace Hairhub.Service.Services.Services
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
                                                               || x.Status.Equals(AppointmentStatus.CancelByCustomer)
-                                                              || x.Status.Equals(AppointmentStatus.CancelBySalon)),
+                                                              ),
                                                    include: query => query.Include(a => a.Customer)
                                                                            .Include(a => a.AppointmentDetails)
                                                                                 .ThenInclude(ad => ad.SalonEmployee)
@@ -733,7 +722,7 @@ namespace Hairhub.Service.Services.Services
             }
 
             if (!updateAppointmentRequest.Status.Equals(AppointmentStatus.Successed) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Fail)
-                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelByCustomer) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelBySalon)
+                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelByCustomer)
                 && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Booking))
             {
                 throw new Exception("Status không tồn tại");

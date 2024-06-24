@@ -120,6 +120,7 @@ namespace Hairhub.Service.Services.Services
                 userInfor.Id = Guid.NewGuid();
                 userInfor.AccountId = account.Id;
                 userInfor.Img = _configuaration["Default:Avatar_Default"];
+                userInfor.NumberOfReported = 0;
                 await _unitOfWork.GetRepository<Customer>().InsertAsync(userInfor);
                 createAccountResponse.Img = userInfor.Img;
             }
