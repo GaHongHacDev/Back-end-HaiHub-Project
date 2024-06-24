@@ -135,6 +135,10 @@ namespace Hairhub.Service.Services.Services
                 await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonInfo);
                 createAccountResponse.Img = salonInfo.Img;
             }
+            else
+            {
+                throw new Exception("Không thể đăng ký tài khoản");
+            }
             await _unitOfWork.GetRepository<Domain.Entitities.Account>().InsertAsync(account);
             await _unitOfWork.CommitAsync();
             

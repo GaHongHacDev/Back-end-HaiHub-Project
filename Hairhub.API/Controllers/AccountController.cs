@@ -27,13 +27,13 @@ namespace Hairhub.API.Controllers
                 var accoutResponse = await _accountService.RegisterAccount(createAccountRequest);
                 if (accoutResponse == null)
                 {
-                    return BadRequest("Cannot register account!");
+                    return BadRequest(new { message = "Không thể đăng ký tài khoản" });
                 }
                 return Ok(accoutResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
