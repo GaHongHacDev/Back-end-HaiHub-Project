@@ -1,14 +1,11 @@
 ﻿using Hairhub.Domain.Enums;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using IronBarCode;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Common.CommonService.Contract;
+using Microsoft.AspNetCore.Http;
 
 namespace Hairhub.Common.CommonService.Implementation
 {
@@ -28,8 +25,7 @@ namespace Hairhub.Common.CommonService.Implementation
 
         public async Task<string> GenerateQR(Guid AppointmentId)
         {
-            string qrAppointment = $"{AppointmentId.ToString()}";
-            //string encryptAccountResponseString = EncryptData(qrAccountString, SD.QR_CODE_KEY);
+            string qrAppointment = $"{AppointmentId}";
             string pathName = MediaPath.QR_APPOINTMENT;
             IFormFile qr = GenerateQRCodeImage(qrAppointment);
             var url = await _mediaService.UploadAnImage(qr, pathName, AppointmentId.ToString());
@@ -51,7 +47,11 @@ namespace Hairhub.Common.CommonService.Implementation
             MemoryStream ms = new MemoryStream(barcodeBytes);
 
             // Create an IFormFile from the MemoryStream
-            IFormFile formFile = new FormFile(ms, 0, ms.Length, "barcode.png", "image/png");
+            IFormFile formFile = new FormFile(ms, 0, ms.Length, "barcode", "barcode.png")
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "image/png"
+            };
 
             // Set the position of the MemoryStream back to the beginning for subsequent reads
             ms.Position = 0;

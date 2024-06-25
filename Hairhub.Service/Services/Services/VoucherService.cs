@@ -132,7 +132,7 @@ namespace Hairhub.Service.Services.Services
             Voucher voucherResponse = await _unitofwork
                 .GetRepository<Voucher>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.Id.Equals(id)
+                    predicate: x => x.Id == id
                  );
 
             if (voucherResponse == null) return null;
@@ -144,7 +144,7 @@ namespace Hairhub.Service.Services.Services
             Voucher voucherResponse = await _unitofwork
                 .GetRepository<Voucher>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.SalonInformationId.Equals(id),
+                    predicate: x => x.SalonInformationId == id,
                     include: query => query.Include(s => s.SalonInformation)
                  );
 
@@ -156,7 +156,7 @@ namespace Hairhub.Service.Services.Services
         {
             var voucher = await _unitofwork.GetRepository<Voucher>()
           .GetPagingListAsync(
-                predicate: x => x.SalonInformationId.Equals(id) && (x.IsSystemCreated || x.IsSystemCreated == true),
+                predicate: x => x.SalonInformationId == id && (x.IsSystemCreated || x.IsSystemCreated == true),
               include: query => query.Include(s => s.SalonInformation),
               page: page,
               size: size
@@ -178,7 +178,7 @@ namespace Hairhub.Service.Services.Services
             var now = DateTime.UtcNow;
             var voucher = await _unitofwork.GetRepository<Voucher>()
           .GetPagingListAsync(
-              predicate: x => x.SalonInformationId.Equals(salonId) && x.ExpiryDate > now,
+              predicate: x => x.SalonInformationId == salonId && x.ExpiryDate > now,
               include: query => query.Include(s => s.SalonInformation),
               page: page,
               size: size
