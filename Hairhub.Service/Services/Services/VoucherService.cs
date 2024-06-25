@@ -139,17 +139,17 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetVoucherResponse>(voucherResponse);
         }
 
-        public async Task<GetVoucherResponse?> GetVoucherbySalonId(Guid id)
+        public async Task<List<GetVoucherResponse>> GetVoucherbySalonId(Guid id)
         {
-            Voucher voucherResponse = await _unitofwork
+            List<Voucher> voucherResponse = new List<Voucher>();
+            voucherResponse = (List<Voucher>)await _unitofwork
                 .GetRepository<Voucher>()
-                .SingleOrDefaultAsync(
-                    predicate: x => x.SalonInformationId == id,
+                .GetListAsync(
+                    predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true,
                     include: query => query.Include(s => s.SalonInformation)
                  );
 
-            if (voucherResponse == null) return null;
-            return _mapper.Map<GetVoucherResponse>(voucherResponse);
+            return _mapper.Map<List<GetVoucherResponse>>(voucherResponse);
         }
 
         public async Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size)
