@@ -8,75 +8,17 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 using System.Text;
 using Hairhub.Domain.Enums;
+using Hairhub.Common.Security;
 
 namespace Hairhub.Common.CommonService.Implementation
 {
     public class QRCodeService : IQRCodeService
     {
         private readonly IMediaService _mediaService;
-        private static readonly string encryptionKey = "hairhub";
 
         public QRCodeService(IMediaService media)
         {
             _mediaService = media;
-        }
-
-        private string EncryptAES(string plainText)
-        {
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = GetAesKey(encryptionKey);
-                aes.IV = new byte[16]; // Default IV to 0
-
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter sw = new StreamWriter(cs))
-                        {
-                            sw.Write(plainText);
-                        }
-                    }
-                    byte[] encryptedBytes = ms.ToArray();
-                    return Convert.ToBase64String(encryptedBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
-                }
-            }
-        }
-
-        private string DecryptAES(string cipherText)
-        {
-            string modifiedCipherText = cipherText.Replace("-", "+").Replace("_", "/") + "==".Substring(0, (4 - cipherText.Length % 4) % 4);
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = GetAesKey(encryptionKey);
-                aes.IV = new byte[16]; // Default IV to 0
-
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(modifiedCipherText)))
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader sr = new StreamReader(cs))
-                        {
-                            return sr.ReadToEnd();
-                        }
-                    }
-                }
-            }
-        }
-
-        private byte[] GetAesKey(string key)
-        {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-                byte[] hash = sha256.ComputeHash(keyBytes);
-                Array.Resize(ref hash, 32); // Ensure the key is 32 bytes long
-                return hash;
-            }
         }
 
         public async Task<string> DecodeQR(string hashedAppointmentData)
@@ -90,8 +32,8 @@ namespace Hairhub.Common.CommonService.Implementation
             try
             {
                 string qrAppointment = $"{AppointmentId}";
-                string dataEncrypt = EncryptAES(qrAppointment);
-                //string decryptedQrAppointment = DecryptAES(dataEncrypt);
+                string dataEncrypt = AesEncoding.EncryptAES(qrAppointment);
+                //string decryptedQrAppointment = AesEncoding.DecryptAES(dataEncrypt);
                 string pathName = MediaPath.QR_APPOINTMENT;
                 IFormFile qr = GenerateQRCodeImage(dataEncrypt);
                 var url = await _mediaService.UploadAnImage(qr, pathName, dataEncrypt);
