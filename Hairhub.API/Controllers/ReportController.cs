@@ -36,35 +36,35 @@ namespace Hairhub.API.Controllers
             return Ok(reportsResponse);
         }
 
-          [HttpGet]
-          [Route("{salonId:Guid}")]
-          public async Task<IActionResult> GetReportBySalonId([FromRoute] Guid salonId, [FromQuery] int page = 1, [FromQuery] int size = 10)
-          {
-              var reportsResponse = await _reportService.GetReportBySalonId(salonId, page, size);
-              return Ok(reportsResponse);
-          }
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        public async Task<IActionResult> GetReportBySalonId([FromRoute] Guid salonId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            var reportsResponse = await _reportService.GetReportBySalonId(salonId, page, size);
+            return Ok(reportsResponse);
+        }
 
-         [HttpPost]
-         public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest createReportRequest)
-         {
-             try
-             {
-                 var reportResponse = await _reportService.CreateReport(createReportRequest);
-                 if (reportResponse == false)
-                 {
-                     return NotFound(new { message = "Không thể tạo đơn báo cáo" });
-                 }
-                 return Ok("Tạo báo cáo thành công");
-             }
-             catch (NotFoundException ex)
-             {
-                 return NotFound(new { message = ex.Message });
-             }
-             catch (Exception ex)
-             {
-                 return BadRequest(new { message = ex.Message });
-             }
-         }
+        [HttpPost]
+        public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest createReportRequest)
+        {
+            try
+            {
+                var reportResponse = await _reportService.CreateReport(createReportRequest);
+                if (reportResponse == false)
+                {
+                    return NotFound(new { message = "Không thể tạo đơn báo cáo" });
+                }
+                return Ok("Tạo báo cáo thành công");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         [HttpPut]
         [Route("{id:Guid}")]

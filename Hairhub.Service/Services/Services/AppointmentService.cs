@@ -10,6 +10,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Hairhub.Common.CommonService.Contract;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -18,12 +19,14 @@ namespace Hairhub.Service.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAppointmentDetailService _appointmentDetailService;
+        private readonly IQRCodeService _qrCodeService;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _appointmentDetailService = appointmentDetailService;
+            _qrCodeService = qrCodeService;
         }
 
         #region GET
@@ -658,9 +661,15 @@ namespace Hairhub.Service.Services.Services
         #region Create Update Delete Active
         public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
-            var appointment = new Appointment() 
+            Guid id = Guid.NewGuid();
+            string url = await _qrCodeService.GenerateQR(id);
+            if (String.IsNullOrEmpty(url))
             {
-                Id = Guid.NewGuid(),
+                throw new Exception("Không thể tạo QR check in cho đơn đặt lịch này");
+            }
+            var appointment = new Appointment()
+            {
+                Id = id,
                 CustomerId = request.CustomerId,
                 CreatedDate = DateTime.Now,
                 StartDate = request.StartDate,
@@ -668,6 +677,7 @@ namespace Hairhub.Service.Services.Services
                 OriginalPrice = request.OriginalPrice,
                 DiscountedPrice = request.DiscountedPrice,
                 Status = AppointmentStatus.Booking,
+                QrCodeImg = url,
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 

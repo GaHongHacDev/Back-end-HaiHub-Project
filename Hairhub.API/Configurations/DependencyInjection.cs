@@ -1,4 +1,6 @@
-﻿using Hairhub.Domain.Entitities;
+﻿using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Common.ThirdParties.Implementation;
+using Hairhub.Domain.Entitities;
 using Hairhub.Infrastructure.Repository;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;

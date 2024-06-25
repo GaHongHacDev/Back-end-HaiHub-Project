@@ -19,6 +19,9 @@ namespace Hairhub.Domain.Entitities
         public Decimal DiscountedPrice { get; set; }
         public bool? IsReportByCustomer {  get; set; }
         public bool? IsReportBySalon { get; set; }
+        public string? ReasonCancel { get; set; }
+        public DateTime? CancelDate { get; set; }
+        public string? QrCodeImg { get; set; }
         public string Status { get; set; }
 
 

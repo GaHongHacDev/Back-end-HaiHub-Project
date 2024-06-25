@@ -26,6 +26,8 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public string Address { get; set; }
         public string? Description { get; set; }
         public string Img { get; set; }
+        public string Longitude { get; set; }
+        public string Latitude { get; set; }
     }
 
     public class CustomerAppointment

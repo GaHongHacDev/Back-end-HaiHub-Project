@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;

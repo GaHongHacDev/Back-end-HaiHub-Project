@@ -8,7 +8,7 @@ using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using CloudinaryDotNet;
+using Hairhub.Common.ThirdParties.Contract;
 
 
 namespace Hairhub.Service.Services.Services

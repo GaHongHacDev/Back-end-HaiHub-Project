@@ -102,6 +102,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("cancel_date");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_date");
@@ -125,6 +129,16 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("original_price");
+
+                    b.Property<string>("QrCodeImg")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("qr_code_img");
+
+                    b.Property<string>("ReasonCancel")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("reason_report");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2")

@@ -25,9 +25,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
 
         // DBSet<>
@@ -331,8 +331,11 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.TotalPrice).HasColumnType("decimal(18, 2)").HasColumnName("total_price");
                 entity.Property(e => e.OriginalPrice).HasColumnName("original_price").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.DiscountedPrice).HasColumnName("discounted_price").HasColumnType("decimal(18,2)");
-                entity.Property(e => e.IsReportByCustomer).HasColumnName("is_report_by_customer");
-                entity.Property(e => e.IsReportBySalon).HasColumnName("is_report_by_salon");
+                entity.Property(e => e.IsReportByCustomer).HasColumnName("is_report_by_customer").IsRequired(false);
+                entity.Property(e => e.IsReportBySalon).HasColumnName("is_report_by_salon").IsRequired(false);
+                entity.Property(e => e.ReasonCancel).HasMaxLength(255).HasColumnName("reason_report").IsRequired(false);
+                entity.Property(e => e.CancelDate).HasColumnName("cancel_date").IsRequired(false);
+                entity.Property(e => e.QrCodeImg).HasMaxLength(255).HasColumnName("qr_code_img").IsRequired(false);
                 entity.Property(e => e.Status).HasMaxLength(25).HasColumnName("status");
 
                 entity.HasOne(d => d.Customer)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Annotations;
+using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Feedbacks;
 using Hairhub.Domain.Dtos.Responses.Feedbacks;
