@@ -156,7 +156,7 @@ namespace Hairhub.Service.Services.Services
         {
             var voucher = await _unitofwork.GetRepository<Voucher>()
           .GetPagingListAsync(
-                predicate: x => x.SalonInformationId == id && (x.IsSystemCreated || x.IsSystemCreated == true),
+                predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true,
               include: query => query.Include(s => s.SalonInformation),
               page: page,
               size: size
