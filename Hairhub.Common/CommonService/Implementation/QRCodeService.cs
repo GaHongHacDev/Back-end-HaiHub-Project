@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Common.CommonService.Contract;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 
 namespace Hairhub.Common.CommonService.Implementation
 {
