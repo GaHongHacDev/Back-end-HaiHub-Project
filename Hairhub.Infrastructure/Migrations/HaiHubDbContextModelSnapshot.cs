@@ -138,7 +138,7 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<string>("ReasonCancel")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
-                        .HasColumnName("reason_report");
+                        .HasColumnName("reason_cancel");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2")
