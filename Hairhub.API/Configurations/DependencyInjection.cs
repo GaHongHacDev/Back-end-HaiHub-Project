@@ -39,6 +39,7 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<ISalonEmployeeService, SalonEmployeeService>();
             services.AddScoped<ISalonInformationService, SalonInformationService>();
             services.AddScoped<IServiceHairService, ServiceHairService>();
+            services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IQRCodeService, QRCodeService>();
             services.AddScoped<IPaymentService, PaymentService>();
