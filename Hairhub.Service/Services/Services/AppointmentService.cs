@@ -790,7 +790,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Voucher Not Found");
                 }
-                discountPercentage = existingVoucher.DiscountPercentage / 100;
+                discountPercentage = existingVoucher.DiscountPercentage;
             }
 
             var serviceHairIds = calculatePriceRequest.ServiceHairId;
