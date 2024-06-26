@@ -696,8 +696,7 @@ namespace Hairhub.Service.Services.Services
                      var voucher = await _unitOfWork.GetRepository<Voucher>()
                                               .SingleOrDefaultAsync
                                               (
-                                                 predicate: x => x.Id == item && x.ExpiryDate >= DateTime.Now
-                                                             && x.MinimumOrderAmount <= request.TotalPrice
+                                                 predicate: x => x.Id == item
                                                              && x.IsActive == true
                                               );
                      if (voucher == null)
