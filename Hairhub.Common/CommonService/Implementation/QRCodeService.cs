@@ -32,15 +32,11 @@ namespace Hairhub.Common.CommonService.Implementation
             try
             {
                 string qrAppointment = $"{AppointmentId}";
-                string dataEncrypt = AesEncoding.EncryptAES(qrAppointment);
+                //string dataEncrypt = AesEncoding.EncryptAES(qrAppointment);
                 //string decryptedQrAppointment = AesEncoding.DecryptAES(dataEncrypt);
                 string pathName = MediaPath.QR_APPOINTMENT;
-                IFormFile qr = GenerateQRCodeImage(dataEncrypt);
-                var url = await _mediaService.UploadAnImage(qr, pathName, dataEncrypt);
-                if (String.IsNullOrEmpty(url))
-                {
-                    return null;
-                }
+                IFormFile qr = GenerateQRCodeImage(qrAppointment);
+                var url = await _mediaService.UploadAnImage(qr, pathName, qrAppointment);
                 return url;
             }
             catch (Exception ex)
