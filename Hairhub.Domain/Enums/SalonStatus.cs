@@ -12,8 +12,8 @@ namespace Hairhub.Domain.Enums
         public static string Rejected = "REJECTED";
         public static string Pending = "PENDING";
         public static string Edited = "EDITED";
-        public static string Unavailable = "UNAVAILABLE";
+        public static string Suspended = "SUSPENDED"; // bị report 4 lần => Nộp tiền để comeback
         public static string Creating = "CREATING";
-        public static string Disabled = "DISABLED";
+        public static string Deleted = "DELETED"; // bị report 5 lần => Xóa khỏi hệ thống
     }
 }

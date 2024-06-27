@@ -11,6 +11,7 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
 {
     public class GetReportResponse
     {
+        public Guid Id { get; set; }
         public Guid? SalonId { get; set; }
         public Guid? CustomerId { get; set; }
         public Guid AppointmentId { get; set; }

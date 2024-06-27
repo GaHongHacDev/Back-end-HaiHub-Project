@@ -33,7 +33,7 @@ namespace Hairhub.Service.Services.Services
                                                include: x => x.Include(s => s.SalonInformation)
                                                                   .ThenInclude(s => s.SalonOwner)
                                                               .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment),
+                                                              .Include(s => s.Appointment).ThenInclude(s=>s.AppointmentDetails),
                                                page: page,
                                                size: size
                                            );
@@ -57,7 +57,7 @@ namespace Hairhub.Service.Services.Services
                                                include: x => x.Include(s => s.SalonInformation)
                                                                 .ThenInclude(s => s.SalonOwner)
                                                               .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment),
+                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails),
                                                page: page,
                                                size: size
                                            );
@@ -80,7 +80,7 @@ namespace Hairhub.Service.Services.Services
                                              include: x => x.Include(s => s.SalonInformation)
                                                                 .ThenInclude(s => s.SalonOwner)
                                                             .Include(s => s.Customer)
-                                                            .Include(s => s.Appointment),
+                                                            .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails),
                                                predicate: x => x.SalonId == salonId,
                                                page: page,
                                                size: size
@@ -195,9 +195,9 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> ConfirmReport(Guid id,  ConfirmReportRequest request)
         {
-            if (!request.Status.Equals(ReportStatus.Pending))
+            if (!request.Status.Equals(ReportStatus.Approved)&& !request.Status.Equals(ReportStatus.Rejected))
             {
-                throw new NotFoundException("Không thể duyệt báo cáo với trạng thái là đồng ý hoặc từ chối");
+                throw new NotFoundException("Sai trạng thái duyệt");
             }
             var report = await _unitOfWork.GetRepository<Report>()
                                           .SingleOrDefaultAsync
@@ -213,15 +213,35 @@ namespace Hairhub.Service.Services.Services
                 var salon = await _unitOfWork.GetRepository<SalonInformation>()
                                         .SingleOrDefaultAsync
                                         (
-                                           predicate: x=>x.Id == report.SalonId && x.Status.Equals(SalonStatus.Approved)
+                                           predicate: x=>x.Id == report.SalonId
                                         );
-                if (salon == null)
+                if (salon != null)
                 {
-                    throw new NotFoundException("Không tìm thấy salon, barber shop");
+                    salon.NumberOfReported++;
+                    //Xử lý khi salon bị báo cáo, reported+=1
+                    switch (salon.NumberOfReported)
+                    {
+                        case 1:
+                            SendMailNotificatinRemind(salon);
+                            break;
+                        case 2:
+                            SendMailNotificatinRemind(salon);
+                            break;
+                        case 3:
+                            SendMailNotificatinRemind(salon);
+                            break;
+                        case 4:
+                            salon = SuspendedSalon(salon);
+                            break;
+                        case 5:
+                            salon = RemoveFromSystem(salon);
+                            break;
+
+                    }
+                    _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
                 }
-                salon.NumberOfReported++;
-                _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
             }
+               
             else if (report.RoleNameReport.Equals(RoleEnum.SalonOwner.ToString()) || request.Status.Equals(ReportStatus.Approved))
             {
                 var customer = await _unitOfWork.GetRepository<Customer>()
@@ -229,12 +249,11 @@ namespace Hairhub.Service.Services.Services
                                         (
                                            predicate: x => x.Id == report.SalonId && x.Account.IsActive
                                         );
-                if (customer == null)
+                if (customer != null)
                 {
-                    throw new NotFoundException("Không tìm thấy người đặt lịch");
+                    customer.NumberOfReported++;
+                    _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
                 }
-                customer.NumberOfReported++;
-                _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
             }
             report.TimeConfirm = DateTime.Now;
             report.Status = request.Status;
@@ -242,6 +261,36 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<Report>().UpdateAsync(report);
             bool isConfirm = await _unitOfWork.CommitAsync() > 0;
             return isConfirm;
+        }
+
+        // Xóa salon khởi hệ thống, reported = 5
+        private SalonInformation RemoveFromSystem(SalonInformation salon)
+        {
+            //Gửi mail hoặc sdt -> Chỉ cần gửi thông báo 1 lần khi reported = 5 thôi
+            if (salon.NumberOfReported == 5)
+            {
+
+            }
+            //Chuyển trạng thái Salon
+            salon.Status = SalonStatus.Deleted;
+            return salon;
+        }
+
+        // Đóng salon, nộp tiền để comeback, reported = 4
+        private SalonInformation SuspendedSalon(SalonInformation salon)
+        {
+            //Gửi mail hoặc sdt
+            //Chuyển trạng thái Salon
+            salon.Status = SalonStatus.Suspended;
+            return salon;
+        }
+
+        // Gửi thông báo cảnh cáo khi salon bị report < 4
+        private bool SendMailNotificatinRemind(SalonInformation salon)
+        {
+            //Gửi mail nhắc nhở
+            string userEmail = salon.SalonOwner.Email;
+            return true;
         }
     }
 }

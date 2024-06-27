@@ -8,7 +8,6 @@ namespace Hairhub.Domain.Dtos.Requests.Reports
 {
     public class ConfirmReportRequest
     {
-        public DateTime? TimeConfirm { get; set; }
         public string? DescriptionAdmin { get; set; }
         public string Status {  get; set; }
     }
