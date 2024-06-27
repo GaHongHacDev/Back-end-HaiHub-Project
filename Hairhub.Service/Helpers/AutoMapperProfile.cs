@@ -33,6 +33,7 @@ using Hairhub.Domain.Dtos.Responses.Authentication;
 using Hairhub.Domain.Dtos.Requests.Approval;
 using Hairhub.Domain.Dtos.Responses.Approval;
 using Hairhub.Domain.Dtos.Responses.Reports;
+using Hairhub.Domain.Dtos.Requests.Reports;
 
 namespace Hairhub.Service.Helpers
 {
@@ -169,6 +170,7 @@ namespace Hairhub.Service.Helpers
             //Report CreateReportRequest
             CreateMap<Report, GetReportResponse>();
             CreateMap<Report, UpdateAccountRequest>();
+            CreateMap<Report, CreateReportRequest>().ReverseMap();
         }
     }
 }

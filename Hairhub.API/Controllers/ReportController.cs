@@ -45,7 +45,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateReport([FromBody] CreateReportRequest createReportRequest)
+        public async Task<IActionResult> CreateReport([FromForm] CreateReportRequest createReportRequest)
         {
             try
             {

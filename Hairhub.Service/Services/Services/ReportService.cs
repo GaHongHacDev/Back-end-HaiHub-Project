@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.Reports;
 using Hairhub.Domain.Dtos.Responses.Reports;
 using Hairhub.Domain.Entitities;
@@ -15,10 +16,13 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ReportService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IMediaService _mediaService;
+
+        public ReportService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         public async Task<IPaginate<GetReportResponse>> GetAllReport(int page, int size)
@@ -94,28 +98,43 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> CreateReport(CreateReportRequest request)
         {
             var report = _mapper.Map<Report>(request);
-            report.Id = new Guid();
+            report.Id = Guid.NewGuid();
             report.Status = ReportStatus.Pending;
             report.CreateDate = DateTime.Now;
             Appointment appointment = null;
-            if (request.CustomerId != null)
+            if (report.RoleNameReport.Equals(RoleEnum.Customer.ToString()))
             {
+                var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == report.CustomerId && x.Account.IsActive==true);
+                if (customer == null)
+                {
+                    throw new NotFoundException("Không thể tạo báo cáo vì tài khoản của bạn không hoạt động");
+                }
                  appointment = await _unitOfWork.GetRepository<Appointment>()
                                    .SingleOrDefaultAsync
                                    (
                                     predicate: x => x.Id == request.AppointmentId
                                                 && (
                                                 x.Status.Equals(AppointmentStatus.Successed)
-                                                || x.Status.Equals(AppointmentStatus.Booking)
+                                                || x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.CancelByCustomer)
                                                 )
                                    );
                 if (appointment == null)
                 {
-                    throw new NotFoundException("Bạn không được báo cáo salon, barber shop khi chưa đặt hoặc chưa check in");
+                    throw new NotFoundException("Bạn không thể báo cáo salon, barber shop khi chưa đặt lịch");
                 }
+                appointment.IsReportByCustomer = true;
             }
-            else if(request.SalonId != null)
+            else if(report.RoleNameReport.Equals(RoleEnum.SalonOwner.ToString()))
             {
+                var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync
+                                                                         (
+                                                                            predicate: x => x.Id == report.SalonId && x.Status.Equals(SalonStatus.Approved) 
+                                                                            && x.SalonOwner.Account.IsActive==true
+                                                                         );
+                if (salon == null)
+                {
+                    throw new NotFoundException("Tài khoản không còn hoạt động");
+                }
                 appointment = await _unitOfWork.GetRepository<Appointment>()
                                   .SingleOrDefaultAsync
                                   (
@@ -128,24 +147,47 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Bạn không được báo cáo người dùng khi chưa đến thời gian đặt lịch");
                 }
-            }
-            else
-            {
-                throw new Exception("Không tìm thông tin của bạn để báo cáo");
-            }
-
-            if (appointment == null)
-            {
-                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
-            }
-            if (request.CustomerId!=null)
-            {
-                appointment.IsReportByCustomer = true;
-            }
-            else
-            {
                 appointment.IsReportBySalon = true;
             }
+            else
+            {
+                throw new Exception("Thông tin người dùng báo cáo không chính xác");
+            }
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
+            if (request.ImgeReportRequest != null && request.ImgeReportRequest.Count > 0)
+            {
+                for (int i=0; i<request.ImgeReportRequest.Count; i++)
+                {
+                    var item = request.ImgeReportRequest[i];
+                    StaticFile staticFile = new StaticFile();
+                    staticFile.Id = Guid.NewGuid();
+                    staticFile.ReportId = report.Id;
+                    if (item != null)
+                    {
+                        try
+                        {
+                            staticFile.Img = await _mediaService.UploadAnImage(item, MediaPath.REPORT, "Img"+staticFile.Id.ToString() + i.ToString());
+                        }
+                        catch (Exception ex) 
+                        {
+                            throw new Exception("Lỗi tải ảnh lên");
+                        }
+                    }
+                    //if (item.VideoReport != null)
+                    //{
+                    //    try
+                    //    {
+                    //        staticFile.Video = await _mediaService.UploadAVideo(item.VideoReport, MediaPath.REPORT, "Video" + staticFile.Id.ToString() + i.ToString());
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        throw new Exception("Lỗi tải video lên");
+                    //    }
+                    //}
+                    await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                }
+            }
+
             await _unitOfWork.GetRepository<Report>().InsertAsync(report);
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
