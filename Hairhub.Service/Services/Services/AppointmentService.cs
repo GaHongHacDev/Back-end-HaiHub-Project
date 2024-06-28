@@ -508,7 +508,8 @@ namespace Hairhub.Service.Services.Services
                 }
                 var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
                 serviceHairResult.StartTime = StartTimeBooking;
-                serviceHairResult.EndTime = StartTimeBooking.AddHours((double)serviceHair.Time);
+                StartTimeBooking = StartTimeBooking.AddHours((double)serviceHair.Time);
+                serviceHairResult.EndTime = StartTimeBooking;
                 serviceHairResult.WaitingTime = waitingTime;
                 //Add list BookingDetail vào result
                 bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()

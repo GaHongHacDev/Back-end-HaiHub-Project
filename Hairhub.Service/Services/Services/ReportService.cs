@@ -268,7 +268,7 @@ namespace Hairhub.Service.Services.Services
         {
             //Gửi mail hoặc sdt 
             //Chuyển trạng thái Salon
-            salon.Status = SalonStatus.Deleted;
+            salon.Status = SalonStatus.Disable;
             return salon;
         }
 
