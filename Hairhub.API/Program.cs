@@ -65,6 +65,9 @@ builder.Services.AddDbContext<HaiHubDbContext>(options =>
     options.EnableSensitiveDataLogging(); // Thêm dòng này
 });
 
+//Config SignalR RealTime
+builder.Services.AddSignalR();
+
 //Setting Cors for all source
 builder.Services.AddCors(options =>
 {
