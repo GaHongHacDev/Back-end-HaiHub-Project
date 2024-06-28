@@ -266,11 +266,7 @@ namespace Hairhub.Service.Services.Services
         // Xóa salon khởi hệ thống, reported = 5
         private SalonInformation RemoveFromSystem(SalonInformation salon)
         {
-            //Gửi mail hoặc sdt -> Chỉ cần gửi thông báo 1 lần khi reported = 5 thôi
-            if (salon.NumberOfReported == 5)
-            {
-
-            }
+            //Gửi mail hoặc sdt 
             //Chuyển trạng thái Salon
             salon.Status = SalonStatus.Deleted;
             return salon;

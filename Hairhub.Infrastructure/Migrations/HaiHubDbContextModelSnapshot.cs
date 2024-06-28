@@ -39,16 +39,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("password");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("phone");
-
                     b.Property<Guid>("RoleId")
                         .HasMaxLength(64)
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("username");
 
                     b.HasKey("Id");
 

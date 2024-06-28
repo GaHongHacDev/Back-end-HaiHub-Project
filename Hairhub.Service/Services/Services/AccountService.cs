@@ -105,36 +105,35 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Role not found");
             }
-            var userName = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.Phone.Equals(createAccountRequest.Phone));
+            var userName = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(createAccountRequest.UserName));
             if (userName != null)
             {
                 throw new Exception("Username đã tồn tại!");
             }
             var account = _mapper.Map<Domain.Entitities.Account>(createAccountRequest);
+            account.Id = Guid.NewGuid();
+            account.RoleId = role.RoleId;
+            account.IsActive = true;
             if (RoleEnum.Customer.ToString().Equals(createAccountRequest.RoleName))
             {
-                var userInfor = _mapper.Map<Customer>(createAccountRequest);
-                account.Id = Guid.NewGuid();
-                account.RoleId = role.RoleId;
-                account.IsActive = true;
-                userInfor.Id = Guid.NewGuid();
-                userInfor.AccountId = account.Id;
-                userInfor.Img = _configuaration["Default:Avatar_Default"];
-                userInfor.NumberOfReported = 0;
-                await _unitOfWork.GetRepository<Customer>().InsertAsync(userInfor);
-                createAccountResponse.Img = userInfor.Img;
+                var customer = _mapper.Map<Customer>(createAccountRequest);
+                customer.Id = Guid.NewGuid();
+                customer.AccountId = account.Id;
+                customer.Img = _configuaration["Default:Avatar_Default"];
+                customer.Email = createAccountRequest.UserName;
+                customer.NumberOfReported = 0;
+                await _unitOfWork.GetRepository<Customer>().InsertAsync(customer);
+                createAccountResponse.Img = customer.Img;
             }
             else if (RoleEnum.SalonOwner.ToString().Equals(createAccountRequest.RoleName))
             {
-                var salonInfo = _mapper.Map<SalonOwner>(createAccountRequest);
-                account.Id = Guid.NewGuid();
-                account.RoleId = role.RoleId;
-                account.IsActive = true;
-                salonInfo.Id = Guid.NewGuid();
-                salonInfo.AccountId = account.Id;
-                salonInfo.Img = _configuaration["Default:Avatar_Default"];
-                await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonInfo);
-                createAccountResponse.Img = salonInfo.Img;
+                var salonOwner = _mapper.Map<SalonOwner>(createAccountRequest);
+                salonOwner.Id = Guid.NewGuid();
+                salonOwner.AccountId = account.Id;
+                salonOwner.Img = _configuaration["Default:Avatar_Default"];
+                salonOwner.Email = createAccountRequest.UserName;
+                await _unitOfWork.GetRepository<SalonOwner>().InsertAsync(salonOwner);
+                createAccountResponse.Img = salonOwner.Img;
             }
             else
             {
@@ -167,7 +166,6 @@ namespace Hairhub.Service.Services.Services
                 salonOwner.FullName = updateAccountRequest.FullName;
                 salonOwner.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth;
                 salonOwner.Gender = updateAccountRequest.Gender;
-                salonOwner.Email = updateAccountRequest.Email;
                 salonOwner.Phone = updateAccountRequest.Phone;
                 salonOwner.Address = updateAccountRequest.Address;
                 salonOwner.Img = urlImg;
@@ -185,7 +183,6 @@ namespace Hairhub.Service.Services.Services
                 customer.FullName = updateAccountRequest.FullName;
                 customer.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth;
                 customer.Gender = updateAccountRequest.Gender;
-                customer.Email = updateAccountRequest.Email;
                 customer.Phone = updateAccountRequest.Phone;
                 customer.Address = updateAccountRequest.Address;
                 customer.Img = urlImg;

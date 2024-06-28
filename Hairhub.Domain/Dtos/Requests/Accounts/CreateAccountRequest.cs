@@ -7,7 +7,10 @@ namespace Hairhub.Domain.Dtos.Requests.Accounts
         [Required]
         public string RoleName { get; set; }
         [Required]
-        public string Phone { get; set; }
+        [EmailAddress]
+        public string UserName { get; set; }
+        [Required]
+        public string Phone {  get; set; }
         [Required]
         [MinLength(8, ErrorMessage = "Mật khẩu phải ít nhất 8 ký tự")]
         public string Password { get; set; }
