@@ -12,5 +12,6 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<IPaginate<GetCustomerResponse>> GetCustomers(int page, int size);
         Task<GetCustomerResponse>? GetCustomerById(Guid id);
+        Task<bool> CheckInByCustomer(string dataAES, Guid customerId);
     }
 }

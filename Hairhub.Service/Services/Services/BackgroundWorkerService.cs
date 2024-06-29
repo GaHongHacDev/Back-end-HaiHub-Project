@@ -52,8 +52,6 @@ namespace Hairhub.Service.Services.Services
 
                 //Check status appointment
                 await ExecuteExpriredAppointment(stoppingToken);
-
-
             }
         }
         private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
@@ -75,10 +73,10 @@ namespace Hairhub.Service.Services.Services
                     {
                         foreach(var appointmentDetail in appointment.AppointmentDetails)
                         {
-                            appointmentDetail.Status = AppointmentStatus.Successed;
+                            appointmentDetail.Status = AppointmentStatus.Fail;
                             uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
                         }
-                        appointment.Status = AppointmentStatus.Successed;
+                        appointment.Status = AppointmentStatus.Fail;
                         uow.GetRepository<Appointment>().UpdateAsync(appointment);
                     }
                     uow.CommitAsync();

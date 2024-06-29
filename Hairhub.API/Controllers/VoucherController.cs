@@ -2,6 +2,7 @@
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Voucher;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
@@ -50,7 +51,6 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAdminVoucher([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-
             var listVoucher = await _voucherService.GetAdminVoucher(page, size);
             return Ok(listVoucher);
         }
@@ -66,6 +66,22 @@ namespace Hairhub.API.Controllers
                 {
                     return NotFound("Cannont find this voucher!");
                 }
+                return Ok(Voucher);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetVoucherBySalonIdNoPaging([FromRoute] Guid id)
+        {
+            try
+            {
+                var Voucher = await _voucherService.GetVoucherbySalonId(id);
                 return Ok(Voucher);
             }
             catch (Exception ex)
@@ -105,7 +121,11 @@ namespace Hairhub.API.Controllers
                 }
                 return Ok("Creted Successfully");
 
-            } catch (Exception ex)
+            }catch(NotFoundException ex)
+            {
+                return NotFound(new { message=ex.Message});
+            } 
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

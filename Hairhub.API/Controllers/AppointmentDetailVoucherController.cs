@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
 {
-    [Route(ApiEndPointConstant.AppointmentDetailVoucher.AppointmentDetailVouchersEndpoint + "/[action]")]
+   /* [Route(ApiEndPointConstant.AppointmentDetailVoucher.AppointmentDetailVouchersEndpoint + "/[action]")]
     [ApiController]
     public class AppointmentDetailVoucherController : ControllerBase
     {
@@ -40,13 +40,13 @@ namespace Hairhub.API.Controllers
                 var schedule = await _appointmentDetailVoucherService.GetAppointmentDetailVoucherById(id);
                 if (schedule == null)
                 {
-                    return NotFound();
+                    return NotFound(new {message = "Không tìm thấy chi tiết đơn đặt lịch"});
                 }
                 return Ok(schedule);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -60,7 +60,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -71,12 +71,16 @@ namespace Hairhub.API.Controllers
             try
             {
                 var isSuccessfull = await _appointmentDetailVoucherService.UpdateAppointmentDetailVoucher(id, request);
+                if (!isSuccessfull)
+                {
+
+                }
                 return Ok(isSuccessfull);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
-    }
+    }*/
 }

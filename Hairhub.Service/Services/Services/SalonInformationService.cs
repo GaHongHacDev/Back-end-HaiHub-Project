@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
@@ -61,6 +62,7 @@ namespace Hairhub.Service.Services.Services
             salonInformation.Rate = 0;
             salonInformation.TotalRating = 0;
             salonInformation.TotalReviewer = 0;
+            salonInformation.NumberOfReported = 0;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
@@ -86,14 +88,35 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> DeleteSalonInformationById(Guid id)
         {
-            var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == id);
-            if (salonInformation == null)
+            try
             {
-                throw new NotFoundException("SalonInformation not found!");
+                var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: p => p.SalonInformationId == id);
+                if (employees == null || !employees.Any())
+                {
+                    throw new NotFoundException("Không tìm thấy nhân viên nào trong salon này");
+                }
+
+                foreach (var employee in employees)
+                {
+                    var existingAppointments = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                               predicate: a => a.SalonEmployeeId == employee.Id 
+                                               && a.Status == AppointmentStatus.Booking && a.StartTime > DateTime.UtcNow.Date);
+                    if (existingAppointments.Any())
+                    {
+                        throw new Exception("Không thể xóa salon này vì có nhân viên có lịch hẹn");
+                    }
+                }
+                salonInformation.Status = SalonStatus.Disable;
+                _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
+                bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+                return isUpdate;                
+
             }
-            _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
-            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
-            return isUpdate;
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<IPaginate<GetSalonInformationResponse>> GetAllApprovedSalonInformation(int page, int size)

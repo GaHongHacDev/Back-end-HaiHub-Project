@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
 {
-    [Route(ApiEndPointConstant.AppointmentDetail.AppointmentDetailsEndpoint + "/[action]")]
+   /* [Route(ApiEndPointConstant.AppointmentDetail.AppointmentDetailsEndpoint + "/[action]")]
     [ApiController]
     public class AppointmentDetailController : BaseController
     {
@@ -37,38 +37,15 @@ namespace Hairhub.API.Controllers
                 var appointmentResponse = await _appointmentDetailService.GetAppointmentDetailById(id);
                 if (appointmentResponse == null)
                 {
-                    return NotFound("Appointment detail not found!");
+                    return NotFound(new { message = "Không tìm thấy chi tiết đơn đặt lịch" });
                 }
                 return Ok(appointmentResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
-
-      /*  [HttpPost]
-        public async Task<IActionResult> CreateAppointmentDetail([FromBody] CreateAppointmentDetailRequest createAppointmentRequest)
-        {
-            try
-            {
-                var accoutResponse = await _appointmentDetailService.CreateAppointmentDetail(createAppointmentRequest);
-                if (accoutResponse == null)
-                {
-                    return BadRequest("Cannot create appointment!");
-                }
-                return Ok(accoutResponse);
-            }
-            catch (NotFoundException ex)
-            {
-
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }*/
 
         [HttpPut]
         [Route("{id:Guid}")]
@@ -76,17 +53,12 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if (id == null)
-                {
-                    return BadRequest("Apointment Id is null or empty!");
-                }
-
                 bool isUpdate = await _appointmentDetailService.UpdateAppointmentDetailById(id, updateAppointmentDetailRequest);
                 if (!isUpdate)
                 {
-                    return BadRequest("Cannot update appointment detail");
+                    return BadRequest(new {message = "Không thể cập nhật chi tiết đơn đặt lịch" });
                 }
-                return Ok("Update appointment detail successfully");
+                return Ok("Cập nhật đơn đặt lịch thành công");
             }
             catch (NotFoundException ex)
             {
@@ -94,7 +66,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -108,7 +80,7 @@ namespace Hairhub.API.Controllers
                     var isDelete = await _appointmentDetailService.DeleteAppoinmentDetailById(id);
                     if (!isDelete)
                     {
-                        return BadRequest("Cannot delete this appointment!");
+                        return BadRequest(new { message = "Không thể xóa chi tiết đặt lịch" });
                     }
                     return Ok("Delete appointment detail successfully!");
                 }
@@ -123,4 +95,5 @@ namespace Hairhub.API.Controllers
             }
         }
     }
+*/
 }

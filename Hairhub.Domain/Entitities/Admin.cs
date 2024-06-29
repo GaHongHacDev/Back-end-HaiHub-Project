@@ -12,6 +12,7 @@ namespace Hairhub.Domain.Entitities
         [Key]
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }
+        public string Phone {  get; set; }
         public string FullName { get; set; }
         public string Email {  get; set; }
         public string img {  get; set; }

@@ -98,6 +98,9 @@ namespace Hairhub.Service.Services.Services
                 StartTime = createAppointmentDetailRequest.StartTime,
                 ServiceHairId = createAppointmentDetailRequest.ServiceHairId,
                 SalonEmployeeId = createAppointmentDetailRequest.SalonEmployeeId,
+                ServiceName = serviceHair.ServiceName,
+                DescriptionServiceHair = serviceHair.Description,
+                PriceServiceHair = serviceHair.Price,
             };
             await _unitOfWork.GetRepository<AppointmentDetail>().InsertAsync(appointmentDetail);
             return true;

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hairhub.Common\Hairhub.Common.csproj" />
     <ProjectReference Include="..\Hairhub.Domain\Hairhub.Domain.csproj" />
     <ProjectReference Include="..\Hairhub.Service\Hairhub.Service.csproj" />
   </ItemGroup>

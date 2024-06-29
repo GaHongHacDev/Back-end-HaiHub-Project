@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Actions;
-using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Appointments;
-using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Appointments;
-using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
@@ -14,13 +10,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hairhub.Common.CommonService.Contract;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -29,12 +19,14 @@ namespace Hairhub.Service.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAppointmentDetailService _appointmentDetailService;
+        private readonly IQRCodeService _qrCodeService;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _appointmentDetailService = appointmentDetailService;
+            _qrCodeService = qrCodeService;
         }
 
         #region GET
@@ -78,7 +70,7 @@ namespace Hairhub.Service.Services.Services
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
                                                               || x.Status.Equals(AppointmentStatus.CancelByCustomer)
-                                                              || x.Status.Equals(AppointmentStatus.CancelBySalon)),
+                                                              ),
                                                    include: query => query.Include(a => a.Customer)
                                                                            .Include(a => a.AppointmentDetails)
                                                                                 .ThenInclude(ad => ad.SalonEmployee)
@@ -168,7 +160,7 @@ namespace Hairhub.Service.Services.Services
             }
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
-                    predicate: x => x.CustomerId == customer.Id,
+                    predicate: x => x.CustomerId == customer.Id && x.Status.Equals(AppointmentStatus.Booking),
                     include: query => query.Include(a => a.Customer)
                                            .Include(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
@@ -516,7 +508,8 @@ namespace Hairhub.Service.Services.Services
                 }
                 var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
                 serviceHairResult.StartTime = StartTimeBooking;
-                serviceHairResult.EndTime = StartTimeBooking.AddHours((double)serviceHair.Time);
+                StartTimeBooking = StartTimeBooking.AddHours((double)serviceHair.Time);
+                serviceHairResult.EndTime = StartTimeBooking;
                 serviceHairResult.WaitingTime = waitingTime;
                 //Add list BookingDetail vào result
                 bookingResponse.BookingDetailResponses.Add(new BookingDetailResponse()
@@ -669,9 +662,15 @@ namespace Hairhub.Service.Services.Services
         #region Create Update Delete Active
         public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
-            var appointment = new Appointment() 
+            Guid id = Guid.NewGuid();
+            string url = await _qrCodeService.GenerateQR(id);
+            if (String.IsNullOrEmpty(url))
             {
-                Id = Guid.NewGuid(),
+                throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
+            }
+            var appointment = new Appointment()
+            {
+                Id = id,
                 CustomerId = request.CustomerId,
                 CreatedDate = DateTime.Now,
                 StartDate = request.StartDate,
@@ -679,6 +678,7 @@ namespace Hairhub.Service.Services.Services
                 OriginalPrice = request.OriginalPrice,
                 DiscountedPrice = request.DiscountedPrice,
                 Status = AppointmentStatus.Booking,
+                QrCodeImg = url,
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
@@ -697,8 +697,7 @@ namespace Hairhub.Service.Services.Services
                      var voucher = await _unitOfWork.GetRepository<Voucher>()
                                               .SingleOrDefaultAsync
                                               (
-                                                 predicate: x => x.Id == item && x.ExpiryDate >= DateTime.Now
-                                                             && x.MinimumOrderAmount <= request.TotalPrice
+                                                 predicate: x => x.Id == item
                                                              && x.IsActive == true
                                               );
                      if (voucher == null)
@@ -733,7 +732,7 @@ namespace Hairhub.Service.Services.Services
             }
 
             if (!updateAppointmentRequest.Status.Equals(AppointmentStatus.Successed) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Fail)
-                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelByCustomer) && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelBySalon)
+                && !updateAppointmentRequest.Status.Equals(AppointmentStatus.CancelByCustomer)
                 && !updateAppointmentRequest.Status.Equals(AppointmentStatus.Booking))
             {
                 throw new Exception("Status không tồn tại");
@@ -792,7 +791,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Voucher Not Found");
                 }
-                discountPercentage = existingVoucher.DiscountPercentage / 100;
+                discountPercentage = existingVoucher.DiscountPercentage;
             }
 
             var serviceHairIds = calculatePriceRequest.ServiceHairId;

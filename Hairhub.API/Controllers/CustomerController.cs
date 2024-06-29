@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
+using Hairhub.Domain.Dtos.Requests.Customers;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,25 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> CheckInByCustomer(CheckInRequest checkInRequest)
+        {
+            try
+            {
+                bool isCheckIn = await _customerService.CheckInByCustomer(checkInRequest.DataString, checkInRequest.CustomerId);
+                if (!isCheckIn)
+                {
+                    return BadRequest(new { message = "Checkin thất bại. Vui lòng thử lại" });
+                }
+                return Ok("Checkin thành công");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -38,15 +57,11 @@ namespace Hairhub.API.Controllers
             try
             {
                 var Customer = await _customerService.GetCustomerById(id);
-                if (Customer == null)
-                {
-                    return NotFound("Customer not found!");
-                }
                 return Ok(Customer);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

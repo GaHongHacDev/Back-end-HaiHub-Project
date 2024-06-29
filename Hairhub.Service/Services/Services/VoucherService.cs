@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Voucher;
@@ -133,31 +132,31 @@ namespace Hairhub.Service.Services.Services
             Voucher voucherResponse = await _unitofwork
                 .GetRepository<Voucher>()
                 .SingleOrDefaultAsync(
-                    predicate: x => x.Id.Equals(id)
+                    predicate: x => x.Id == id
                  );
 
             if (voucherResponse == null) return null;
             return _mapper.Map<GetVoucherResponse>(voucherResponse);
         }
 
-        public async Task<GetVoucherResponse?> GetVoucherbySalonId(Guid id)
+        public async Task<List<GetVoucherResponse>> GetVoucherbySalonId(Guid id)
         {
-            Voucher voucherResponse = await _unitofwork
+            List<Voucher> voucherResponse = new List<Voucher>();
+            voucherResponse = (List<Voucher>)await _unitofwork
                 .GetRepository<Voucher>()
-                .SingleOrDefaultAsync(
-                    predicate: x => x.SalonInformationId.Equals(id),
+                .GetListAsync(
+                    predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true,
                     include: query => query.Include(s => s.SalonInformation)
                  );
 
-            if (voucherResponse == null) return null;
-            return _mapper.Map<GetVoucherResponse>(voucherResponse);
+            return _mapper.Map<List<GetVoucherResponse>>(voucherResponse);
         }
 
         public async Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size)
         {
             var voucher = await _unitofwork.GetRepository<Voucher>()
           .GetPagingListAsync(
-                predicate: x => x.SalonInformationId.Equals(id) && (x.IsSystemCreated || x.IsSystemCreated == true),
+                predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true,
               include: query => query.Include(s => s.SalonInformation),
               page: page,
               size: size
@@ -179,7 +178,7 @@ namespace Hairhub.Service.Services.Services
             var now = DateTime.UtcNow;
             var voucher = await _unitofwork.GetRepository<Voucher>()
           .GetPagingListAsync(
-              predicate: x => x.SalonInformationId.Equals(salonId) && x.ExpiryDate > now,
+              predicate: x => x.SalonInformationId == salonId && x.ExpiryDate > now,
               include: query => query.Include(s => s.SalonInformation),
               page: page,
               size: size
