@@ -33,7 +33,8 @@ namespace Hairhub.Service.Services.Services
                                                include: x => x.Include(s => s.SalonInformation)
                                                                   .ThenInclude(s => s.SalonOwner)
                                                               .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s=>s.AppointmentDetails),
+                                                              .Include(s => s.Appointment).ThenInclude(s=>s.AppointmentDetails)
+                                                              .Include(s => s.StaticFiles),
                                                page: page,
                                                size: size
                                            );
@@ -57,7 +58,8 @@ namespace Hairhub.Service.Services.Services
                                                include: x => x.Include(s => s.SalonInformation)
                                                                   .ThenInclude(s => s.SalonOwner)
                                                               .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails),
+                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails)
+                                                              .Include(s => s.StaticFiles),
                                                page: page,
                                                size: size
                                            );
@@ -81,7 +83,8 @@ namespace Hairhub.Service.Services.Services
                                                include: x => x.Include(s => s.SalonInformation)
                                                                 .ThenInclude(s => s.SalonOwner)
                                                               .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails),
+                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails)
+                                                              .Include(s => s.StaticFiles),
                                                page: page,
                                                size: size
                                            );
@@ -104,7 +107,8 @@ namespace Hairhub.Service.Services.Services
                                              include: x => x.Include(s => s.SalonInformation)
                                                                 .ThenInclude(s => s.SalonOwner)
                                                             .Include(s => s.Customer)
-                                                            .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails),
+                                                            .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails)
+                                                            .Include(s => s.StaticFiles),
                                                predicate: x => x.SalonId == salonId,
                                                page: page,
                                                size: size

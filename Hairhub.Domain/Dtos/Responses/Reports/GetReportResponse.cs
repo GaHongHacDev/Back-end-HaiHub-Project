@@ -23,6 +23,15 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
         public string Status { get; set; }
         public SalonOwnerSalonInformationResponse SalonOwner { get; set; }
         public GetAppointmentResponse Appointment { get; set; }
+        public List<FileReportResponse> FileReport { get; set; }
+    }
+
+    public class FileReportResponse
+    {
+        public Guid Id { get; set; }
+        public Guid? ReportId { get; set; }
+        public string? Img { get; set; }
+        public string? Video { get; set; }
     }
 
 
