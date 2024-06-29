@@ -24,7 +24,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonOwners
     public class AccountResponse()
     {
         public Guid Id { get; set; }
-        public string? Username { get; set; }
+        public string Phone { get; set; }
         public Guid? RoleId { get; set; }
         public bool? IsActive { get; set; }
     }

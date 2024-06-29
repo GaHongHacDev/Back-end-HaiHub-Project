@@ -34,12 +34,12 @@ namespace Hairhub.API.Controllers
                 var loginResponse = await _authenticationService.Login(loginRequest.Username, loginRequest.Password);
 
                 if (loginResponse == null || String.IsNullOrWhiteSpace(loginResponse.ToString()))
-                    return Unauthorized(new { message = "User name or password is incorrect" });
+                    return Unauthorized(new { message = "Tài khoản hoặc mật khẩu không đúng" });
                 return Ok(loginResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -53,7 +53,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -71,7 +71,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -86,11 +86,11 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

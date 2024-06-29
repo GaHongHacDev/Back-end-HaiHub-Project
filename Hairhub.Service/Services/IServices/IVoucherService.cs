@@ -27,6 +27,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size);
 
         Task<IPaginate<GetVoucherResponse?>> GetVouchersByExpiredDate(Guid salonId, int page, int size);
+        Task<List<GetVoucherResponse>> GetVoucherbySalonId(Guid id);
 
         //Task<IPaginate<GetVoucherResponse?>> GetSalonHaveVoucher(int page, int size);
     }

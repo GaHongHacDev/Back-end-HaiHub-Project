@@ -27,13 +27,13 @@ namespace Hairhub.API.Controllers
                 var accoutResponse = await _accountService.RegisterAccount(createAccountRequest);
                 if (accoutResponse == null)
                 {
-                    return BadRequest("Cannot register account!");
+                    return BadRequest(new { message = "Không thể đăng ký tài khoản" });
                 }
                 return Ok(accoutResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -48,20 +48,20 @@ namespace Hairhub.API.Controllers
                     return BadRequest("Account Id is null or empty!");
                 }
 
-                var updateAccountResponse = await _accountService.UpdateAccountById(id, updateAccountRequest);
-                if (updateAccountResponse == null)
+                bool updateSuccess = await _accountService.UpdateAccountById(id, updateAccountRequest);
+                if (updateSuccess == false)
                 {
-                    return BadRequest("Cannot update account");
+                    return BadRequest(new { massage = "Cập nhật tài khoản thất bại" });
                 }
-                return Ok(updateAccountResponse);
+                return Ok("Cập nhật tài khoản thành công");
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -80,11 +80,11 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -97,17 +97,17 @@ namespace Hairhub.API.Controllers
                 var isChangePassword = await _accountService.ChangePassword(id, changePasswordRequest);
                 if (!isChangePassword)
                 {
-                    return BadRequest("Cannot change password!");
+                    return BadRequest(new { message = "Không thể đổi mật khẩu" });
                 }
-                return Ok("Change password successfully!");
+                return Ok("Đổi mật khẩu thành công");
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -120,17 +120,17 @@ namespace Hairhub.API.Controllers
                 var isDelete = await _accountService.DeleteAccountById(id);
                 if (!isDelete)
                 {
-                    return BadRequest("Cannot delete this account!");
+                    return BadRequest(new { message = "Không thể xóa tài khoản" });
                 }
-                return Ok("Delete account successfully!");
+                return Ok("Xóa tài khoản thành công");
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -143,17 +143,17 @@ namespace Hairhub.API.Controllers
                 var accooutReponse = await _accountService.GetAccountById(id);
                 if (accooutReponse==null)
                 {
-                    return BadRequest("Cannot find this account!");
+                    return BadRequest(new { message = "Không tìm thấy tài khoản" });
                 }
                 return Ok(accooutReponse);
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

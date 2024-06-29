@@ -81,7 +81,7 @@ namespace Hairhub.API.Controllers
                 bool isUpdate = await _configservice.UpdateConfigAsync(id, request);
                 if (!isUpdate)
                 {
-                    return BadRequest("Cannot update ServiceHair");
+                    return BadRequest(new { message = "Không thể cập nhật gói" });
                 }
                 return Ok("Update ServiceHair successfully");
             }
@@ -99,7 +99,7 @@ namespace Hairhub.API.Controllers
                 var isDelete = await _configservice.DeleteConfigAsync(id);
                 if (!isDelete)
                 {
-                    return BadRequest("Cannot Delete the Config!!");
+                    return BadRequest("Không thể xóa gói");
                 }
                 return Ok("Deleted successfully!");
             }

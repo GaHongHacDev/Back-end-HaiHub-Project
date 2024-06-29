@@ -1,4 +1,8 @@
-﻿using Hairhub.Domain.Entitities;
+﻿using Hairhub.Common.CommonService.Contract;
+using Hairhub.Common.CommonService.Implementation;
+using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Common.ThirdParties.Implementation;
+using Hairhub.Domain.Entitities;
 using Hairhub.Infrastructure.Repository;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
@@ -35,7 +39,9 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<ISalonEmployeeService, SalonEmployeeService>();
             services.AddScoped<ISalonInformationService, SalonInformationService>();
             services.AddScoped<IServiceHairService, ServiceHairService>();
+            services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IMediaService, MediaService>();
+            services.AddScoped<IQRCodeService, QRCodeService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IConfigService, ConfigService>();

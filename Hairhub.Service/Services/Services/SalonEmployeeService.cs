@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;

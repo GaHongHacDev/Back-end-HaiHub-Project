@@ -63,7 +63,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new{message = ex.Message});
             }
         }
 
@@ -74,11 +74,15 @@ namespace Hairhub.API.Controllers
             try
             {
                 var isSuccessfull = await _feedbackService.UpdateFeedback(id, request);
+                if (!isSuccessfull)
+                {
+                    return BadRequest(new { message = "Không thể cập nhật đánh giá"});
+                }
                 return Ok(isSuccessfull);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -93,7 +97,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

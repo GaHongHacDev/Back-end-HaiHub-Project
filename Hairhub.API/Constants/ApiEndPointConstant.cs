@@ -108,5 +108,10 @@
             public const string ApprovalEndpoint = ApprovalsEndpoint + "/{id}";
             public const string SalonApprovalsEndpoint = ApprovalsEndpoint + "/salon/{salonId}";
         }
+
+        public static class Report
+        {
+            public const string ReportsEndpoint = ApiEndpoint + "/reports";
+        }
     }
 }

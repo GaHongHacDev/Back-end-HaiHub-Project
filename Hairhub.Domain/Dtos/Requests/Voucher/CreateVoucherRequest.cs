@@ -15,7 +15,6 @@ namespace Hairhub.Domain.Dtos.Requests.Voucher
         public DateTime? ExpiryDate { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        public bool IsSystemCreated { get; set; }
         public bool IsActive { get; set; }
 
 

@@ -1,4 +1,5 @@
 using BirthdayParty.WebApi.Constants;
+using Hairhub.API.Hubs;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
@@ -65,6 +66,9 @@ builder.Services.AddDbContext<HaiHubDbContext>(options =>
     options.EnableSensitiveDataLogging(); // Thêm dòng này
 });
 
+//Config SignalR RealTime
+builder.Services.AddSignalR();
+
 //Setting Cors for all source
 builder.Services.AddCors(options =>
 {
@@ -114,5 +118,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map Hub and define route of hub
+app.MapHub<BookHub>("book-hub");
 
 app.Run();

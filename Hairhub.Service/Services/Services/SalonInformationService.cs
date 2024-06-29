@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
@@ -61,6 +62,7 @@ namespace Hairhub.Service.Services.Services
             salonInformation.Rate = 0;
             salonInformation.TotalRating = 0;
             salonInformation.TotalReviewer = 0;
+            salonInformation.NumberOfReported = 0;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {

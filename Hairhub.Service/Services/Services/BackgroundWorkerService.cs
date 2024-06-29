@@ -14,7 +14,9 @@ using Hairhub.Domain.Entitities;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Domain.Dtos.Requests.Otps;
 using Microsoft.Extensions.Configuration;
-
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -38,12 +40,21 @@ namespace Hairhub.Service.Services.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await CheckAndExpireAccounts(stoppingToken);
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Check every hour
+                // Calculate delay time until next midnight
+                var now = DateTime.Now;
+                var nextMidnight = now.Date.AddDays(1); // Next midnight
+                var delayTime = nextMidnight - now;
+
+                // Wait until next midnight
+                await Task.Delay(delayTime, stoppingToken);
+                // Check Payment expired
+                await ExecuteExpriredSalon(stoppingToken);
+
+                //Check status appointment
+                await ExecuteExpriredAppointment(stoppingToken);
             }
         }
-
-        private async Task CheckAndExpireAccounts(CancellationToken stoppingToken)
+        private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
         {
             try
             {
@@ -52,7 +63,45 @@ namespace Hairhub.Service.Services.Services
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-                    var salons = await uow.GetRepository<SalonInformation>().GetListAsync();
+                    var appontments = await uow.GetRepository<Appointment>().GetListAsync(
+                        predicate: x => x.Status.Equals(AppointmentStatus.Booking) 
+                                && x.StartDate.Date == DateTime.Now.AddDays(-1).Date,
+                        include: x => x.Include(s => s.AppointmentDetails)
+                    );
+
+                    foreach (var appointment in appontments)
+                    {
+                        foreach(var appointmentDetail in appointment.AppointmentDetails)
+                        {
+                            appointmentDetail.Status = AppointmentStatus.Fail;
+                            uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
+                        }
+                        appointment.Status = AppointmentStatus.Fail;
+                        uow.GetRepository<Appointment>().UpdateAsync(appointment);
+                    }
+                    uow.CommitAsync();
+                    _logger.LogInformation("Expired salappointment checked and updated at: {time}", DateTimeOffset.Now);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
+                // Thực hiện xử lý lỗi tại đây nếu cần thiết
+            }
+        }
+
+        private async Task ExecuteExpriredSalon(CancellationToken stoppingToken)
+        {
+            try
+            {
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+                    var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
+                        include: x => x.Include(s => s.SalonOwner)
+                    );
 
                     foreach (var salon in salons)
                     {
@@ -79,6 +128,8 @@ namespace Hairhub.Service.Services.Services
                             if (latestPayment.EndDate < DateTime.Now && salon.Status != "DISABLED")
                             {
                                 salon.Status = "DISABLED";
+                                uow.GetRepository<SalonInformation>().UpdateAsync(salon);
+                                uow.CommitAsync();
                             }
                         }
                     }

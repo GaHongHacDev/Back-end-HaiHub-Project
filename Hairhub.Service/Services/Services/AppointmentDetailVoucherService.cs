@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.AppointmentDetailVouchers;
-using Hairhub.Domain.Dtos.Responses.AppointmentDetailVoucher;
 using Hairhub.Domain.Dtos.Responses.Feedbacks;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Specifications;
@@ -26,37 +25,37 @@ namespace Hairhub.Service.Services.Services
             this._mapper = _mapper;
         }
 
-        public async Task<IPaginate<GetAppointmentDetailVoucherResponse>> GetAppointmentDetailVouchers(int page, int size)
-        {
-            var appointmentDetailVouchers = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
-                .GetPagingListAsync(
-                include: query => query.Include(s => s.Voucher).Include(s => s.Appointment),
-                page: page,
-                size: size);
+        //public async Task<IPaginate<GetAppointmentDetailVoucherResponse>> GetAppointmentDetailVouchers(int page, int size)
+        //{
+        //    var appointmentDetailVouchers = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
+        //        .GetPagingListAsync(
+        //        include: query => query.Include(s => s.Voucher).Include(s => s.Appointment),
+        //        page: page,
+        //        size: size);
 
-            var appointmentDetailVoucherResponses = new Paginate<GetAppointmentDetailVoucherResponse>()
-            {
-                Page = appointmentDetailVouchers.Page,
-                Size = appointmentDetailVouchers.Size,
-                Total = appointmentDetailVouchers.Total,
-                TotalPages = appointmentDetailVouchers.TotalPages,
-                Items = _mapper.Map<IList<GetAppointmentDetailVoucherResponse>>(appointmentDetailVouchers.Items),
-            };
+        //    var appointmentDetailVoucherResponses = new Paginate<GetAppointmentDetailVoucherResponse>()
+        //    {
+        //        Page = appointmentDetailVouchers.Page,
+        //        Size = appointmentDetailVouchers.Size,
+        //        Total = appointmentDetailVouchers.Total,
+        //        TotalPages = appointmentDetailVouchers.TotalPages,
+        //        Items = _mapper.Map<IList<GetAppointmentDetailVoucherResponse>>(appointmentDetailVouchers.Items),
+        //    };
 
-            return appointmentDetailVoucherResponses;
-        }
+        //    return appointmentDetailVoucherResponses;
+        //}
 
-        public async Task<GetAppointmentDetailVoucherResponse> GetAppointmentDetailVoucherById(Guid id)
-        {
-            var appointmentDetailVoucher = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
-                .SingleOrDefaultAsync(
-                 predicate: predicate => predicate.Id.Equals(id),
-                 include: query => query.Include(s => s.Voucher).Include(s => s.Appointment));
+        //public async Task<GetAppointmentDetailVoucherResponse> GetAppointmentDetailVoucherById(Guid id)
+        //{
+        //    var appointmentDetailVoucher = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
+        //        .SingleOrDefaultAsync(
+        //         predicate: predicate => predicate.Id.Equals(id),
+        //         include: query => query.Include(s => s.Voucher).Include(s => s.Appointment));
 
-            var appointmentDetailVoucherResponse = _mapper.Map<GetAppointmentDetailVoucherResponse>(appointmentDetailVoucher);
+        //    var appointmentDetailVoucherResponse = _mapper.Map<GetAppointmentDetailVoucherResponse>(appointmentDetailVoucher);
 
-            return appointmentDetailVoucherResponse;
-        }
+        //    return appointmentDetailVoucherResponse;
+        //}
 
         public async Task<bool> CreateAppointmentDetailVoucher(CreateAppointmentDetailVoucherRequest request)
         {

@@ -9,34 +9,34 @@ namespace Hairhub.API.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private readonly IRoleService roleService;
+        //private readonly IRoleService roleService;
 
-        public RoleController(IRoleService roleService)
-        {
-            this.roleService = roleService;
-        }
+        //public RoleController(IRoleService roleService)
+        //{
+        //    this.roleService = roleService;
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetRoles()
-        {
-            var roles = await roleService.GetRoles();
-            if (roles == null)
-            {
-                return BadRequest();
-            }
-            return Ok(roles);        
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetRoles()
+        //{
+        //    var roles = await roleService.GetRoles();
+        //    if (roles == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Ok(roles);        
+        //}
 
-        [HttpGet]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> GetRoleById(Guid id)
-        {
-            var role = await roleService.GetRoleById(id);
-            if (role == null)
-            {
-                return BadRequest();
-            }
-            return Ok(role);
-        }
+        //[HttpGet]
+        //[Route("{id:Guid}")]
+        //public async Task<IActionResult> GetRoleById(Guid id)
+        //{
+        //    var role = await roleService.GetRoleById(id);
+        //    if (role == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Ok(role);
+        //}
     }
 }
