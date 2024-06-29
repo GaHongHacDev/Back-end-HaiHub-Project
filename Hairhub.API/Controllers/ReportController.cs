@@ -29,8 +29,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Route("{roleName}")]
-        public async Task<IActionResult> GetAllReportByRoleName([FromRoute] string roleName, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetAllReportByRoleName([FromQuery] string roleName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var reportsResponse = await _reportService.GetAllReportByRoleName(roleName, page, size);
             return Ok(reportsResponse);
