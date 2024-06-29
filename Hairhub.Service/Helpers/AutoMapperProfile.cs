@@ -171,6 +171,7 @@ namespace Hairhub.Service.Helpers
             CreateMap<Report, GetReportResponse>();
             CreateMap<Report, UpdateAccountRequest>(); 
             CreateMap<Report, CreateReportRequest>().ReverseMap();
+
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();
         }

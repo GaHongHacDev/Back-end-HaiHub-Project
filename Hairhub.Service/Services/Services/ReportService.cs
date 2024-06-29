@@ -33,11 +33,11 @@ namespace Hairhub.Service.Services.Services
                                                include: x => x.Include(s => s.SalonInformation)
                                                                   .ThenInclude(s => s.SalonOwner)
                                                               .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s=>s.AppointmentDetails)
+                                                              .Include(s => s.Appointment).ThenInclude(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee)
                                                               .Include(s => s.StaticFiles),
                                                page: page,
                                                size: size
-                                           );
+                                           ); 
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,

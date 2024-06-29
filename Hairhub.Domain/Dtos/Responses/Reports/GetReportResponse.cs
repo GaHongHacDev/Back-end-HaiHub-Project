@@ -21,7 +21,7 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
         public DateTime? TimeConfirm { get; set; }
         public string? DescriptionAdmin { get; set; }
         public string Status { get; set; }
-        public SalonOwnerSalonInformationResponse SalonOwner { get; set; }
+        public GetSalonInformationResponse Salon { get; set; }
         public GetAppointmentResponse Appointment { get; set; }
         public List<FileReportResponse> FileReport { get; set; }
     }
@@ -33,6 +33,4 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
         public string? Img { get; set; }
         public string? Video { get; set; }
     }
-
-
 }
