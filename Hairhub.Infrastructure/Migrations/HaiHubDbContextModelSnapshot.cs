@@ -177,9 +177,23 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
+                    b.Property<string>("DescriptionServiceHair")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("description_service_hair");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2")
                         .HasColumnName("end_time");
+
+                    b.Property<string>("ImgServiceHair")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)")
+                        .HasColumnName("img_service_hair");
+
+                    b.Property<decimal?>("PriceServiceHair")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("price_service_hair");
 
                     b.Property<Guid>("SalonEmployeeId")
                         .HasColumnType("uniqueidentifier")
@@ -188,6 +202,11 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<Guid>("ServiceHairId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("service_hair_id");
+
+                    b.Property<string>("ServiceName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("service_name");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2")
@@ -198,6 +217,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)")
                         .HasColumnName("status");
+
+                    b.Property<decimal?>("TimeServiceHair")
+                        .HasMaxLength(25)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("time_service_hair");
 
                     b.HasKey("Id");
 

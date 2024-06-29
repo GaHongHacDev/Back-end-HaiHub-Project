@@ -17,6 +17,14 @@ namespace Hairhub.Domain.Entitities
         public DateTime EndTime { get; set; }
         public DateTime StartTime { get; set; }
         public string Status { get; set; }
+        
+        //Service Hair
+        public string? ServiceName { get; set; }
+        public string? DescriptionServiceHair { get; set; }
+        public decimal? PriceServiceHair { get; set; }
+        public string? ImgServiceHair { get; set; }
+        public decimal? TimeServiceHair { get; set; }
+
 
         public virtual SalonEmployee SalonEmployee { get; set; }
         public virtual ServiceHair ServiceHair { get; set; }

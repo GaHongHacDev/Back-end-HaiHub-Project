@@ -1,4 +1,5 @@
 using BirthdayParty.WebApi.Constants;
+using Hairhub.API.Hubs;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
@@ -117,5 +118,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map Hub and define route of hub
+app.MapHub<BookHub>("book-hub");
 
 app.Run();

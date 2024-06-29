@@ -25,9 +25,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
 
         // DBSet<>
@@ -358,6 +358,12 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.StartTime).HasColumnName("start_time");
                 entity.Property(e => e.EndTime).HasColumnName("end_time");
                 entity.Property(e => e.Status).HasMaxLength(25).HasColumnName("status");
+
+                entity.Property(e => e.ServiceName).HasMaxLength(100).HasColumnName("service_name");
+                entity.Property(e => e.DescriptionServiceHair).HasMaxLength(255).HasColumnName("description_service_hair");
+                entity.Property(e => e.PriceServiceHair).HasColumnName("price_service_hair");
+                entity.Property(e => e.ImgServiceHair).HasMaxLength(25).HasColumnName("img_service_hair");
+                entity.Property(e => e.TimeServiceHair).HasMaxLength(25).HasColumnName("time_service_hair");
 
                 entity.HasOne(d => d.SalonEmployee)
                       .WithMany(p => p.AppointmentDetails)
