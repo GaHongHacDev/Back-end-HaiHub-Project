@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Entitities;
@@ -56,11 +57,18 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> DeleteServiceHairById(Guid id)
         {
-            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id == id );
+            var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(predicate: p => p.ServiceHairId == serviceHair.Id);
+
             if (serviceHair == null)
             {
-                throw new NotFoundException("ServiceHair not found!");
+                throw new NotFoundException("Dịch vụ này không có");
             }
+            if (appointment != null)
+            {
+                throw new NotFoundException("Dịch vụ này không thể xóa vì đã có lịch hẹn đặt");
+            }
+            serviceHair.IsActive = false;
             _unitOfWork.GetRepository<ServiceHair>().UpdateAsync(serviceHair);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
@@ -114,7 +122,37 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("ServiceHair not found!");
             }
-            serviceHair = _mapper.Map<ServiceHair>(updateServiceHairRequest);
+
+            if (!string.IsNullOrEmpty(updateServiceHairRequest.ServiceName))
+            {
+                serviceHair.ServiceName = updateServiceHairRequest.ServiceName;
+            }
+
+            if (!string.IsNullOrEmpty(updateServiceHairRequest.Description))
+            {
+                serviceHair.Description = updateServiceHairRequest.Description;
+            }
+
+            if (updateServiceHairRequest.Price.HasValue)
+            {
+                serviceHair.Price = updateServiceHairRequest.Price.Value;
+            }
+
+            if (updateServiceHairRequest.Img != null)
+            {
+                serviceHair.Img = await _mediaService.UploadAnImage(updateServiceHairRequest.Img, MediaPath.SERVICE_HAIR, serviceHair.Id.ToString());
+            }
+
+            if (updateServiceHairRequest.Time.HasValue)
+            {
+                serviceHair.Time = updateServiceHairRequest.Time.Value;
+            }
+
+            if (updateServiceHairRequest.IsActive.HasValue)
+            {
+                serviceHair.IsActive = updateServiceHairRequest.IsActive.Value;
+            }
+
             _unitOfWork.GetRepository<ServiceHair>().UpdateAsync(serviceHair);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;

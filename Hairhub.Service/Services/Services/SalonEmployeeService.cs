@@ -96,14 +96,36 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> DeleteSalonEmployeeById(Guid id)
         {
-            var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == id);
-            if (salonEmployee == null)
+            try
             {
-                throw new NotFoundException("SalonEmployee not found!");
+                var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+                var existingappointmentdetail = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                                predicate: p => p.SalonEmployeeId == salonEmployee.Id 
+                                                && p.Appointment.StartDate > DateTime.Now.Date && p.Appointment.Status == AppointmentStatus.Booking
+                                                , include: i => i.Include(o => o.Appointment)
+                                                );                
+                if (salonEmployee == null)
+                {
+                    throw new NotFoundException("Không tìm thấy nhân viên này");
+                }
+                
+                if (existingappointmentdetail == null)
+                {
+                    salonEmployee.IsActive = false;
+                    _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
+                    bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+                    return isUpdate;                    
+                }
+                else
+                {
+                    throw new Exception("Không thể xóa nhân viên này vì đã có khách hàng đặt lịch");
+                }
+                
+            } catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
-            _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
-            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
-            return isUpdate;
+            
         }
 
         public async Task<IPaginate<GetSalonEmployeeResponse>> GetAllSalonEmployee(int page, int size)
@@ -167,11 +189,34 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest)
         {
             var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+
             if (salonEmployee == null)
             {
-                throw new NotFoundException("SalonEmployee not found!");
+                throw new NotFoundException("Không tìm thấy nhân viên salon!");
             }
-            salonEmployee = _mapper.Map<SalonEmployee>(updateSalonEmployeeRequest);
+
+            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.FullName))
+            {
+                salonEmployee.FullName = updateSalonEmployeeRequest.FullName;
+            }
+
+            if (updateSalonEmployeeRequest.Gender != null)
+            {
+                salonEmployee.Gender = updateSalonEmployeeRequest.Gender;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.Phone))
+            {
+                salonEmployee.Phone = updateSalonEmployeeRequest.Phone;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.Img))
+            {
+                salonEmployee.Img = updateSalonEmployeeRequest.Img;
+            }
+
+            salonEmployee.IsActive = updateSalonEmployeeRequest.IsActive;
+
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
