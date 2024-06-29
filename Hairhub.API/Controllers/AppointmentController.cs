@@ -140,19 +140,6 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                    return BadRequest(new { message = ex.InnerException.Message });
-
-                    // Nếu cần, bạn có thể truy cập sâu hơn các inner exception
-                    var inner = ex.InnerException;
-                    while (inner.InnerException != null)
-                    {
-                        inner = inner.InnerException;
-                        Console.WriteLine($"Deeper Inner Exception: {inner.Message}");
-                    }
-                }
                 return BadRequest(new { message = ex.Message });
             }
         }
