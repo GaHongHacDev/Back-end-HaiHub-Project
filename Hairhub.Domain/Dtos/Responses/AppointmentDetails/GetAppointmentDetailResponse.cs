@@ -41,7 +41,13 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetails
         public DateTime StartTime { get; set; }
         public string Status { get; set; }
 
+        //Service Hair
+        public string? ServiceName { get; set; }
+        public string? DescriptionServiceHair { get; set; }
+        public decimal? PriceServiceHair { get; set; }
+        public string? ImgServiceHair { get; set; }
+        public decimal? TimeServiceHair { get; set; }
+
         public SalonEmployeeResponse SalonEmployee { get; set; }
-        public ServiceHairResponse ServiceHair { get; set; }
     }
 }
