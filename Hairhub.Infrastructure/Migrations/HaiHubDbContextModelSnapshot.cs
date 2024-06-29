@@ -585,6 +585,12 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("description_admin");
 
+                    b.Property<string>("ReasonReport")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("reason_report");
+
                     b.Property<string>("RoleNameReport")
                         .IsRequired()
                         .HasMaxLength(50)

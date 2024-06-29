@@ -15,6 +15,7 @@ namespace Hairhub.Domain.Entitities
         public Guid? CustomerId { get; set; }
         public Guid AppointmentId { get; set; }
         public string RoleNameReport { get; set; } // Customer or SalonOwner
+        public string ReasonReport { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? TimeConfirm { get; set; }
         public string? DescriptionAdmin { get; set; }

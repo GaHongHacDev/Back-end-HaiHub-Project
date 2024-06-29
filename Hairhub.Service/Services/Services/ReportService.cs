@@ -125,6 +125,7 @@ namespace Hairhub.Service.Services.Services
             report.Id = Guid.NewGuid();
             report.Status = ReportStatus.Pending;
             report.CreateDate = DateTime.Now;
+            report.ReasonReport = request.ReasonReport;
             Appointment appointment = null;
             if (report.RoleNameReport.Equals(RoleEnum.Customer.ToString()))
             {
