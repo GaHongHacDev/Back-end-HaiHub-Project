@@ -111,6 +111,7 @@ namespace Hairhub.Service.Services.Services
                 
                 if (existingappointmentdetail == null)
                 {
+                    salonEmployee.IsActive = false;
                     _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
                     bool isUpdate = await _unitOfWork.CommitAsync() > 0;
                     return isUpdate;                    
@@ -188,11 +189,34 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> UpdateSalonEmployeeById(Guid id, UpdateSalonEmployeeRequest updateSalonEmployeeRequest)
         {
             var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+
             if (salonEmployee == null)
             {
-                throw new NotFoundException("SalonEmployee not found!");
+                throw new NotFoundException("Không tìm thấy nhân viên salon!");
             }
-            salonEmployee = _mapper.Map<SalonEmployee>(updateSalonEmployeeRequest);
+
+            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.FullName))
+            {
+                salonEmployee.FullName = updateSalonEmployeeRequest.FullName;
+            }
+
+            if (updateSalonEmployeeRequest.Gender != null)
+            {
+                salonEmployee.Gender = updateSalonEmployeeRequest.Gender;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.Phone))
+            {
+                salonEmployee.Phone = updateSalonEmployeeRequest.Phone;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.Img))
+            {
+                salonEmployee.Img = updateSalonEmployeeRequest.Img;
+            }
+
+            salonEmployee.IsActive = updateSalonEmployeeRequest.IsActive;
+
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;

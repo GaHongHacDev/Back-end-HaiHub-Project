@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
@@ -232,11 +233,43 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("SalonInformation not found!");
             }
-            salonInformation = _mapper.Map<SalonInformation>(updateSalonInformationRequest);
-            salonInformation.Status = SalonStatus.Edited;
+            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Name))
+            {
+                salonInformation.Name = updateSalonInformationRequest.Name;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Address))
+            {
+                salonInformation.Address = updateSalonInformationRequest.Address;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Description))
+            {
+                salonInformation.Description = updateSalonInformationRequest.Description;
+            }
+
+            if (updateSalonInformationRequest.Image != null)
+            {
+
+                salonInformation.Img = await _mediaService.UploadAnImage(updateSalonInformationRequest.Image, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Longitude))
+            {
+                salonInformation.Longitude = updateSalonInformationRequest.Longitude;
+            }
+
+            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Latitude))
+            {
+                salonInformation.Latitude = updateSalonInformationRequest.Latitude;
+            }
+
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
+
+
+           
         }
 
         public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "")

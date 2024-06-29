@@ -69,7 +69,8 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Voucher not found!");
             }
-            _unitofwork.GetRepository<Voucher>().DeleteAsync(existvoucher);
+            existvoucher.IsActive = false;
+            _unitofwork.GetRepository<Voucher>().UpdateAsync(existvoucher);
             bool isDelete = await _unitofwork.CommitAsync() > 0;
             return isDelete;
         }
@@ -204,8 +205,42 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Cannot Find Voucher");
             }
-
-            existVoucher = _mapper.Map<Voucher>(request);
+            // Chỉ cập nhật các trường được cung cấp
+            if (request.SalonInformationId.HasValue)
+            {
+                existVoucher.SalonInformationId = request.SalonInformationId.Value;
+            }
+            if (!string.IsNullOrEmpty(request.Code))
+            {
+                existVoucher.Code = request.Code;
+            }
+            if (!string.IsNullOrEmpty(request.Description))
+            {
+                existVoucher.Description = request.Description;
+            }
+            if (request.MinimumOrderAmount != default(decimal))
+            {
+                existVoucher.MinimumOrderAmount = request.MinimumOrderAmount;
+            }
+            if (request.DiscountPercentage != default(decimal))
+            {
+                existVoucher.DiscountPercentage = request.DiscountPercentage;
+            }
+            if (request.ExpiryDate != default(DateTime))
+            {
+                existVoucher.ExpiryDate = request.ExpiryDate;
+            }
+            if (request.CreatedDate != default(DateTime))
+            {
+                existVoucher.CreatedDate = request.CreatedDate;
+            }
+            if (request.ModifiedDate != default(DateTime)) 
+            {
+                existVoucher.ModifiedDate = request.ModifiedDate.Value;
+            }
+            // Vì các giá trị boolean không nullable, chúng ta sẽ kiểm tra xem chúng có khác giá trị mặc định không
+            existVoucher.IsSystemCreated = request.IsSystemCreated;
+            existVoucher.IsActive = request.IsActive;
             existVoucher.Id = id;
             _unitofwork.GetRepository<Voucher>().UpdateAsync(existVoucher);
             bool isUpdate = await _unitofwork.CommitAsync()>0;
