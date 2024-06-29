@@ -666,7 +666,7 @@ namespace Hairhub.Service.Services.Services
             string url = await _qrCodeService.GenerateQR(id);
             if (String.IsNullOrEmpty(url))
             {
-                throw new Exception("Không thể tạo QR check in cho đơn đặt lịch này");
+                throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
             var appointment = new Appointment()
             {
