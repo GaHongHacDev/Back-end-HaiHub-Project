@@ -197,6 +197,9 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Not found salon information with owner id {ownerId}");
             var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             var schedules = await _scheduleService.GetSalonSchedules(salonInformation.Id);
+            var orderedSchedules = schedules
+                .OrderBy(s => (int)Enum.Parse<DayOfWeek>(s.DayOfWeek) == 0 ? 7 : (int)Enum.Parse<DayOfWeek>(s.DayOfWeek))
+                .ToList();
             if (schedules.Any())
             {
                 salonInforResponse.schedules = schedules;

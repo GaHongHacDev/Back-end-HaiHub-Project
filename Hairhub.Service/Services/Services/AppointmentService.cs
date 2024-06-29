@@ -11,6 +11,7 @@ using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Common.CommonService.Contract;
+using System.Data;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -269,6 +270,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Salon, barber shop không hoạt động vào thời gian này");
             }
+            //****************************************
+           /* if (salonSchedule.EndTime)
+            {
+
+            }*/
             List<decimal> availbeTimeResponse = GenerateTimeSlot(salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60, salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60, 0.25m);
             var availableTimesDict = availbeTimeResponse.ToDictionary(timeSlot => timeSlot, timeSlot => new List<EmployeeAvailable>());
             if (!request.IsAnyOne)
@@ -662,60 +668,66 @@ namespace Hairhub.Service.Services.Services
         #region Create Update Delete Active
         public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
-            Guid id = Guid.NewGuid();
-            string url = await _qrCodeService.GenerateQR(id);
-            if (String.IsNullOrEmpty(url))
+            try
             {
-                throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
-            }
-            var appointment = new Appointment()
-            {
-                Id = id,
-                CustomerId = request.CustomerId,
-                CreatedDate = DateTime.Now,
-                StartDate = request.StartDate,
-                TotalPrice = request.TotalPrice,
-                OriginalPrice = request.OriginalPrice,
-                DiscountedPrice = request.DiscountedPrice,
-                Status = AppointmentStatus.Booking,
-                QrCodeImg = url,
-            };
-            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+                Guid id = Guid.NewGuid();
+                string url = await _qrCodeService.GenerateQR(id);
+                if (String.IsNullOrEmpty(url))
+                {
+                    throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
+                }
+                var appointment = new Appointment()
+                {
+                    Id = id,
+                    CustomerId = request.CustomerId,
+                    CreatedDate = DateTime.Now,
+                    StartDate = request.StartDate,
+                    TotalPrice = request.TotalPrice,
+                    OriginalPrice = request.OriginalPrice,
+                    DiscountedPrice = request.DiscountedPrice,
+                    Status = AppointmentStatus.Booking,
+                    QrCodeImg = url,
+                };
+                await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
-            if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
-            {
-                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+                if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
+                {
+                    throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+                }
+                foreach (var item in request.AppointmentDetails)
+                {
+                    await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+                }
+                if (request.VoucherIds != null && request.VoucherIds.Count > 0)
+                {
+                    foreach (var item in request.VoucherIds)
+                    {
+                        var voucher = await _unitOfWork.GetRepository<Voucher>()
+                                                 .SingleOrDefaultAsync
+                                                 (
+                                                    predicate: x => x.Id == item
+                                                                && x.IsActive == true
+                                                 );
+                        if (voucher == null)
+                        {
+                            throw new NotFoundException("Voucher Không phù hợp");
+                        }
+                        var appointmentVoucher = new AppointmentDetailVoucher()
+                        {
+                            Id = new Guid(),
+                            AppointmentId = appointment.Id,
+                            VoucherId = item
+                        };
+                        await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                    }
+                }
+                bool isInsert = await _unitOfWork.CommitAsync() > 0;
+                return isInsert;
             }
-            foreach (var item in request.AppointmentDetails)
+            catch(Exception ex)
             {
-                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+                return false;
             }
-             if (request.VoucherIds != null && request.VoucherIds.Count>0)
-             {
-                 foreach (var item in request.VoucherIds)
-                 {
-                     var voucher = await _unitOfWork.GetRepository<Voucher>()
-                                              .SingleOrDefaultAsync
-                                              (
-                                                 predicate: x => x.Id == item
-                                                             && x.IsActive == true
-                                              );
-                     if (voucher == null)
-                     {
-                         throw new NotFoundException("Voucher Không phù hợp");
-                     }
-                     var appointmentVoucher = new AppointmentDetailVoucher()
-                     {
-                         Id = new Guid(),
-                         AppointmentId = appointment.Id,
-                         VoucherId = item
-                     };
-                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
-                 }
-             }
-
-            bool isInsert = await _unitOfWork.CommitAsync() > 0;
-            return isInsert;
         }
 
         public async Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest)

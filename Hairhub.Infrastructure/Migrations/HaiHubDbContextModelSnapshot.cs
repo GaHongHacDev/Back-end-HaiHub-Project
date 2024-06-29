@@ -187,8 +187,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("end_time");
 
                     b.Property<string>("ImgServiceHair")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
                         .HasColumnName("img_service_hair");
 
                     b.Property<decimal?>("PriceServiceHair")
@@ -219,7 +219,6 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("status");
 
                     b.Property<decimal?>("TimeServiceHair")
-                        .HasMaxLength(25)
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("time_service_hair");
 
