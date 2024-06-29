@@ -51,10 +51,11 @@ namespace Hairhub.Service.Services.Services
         }
 
         public async Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId)
-        {;
+        {
+            ;
             var schedules = await _unitOfWork.GetRepository<Schedule>()
             .GetListAsync(
-                predicate: x=>x.SalonId == salonId,
+                predicate: x => x.SalonId == salonId,
                 include: query => query.Include(s => s.SalonInformation)
             );
             if (schedules == null)
@@ -109,15 +110,21 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> UpdateSchedule(Guid id, UpdateScheduleRequest request)
         {
             var schedule = await _unitOfWork.GetRepository<Schedule>()
-                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
+                                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
+            if (schedule == null)
+                throw new NotFoundException($"Không tìm thấy lịch làm việc với id {id}");
+            
+            if (schedule.SalonId!=null)
+            {
+                
+            }
+            
 
-            if (schedule == null) throw new Exception("Schedule is not exist!!!");
-
-            schedule.DayOfWeek = request.DayOfWeek;
             schedule.StartTime = request.StartTime;
             schedule.EndTime = request.EndTime;
-
+            schedule.IsActive = request.IsActive;
             _unitOfWork.GetRepository<Schedule>().UpdateAsync(schedule);
+
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
         }

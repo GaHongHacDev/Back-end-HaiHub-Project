@@ -48,6 +48,30 @@ namespace Hairhub.Service.Services.Services
             return reportResponse;
         }
 
+        public async Task<IPaginate<GetReportResponse>> GetAllReportByRoleName(string roleNameReport, int page, int size)
+        {
+            var reports = await _unitOfWork.GetRepository<Report>()
+                                           .GetPagingListAsync
+                                           (
+                                               predicate: x => x.RoleNameReport.Equals(roleNameReport),
+                                               include: x => x.Include(s => s.SalonInformation)
+                                                                  .ThenInclude(s => s.SalonOwner)
+                                                              .Include(s => s.Customer)
+                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails),
+                                               page: page,
+                                               size: size
+                                           );
+            var reportResponse = new Paginate<GetReportResponse>()
+            {
+                Page = reports.Page,
+                Size = reports.Size,
+                Total = reports.Total,
+                TotalPages = reports.TotalPages,
+                Items = _mapper.Map<IList<GetReportResponse>>(reports.Items),
+            };
+            return reportResponse;
+        }
+
         public async Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, int page, int size)
         {
             var reports = await _unitOfWork.GetRepository<Report>()
