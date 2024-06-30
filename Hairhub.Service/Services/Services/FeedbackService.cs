@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -147,5 +148,29 @@ namespace Hairhub.Service.Services.Services
             return isSuccessful;
         }
 
+        public async Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, int? rating, int page, int size)
+        {
+
+            var feedbacks = await _unitOfWork.GetRepository<Feedback>().GetPagingListAsync(
+                            predicate: f => f.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id) && f.Rating == rating,
+                            include: query => query.Include(f => f.Appointment)
+                                                   .ThenInclude(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee),
+                            page: page,
+                            size: size
+                            );
+
+
+            var feedbackResponses = new Paginate<GetFeedbackResponse>()
+            {
+                Page = feedbacks.Page,
+                Size = feedbacks.Size,
+                Total = feedbacks.Total,
+                TotalPages = feedbacks.TotalPages,
+                Items = _mapper.Map<IList<GetFeedbackResponse>>(feedbacks.Items),
+            };
+
+            return feedbackResponses;
+        }
     }
 }

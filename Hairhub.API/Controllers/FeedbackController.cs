@@ -100,5 +100,20 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetFeedBackBySalonId([FromRoute]Guid id, [FromQuery] int rating, int page = 1, int size = 10)
+        {
+            try
+            {
+                var isSuccessfull = await _feedbackService.GetFeedBackBySalonId(id, rating, page, size);
+                return Ok(isSuccessfull);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
