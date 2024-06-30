@@ -168,8 +168,8 @@ namespace Hairhub.Service.Helpers
             CreateMap<Approval, GetApprovalResponse>();
 
             //Report CreateReportRequest
-            CreateMap<Report, GetReportResponse>();
-            CreateMap<Report, UpdateAccountRequest>(); 
+            CreateMap<Report, GetReportResponse>().ReverseMap();
+            CreateMap<Report, UpdateAccountRequest>().ReverseMap(); 
             CreateMap<Report, CreateReportRequest>().ReverseMap();
 
             //Static File

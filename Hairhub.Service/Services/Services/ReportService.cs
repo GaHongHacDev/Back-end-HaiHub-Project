@@ -37,7 +37,7 @@ namespace Hairhub.Service.Services.Services
                                                               .Include(s => s.StaticFiles),
                                                page: page,
                                                size: size
-                                           ); 
+                                           );  
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,
