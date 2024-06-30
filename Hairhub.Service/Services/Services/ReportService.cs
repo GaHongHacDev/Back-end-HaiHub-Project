@@ -74,6 +74,10 @@ namespace Hairhub.Service.Services.Services
                                                page: page,
                                                size: size
                                            );
+            foreach (var report in reports.Items)
+            {
+                report.StaticFiles = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: x => x.ReportId == report.Id);
+            }
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,

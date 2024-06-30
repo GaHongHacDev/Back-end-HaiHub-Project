@@ -114,46 +114,42 @@ namespace Hairhub.Service.Services.Services
                                 .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
             if (schedule == null)
                 throw new NotFoundException($"Không tìm thấy lịch làm việc với id {id}");
-            
-            if (schedule.SalonId!=null)
+
+            if (schedule.SalonId != null || schedule.EmployeeId != null)
             {
                 if (!request.IsActive)
                 {
                     var appointment = await _unitOfWork.GetRepository<Appointment>()
                                                         .SingleOrDefaultAsync
                                                             (
-                                                                predicate: x => x.StartDate.DayOfWeek.ToString().Equals(schedule.DayOfWeek) 
+                                                                predicate: x => x.StartDate.DayOfWeek.ToString().Equals(schedule.DayOfWeek)
                                                                 && x.Status.Equals(AppointmentStatus.Booking),
-                                                                include: x=>x.Include(s=>s.AppointmentDetails).Include(s=>s.Customer)
+                                                                include: x => x.Include(s => s.AppointmentDetails).Include(s => s.Customer)
                                                             );
                     if (appointment != null)
                     {
                         throw new Exception($"Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn với {appointment.Customer.FullName} vào lúc {appointment.AppointmentDetails.First().StartTime}");
                     }
+                    schedule.IsActive = false;
                 }
                 else
                 {
-                    if (request.StartTime>=schedule.StartTime && request.EndTime <= schedule.EndTime)
+
+                    var appointment = await _unitOfWork.GetRepository<Appointment>()
+                                                        .SingleOrDefaultAsync
+                                                         (
+                                                            predicate: x => (TimeOnly.FromDateTime(x.AppointmentDetails.FirstOrDefault().StartTime) < request.StartTime
+                                                                            || TimeOnly.FromDateTime(x.AppointmentDetails.OrderByDescending(s => s.EndTime).FirstOrDefault().EndTime) > request.EndTime)
+                                                                            && x.Status.Equals(AppointmentStatus.Booking)
+                                                         );
+                    if (appointment != null)
                     {
-                        var appointment = await _unitOfWork.GetRepository<Appointment>()
-                                                            .SingleOrDefaultAsync
-                                                             (
-                                                                predicate: x => (TimeOnly.FromDateTime(x.AppointmentDetails.FirstOrDefault().StartTime) < request.StartTime
-                                                                                || TimeOnly.FromDateTime(x.AppointmentDetails.OrderByDescending(s=>s.EndTime).FirstOrDefault().EndTime) > request.EndTime)
-                                                                                && x.Status.Equals(AppointmentStatus.Booking)
-                                                             );
-                        if (appointment != null)
-                        {
-                            throw new Exception($"Không thể cập nhật lịch làm việc vì đang có đơn đặt lịch vào {appointment.StartDate.ToString()}");
-                        }
+                        throw new Exception($"Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn với {appointment.Customer.FullName} vào lúc {appointment.StartDate.Date.ToString()}");
                     }
+                    schedule.StartTime = request.StartTime;
+                    schedule.EndTime = request.EndTime;
                 }
             }
-            
-
-            schedule.StartTime = request.StartTime;
-            schedule.EndTime = request.EndTime;
-            schedule.IsActive = request.IsActive;
             _unitOfWork.GetRepository<Schedule>().UpdateAsync(schedule);
 
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
