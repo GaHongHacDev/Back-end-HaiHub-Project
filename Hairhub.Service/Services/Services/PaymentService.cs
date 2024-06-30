@@ -233,9 +233,9 @@ namespace Hairhub.Service.Services.Services
            var firstPayment = new Payment { 
                Id = Guid.NewGuid(),
                Description = "Miễn phí 1 tháng đầu tiên",
-               StartDate = DateTime.Now.AddDays(-30),
-               EndDate = DateTime.Now,
-               PaymentDate = DateTime.Now.AddDays(-30),
+               StartDate = DateTime.Now,
+               EndDate = DateTime.Now.AddDays(30),
+               PaymentDate = DateTime.Now,
                SalonOWnerID = salonownerid,
                MethodBanking = "None",
                PaymentCode = new Random().Next(1, 1000000),
