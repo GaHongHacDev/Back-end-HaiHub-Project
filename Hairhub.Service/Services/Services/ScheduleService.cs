@@ -3,6 +3,7 @@ using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -116,7 +117,27 @@ namespace Hairhub.Service.Services.Services
             
             if (schedule.SalonId!=null)
             {
-                
+                if (!request.IsActive)
+                {
+                    var appointment = await _unitOfWork.GetRepository<Appointment>()
+                                                        .SingleOrDefaultAsync
+                                                            (
+                                                                predicate: x => x.StartDate.DayOfWeek.ToString().Equals(schedule.DayOfWeek) 
+                                                                && x.Status.Equals(AppointmentStatus.Booking),
+                                                                include: x=>x.Include(s=>s.AppointmentDetails).Include(s=>s.Customer)
+                                                            );
+                    if (appointment != null)
+                    {
+                        throw new Exception($"Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn với {appointment.Customer.FullName} vào lúc {appointment.AppointmentDetails.First().StartTime}");
+                    }
+                }
+                else
+                {
+                    if (request.StartTime<=schedule.StartTime && request.EndTime >= schedule.EndTime)
+                    {
+
+                    }
+                }
             }
             
 
