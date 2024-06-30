@@ -825,6 +825,33 @@ namespace Hairhub.Service.Services.Services
 
         }
 
+        public async Task<bool> CancelAppointmentByCustomer(Guid id, CancelApointmentRequest cancelApointmentRequest)
+        {
+            var appoinment = await _unitOfWork.GetRepository<Appointment>()
+                                                         .SingleOrDefaultAsync
+                                                         (
+                                                           predicate: x => x.Id == id && cancelApointmentRequest.CustomerId == x.CustomerId,
+                                                           include: x => x.Include(x => x.AppointmentDetails)
+                                                         );
+            if (appoinment == null)
+            {
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+
+            foreach (var item in appoinment.AppointmentDetails)
+            {
+                item.Status = AppointmentStatus.CancelByCustomer;
+                _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(item);
+            }
+
+            appoinment.Status = AppointmentStatus.CancelByCustomer;
+            appoinment.ReasonCancel = cancelApointmentRequest.ReasonReport;
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+
+            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            return isUpdate;
+        }
+
         #endregion
 
     }

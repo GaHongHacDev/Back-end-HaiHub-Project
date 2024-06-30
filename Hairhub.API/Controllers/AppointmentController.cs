@@ -167,19 +167,44 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        //[HttpPut]
+        //[Route("{id:Guid}")]
+        //public async Task<IActionResult> DeleteAppointment([FromRoute] Guid id)
+        //{
+        //    {
+        //        try
+        //        {
+        //            var isDelete = await _appointmentService.DeleteAppoinmentById(id);
+        //            if (!isDelete)
+        //            {
+        //                return BadRequest(new { message = "Cannot delete this appointment!" });
+        //            }
+        //            return Ok("Delete appointment successfully!");
+        //        }
+        //        catch (NotFoundException ex)
+        //        {
+        //            return NotFound(new { message = ex.Message });
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return BadRequest(new { message = ex.Message });
+        //        }
+        //    }
+        //}
+
         [HttpPut]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> DeleteAppointment([FromRoute] Guid id)
+        public async Task<IActionResult> CancelAppointByCustomer([FromRoute] Guid id, [FromBody] CancelApointmentRequest cancelApointmentRequest)
         {
             {
                 try
                 {
-                    var isDelete = await _appointmentService.DeleteAppoinmentById(id);
+                    var isDelete = await _appointmentService.CancelAppointmentByCustomer(id, cancelApointmentRequest);
                     if (!isDelete)
                     {
-                        return BadRequest("Cannot delete this appointment!");
+                        return BadRequest(new { message = "Không thể hủy đơn đặt lịch" });
                     }
-                    return Ok("Delete appointment successfully!");
+                    return Ok("Hủy Đơn đặt lịch thành công");
                 }
                 catch (NotFoundException ex)
                 {
@@ -192,28 +217,28 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> ActiveAppointment([FromRoute] Guid id)
-        {
-            try
-            {
-                var isActive = await _appointmentService.ActiveAppointment(id);
-                if (!isActive)
-                {
-                    return BadRequest("Cannot delete this appointment!");
-                }
-                return Ok("Appointment account successfully!");
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        //[HttpPut]
+        //[Route("{id:Guid}")]
+        //public async Task<IActionResult> ActiveAppointment([FromRoute] Guid id)
+        //{
+        //    try
+        //    {
+        //        var isActive = await _appointmentService.ActiveAppointment(id);
+        //        if (!isActive)
+        //        {
+        //            return BadRequest("Cannot delete this appointment!");
+        //        }
+        //        return Ok("Appointment account successfully!");
+        //    }
+        //    catch (NotFoundException ex)
+        //    {
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
 
         [HttpGet]
         [Route("{AccountId:Guid}")]
