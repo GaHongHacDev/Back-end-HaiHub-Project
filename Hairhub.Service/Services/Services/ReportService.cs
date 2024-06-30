@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Requests.Reports;
 using Hairhub.Domain.Dtos.Responses.Reports;
 using Hairhub.Domain.Entitities;
@@ -17,12 +18,14 @@ namespace Hairhub.Service.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMediaService _mediaService;
+        private readonly IEmailService _emailService;
 
-        public ReportService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
+        public ReportService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _mediaService = mediaService;
+            _emailService = emailService;
         }
 
         public async Task<IPaginate<GetReportResponse>> GetAllReport(int page, int size)
@@ -275,13 +278,13 @@ namespace Hairhub.Service.Services.Services
                     switch (salon.NumberOfReported)
                     {
                         case 1:
-                            SendMailNotificatinRemind(salon);
+                            await SendMailNotificatinRemind(salon, (int)salon.NumberOfReported);
                             break;
                         case 2:
-                            SendMailNotificatinRemind(salon);
+                            await SendMailNotificatinRemind(salon, (int)salon.NumberOfReported);
                             break;
                         case 3:
-                            SendMailNotificatinRemind(salon);
+                            await SendMailNotificatinRemind(salon, (int)salon.NumberOfReported);
                             break;
                         case 4:
                             salon = SuspendedSalon(salon);
@@ -335,10 +338,13 @@ namespace Hairhub.Service.Services.Services
         }
 
         // Gửi thông báo cảnh cáo khi salon bị report < 4
-        private bool SendMailNotificatinRemind(SalonInformation salon)
+        private async Task<bool> SendMailNotificatinRemind(SalonInformation salon, int numberOfReported)
         {
             //Gửi mail nhắc nhở
+            string subject = "Thông báo từ hệ thống Hairhub: Bạn đã bị báo cáo vi phạm";
+            string bodyEmail = $"Chúng tôi nhận được thông báo từ khách hàng về một số vấn đề liên quan đến hoạt động của salon {salon.Name} của bạn lần thứ {numberOfReported} trên nền tảng Hairhub. Đây là một phần trong cam kết của chúng tôi để duy trì chất lượng dịch vụ và đảm bảo trải nghiệm tốt nhất cho người dùng. Vui lòng kiểm tra và xử lý các vấn đề đang xảy ra để đảm bảo rằng hoạt động của salon của bạn đáp ứng các tiêu chuẩn của chúng tôi. Mọi chi tiết liên hệ phản hồi qua mail này hoặc kiểm tra thông tin report trên HairHub để hiểu rõ hơn.";
             string userEmail = salon.SalonOwner.Email;
+            await _emailService.SendEmailWithBodyAsync(salon.SalonOwner.Email, subject, salon.SalonOwner.FullName, bodyEmail);
             return true;
         }
     }

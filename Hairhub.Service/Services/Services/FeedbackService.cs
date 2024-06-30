@@ -8,6 +8,7 @@ using Hairhub.Domain.Dtos.Responses.Payment;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Enums;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
@@ -70,6 +71,11 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
+                var existingSalon = await _salonInformationService.GetSalonInformationById(request.SalonId);
+                if (existingSalon == null)
+                {
+                    throw new NotFoundException("Salon, barber shop không tồn tại");
+                }
 
                 Feedback newFeedback = new Feedback()
                 {
@@ -80,21 +86,20 @@ namespace Hairhub.Service.Services.Services
                     Comment = request.Comment,
                     IsActive = true,
                 };
-                var urlImg = await _mediaservice.UploadAnImage(request.Img, MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString());
-                var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
-                StaticFile staticFile = new StaticFile()
+
+                for(int i=0; i<request.ImgFeedbacks.Count; i++)
                 {
-                    Id = Guid.NewGuid(),
-                    FeedbackId = newFeedback.Id,
-                    Img = urlImg,
-                    Video = urlVideo,
-                };
-                var existingSalon = await _salonInformationService.GetSalonInformationById(request.SalonId);
-                if (existingSalon == null)
-                {
-                    
-                    return false;
-                }                
+                    var urlImg = await _mediaservice.UploadAnImage(request.ImgFeedbacks[i], MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString()+"/"+i.ToString());
+                    //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
+                    StaticFile staticFile = new StaticFile()
+                    {
+                        Id = Guid.NewGuid(),
+                        FeedbackId = newFeedback.Id,
+                        Img = urlImg,
+                    };
+                    await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                }
+                              
                 int totalRating = existingSalon.TotalRating;
                 int totalReview = existingSalon.TotalReviewer + 1;
                 existingSalon.Rate = (int)(totalRating + request.Rating) / totalReview;
@@ -105,7 +110,6 @@ namespace Hairhub.Service.Services.Services
 
                 _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
                 await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
-                await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
 
                 bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
                 return isSuccessful;

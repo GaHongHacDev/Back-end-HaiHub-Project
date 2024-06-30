@@ -1,6 +1,7 @@
 ﻿using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Feedbacks;
 using Hairhub.Domain.Dtos.Requests.Schedule;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
@@ -53,13 +54,16 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-
         public async Task<IActionResult> CreateFeedback([FromForm]CreateFeedbackRequest request)
         {
             try
             {
                 var isSuccessFull = await _feedbackService.CreateFeedback(request);
                 return Ok(isSuccessFull);
+            }
+            catch(NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
