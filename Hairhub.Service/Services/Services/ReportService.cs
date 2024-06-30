@@ -265,7 +265,8 @@ namespace Hairhub.Service.Services.Services
                 var salon = await _unitOfWork.GetRepository<SalonInformation>()
                                         .SingleOrDefaultAsync
                                         (
-                                           predicate: x => x.Id == report.SalonId
+                                           predicate: x => x.Id == report.SalonId,
+                                           include: x => x.Include(s=>s.SalonOwner)
                                         );
                 if (salon != null)
                 {
