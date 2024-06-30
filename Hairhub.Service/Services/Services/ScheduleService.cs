@@ -133,9 +133,19 @@ namespace Hairhub.Service.Services.Services
                 }
                 else
                 {
-                    if (request.StartTime<=schedule.StartTime && request.EndTime >= schedule.EndTime)
+                    if (request.StartTime>=schedule.StartTime && request.EndTime <= schedule.EndTime)
                     {
-
+                        var appointment = await _unitOfWork.GetRepository<Appointment>()
+                                                            .SingleOrDefaultAsync
+                                                             (
+                                                                predicate: x => (TimeOnly.FromDateTime(x.AppointmentDetails.FirstOrDefault().StartTime) < request.StartTime
+                                                                                || TimeOnly.FromDateTime(x.AppointmentDetails.OrderByDescending(s=>s.EndTime).FirstOrDefault().EndTime) > request.EndTime)
+                                                                                && x.Status.Equals(AppointmentStatus.Booking)
+                                                             );
+                        if (appointment != null)
+                        {
+                            throw new Exception($"Không thể cập nhật lịch làm việc vì đang có đơn đặt lịch vào {appointment.StartDate.ToString()}");
+                        }
                     }
                 }
             }

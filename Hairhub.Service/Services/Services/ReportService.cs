@@ -62,11 +62,15 @@ namespace Hairhub.Service.Services.Services
                                            .GetPagingListAsync
                                            (
                                                predicate: x => x.RoleNameReport.Equals(roleNameReport),
-                                               include: x => x.Include(s => s.SalonInformation)
-                                                                  .ThenInclude(s => s.SalonOwner)
-                                                              .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails)
-                                                              .Include(s => s.StaticFiles),
+                                               include: x => x.Include(s => s.StaticFiles)
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                               .Include(s => s.Customer)
+                                                               .Include(s => s.Appointment)
+                                                                   .ThenInclude(a => a.AppointmentDetails)
+                                                                       .ThenInclude(ad => ad.SalonEmployee),
                                                page: page,
                                                size: size
                                            );
