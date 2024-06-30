@@ -97,7 +97,8 @@ namespace Hairhub.Service.Helpers
 
 
             //SalonInformation
-            CreateMap<GetSalonInformationResponse, SalonInformation>().ReverseMap();
+            CreateMap<SalonInformation, GetSalonInformationResponse>()
+                .ForMember(dest => dest.schedules, opt => opt.MapFrom(src => src.Schedules));
             CreateMap<CreateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
@@ -168,7 +169,9 @@ namespace Hairhub.Service.Helpers
             CreateMap<Approval, GetApprovalResponse>();
 
             //Report CreateReportRequest
-            CreateMap<Report, GetReportResponse>().ReverseMap();
+            CreateMap<Report, GetReportResponse>()
+                 .ForMember(dest => dest.FileReports, opt => opt.MapFrom(src => src.StaticFiles.ToList()));
+
             CreateMap<Report, UpdateAccountRequest>().ReverseMap(); 
             CreateMap<Report, CreateReportRequest>().ReverseMap();
 

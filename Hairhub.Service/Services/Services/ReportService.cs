@@ -28,16 +28,23 @@ namespace Hairhub.Service.Services.Services
         public async Task<IPaginate<GetReportResponse>> GetAllReport(int page, int size)
         {
             var reports = await _unitOfWork.GetRepository<Report>()
-                                           .GetPagingListAsync
-                                           (
-                                               include: x => x.Include(s => s.SalonInformation)
-                                                                  .ThenInclude(s => s.SalonOwner)
-                                                              .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee)
-                                                              .Include(s => s.StaticFiles),
-                                               page: page,
-                                               size: size
-                                           );  
+                .GetPagingListAsync(
+                    include: x => x.Include(s => s.StaticFiles)
+                                   .Include(s => s.SalonInformation)
+                                       .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                   .Include(s => s.SalonInformation)
+                                       .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                   .Include(s => s.Customer)
+                                   .Include(s => s.Appointment)
+                                       .ThenInclude(a => a.AppointmentDetails)
+                                           .ThenInclude(ad => ad.SalonEmployee),
+                    page: page,
+                    size: size
+                );
+            foreach (var report in reports.Items)
+            {
+                report.StaticFiles = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: x => x.ReportId == report.Id);
+            }
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,
@@ -79,12 +86,16 @@ namespace Hairhub.Service.Services.Services
             var reports = await _unitOfWork.GetRepository<Report>()
                                            .GetPagingListAsync
                                            (
-                                               predicate: x=>x.CustomerId == customerId,
-                                               include: x => x.Include(s => s.SalonInformation)
-                                                                .ThenInclude(s => s.SalonOwner)
-                                                              .Include(s => s.Customer)
-                                                              .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails)
-                                                              .Include(s => s.StaticFiles),
+                                              predicate: x => x.CustomerId == customerId,
+                                              include: x => x.Include(s => s.StaticFiles)
+                                                            .Include(s => s.SalonInformation)
+                                                                .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                            .Include(s => s.SalonInformation)
+                                                                .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                            .Include(s => s.Customer)
+                                                            .Include(s => s.Appointment)
+                                                                .ThenInclude(a => a.AppointmentDetails)
+                                                                    .ThenInclude(ad => ad.SalonEmployee),
                                                page: page,
                                                size: size
                                            );
@@ -104,12 +115,16 @@ namespace Hairhub.Service.Services.Services
             var reports = await _unitOfWork.GetRepository<Report>()
                                            .GetPagingListAsync
                                            (
-                                             include: x => x.Include(s => s.SalonInformation)
-                                                                .ThenInclude(s => s.SalonOwner)
-                                                            .Include(s => s.Customer)
-                                                            .Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails)
-                                                            .Include(s => s.StaticFiles),
                                                predicate: x => x.SalonId == salonId,
+                                               include: x => x.Include(s => s.StaticFiles)
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                               .Include(s => s.Customer)
+                                                               .Include(s => s.Appointment)
+                                                                   .ThenInclude(a => a.AppointmentDetails)
+                                                                       .ThenInclude(ad => ad.SalonEmployee),
                                                page: page,
                                                size: size
                                            );
@@ -133,32 +148,32 @@ namespace Hairhub.Service.Services.Services
             Appointment appointment = null;
             if (report.RoleNameReport.Equals(RoleEnum.Customer.ToString()))
             {
-                var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == report.CustomerId && x.Account.IsActive==true);
+                var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == report.CustomerId && x.Account.IsActive == true);
                 if (customer == null)
                 {
                     throw new NotFoundException("Không thể tạo báo cáo vì tài khoản của bạn không hoạt động");
                 }
-                 appointment = await _unitOfWork.GetRepository<Appointment>()
-                                   .SingleOrDefaultAsync
-                                   (
-                                    predicate: x => x.Id == request.AppointmentId
-                                                && (
-                                                x.Status.Equals(AppointmentStatus.Successed)
-                                                || x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.CancelByCustomer)
-                                                )
-                                   );
+                appointment = await _unitOfWork.GetRepository<Appointment>()
+                                  .SingleOrDefaultAsync
+                                  (
+                                   predicate: x => x.Id == request.AppointmentId
+                                               && (
+                                               x.Status.Equals(AppointmentStatus.Successed)
+                                               || x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.CancelByCustomer)
+                                               )
+                                  );
                 if (appointment == null)
                 {
                     throw new NotFoundException("Bạn không thể báo cáo salon, barber shop khi chưa đặt lịch");
                 }
                 appointment.IsReportByCustomer = true;
             }
-            else if(report.RoleNameReport.Equals(RoleEnum.SalonOwner.ToString()))
+            else if (report.RoleNameReport.Equals(RoleEnum.SalonOwner.ToString()))
             {
                 var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync
                                                                          (
-                                                                            predicate: x => x.Id == report.SalonId && x.Status.Equals(SalonStatus.Approved) 
-                                                                            && x.SalonOwner.Account.IsActive==true
+                                                                            predicate: x => x.Id == report.SalonId && x.Status.Equals(SalonStatus.Approved)
+                                                                            && x.SalonOwner.Account.IsActive == true
                                                                          );
                 if (salon == null)
                 {
@@ -168,7 +183,7 @@ namespace Hairhub.Service.Services.Services
                                   .SingleOrDefaultAsync
                                   (
                                    predicate: x => x.Id == request.AppointmentId
-                                               && ((x.Status.Equals(AppointmentStatus.Booking) && x.StartDate<DateTime.Now) 
+                                               && ((x.Status.Equals(AppointmentStatus.Booking) && x.StartDate < DateTime.Now)
                                                || x.Status.Equals(AppointmentStatus.Successed)
                                                || x.Status.Equals(AppointmentStatus.CancelByCustomer))
                                   );
@@ -185,7 +200,7 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
             if (request.ImgeReportRequest != null && request.ImgeReportRequest.Count > 0)
             {
-                for (int i=0; i<request.ImgeReportRequest.Count; i++)
+                for (int i = 0; i < request.ImgeReportRequest.Count; i++)
                 {
                     var item = request.ImgeReportRequest[i];
                     StaticFile staticFile = new StaticFile();
@@ -195,9 +210,9 @@ namespace Hairhub.Service.Services.Services
                     {
                         try
                         {
-                            staticFile.Img = await _mediaService.UploadAnImage(item, MediaPath.REPORT, "Img"+staticFile.Id.ToString() + i.ToString());
+                            staticFile.Img = await _mediaService.UploadAnImage(item, MediaPath.REPORT, "Img" + staticFile.Id.ToString() + i.ToString());
                         }
-                        catch (Exception ex) 
+                        catch (Exception ex)
                         {
                             throw new Exception("Lỗi tải ảnh lên");
                         }
@@ -222,18 +237,18 @@ namespace Hairhub.Service.Services.Services
             return isInsert;
         }
 
-        public async Task<bool> ConfirmReport(Guid id,  ConfirmReportRequest request)
+        public async Task<bool> ConfirmReport(Guid id, ConfirmReportRequest request)
         {
-            if (!request.Status.Equals(ReportStatus.Approved)&& !request.Status.Equals(ReportStatus.Rejected))
+            if (!request.Status.Equals(ReportStatus.Approved) && !request.Status.Equals(ReportStatus.Rejected))
             {
                 throw new NotFoundException("Sai trạng thái duyệt");
             }
             var report = await _unitOfWork.GetRepository<Report>()
                                           .SingleOrDefaultAsync
                                           (
-                                            predicate: x=>x.Id == id  
+                                            predicate: x => x.Id == id
                                           );
-            if(report == null)
+            if (report == null)
             {
                 throw new NotFoundException("Không tìm thấy đơn báo cáo");
             }
@@ -242,7 +257,7 @@ namespace Hairhub.Service.Services.Services
                 var salon = await _unitOfWork.GetRepository<SalonInformation>()
                                         .SingleOrDefaultAsync
                                         (
-                                           predicate: x=>x.Id == report.SalonId
+                                           predicate: x => x.Id == report.SalonId
                                         );
                 if (salon != null)
                 {
@@ -270,7 +285,7 @@ namespace Hairhub.Service.Services.Services
                     _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
                 }
             }
-               
+
             else if (report.RoleNameReport.Equals(RoleEnum.SalonOwner.ToString()) || request.Status.Equals(ReportStatus.Approved))
             {
                 var customer = await _unitOfWork.GetRepository<Customer>()

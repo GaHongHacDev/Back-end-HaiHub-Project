@@ -16,8 +16,8 @@ namespace Hairhub.Domain.Dtos.Responses.Schedules
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
         public bool? IsActive { get; set; }
-        public SalonEmployeeResponseS? SalonEmployee { get; set; }
-        public SalonInformationSchedule? SalonInformation { get; set; }
+       // public SalonEmployeeResponseS? SalonEmployee { get; set; }
+       // public SalonInformationSchedule? SalonInformation { get; set; }
     }
 
     public class SalonEmployeeResponseS

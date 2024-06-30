@@ -20,8 +20,8 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
         public string? DescriptionAdmin { get; set; }
         public string Status { get; set; }
         public GetAppointmentResponse Appointment { get; set; }
-        public List<FileReportResponse> StaticFiles { get; set; }
-        public AppointmentSalon SalonInformation { get; set; }
+        public List<FileReportResponse> FileReports { get; set; }
+        public GetSalonInformationResponse SalonInformation { get; set; }
         public CustomerAppointment Customer { get; set; }
     }
 
