@@ -247,7 +247,7 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.OwnerId).HasColumnName("owner_id");
-                entity.Property(e => e.Name).HasMaxLength(50).HasColumnName("phone");
+                entity.Property(e => e.Name).HasMaxLength(100).HasColumnName("name");
                 entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Img).HasMaxLength(200).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address");

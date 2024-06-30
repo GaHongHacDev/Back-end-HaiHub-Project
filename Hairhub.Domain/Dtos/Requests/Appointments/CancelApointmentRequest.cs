@@ -8,7 +8,7 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
 {
     public class CancelApointmentRequest
     {
-        public string ReasonReport {  get; set; }
+        public string reasonCancel {  get; set; }
         public Guid CustomerId { get; set; }
     }
 }

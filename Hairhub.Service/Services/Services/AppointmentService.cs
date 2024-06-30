@@ -21,13 +21,15 @@ namespace Hairhub.Service.Services.Services
         private readonly IMapper _mapper;
         private readonly IAppointmentDetailService _appointmentDetailService;
         private readonly IQRCodeService _qrCodeService;
+        private readonly IEmailService _emailService;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _appointmentDetailService = appointmentDetailService;
             _qrCodeService = qrCodeService;
+            _emailService = emailService;
         }
 
         #region GET
@@ -827,15 +829,25 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CancelAppointmentByCustomer(Guid id, CancelApointmentRequest cancelApointmentRequest)
         {
+
             var appoinment = await _unitOfWork.GetRepository<Appointment>()
                                                          .SingleOrDefaultAsync
                                                          (
                                                            predicate: x => x.Id == id && cancelApointmentRequest.CustomerId == x.CustomerId,
-                                                           include: x => x.Include(x => x.AppointmentDetails)
+                                                           include: x => x.Include(x => x.AppointmentDetails).ThenInclude(s => s.SalonEmployee).ThenInclude(s => s.SalonInformation).ThenInclude(s => s.SalonOwner)
+                                                                          .Include(s=>s.Customer)
                                                          );
+
             if (appoinment == null)
             {
                 throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+            else
+            {
+                if (!appoinment.Status.Equals(AppointmentStatus.Booking))
+                {
+                    throw new Exception("Chỉ được hủy lịch cắt tóc khi đã đặt lịch hẹn");
+                }
             }
 
             foreach (var item in appoinment.AppointmentDetails)
@@ -845,10 +857,17 @@ namespace Hairhub.Service.Services.Services
             }
 
             appoinment.Status = AppointmentStatus.CancelByCustomer;
-            appoinment.ReasonCancel = cancelApointmentRequest.ReasonReport;
+            appoinment.ReasonCancel = cancelApointmentRequest.reasonCancel;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
 
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            if (isUpdate)
+            {
+                DateTime TimeBook = appoinment.AppointmentDetails.OrderBy(s => s.StartTime).FirstOrDefault().StartTime;
+                SalonInformation Salon = appoinment.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation;
+                string bodyEmail = $"Chúng tôi rất tiếc phải thông báo rằng khách hàng {appoinment.Customer.FullName} của bạn đã hủy lịch hẹn cắt tóc có thời gian vào {TimeBook.Hour}:{TimeBook.Minute} ngày {appoinment.StartDate.Day}, tháng {appoinment.StartDate.Month}, năm {appoinment.StartDate.Year}. Lý do: {cancelApointmentRequest.reasonCancel}. Vui lòng kiểm tra lại lịch trình của bạn để biết thêm chi tiết";
+                await _emailService.SendEmailWithBodyAsync(Salon.SalonOwner.Email, "Thông báo hủy đơn đặt lịch trên Hairhub", Salon.Name, bodyEmail);
+            }
             return isUpdate;
         }
 
