@@ -26,6 +26,7 @@ namespace Hairhub.Service.Services.IServices
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
         Task<bool> CreateAppointment(CreateAppointmentRequest request);
         Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest);
+        Task<bool> CancelAppointmentByCustomer(Guid id, CancelApointmentRequest cancelApointmentRequest);
         Task<bool> DeleteAppoinmentById(Guid id);
         Task<bool> ActiveAppointment(Guid id);
     }

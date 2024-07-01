@@ -9,6 +9,7 @@ namespace Hairhub.Domain.Entitities
 {
     public class Feedback
     {
+        [Key]
         public Guid Id { get; set; }
         public Guid CustomerId { get; set; }
         public Guid AppointmentId { get; set; }

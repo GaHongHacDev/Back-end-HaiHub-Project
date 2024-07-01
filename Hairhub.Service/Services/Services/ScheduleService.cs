@@ -3,6 +3,7 @@ using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Dtos.Responses.Schedules;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
@@ -51,10 +52,11 @@ namespace Hairhub.Service.Services.Services
         }
 
         public async Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId)
-        {;
+        {
+            ;
             var schedules = await _unitOfWork.GetRepository<Schedule>()
             .GetListAsync(
-                predicate: x=>x.SalonId == salonId,
+                predicate: x => x.SalonId == salonId,
                 include: query => query.Include(s => s.SalonInformation)
             );
             if (schedules == null)
@@ -109,15 +111,47 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> UpdateSchedule(Guid id, UpdateScheduleRequest request)
         {
             var schedule = await _unitOfWork.GetRepository<Schedule>()
-                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
+                                .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
+            if (schedule == null)
+                throw new NotFoundException($"Không tìm thấy lịch làm việc với id {id}");
 
-            if (schedule == null) throw new Exception("Schedule is not exist!!!");
+            if (schedule.SalonId != null || schedule.EmployeeId != null)
+            {
+                if (!request.IsActive)
+                {
+                    var appointment = await _unitOfWork.GetRepository<Appointment>()
+                                                        .SingleOrDefaultAsync
+                                                            (
+                                                                predicate: x => x.StartDate.DayOfWeek.ToString().Equals(schedule.DayOfWeek)
+                                                                && x.Status.Equals(AppointmentStatus.Booking),
+                                                                include: x => x.Include(s => s.AppointmentDetails).Include(s => s.Customer)
+                                                            );
+                    if (appointment != null)
+                    {
+                        throw new Exception($"Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn với {appointment.Customer.FullName} vào lúc {appointment.AppointmentDetails.First().StartTime}");
+                    }
+                    schedule.IsActive = false;
+                }
+                else
+                {
 
-            schedule.DayOfWeek = request.DayOfWeek;
-            schedule.StartTime = request.StartTime;
-            schedule.EndTime = request.EndTime;
-
+                    var appointment = await _unitOfWork.GetRepository<Appointment>()
+                                                        .SingleOrDefaultAsync
+                                                         (
+                                                            predicate: x => (TimeOnly.FromDateTime(x.AppointmentDetails.FirstOrDefault().StartTime) < request.StartTime
+                                                                            || TimeOnly.FromDateTime(x.AppointmentDetails.OrderByDescending(s => s.EndTime).FirstOrDefault().EndTime) > request.EndTime)
+                                                                            && x.Status.Equals(AppointmentStatus.Booking)
+                                                         );
+                    if (appointment != null)
+                    {
+                        throw new Exception($"Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn với {appointment.Customer.FullName} vào lúc {appointment.StartDate.Date.ToString()}");
+                    }
+                    schedule.StartTime = request.StartTime;
+                    schedule.EndTime = request.EndTime;
+                }
+            }
             _unitOfWork.GetRepository<Schedule>().UpdateAsync(schedule);
+
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
         }

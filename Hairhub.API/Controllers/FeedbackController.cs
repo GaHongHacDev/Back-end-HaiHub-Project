@@ -1,6 +1,7 @@
 ﻿using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Feedbacks;
 using Hairhub.Domain.Dtos.Requests.Schedule;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
@@ -53,13 +54,20 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-
         public async Task<IActionResult> CreateFeedback([FromForm]CreateFeedbackRequest request)
         {
             try
             {
                 var isSuccessFull = await _feedbackService.CreateFeedback(request);
-                return Ok(isSuccessFull);
+                if (!isSuccessFull)
+                {
+                    return BadRequest(new { message = "Lỗi trong quá trình tạo đánh giá dịch vụ salon, barber shop" });
+                }
+                return Ok("Tạo đánh giá thành công");
+            }
+            catch(NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -103,7 +111,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> GetFeedBackBySalonId([FromRoute]Guid id, [FromQuery] int rating, int page = 1, int size = 10)
+        public async Task<IActionResult> GetFeedBackBySalonId([FromRoute]Guid id, [FromQuery] int rating, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
@@ -115,5 +123,21 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetFeedBackByAppointmentId([FromRoute] Guid id,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var isSuccessfull = await _feedbackService.GetFeedBackByAppointmentId(id, page, size);
+                return Ok(isSuccessfull);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

@@ -12,8 +12,6 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
     public class GetReportResponse
     {
         public Guid Id { get; set; }
-        public Guid? SalonId { get; set; }
-        public Guid? CustomerId { get; set; }
         public Guid AppointmentId { get; set; }
         public string RoleNameReport { get; set; } // Customer or SalonOwner
         public string? ReasonReport { get; set; }
@@ -21,9 +19,17 @@ namespace Hairhub.Domain.Dtos.Responses.Reports
         public DateTime? TimeConfirm { get; set; }
         public string? DescriptionAdmin { get; set; }
         public string Status { get; set; }
-        public SalonOwnerSalonInformationResponse SalonOwner { get; set; }
         public GetAppointmentResponse Appointment { get; set; }
+        public List<FileReportResponse> FileReports { get; set; }
+        public GetSalonInformationResponse SalonInformation { get; set; }
+        public CustomerAppointment Customer { get; set; }
     }
 
-
+    public class FileReportResponse
+    {
+        public Guid Id { get; set; }
+        public Guid? ReportId { get; set; }
+        public string? Img { get; set; }
+        public string? Video { get; set; }
+    }
 }

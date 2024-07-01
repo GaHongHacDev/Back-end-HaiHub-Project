@@ -11,6 +11,7 @@ using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Common.CommonService.Contract;
+using System.Data;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -20,13 +21,15 @@ namespace Hairhub.Service.Services.Services
         private readonly IMapper _mapper;
         private readonly IAppointmentDetailService _appointmentDetailService;
         private readonly IQRCodeService _qrCodeService;
+        private readonly IEmailService _emailService;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _appointmentDetailService = appointmentDetailService;
             _qrCodeService = qrCodeService;
+            _emailService = emailService;
         }
 
         #region GET
@@ -78,7 +81,7 @@ namespace Hairhub.Service.Services.Services
                                                    page: page,
                                                    size: size
                                                );
-            
+
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
@@ -87,7 +90,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointmentResponse != null && appointmentResponse.Items.Count>0)
+            if (appointmentResponse != null && appointmentResponse.Items.Count > 0)
             {
                 foreach (var item in appointmentResponse.Items)
                 {
@@ -119,7 +122,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointmentResponse != null && appointmentResponse.Items.Count!=0)
+            if (appointmentResponse != null && appointmentResponse.Items.Count != 0)
             {
                 foreach (var item in appointmentResponse.Items)
                 {
@@ -145,8 +148,8 @@ namespace Hairhub.Service.Services.Services
             if (appointment == null)
                 return null;
             var appointmentResponse = _mapper.Map<GetAppointmentResponse>(appointment);
-                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x => x.AppointmentId == appointmentResponse.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
+            var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                .GetListAsync(predicate: x => x.AppointmentId == appointmentResponse.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
             appointmentResponse.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
             return appointmentResponse;
         }
@@ -179,7 +182,7 @@ namespace Hairhub.Service.Services.Services
             foreach (var item in appointmentResponse.Items)
             {
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x=>x.Include(x=>x.SalonEmployee).Include(y=>y.ServiceHair));
+                                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
                 item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
             }
             return appointmentResponse;
@@ -210,7 +213,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = appointments.TotalPages,
                 Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
             };
-            if (appointmentResponse != null && appointmentResponse.Items.Count>0)
+            if (appointmentResponse != null && appointmentResponse.Items.Count > 0)
             {
                 foreach (var item in appointmentResponse.Items)
                 {
@@ -269,6 +272,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Salon, barber shop không hoạt động vào thời gian này");
             }
+            //****************************************
+            /* if (salonSchedule.EndTime)
+             {
+
+             }*/
             List<decimal> availbeTimeResponse = GenerateTimeSlot(salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60, salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60, 0.25m);
             var availableTimesDict = availbeTimeResponse.ToDictionary(timeSlot => timeSlot, timeSlot => new List<EmployeeAvailable>());
             if (!request.IsAnyOne)
@@ -403,7 +411,7 @@ namespace Hairhub.Service.Services.Services
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
-                        await Console.Out.WriteLineAsync(start + " : "+ end);
+                        await Console.Out.WriteLineAsync(start + " : " + end);
                         timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                     }
 
@@ -601,7 +609,7 @@ namespace Hairhub.Service.Services.Services
                                                              || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                              || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                     .ToList();
-                    if (appointmentDetails == null || appointmentDetails.Count==0)
+                    if (appointmentDetails == null || appointmentDetails.Count == 0)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                     }
@@ -620,7 +628,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception($"Cannot convert minute {Time}");
             }
-            return (decimal)(Time.Hour + Time.Minute/60m);
+            return (decimal)(Time.Hour + Time.Minute / 60m);
         }
 
         private async Task<bool> CheckAppointmentBooking(Guid SalonId, DateTime Day, Decimal TimeSlot, bool IsAnyOne)
@@ -690,30 +698,29 @@ namespace Hairhub.Service.Services.Services
             {
                 await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
             }
-             if (request.VoucherIds != null && request.VoucherIds.Count>0)
-             {
-                 foreach (var item in request.VoucherIds)
-                 {
-                     var voucher = await _unitOfWork.GetRepository<Voucher>()
-                                              .SingleOrDefaultAsync
-                                              (
-                                                 predicate: x => x.Id == item
-                                                             && x.IsActive == true
-                                              );
-                     if (voucher == null)
-                     {
-                         throw new NotFoundException("Voucher Không phù hợp");
-                     }
-                     var appointmentVoucher = new AppointmentDetailVoucher()
-                     {
-                         Id = new Guid(),
-                         AppointmentId = appointment.Id,
-                         VoucherId = item
-                     };
-                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
-                 }
-             }
-
+            if (request.VoucherIds != null && request.VoucherIds.Count > 0)
+            {
+                foreach (var item in request.VoucherIds)
+                {
+                    var voucher = await _unitOfWork.GetRepository<Voucher>()
+                                             .SingleOrDefaultAsync
+                                             (
+                                                predicate: x => x.Id == item
+                                                            && x.IsActive == true
+                                             );
+                    if (voucher == null)
+                    {
+                        throw new NotFoundException("Voucher Không phù hợp");
+                    }
+                    var appointmentVoucher = new AppointmentDetailVoucher()
+                    {
+                        Id = new Guid(),
+                        AppointmentId = appointment.Id,
+                        VoucherId = item
+                    };
+                    await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                }
+            }
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
@@ -724,8 +731,8 @@ namespace Hairhub.Service.Services.Services
                                               .SingleOrDefaultAsync
                                               (
                                                 predicate: x => x.Id == id && updateAppointmentRequest.CustomerId == x.CustomerId,
-                                                include: x => x.Include(x=>x.AppointmentDetails)
-                                              ); 
+                                                include: x => x.Include(x => x.AppointmentDetails)
+                                              );
             if (appoinment == null)
             {
                 throw new NotFoundException("Không tìm thấy đơn đặt lịch");
@@ -818,6 +825,50 @@ namespace Hairhub.Service.Services.Services
 
             return response;
 
+        }
+
+        public async Task<bool> CancelAppointmentByCustomer(Guid id, CancelApointmentRequest cancelApointmentRequest)
+        {
+
+            var appoinment = await _unitOfWork.GetRepository<Appointment>()
+                                                         .SingleOrDefaultAsync
+                                                         (
+                                                           predicate: x => x.Id == id && cancelApointmentRequest.CustomerId == x.CustomerId,
+                                                           include: x => x.Include(x => x.AppointmentDetails).ThenInclude(s => s.SalonEmployee).ThenInclude(s => s.SalonInformation).ThenInclude(s => s.SalonOwner)
+                                                                          .Include(s=>s.Customer)
+                                                         );
+
+            if (appoinment == null)
+            {
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+            else
+            {
+                if (!appoinment.Status.Equals(AppointmentStatus.Booking))
+                {
+                    throw new Exception("Chỉ được hủy lịch cắt tóc khi đã đặt lịch hẹn");
+                }
+            }
+
+            foreach (var item in appoinment.AppointmentDetails)
+            {
+                item.Status = AppointmentStatus.CancelByCustomer;
+                _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(item);
+            }
+
+            appoinment.Status = AppointmentStatus.CancelByCustomer;
+            appoinment.ReasonCancel = cancelApointmentRequest.reasonCancel;
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+
+            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            if (isUpdate)
+            {
+                DateTime TimeBook = appoinment.AppointmentDetails.OrderBy(s => s.StartTime).FirstOrDefault().StartTime;
+                SalonInformation Salon = appoinment.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation;
+                string bodyEmail = $"Chúng tôi rất tiếc phải thông báo rằng khách hàng {appoinment.Customer.FullName} của bạn đã hủy lịch hẹn cắt tóc có thời gian vào {TimeBook.Hour}:{TimeBook.Minute} ngày {appoinment.StartDate.Day}, tháng {appoinment.StartDate.Month}, năm {appoinment.StartDate.Year}. Lý do: {cancelApointmentRequest.reasonCancel}. Vui lòng kiểm tra lại lịch trình của bạn để biết thêm chi tiết";
+                await _emailService.SendEmailWithBodyAsync(Salon.SalonOwner.Email, "Thông báo hủy đơn đặt lịch trên Hairhub", Salon.Name, bodyEmail);
+            }
+            return isUpdate;
         }
 
         #endregion

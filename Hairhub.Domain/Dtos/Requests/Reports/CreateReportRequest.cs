@@ -16,6 +16,7 @@ namespace Hairhub.Domain.Dtos.Requests.Reports
         public Guid CustomerId { get; set; }
         public Guid AppointmentId { get; set; }
         public string RoleNameReport { get; set; } // Customer or SalonOwner
+        public string ReasonReport {  get; set; }
         public List<IFormFile> ImgeReportRequest { get; set; }
     }
 }

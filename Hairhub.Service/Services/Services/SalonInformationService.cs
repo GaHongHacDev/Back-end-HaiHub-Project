@@ -219,6 +219,9 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException($"Not found salon information with owner id {ownerId}");
             var salonInforResponse = _mapper.Map<GetSalonInformationResponse>(salonInformation);
             var schedules = await _scheduleService.GetSalonSchedules(salonInformation.Id);
+            var orderedSchedules = schedules
+                .OrderBy(s => (int)Enum.Parse<DayOfWeek>(s.DayOfWeek) == 0 ? 7 : (int)Enum.Parse<DayOfWeek>(s.DayOfWeek))
+                .ToList();
             if (schedules.Any())
             {
                 salonInforResponse.schedules = schedules;
@@ -323,6 +326,19 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = (int)Math.Ceiling((double)result.Count / size),
                 Items = result,
             };
+        }
+
+        public async Task<List<SalonSuggesstionResponse>> GetSalonSuggestion()
+        {
+            var salons = await _unitOfWork.GetRepository<SalonInformation>()
+                .GetListAsync(
+                predicate: x => x.Status.Equals(SalonStatus.Approved),
+                    orderBy: q => q.OrderByDescending(s => s.Rate)
+                                  .ThenByDescending(s => s.TotalReviewer),
+                    take: 20
+                );
+
+            return _mapper.Map<List<SalonSuggesstionResponse>>(salons);
         }
     }
 }

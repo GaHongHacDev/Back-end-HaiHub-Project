@@ -11,6 +11,7 @@ namespace Hairhub.Service.Services.IServices
 {
     public interface ISalonInformationService
     {
+        Task<List<SalonSuggesstionResponse>> GetSalonSuggestion();
         Task<IPaginate<GetSalonInformationResponse>> GetAllApprovedSalonInformation(int page, int size);
         Task<IPaginate<GetSalonInformationResponse>> GetAllSalonByAdmin(int page, int size);
         Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? status, int page, int size);

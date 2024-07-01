@@ -18,5 +18,6 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, int page, int size);
         Task<bool> CreateReport(CreateReportRequest request);
         Task<bool> ConfirmReport(Guid id, ConfirmReportRequest request);
+        Task<IPaginate<GetReportResponse>> GetAllReportByRoleName(string roleNameReport, int page, int size);
     }
 }

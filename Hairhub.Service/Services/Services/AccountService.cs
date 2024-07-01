@@ -108,7 +108,7 @@ namespace Hairhub.Service.Services.Services
             var userName = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(createAccountRequest.UserName));
             if (userName != null)
             {
-                throw new Exception("Username đã tồn tại!");
+                throw new Exception("Email đã tồn tại!");
             }
             var account = _mapper.Map<Domain.Entitities.Account>(createAccountRequest);
             account.Id = Guid.NewGuid();

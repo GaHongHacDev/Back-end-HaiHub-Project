@@ -68,9 +68,55 @@ namespace Hairhub.Service.Helpers
             CreateMap<SalonInformationSchedule, SalonInformation>().ReverseMap();
 
             //Feedback
-            CreateMap<Feedback, GetFeedbackResponse>().ReverseMap();
+            CreateMap<Feedback, GetFeedbackResponse>()
+            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+            .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.Appointment.AppointmentDetails.FirstOrDefault()))
+            .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
+            .ReverseMap();
+
+            // Mapping from Customer to CustomerResponseF
+            CreateMap<Customer, CustomerResponseF>().ReverseMap();
+
+            // Mapping from AppointmentDetail to AppointmentDetailResponseF
+            CreateMap<AppointmentDetail, AppointmentDetailResponseF>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.SalonEmployeeId, opt => opt.MapFrom(src => src.SalonEmployeeId))
+                .ForMember(dest => dest.ServiceHairId, opt => opt.MapFrom(src => src.ServiceHairId))
+                .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.StartTime))  // Assuming StartTime is the desired date
+                .ForMember(dest => dest.Time, opt => opt.MapFrom(src => src.StartTime))  // Assuming StartTime is the desired time
+                .ForMember(dest => dest.OriginalPrice, opt => opt.MapFrom(src => src.PriceServiceHair))
+                .ForMember(dest => dest.DiscountedPrice, opt => opt.MapFrom(src => src.PriceServiceHair))  // Adjust based on your logic
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ReverseMap();
+
+            // Mapping from Appointment to AppointmentResponseF
+            CreateMap<Appointment, AppointmentResponseF>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
+                .ForMember(dest => dest.OriginalPrice, opt => opt.MapFrom(src => src.OriginalPrice))
+                .ForMember(dest => dest.DiscountedPrice, opt => opt.MapFrom(src => src.DiscountedPrice))
+                .ForMember(dest => dest.IsReportByCustomer, opt => opt.MapFrom(src => src.IsReportByCustomer))
+                .ForMember(dest => dest.IsReportBySalon, opt => opt.MapFrom(src => src.IsReportBySalon))
+                .ForMember(dest => dest.ReasonCancel, opt => opt.MapFrom(src => src.ReasonCancel))
+                .ForMember(dest => dest.CancelDate, opt => opt.MapFrom(src => src.CancelDate))
+                .ForMember(dest => dest.QrCodeImg, opt => opt.MapFrom(src => src.QrCodeImg))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ReverseMap();
+            CreateMap<StaticFile, StaticFileResponseF>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.FeedbackId, opt => opt.MapFrom(src => src.FeedbackId))
+                .ForMember(dest => dest.ReportId, opt => opt.MapFrom(src => src.ReportId))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.Video, opt => opt.MapFrom(src => src.Video))
+                .ReverseMap();
             CreateMap<Customer, CustomerResponseF>().ReverseMap();
             CreateMap<AppointmentDetail, AppointmentDetailResponseF>().ReverseMap();
+
 
             //Appointment
             CreateMap<CreateAppointmentRequest, Appointment>().ReverseMap();
@@ -97,7 +143,8 @@ namespace Hairhub.Service.Helpers
 
 
             //SalonInformation
-            CreateMap<GetSalonInformationResponse, SalonInformation>().ReverseMap();
+            CreateMap<SalonInformation, GetSalonInformationResponse>()
+                .ForMember(dest => dest.schedules, opt => opt.MapFrom(src => src.Schedules));
             CreateMap<CreateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
@@ -109,7 +156,9 @@ namespace Hairhub.Service.Helpers
                        .ForMember(dest => dest.Vouchers, opt => opt.Ignore());
             CreateMap<SearchSalonServiceResponse, ServiceHair>().ReverseMap();
             CreateMap<SearchSalonVoucherRespnse, Voucher>().ReverseMap();
-            CreateMap<AppointmentSalon, SalonInformation>().ReverseMap();
+            CreateMap<AppointmentSalon, SalonInformation>().ReverseMap(); 
+            CreateMap<SalonInformation, GetSalonInformationResponse>().ReverseMap();
+            CreateMap<SalonInformation, SalonSuggesstionResponse>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();
@@ -168,9 +217,14 @@ namespace Hairhub.Service.Helpers
             CreateMap<Approval, GetApprovalResponse>();
 
             //Report CreateReportRequest
-            CreateMap<Report, GetReportResponse>();
-            CreateMap<Report, UpdateAccountRequest>();
+            CreateMap<Report, GetReportResponse>()
+                 .ForMember(dest => dest.FileReports, opt => opt.MapFrom(src => src.StaticFiles.ToList()));
+
+            CreateMap<Report, UpdateAccountRequest>().ReverseMap(); 
             CreateMap<Report, CreateReportRequest>().ReverseMap();
+
+            //Static File
+            CreateMap<StaticFile, FileReportResponse>().ReverseMap();
         }
     }
 }

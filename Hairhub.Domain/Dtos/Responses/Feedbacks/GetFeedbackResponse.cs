@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hairhub.Domain.Dtos.Responses.StaticFile;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,17 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public AppointmentDetailResponseF AppointmentDetail { get; set; }
 
         public AppointmentResponseF Appointment { get; set; }
+
+        public StaticFileResponseF StaticFile {  get; set; }
+    }
+
+    public class StaticFileResponseF
+    {
+        public Guid Id { get; set; }
+        public Guid? FeedbackId { get; set; }
+        public Guid? ReportId { get; set; }
+        public string? Img { get; set; }
+        public string? Video { get; set; }
     }
 
     public class CustomerResponseF

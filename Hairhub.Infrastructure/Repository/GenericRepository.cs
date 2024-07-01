@@ -59,13 +59,18 @@ namespace Hairhub.Infrastructure.Repository
         public virtual async Task<ICollection<T>> GetListAsync(
             Expression<Func<T, bool>> predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, 
                         Func<IQueryable<T>, IIncludableQueryable<T, object>> 
-                        include = null)
+                        include = null, int? take = null)
         {
             IQueryable<T> query = _dbSet;
 
             if (include != null) query = include(query);
 
             if (predicate != null) query = query.Where(predicate);
+
+            if (take.HasValue)
+            {
+                query = query.Take(take.Value);
+            }
 
             if (orderBy != null) return await orderBy(query).AsNoTracking().ToListAsync();
 
