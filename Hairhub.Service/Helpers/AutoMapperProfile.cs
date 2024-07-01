@@ -111,6 +111,7 @@ namespace Hairhub.Service.Helpers
             CreateMap<SearchSalonServiceResponse, ServiceHair>().ReverseMap();
             CreateMap<SearchSalonVoucherRespnse, Voucher>().ReverseMap();
             CreateMap<AppointmentSalon, SalonInformation>().ReverseMap();
+            CreateMap<SalonInformation, GetSalonInformationResponse>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();

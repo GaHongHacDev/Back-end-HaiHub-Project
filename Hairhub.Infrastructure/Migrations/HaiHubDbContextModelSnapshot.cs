@@ -721,9 +721,9 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("phone");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("name");
 
                     b.Property<int?>("NumberOfReported")
                         .HasColumnType("int")
@@ -953,6 +953,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FeedbackId");
+
+                    b.HasIndex("ReportId");
 
                     b.ToTable("static_file", (string)null);
                 });
@@ -1282,7 +1284,7 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.HasOne("Hairhub.Domain.Entitities.Report", "Report")
                         .WithMany("StaticFiles")
-                        .HasForeignKey("FeedbackId")
+                        .HasForeignKey("ReportId")
                         .HasConstraintName("FK_report_static_file");
 
                     b.Navigation("Feedback");

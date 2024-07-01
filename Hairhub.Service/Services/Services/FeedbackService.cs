@@ -87,7 +87,9 @@ namespace Hairhub.Service.Services.Services
                     IsActive = true,
                 };
 
-                for(int i=0; i<request.ImgFeedbacks.Count; i++)
+                await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
+
+                for (int i=0; i<request.ImgFeedbacks.Count; i++)
                 {
                     var urlImg = await _mediaservice.UploadAnImage(request.ImgFeedbacks[i], MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString()+"/"+i.ToString());
                     //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
@@ -109,14 +111,12 @@ namespace Hairhub.Service.Services.Services
                 var salon = _mapper.Map<SalonInformation>(existingSalon);
 
                 _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
-                await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
 
                 bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
                 return isSuccessful;
             }
             catch (Exception ex)
             {
-                
                 throw new Exception(ex.Message);
             }
         }

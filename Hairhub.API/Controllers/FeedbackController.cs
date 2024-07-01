@@ -59,7 +59,11 @@ namespace Hairhub.API.Controllers
             try
             {
                 var isSuccessFull = await _feedbackService.CreateFeedback(request);
-                return Ok(isSuccessFull);
+                if (!isSuccessFull)
+                {
+                    return BadRequest(new { message = "Lỗi trong quá trình tạo đánh giá dịch vụ salon, barber shop" });
+                }
+                return Ok("Tạo đánh giá thành công");
             }
             catch(NotFoundException ex)
             {

@@ -406,6 +406,31 @@ namespace Hairhub.Infrastructure
                       .HasConstraintName("FK_appointment_detail_appointment_detail_voucher");
             });
 
+
+            modelBuilder.Entity<StaticFile>(entity =>
+            {
+                entity.ToTable("static_file");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
+                entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
+                entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
+                entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
+
+                entity.HasOne(d => d.Feedback)
+                      .WithMany(p => p.StaticFiles)
+                      .HasForeignKey(d => d.FeedbackId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_feedback_static_file");
+
+                entity.HasOne(d => d.Report)
+                      .WithMany(p => p.StaticFiles)
+                      .HasForeignKey(d => d.ReportId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_report_static_file");
+            });
+
             modelBuilder.Entity<Feedback>(entity =>
             {
                 entity.ToTable("feedback");
@@ -431,28 +456,37 @@ namespace Hairhub.Infrastructure
                       .HasConstraintName("FK_appointment_feedback");
             });
 
-            modelBuilder.Entity<StaticFile>(entity =>
+            modelBuilder.Entity<Report>(entity =>
             {
-                entity.ToTable("static_file");
+                entity.ToTable("report");
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
-                entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
-                entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
-                entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
+                entity.Property(e => e.SalonId).HasColumnName("salon_id").IsRequired(false);
+                entity.Property(e => e.CustomerId).HasColumnName("customer_id").IsRequired(false);
+                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
+                entity.Property(e => e.RoleNameReport).HasMaxLength(50).HasColumnName("role_name_report");
+                entity.Property(e => e.ReasonReport).HasMaxLength(255).HasColumnName("reason_report");
+                entity.Property(e => e.CreateDate).HasColumnName("create_date");
+                entity.Property(e => e.TimeConfirm).HasColumnName("time_confirm").IsRequired(false);
+                entity.Property(e => e.DescriptionAdmin).HasMaxLength(255).HasColumnName("description_admin").IsRequired(false);
+                entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
 
-                entity.HasOne(d => d.Feedback)
-                      .WithMany(p => p.StaticFiles)
-                      .HasForeignKey(d => d.FeedbackId)
+                entity.HasOne(d => d.SalonInformation)
+                      .WithMany(p => p.Report)
+                      .HasForeignKey(d => d.SalonId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_feedback_static_file");
-
-                entity.HasOne(d => d.Report)
-                      .WithMany(p => p.StaticFiles)
-                      .HasForeignKey(d => d.FeedbackId)
+                      .HasConstraintName("FK_salon_report");
+                entity.HasOne(d => d.Customer)
+                      .WithMany(p => p.Report)
+                      .HasForeignKey(d => d.CustomerId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_report_static_file");
+                      .HasConstraintName("FK_customer_report");
+                entity.HasOne(d => d.Appointment)
+                      .WithMany(p => p.Report)
+                      .HasForeignKey(d => d.AppointmentId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_report");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
@@ -516,40 +550,6 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.DateCreate).HasColumnName("date_create");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
-
-            modelBuilder.Entity<Report>(entity =>
-            {
-                entity.ToTable("report");
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.SalonId).HasColumnName("salon_id").IsRequired(false);
-                entity.Property(e => e.CustomerId).HasColumnName("customer_id").IsRequired(false);
-                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id");
-                entity.Property(e => e.RoleNameReport).HasMaxLength(50).HasColumnName("role_name_report");
-                entity.Property(e => e.ReasonReport).HasMaxLength(255).HasColumnName("reason_report");
-                entity.Property(e => e.CreateDate).HasColumnName("create_date");
-                entity.Property(e => e.TimeConfirm).HasColumnName("time_confirm").IsRequired(false);
-                entity.Property(e => e.DescriptionAdmin).HasMaxLength(255).HasColumnName("description_admin").IsRequired(false);
-                entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
-
-                entity.HasOne(d => d.SalonInformation)
-                      .WithMany(p => p.Report)
-                      .HasForeignKey(d => d.SalonId)
-                      .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_salon_report");
-                entity.HasOne(d => d.Customer)
-                      .WithMany(p => p.Report)
-                      .HasForeignKey(d => d.CustomerId)
-                      .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_customer_report");
-                entity.HasOne(d => d.Appointment)
-                      .WithMany(p => p.Report)
-                      .HasForeignKey(d => d.AppointmentId)
-                      .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_appointment_report");
-            });
-
         }
     }
 }
