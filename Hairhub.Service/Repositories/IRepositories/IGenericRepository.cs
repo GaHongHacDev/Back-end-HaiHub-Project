@@ -27,7 +27,7 @@ namespace Hairhub.Service.Repositories.IRepositories
         Task<ICollection<T>> GetListAsync(
             Expression<Func<T, bool>> predicate = null,
             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null);
+            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int? take = null);
 
         Task<ICollection<TResult>> GetListAsync<TResult>(
             Expression<Func<T, TResult>> selector,

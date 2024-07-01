@@ -327,5 +327,18 @@ namespace Hairhub.Service.Services.Services
                 Items = result,
             };
         }
+
+        public async Task<List<SalonSuggesstionResponse>> GetSalonSuggestion()
+        {
+            var salons = await _unitOfWork.GetRepository<SalonInformation>()
+                .GetListAsync(
+                predicate: x => x.Status.Equals(SalonStatus.Approved),
+                    orderBy: q => q.OrderByDescending(s => s.Rate)
+                                  .ThenByDescending(s => s.TotalReviewer),
+                    take: 20
+                );
+
+            return _mapper.Map<List<SalonSuggesstionResponse>>(salons);
+        }
     }
 }
