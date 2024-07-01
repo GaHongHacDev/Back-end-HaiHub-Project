@@ -87,6 +87,7 @@ namespace Hairhub.Service.Services.Services
                     Rating = request.Rating,
                     Comment = request.Comment,
                     IsActive = true,
+                    CreateDate = DateTime.Now,
                 };
 
                 await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
