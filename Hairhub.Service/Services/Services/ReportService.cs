@@ -10,6 +10,7 @@ using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using static Vonage.ProactiveConnect.Lists.SyncStatus;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -92,24 +93,48 @@ namespace Hairhub.Service.Services.Services
             return reportResponse;
         }
 
-        public async Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, int page, int size)
+        public async Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, string? Status, int page, int size)
         {
-            var reports = await _unitOfWork.GetRepository<Report>()
-                                           .GetPagingListAsync
-                                           (
-                                              predicate: x => x.CustomerId == customerId,
-                                              include: x => x.Include(s => s.StaticFiles)
-                                                            .Include(s => s.SalonInformation)
-                                                                .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
-                                                            .Include(s => s.SalonInformation)
-                                                                .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
-                                                            .Include(s => s.Customer)
-                                                            .Include(s => s.Appointment)
-                                                                .ThenInclude(a => a.AppointmentDetails)
-                                                                    .ThenInclude(ad => ad.SalonEmployee),
-                                               page: page,
-                                               size: size
-                                           );
+            IPaginate<Report> reports;
+            if (String.IsNullOrWhiteSpace(Status))
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
+                               .GetPagingListAsync
+                               (
+                                  predicate: x => x.CustomerId == customerId,
+                                  include: x => x.Include(s => s.StaticFiles)
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                .Include(s => s.Customer)
+                                                .Include(s => s.Appointment)
+                                                    .ThenInclude(a => a.AppointmentDetails)
+                                                        .ThenInclude(ad => ad.SalonEmployee),
+                                   page: page,
+                                   size: size
+                               );
+            }
+            else
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
+                               .GetPagingListAsync
+                               (
+                                  predicate: x => x.CustomerId == customerId && x.Status.Equals(Status),
+                                  include: x => x.Include(s => s.StaticFiles)
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                .Include(s => s.Customer)
+                                                .Include(s => s.Appointment)
+                                                    .ThenInclude(a => a.AppointmentDetails)
+                                                        .ThenInclude(ad => ad.SalonEmployee),
+                                   page: page,
+                                   size: size
+                               );
+            }
+
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,
@@ -121,9 +146,12 @@ namespace Hairhub.Service.Services.Services
             return reportResponse;
         }
 
-        public async Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, int page, int size)
+        public async Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, string? status, int page, int size)
         {
-            var reports = await _unitOfWork.GetRepository<Report>()
+            IPaginate<Report> reports;
+            if (String.IsNullOrWhiteSpace(status))
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
                                            .GetPagingListAsync
                                            (
                                                predicate: x => x.SalonId == salonId,
@@ -139,6 +167,27 @@ namespace Hairhub.Service.Services.Services
                                                page: page,
                                                size: size
                                            );
+            }
+            else
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
+                                           .GetPagingListAsync
+                                           (
+                                               predicate: x => x.SalonId == salonId && x.Status.Equals(status),
+                                               include: x => x.Include(s => s.StaticFiles)
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                               .Include(s => s.Customer)
+                                                               .Include(s => s.Appointment)
+                                                                   .ThenInclude(a => a.AppointmentDetails)
+                                                                       .ThenInclude(ad => ad.SalonEmployee),
+                                               page: page,
+                                               size: size
+                                           );
+            }
+
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,
