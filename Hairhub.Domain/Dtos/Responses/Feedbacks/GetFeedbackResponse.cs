@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hairhub.Domain.Dtos.Responses.StaticFile;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,19 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public bool? IsActive { get; set; }
         public CustomerResponseF Customer { get; set; }
         public AppointmentDetailResponseF AppointmentDetail { get; set; }
+
+        public AppointmentResponseF Appointment { get; set; }
+
+        public StaticFileResponseF StaticFile {  get; set; }
+    }
+
+    public class StaticFileResponseF
+    {
+        public Guid Id { get; set; }
+        public Guid? FeedbackId { get; set; }
+        public Guid? ReportId { get; set; }
+        public string? Img { get; set; }
+        public string? Video { get; set; }
     }
 
     public class CustomerResponseF
@@ -46,6 +60,24 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public Decimal? OriginalPrice { get; set; }
         public Decimal? DiscountedPrice { get; set; }
         public bool? Status { get; set; }
+
+    }
+
+    public class AppointmentResponseF{
+        public Guid Id { get; set; }
+        public Guid CustomerId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public Decimal TotalPrice { get; set; }
+        public Decimal OriginalPrice { get; set; }
+        public Decimal DiscountedPrice { get; set; }
+        public bool? IsReportByCustomer { get; set; }
+        public bool? IsReportBySalon { get; set; }
+        public string? ReasonCancel { get; set; }
+        public DateTime? CancelDate { get; set; }
+        public string? QrCodeImg { get; set; }
+        public string Status { get; set; }
+
 
     }
 }
