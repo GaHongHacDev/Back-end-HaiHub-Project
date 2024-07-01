@@ -27,7 +27,7 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
     {
         public Guid Id { get; set; }
         public Guid? FeedbackId { get; set; }
-        public Guid? ReportId { get; set; }
+        public Guid? ReportId {  get; set; }
         public string? Img { get; set; }
         public string? Video { get; set; }
     }
@@ -78,6 +78,7 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public string? QrCodeImg { get; set; }
         public string Status { get; set; }
 
-
+        // Define AppointmentDetail property here
+        public AppointmentDetailResponseF AppointmentDetail { get; set; }
     }
 }

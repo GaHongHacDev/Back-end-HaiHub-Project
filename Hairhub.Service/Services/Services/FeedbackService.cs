@@ -166,7 +166,8 @@ namespace Hairhub.Service.Services.Services
                         include: query => query.Include(f => f.Appointment)
                                                .ThenInclude(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
-                                               .Include(f => f.Customer),
+                                               .Include(f => f.Customer)
+                                               .Include(f => f.StaticFiles),
                         page: page,
                         size: size
                     );
@@ -178,7 +179,8 @@ namespace Hairhub.Service.Services.Services
                         include: query => query.Include(f => f.Appointment)
                                                .ThenInclude(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
-                                               .Include(f => f.Customer),
+                                               .Include(f => f.Customer)
+                                               .Include(f => f.StaticFiles),
                         page: page,
                         size: size
                     );
@@ -203,18 +205,6 @@ namespace Hairhub.Service.Services.Services
                         Rating = feedback.Rating,
                         Comment = feedback.Comment,
                         IsActive = feedback.IsActive,
-                        AppointmentDetail = feedback.Appointment.AppointmentDetails.Select(ad => new AppointmentDetailResponseF
-                        {
-                            Id = ad.Id,
-                            SalonEmployeeId = ad.SalonEmployeeId,
-                            ServiceHairId = ad.ServiceHairId,
-                            AppointmentId = ad.AppointmentId,
-                            Description = ad.Description,
-                            Date = ad.StartTime,
-                            Time = ad.StartTime,
-                            DiscountedPrice = ad.PriceServiceHair,
-                            Status = bool.TryParse(ad.Status, out var status) ? status : (bool?)null
-                        }).FirstOrDefault(),
                         Appointment = new AppointmentResponseF
                         {
                             Id = feedback.Appointment.Id,
@@ -229,8 +219,28 @@ namespace Hairhub.Service.Services.Services
                             ReasonCancel = feedback.Appointment.ReasonCancel,
                             CancelDate = feedback.Appointment.CancelDate,
                             QrCodeImg = feedback.Appointment.QrCodeImg,
-                            Status = feedback.Appointment.Status
-                        }
+                            Status = feedback.Appointment.Status,
+                            AppointmentDetail = feedback.Appointment.AppointmentDetails.Select(ad => new AppointmentDetailResponseF
+                            {
+                                Id = ad.Id,
+                                SalonEmployeeId = ad.SalonEmployeeId,
+                                ServiceHairId = ad.ServiceHairId,
+                                AppointmentId = ad.AppointmentId,
+                                Description = ad.Description,
+                                Date = ad.StartTime,
+                                Time = ad.StartTime,
+                                DiscountedPrice = ad.PriceServiceHair,
+                                Status = bool.TryParse(ad.Status, out var status) ? status : (bool?)null
+                            }).FirstOrDefault()
+                        },
+                        StaticFile = feedback.StaticFiles.Select(sf => new StaticFileResponseF
+                        {
+                            Id = sf.Id,
+                            FeedbackId = sf.FeedbackId,
+                            ReportId = sf.ReportId,
+                            Img = sf.Img,
+                            Video = sf.Video
+                        }).FirstOrDefault()
                     }).ToList()
                 };
 
