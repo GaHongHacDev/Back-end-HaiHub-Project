@@ -69,7 +69,6 @@ namespace Hairhub.Service.Helpers
 
             //Feedback
             CreateMap<Feedback, GetFeedbackResponse>()
-            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
             .ForMember(dest => dest.AppointmentDetail, opt => opt.MapFrom(src => src.Appointment.AppointmentDetails.FirstOrDefault()))
             .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment))
             .ReverseMap();
