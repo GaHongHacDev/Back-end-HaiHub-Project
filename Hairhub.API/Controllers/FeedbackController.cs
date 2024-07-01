@@ -126,11 +126,11 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> GetFeedBackByAppointmentId([FromRoute] Guid id,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetFeedBackByAppointmentId([FromRoute] Guid id)
         {
             try
             {
-                var isSuccessfull = await _feedbackService.GetFeedBackByAppointmentId(id, page, size);
+                var isSuccessfull = await _feedbackService.GetFeedBackByAppointmentId(id);
                 return Ok(isSuccessfull);
             }
             catch (Exception ex)

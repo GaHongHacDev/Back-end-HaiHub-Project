@@ -67,8 +67,10 @@ namespace Hairhub.Service.Services.Services
         {
             var feedback = await _unitOfWork.GetRepository<Feedback>()
                 .SingleOrDefaultAsync(
-                predicate: predicate => predicate.Id.Equals(id),
-                include: query => query.Include(s => s.Customer).Include(s => s.Appointment));
+                    predicate: predicate => predicate.Id.Equals(id),
+                    include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer)
+                );
+
 
             var feedbackResponse = _mapper.Map<GetFeedbackResponse>(feedback);
 
@@ -211,44 +213,20 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<IPaginate<GetFeedbackResponse>> GetFeedBackByAppointmentId(Guid id, int page, int size)
+        public async Task<GetFeedbackResponse> GetFeedBackByAppointmentId(Guid id)
         {
             try
             {
                 var feedbacks = await _unitOfWork.GetRepository<Feedback>()
-                    .GetPagingListAsync(
-                        predicate: f => f.AppointmentId == id,
-                        include: query => query.Include(f => f.StaticFiles),
-                        page: page,
-                        size: size
+                    .SingleOrDefaultAsync(
+                        predicate: x => x.IsActive == true && x.AppointmentId == id,
+                        include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer)
                     );
-
-                if (feedbacks == null || feedbacks.Items == null)
+                if (feedbacks != null)
                 {
-                    throw new InvalidOperationException("Feedbacks or feedback items are null");
+                    feedbacks.StaticFiles = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: x => x.FeedbackId == feedbacks.Id);
                 }
-
-                var feedbackResponses = new Paginate<GetFeedbackResponse>()
-                {
-                    //Page = feedbacks.Page,
-                    //Size = feedbacks.Size,
-                    //Total = feedbacks.Total,
-                    //TotalPages = feedbacks.TotalPages,
-                    //Items = feedbacks.Items.Select(feedback => new GetFeedbackResponse
-                    //{
-                    //    Id = feedback.Id,
-                    //    CustomerId = feedback.CustomerId,
-                    //    AppointmentDetailId = feedback.AppointmentId,
-                    //    Rating = feedback.Rating,
-                    //    Comment = feedback.Comment,
-                    //    CreatedDate = feedback.CreateDate,
-                    //    IsActive = feedback.IsActive,
-                    //    Customer = _mapper.Map<CustomerResponseF>(feedback.Customer),
-                    //    StaticFile = _mapper.Map<StaticFileResponseF>(feedback.StaticFiles.FirstOrDefault())
-                    //}).ToList()
-                };
-
-                return feedbackResponses;
+                return _mapper.Map<GetFeedbackResponse>(feedbacks);
             }
             catch (Exception ex)
             {
