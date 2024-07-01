@@ -18,7 +18,7 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public int? Rating { get; set; }
         public string? Comment { get; set; }
         public bool? IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public DateTime? CreateDate { get; set; }
         public GetAppointmentResponse Appointment { get; set; }
         public List<FileFeedbackResponse> FileFeedbacks { get; set; }
         public CustomerAppointment Customer { get; set; }
