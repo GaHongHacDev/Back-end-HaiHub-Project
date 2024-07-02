@@ -72,8 +72,15 @@ builder.Services.AddSignalR();
 //Setting Cors for all source
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: CorsConstant.PolicyName,
-        policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
+    //options.AddPolicy(name: CorsConstant.PolicyName,
+    //    policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
+    options.AddPolicy(CorsConstant.PolicyName,
+    policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 //Jwt configuration starts here
@@ -102,6 +109,8 @@ builder.Services.AddAuthorization();
 //****BUILD
 var app = builder.Build();
 
+//Add Cors
+app.UseCors(CorsConstant.PolicyName);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -111,8 +120,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
