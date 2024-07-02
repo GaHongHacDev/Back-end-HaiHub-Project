@@ -42,7 +42,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-//******************* Add services to the container  ****************************
+//******************* Add services to the container  **************************
 
 //Dependecy Injection
 builder.Services.AddUnitOfWork();
@@ -54,8 +54,8 @@ builder.Services.AddDIAccessor();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Add services to the container.
-//builder.Services.AddHttpClient();
-//builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 
 
 //Add Background Service 
@@ -72,15 +72,8 @@ builder.Services.AddSignalR();
 //Setting Cors for all source
 builder.Services.AddCors(options =>
 {
-    //options.AddPolicy(name: CorsConstant.PolicyName,
-    //    policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
-    options.AddPolicy(CorsConstant.PolicyName,
-    policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    options.AddPolicy(name: CorsConstant.PolicyName,
+        policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
 });
 
 //Jwt configuration starts here
@@ -109,17 +102,17 @@ builder.Services.AddAuthorization();
 //****BUILD
 var app = builder.Build();
 
-//Add Cors
-app.UseCors(CorsConstant.PolicyName);
 
 // Configure the HTTP request pipeline.
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Error");
-//    app.UseHsts();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
+
+app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
