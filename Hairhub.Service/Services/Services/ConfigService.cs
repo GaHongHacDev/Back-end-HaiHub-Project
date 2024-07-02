@@ -28,25 +28,34 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<CreateConfigResponse> CreateConfigAsync(CreateConfigRequest request)
         {
-            var config = new Config()
+            try
             {
-                PakageName = request.PakageName,
-                PakageFee = request.PakageFee,
-                Description = request.Description,
-                DateCreate = DateTime.Now,
-                IsActive = true,
-            };
+                var config = new Config()
+                {
+                    PakageName = request.PakageName,
+                    PakageFee = request.PakageFee,
+                    Description = request.Description,
+                    NumberOfDay = request.NumberOfDay,
+                    DateCreate = DateTime.Now,
+                    IsActive = request.IsActive,
+                };
 
-            await _unitofwork.GetRepository<Config>().InsertAsync(config);
-            await _unitofwork.CommitAsync();
-            return _mapper.Map<CreateConfigResponse>(config);
+                await _unitofwork.GetRepository<Config>().InsertAsync(config);
+                await _unitofwork.CommitAsync();
+                return _mapper.Map<CreateConfigResponse>(config);
+
+            } catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
         }
 
         
 
         public async Task<bool> DeleteConfigAsync(Guid id)
         {
-            var existconfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: e => e.Id.Equals(id));
+            var existconfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: e => e.Id == id);
             if (existconfig == null)
             {
                 throw new NotFoundException("ServiceHair not found!");
@@ -57,11 +66,9 @@ namespace Hairhub.Service.Services.Services
 
         }
 
-        public async Task<IPaginate<GetConfigResponse>> GetConfigAsync(int page, int size)
+        public async Task<IPaginate<GetConfigResponse>> GetConfigs(int page, int size)
         {
-            IPaginate<GetConfigResponse> config = await _unitofwork.GetRepository<Config>()
-                 .GetPagingListAsync(selector: x => new GetConfigResponse(x.PakageName, x.PakageFee
-                 ,x.Description ,x.DateCreate, x.IsActive), page: page, size: size, orderBy: x => x.OrderBy(x => x.PakageFee));
+            var config = await _unitofwork.GetRepository<Config>().GetPagingListAsync(page: page, size: size);
             var ConfigResponses = new Paginate<GetConfigResponse>()
             {
                 Page = config.Page,
@@ -75,12 +82,12 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetConfigResponse>? GetConfigbyIdAsync(Guid id)
         {
-            GetConfigResponse configresponse = await _unitofwork.GetRepository<Config>().
-                SingleOrDefaultAsync(selector: x => new GetConfigResponse(x.PakageName, x.PakageFee
-                 , x.Description, x.DateCreate, x.IsActive), predicate: x => x.Id.Equals(id));
-
-            if (configresponse == null) return null;
-            return _mapper.Map<GetConfigResponse>(configresponse);
+            var config = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (config == null)
+            {
+                throw new NotFoundException("Không tìm thấy Config này ");
+            } 
+            return _mapper.Map<GetConfigResponse>(config);
         }
  
 
@@ -88,9 +95,7 @@ namespace Hairhub.Service.Services.Services
         {
             
             var existConfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(
-            predicate: e => e.Id == id,
-            orderBy: null,
-            include: null);
+            predicate: e => e.Id == id);
 
             if (existConfig == null)
             {
@@ -100,7 +105,6 @@ namespace Hairhub.Service.Services.Services
             _unitofwork.GetRepository<Config>().UpdateAsync(existConfig);
             bool isUpdate = await _unitofwork.CommitAsync() > 0;
             return isUpdate;
-
         }
 
         

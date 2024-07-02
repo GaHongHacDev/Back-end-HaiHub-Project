@@ -13,4 +13,5 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
         public Guid SalonOWnerID { get; set; }
         public string? Description { get; set; }
     }
+
 }

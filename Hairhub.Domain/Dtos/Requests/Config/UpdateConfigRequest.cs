@@ -12,6 +12,7 @@ namespace Hairhub.Domain.Dtos.Requests.Config
         public string Description { get; set; }
         public decimal PakageFee { get; set; }
         public DateTime DateCreate { get; set; }
+        public int NumberOfDay { get; set; }
         public bool IsActive { get; set; }
     }
 }

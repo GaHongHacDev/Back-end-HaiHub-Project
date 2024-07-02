@@ -550,6 +550,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.PakageFee).HasColumnType("decimal(18, 2)").HasColumnName("pakage_fee");
                 entity.Property(e => e.DateCreate).HasColumnName("date_create");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.NumberOfDay).HasColumnName("number_of_day");
             });
         }
     }
