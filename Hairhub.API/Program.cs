@@ -113,10 +113,10 @@ var app = builder.Build();
 app.UseCors(CorsConstant.PolicyName);
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
