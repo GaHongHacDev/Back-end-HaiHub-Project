@@ -315,6 +315,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
+                    b.Property<int>("NumberOfDay")
+                        .HasColumnType("int")
+                        .HasColumnName("number_of_day");
+
                     b.Property<decimal>("PakageFee")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("pakage_fee");

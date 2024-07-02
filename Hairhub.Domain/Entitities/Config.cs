@@ -14,6 +14,8 @@ namespace Hairhub.Domain.Entitities
         public string Description { get; set; }
         public decimal PakageFee { get; set; }
         public DateTime DateCreate { get; set; }
+
+        public int NumberOfDay {  get; set; }     
         public bool IsActive { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
     }
