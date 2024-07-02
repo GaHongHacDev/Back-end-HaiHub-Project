@@ -63,7 +63,10 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                int amount = (int)request.Configs.PackageFee;
+                var Configs = await _unitOfWork.GetRepository<Domain.Entitities.Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
+                var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
+
+                int amount = (int)Configs.PakageFee;
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.Description;
                 var clientId = _config["PayOS:ClientId"];
@@ -101,14 +104,14 @@ namespace Hairhub.Service.Services.Services
                     cancelUrl: returnurlfail,
                     returnUrl: returnurl,
                     signature: signature,
-                    buyerName: request.SalonOwner.FullName,
-                    buyerPhone: request.SalonOwner.Phone, // Provide a valid currency
-                    buyerEmail: request.SalonOwner.Email,
-                    buyerAddress: request.SalonOwner.Address,
+                    buyerName: SalonOwner.FullName,
+                    buyerPhone: SalonOwner.Phone, // Provide a valid currency
+                    buyerEmail: SalonOwner.Email,
+                    buyerAddress: SalonOwner.Address,
                     expiredAt: (int)expiredAt.ToUnixTimeSeconds()
                 );
 
-                paymentData.items.Add(new ItemData(request.SalonOwner.FullName, 1, amount));
+                paymentData.items.Add(new ItemData(SalonOwner.FullName, 1, amount));
                 var createPaymentResult = await pos.createPaymentLink(paymentData);
 
                 return createPaymentResult; // Chú ý sử dụng PaymentLink thay vì paymentLink
