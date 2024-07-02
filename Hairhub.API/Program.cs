@@ -54,8 +54,8 @@ builder.Services.AddDIAccessor();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Add services to the container.
-builder.Services.AddHttpClient();
-builder.Services.AddHttpContextAccessor();
+//builder.Services.AddHttpClient();
+//builder.Services.AddHttpContextAccessor();
 
 
 //Add Background Service 
@@ -113,11 +113,11 @@ var app = builder.Build();
 app.UseCors(CorsConstant.PolicyName);
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Error");
+//    app.UseHsts();
+//}
 
 //app.UseHttpsRedirection();
 
