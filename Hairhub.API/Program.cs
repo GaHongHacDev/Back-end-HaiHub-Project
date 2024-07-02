@@ -1,4 +1,4 @@
-using BirthdayParty.WebApi.Constants;
+﻿using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Hubs;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
@@ -63,7 +63,7 @@ builder.Services.AddHostedService<BackgroundWorkerService>();
 builder.Services.AddDbContext<HaiHubDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.EnableSensitiveDataLogging(); // Th�m d�ng n�y
+    options.EnableSensitiveDataLogging(); // Thêm dòng này
 });
 
 //Config SignalR RealTime
@@ -97,7 +97,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  });
 builder.Services.AddAuthorization();
 
-
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.HttpsPort = 443; // Cổng HTTPS mặc định là 443
+});
 
 //****BUILD
 var app = builder.Build();
@@ -110,9 +113,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseCors(CorsConstant.PolicyName);
+
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
