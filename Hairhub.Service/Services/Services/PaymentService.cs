@@ -148,11 +148,17 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
+                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
                             var payment = _mapper.Map<Payment>(createPaymentRequest);
                             payment.Id = Guid.NewGuid();
+                            payment.ConfigId = config.Id;
+                            payment.SalonOWnerID = createPaymentRequest.SalonOWnerID;
                             payment.TotalAmount = (int)paymentInfo["amount"];
                             payment.PaymentCode = (int)paymentInfo["orderCode"];
+                            payment.Description = "";
                             payment.PaymentDate = DateTime.Now;
+                            payment.StartDate   = DateTime.Now;
+                            payment.EndDate = DateTime.Now.AddDays(config.NumberOfDay);
                             payment.MethodBanking = "PayOS";
                             payment.Status = status;
                             // Save the transaction
