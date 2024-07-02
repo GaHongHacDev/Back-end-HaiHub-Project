@@ -97,10 +97,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  });
 builder.Services.AddAuthorization();
 
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.HttpsPort = 443; // Cổng HTTPS mặc định là 443
-});
+
 
 //****BUILD
 var app = builder.Build();
@@ -113,9 +110,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(CorsConstant.PolicyName);
-
 app.UseHttpsRedirection();
+
+app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
