@@ -75,8 +75,8 @@ namespace Hairhub.Service.Services.Services
                 var returnurl = _config["PayOS:ReturnUrl"];
                 var returnurlfail = _config["PayOS:ReturnUrlFail"];
 
-                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}";
-                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}";
+                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
+                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
 
                 PayOS pos = new PayOS(clientId, apikey, checksumkey);
                 // Prepare data for signature
