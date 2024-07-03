@@ -7,9 +7,7 @@ on:
 
 jobs:
   DeployHairHub:
-    runs-on: 
-    - self-hosted
-    - RunnerHairhub
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
