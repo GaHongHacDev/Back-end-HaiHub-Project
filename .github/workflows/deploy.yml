@@ -1,4 +1,4 @@
-name: Runner HairHub
+name: hairhub-runner
 
 on:
   push:
