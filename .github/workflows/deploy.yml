@@ -1,0 +1,16 @@
+name: Runner HairHub
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  DeployHairHub:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2 
+
+    - name: Run Docker compose command
+      run: docker compose up --build -d 
