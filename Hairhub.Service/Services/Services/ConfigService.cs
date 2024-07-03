@@ -102,6 +102,7 @@ namespace Hairhub.Service.Services.Services
                 throw new KeyNotFoundException("Cannot Find Config");
             }
             existConfig = _mapper.Map<Config>(request);
+            existConfig.Id = id;
             _unitofwork.GetRepository<Config>().UpdateAsync(existConfig);
             bool isUpdate = await _unitofwork.CommitAsync() > 0;
             return isUpdate;
