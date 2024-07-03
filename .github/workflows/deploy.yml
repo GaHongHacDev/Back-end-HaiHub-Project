@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  hdeploy-server-vps:
+  deploy-server-vps:
     runs-on: self-hosted
     steps:
     - name: Checkout code
