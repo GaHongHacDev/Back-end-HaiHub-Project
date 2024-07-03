@@ -25,6 +25,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            docker pull localhost/hairhubapi:latest
             cd /root/actions-runner/RunnerHairhub/Back-end-HaiHub-Project/Back-end-HaiHub-Project
             docker-compose down
             docker-compose up -d
