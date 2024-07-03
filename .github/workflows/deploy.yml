@@ -6,11 +6,29 @@ on:
       - master
 
 jobs:
-  hello-tien:
+  hellow-tien:
     runs-on: self-hosted
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2 
+    - name: Checkout code
+      uses: actions/checkout@v2 
 
-      - name: Run Docker compose command
-        run: docker-compose up --build -d
+    - name: Run Docker compose command
+      run: docker compose up --build -d
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKER_HAIRHUB }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t hairhubapi:latest -f Hairhub.API/Dockerfile .
+        docker tag hairhubapi:latest ${{ secrets.DOCKER_HAIRHUB }}/hairhubapi:latest
+        docker push ${{ secrets.DOCKER_HAIRHUB }}/hairhubapi:latest
+
+    - name: Deploy to server
+      run: |
+        docker pull ${{ secrets.DOCKER_HAIRHUB }}/hairhubapi:latest
+        cd /root/actions-runner/RunnerHairhub/Back-end-HaiHub-Project/Back-end-HaiHub-Project
+        docker compose up --build -d
