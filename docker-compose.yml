@@ -15,12 +15,12 @@ services:
       ASPNETCORE_URLS: https://+:443;http://+:80
       ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;"
       TZ: "Asia/Ho_Chi_Minh"
-    depends_on:
-      - mssql
+   # depends_on:
+    #  - mssql
 
 networks:
   hairhub:
-    external: true
+    external: false
 
 
 
@@ -35,11 +35,11 @@ networks:
 #     networks:
 #       - demo
 #     environment:
-#       ACCEPT_EULA: 'Y'
-#       SA_PASSWORD: 'Admin@123'
-#       MSSQL_PID: 'Developer'
-#       MSSQL_TCP_PORT: 1433
-#       TZ: "Asia/Ho_Chi_Minh"
+#       accept_eula: 'y'
+#       sa_password: 'admin@123'
+#       mssql_pid: 'developer'
+#       mssql_tcp_port: 1433
+#       tz: "asia/ho_chi_minh"
 #     ports:
 #       - "1455:1433"
 #     volumes:
@@ -48,19 +48,19 @@ networks:
 #       - mssql-secrets:/var/opt/mssql/secrets
 
 #   hairhub.api:
-#     image: ${DOCKER_REGISTRY-}hairhubapi
+#     image: ${docker_registry-}hairhubapi
 #     networks:
 #       - demo
 #     ports:
-#       - "8080:80"   # Thay đổi cổng này thành 8080:80 nếu bạn muốn ứng dụng lắng nghe HTTP trên cổng 8080
-#       - "443:443"   # Đảm bảo rằng ứng dụng cũng hỗ trợ HTTPS trên cổng 443
+#       - "8080:80"   # thay đổi cổng này thành 8080:80 nếu bạn muốn ứng dụng lắng nghe http trên cổng 8080
+#       - "443:443"   # đảm bảo rằng ứng dụng cũng hỗ trợ https trên cổng 443
 #     build:
 #       context: .
-#       dockerfile: Hairhub.API/Dockerfile
+#       dockerfile: hairhub.api/dockerfile
 #     environment:
-#       ASPNETCORE_URLS: https://+:443;http://+:80  # Cấu hình lắng nghe cả HTTP và HTTPS
-#       ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;"
-#       TZ: "Asia/Ho_Chi_Minh"
+#       aspnetcore_urls: https://+:443;http://+:80  # cấu hình lắng nghe cả http và https
+#       connectionstrings__defaultconnection: "server=mssql-db;database=hairhubdb;user id=sa;password=admin@123;"
+#       tz: "asia/ho_chi_minh"
 #     depends_on:
 #       - mssql
 
@@ -69,6 +69,6 @@ networks:
 #     name: demo
 
 # volumes:
-#   mssql-data: # Định nghĩa named volume 'mssql-data'
-#   mssql-log: # Định nghĩa named volume 'mssql-log'
-#   mssql-secrets: # Định nghĩa named volume 'mssql
+#   mssql-data: # định nghĩa named volume 'mssql-data'
+#   mssql-log: # định nghĩa named volume 'mssql-log'
+#   mssql-secrets: # định nghĩa named volume 'mssql
