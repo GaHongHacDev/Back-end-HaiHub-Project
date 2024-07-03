@@ -6,25 +6,11 @@ on:
       - master
 
 jobs:
-  deploy:
-    runs-on: self-hosted  # Chạy job trên runner tự host, phù hợp với VPS của bạn
-
+  hello-tien:
+    runs-on: self-hosted
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2 
 
-      - name: Build Docker image
-        run: |
-          docker build -t hairhubapi:latest -f Hairhub.API/Dockerfile .
-          docker tag hairhubapi:latest localhost/hairhubapi:latest
-
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /root/actions-runner/RunnerHairhub/Back-end-HaiHub-Project/Back-end-HaiHub-Project
-            docker-compose down
-            docker-compose up -d
+      - name: Run Docker compose command
+        run: docker-compose up --build -d
