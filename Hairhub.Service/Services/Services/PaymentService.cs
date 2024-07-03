@@ -74,17 +74,23 @@ namespace Hairhub.Service.Services.Services
                 var checksumkey = _config["PayOS:ChecksumKey"];
                 var returnurl = _config["PayOS:ReturnUrl"];
                 var returnurlfail = _config["PayOS:ReturnUrlFail"];
+
+                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}";
+                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}";
+
                 PayOS pos = new PayOS(clientId, apikey, checksumkey);
                 // Prepare data for signature
                 var signatureData = new Dictionary<string, object>
                  {
                      { "amount", amount },
-                     { "cancelUrl", returnurlfail},
+                     { "cancelUrl", updatedReturnUrlFail},
                      { "description", description },
                      { "expiredAt", DateTimeOffset.Now.ToUnixTimeSeconds() },
                      { "orderCode", orderCode },
-                     { "returnUrl", returnurl}
+                     { "returnUrl", updatedReturnUrl}
                  };
+
+
 
                 // Sort data alphabetically by key
                 var sortedSignatureData = new SortedDictionary<string, object>(signatureData);
@@ -101,8 +107,8 @@ namespace Hairhub.Service.Services.Services
                     amount: amount,
                     description: description,
                     items: new List<ItemData>(), // Provide a list of items if needed
-                    cancelUrl: returnurlfail,
-                    returnUrl: returnurl,
+                    cancelUrl: updatedReturnUrlFail,
+                    returnUrl: updatedReturnUrl,
                     signature: signature,
                     buyerName: SalonOwner.FullName,
                     buyerPhone: SalonOwner.Phone, // Provide a valid currency
