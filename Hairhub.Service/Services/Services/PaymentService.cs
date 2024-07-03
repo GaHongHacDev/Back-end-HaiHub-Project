@@ -58,7 +58,7 @@ namespace Hairhub.Service.Services.Services
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
-
+        //abcde
         public async Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request)
         {
             try
