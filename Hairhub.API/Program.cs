@@ -5,7 +5,6 @@ using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -15,25 +14,20 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//// Lấy đường dẫn chứng chỉ và private key từ appsettings.json
-//var certPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"];
-//var certKeyPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:KeyPath"];
+// Lấy đường dẫn chứng chỉ và private key từ appsettings.json
+var certPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"];
+var certKeyPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:KeyPath"];
 
-//// Cấu hình Kestrel để lắng nghe HTTPS
-//builder.WebHost.UseKestrel(options =>
-//{
-//    if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certKeyPath))
-//    {
-//        options.ListenAnyIP(443, listenOptions =>
-//        {
-//            listenOptions.UseHttps(certPath, certKeyPath);
-//        });
-//    }
-//});
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+// Cấu hình Kestrel để lắng nghe HTTPS
+builder.WebHost.UseKestrel(options =>
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certKeyPath))
+    {
+        options.ListenAnyIP(443, listenOptions =>
+        {
+            listenOptions.UseHttps(certPath, certKeyPath);
+        });
+    }
 });
 
 // Add services to the container.
