@@ -10,12 +10,11 @@ namespace Hairhub.Domain.Dtos.Requests.SalonEmployees
 {
     public class UpdateSalonEmployeeRequest
     {
-        public Guid Id { get; set; }
-        public Guid SalonInformationId { get; set; }
-        public string FullName { get; set; }
+        public Guid? SalonInformationId { get; set; }
+        public string? FullName { get; set; }
         public string? Gender { get; set; }
-        public string Phone { get; set; }
-        public IFormFile Img { get; set; }
+        public string? Phone { get; set; }
+        public IFormFile? Img { get; set; }
         public bool IsActive { get; set; }
     }
 }
