@@ -39,8 +39,8 @@ services:
     depends_on:
       - mssql
     volumes:
-      - /etc/letsencrypt/live/gahonghac.net:/etc/letsencrypt/live/gahonghac.net  # Đường dẫn chứng chỉ Let's Encrypt trong container
-      - /etc/letsencrypt/archive/gahonghac.net:/etc/letsencrypt/archive/gahonghac.net  # Đường dẫn chứng chỉ Let's Encrypt trong container
+      - /etc/letsencrypt/live/gahonghac.net:/etc/letsencrypt/live/gahonghac.net:ro
+      - /etc/letsencrypt/archive/gahonghac.net:/etc/letsencrypt/archive/gahonghac.net:ro     
 
 networks:
   demo:

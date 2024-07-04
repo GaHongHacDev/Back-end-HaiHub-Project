@@ -14,10 +14,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cấu hình Kestrel để sử dụng HTTPS từ appsettings.json
-var certPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"] ;
+// Lấy đường dẫn chứng chỉ và private key từ appsettings.json
+var certPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"];
 var certKeyPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:KeyPath"];
 
+// Cấu hình Kestrel để lắng nghe HTTPS
 builder.WebHost.UseKestrel(options =>
 {
     if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certKeyPath))
