@@ -28,7 +28,7 @@ services:
       - demo
     ports:
       - "8080:80"   # Thay đổi cổng này thành 8080:80 nếu bạn muốn ứng dụng lắng nghe HTTP trên cổng 8080
-      - "443:443"   # Đảm bảo rằng ứng dụng cũng hỗ trợ HTTPS trên cổng 443
+      - "8443:443"   # Đảm bảo rằng ứng dụng cũng hỗ trợ HTTPS trên cổng 443
     build:
       context: .
       dockerfile: Hairhub.API/Dockerfile  # Đảm bảo Dockerfile nằm trong thư mục hairhub.api
