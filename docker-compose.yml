@@ -1,74 +1,75 @@
 ﻿version: '3.4'
 
 services:
-  hairhub.api:
-    image: ${DOCKER_REGISTRY-}hairhubapi
+  mssql:
+    container_name: mssql-db
+    hostname: mssql-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
     networks:
-      - hairhub
+      - demo
+    environment:
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: 'admin@123'
+      MSSQL_PID: 'Developer'
+      MSSQL_TCP_PORT: 1433
+      TZ: "Asia/Ho_Chi_Minh"
     ports:
-      - "8080:80"
-      - "443:443"
+      - "1455:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql/data
+      - mssql-log:/var/opt/mssql/log
+      - mssql-secrets:/var/opt/mssql/secrets
+
+  hairhub.api:
+    container_name: hairhub-api # thêm tên container rõ ràng
+    image: ${docker_registry-}hairhubapi
+    networks:
+      - demo
+    ports:
+      - "8080:80"   # Thay đổi cổng này thành 8080:80 nếu bạn muốn ứng dụng lắng nghe HTTP trên cổng 8080
+      - "443:443"   # Đảm bảo rằng ứng dụng cũng hỗ trợ HTTPS trên cổng 443
     build:
       context: .
-      dockerfile: Hairhub.API/Dockerfile
+      dockerfile: Hairhub.API/Dockerfile  # Đảm bảo Dockerfile nằm trong thư mục hairhub.api
     environment:
-      ASPNETCORE_URLS: https://+:443;http://+:80
-      ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;"
+      ASPNETCORE_URLS: "https://+:443;http://+:80"  # Cấu hình lắng nghe cả HTTP và HTTPS
+      ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=admin@123;"
       TZ: "Asia/Ho_Chi_Minh"
-   # depends_on:
-    #  - mssql
+    depends_on:
+      - mssql
 
 networks:
-  hairhub:
-    external: false
+  demo:
+    name: demo
+
+volumes:
+  mssql-data: # Định nghĩa named volume 'mssql-data'
+  mssql-log: # Định nghĩa named volume 'mssql-log'
+  mssql-secrets: # Định nghĩa named volume 'mssql-secrets'
 
 
 
 # version: '3.4'
 
 # services:
-#   mssql:
-#     container_name: mssql-db
-#     hostname: mssql-db
-#     image: mcr.microsoft.com/mssql/server:2022-latest
-#     user: root
-#     networks:
-#       - demo
-#     environment:
-#       accept_eula: 'y'
-#       sa_password: 'admin@123'
-#       mssql_pid: 'developer'
-#       mssql_tcp_port: 1433
-#       tz: "asia/ho_chi_minh"
-#     ports:
-#       - "1455:1433"
-#     volumes:
-#       - mssql-data:/var/opt/mssql/data
-#       - mssql-log:/var/opt/mssql/log
-#       - mssql-secrets:/var/opt/mssql/secrets
-
 #   hairhub.api:
-#     image: ${docker_registry-}hairhubapi
+#     image: ${DOCKER_REGISTRY-}hairhubapi
 #     networks:
-#       - demo
+#       - hairhub
 #     ports:
-#       - "8080:80"   # thay đổi cổng này thành 8080:80 nếu bạn muốn ứng dụng lắng nghe http trên cổng 8080
-#       - "443:443"   # đảm bảo rằng ứng dụng cũng hỗ trợ https trên cổng 443
+#       - "8080:80"
+#       - "443:443"
 #     build:
 #       context: .
-#       dockerfile: hairhub.api/dockerfile
+#       dockerfile: Hairhub.API/Dockerfile
 #     environment:
-#       aspnetcore_urls: https://+:443;http://+:80  # cấu hình lắng nghe cả http và https
-#       connectionstrings__defaultconnection: "server=mssql-db;database=hairhubdb;user id=sa;password=admin@123;"
-#       tz: "asia/ho_chi_minh"
-#     depends_on:
-#       - mssql
+#       ASPNETCORE_URLS: https://+:443;http://+:80
+#       ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;"
+#       TZ: "Asia/Ho_Chi_Minh"
+#    # depends_on:
+#     #  - mssql
 
 # networks:
-#   demo:
-#     name: demo
-
-# volumes:
-#   mssql-data: # định nghĩa named volume 'mssql-data'
-#   mssql-log: # định nghĩa named volume 'mssql-log'
-#   mssql-secrets: # định nghĩa named volume 'mssql
+#   hairhub:
+#     external: false
