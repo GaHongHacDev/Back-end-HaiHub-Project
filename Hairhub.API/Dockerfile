@@ -24,5 +24,7 @@ RUN dotnet publish "./Hairhub.API.csproj" -c $BUILD_CONFIGURATION -o /app/publis
 
 FROM base AS final
 WORKDIR /app
+COPY /etc/letsencrypt/live/gahonghac.net /etc/letsencrypt/live/gahonghac.net
+COPY /etc/letsencrypt/archive/gahonghac.net /etc/letsencrypt/archive/gahonghac.net
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Hairhub.API.dll"]

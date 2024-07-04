@@ -8,10 +8,27 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Org.BouncyCastle.Asn1.IsisMtt.Ocsp;
 using System.ComponentModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Cấu hình Kestrel để sử dụng HTTPS từ appsettings.json
+var certPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:Path"] ;
+var certKeyPath = builder.Configuration["Kestrel:Endpoints:Https:Certificate:KeyPath"];
+
+builder.WebHost.UseKestrel(options =>
+{
+    if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certKeyPath))
+    {
+        options.ListenAnyIP(443, listenOptions =>
+        {
+            listenOptions.UseHttps(certPath, certKeyPath);
+        });
+    }
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

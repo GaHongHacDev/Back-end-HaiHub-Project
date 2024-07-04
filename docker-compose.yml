@@ -38,6 +38,9 @@ services:
       TZ: "Asia/Ho_Chi_Minh"
     depends_on:
       - mssql
+    volumes:
+      - /etc/letsencrypt/live/gahonghac.net:/etc/letsencrypt/live/gahonghac.net  # Đường dẫn chứng chỉ Let's Encrypt trong container
+      - /etc/letsencrypt/archive/gahonghac.net:/etc/letsencrypt/archive/gahonghac.net  # Đường dẫn chứng chỉ Let's Encrypt trong container
 
 networks:
   demo:
@@ -47,6 +50,58 @@ volumes:
   mssql-data: # Định nghĩa named volume 'mssql-data'
   mssql-log: # Định nghĩa named volume 'mssql-log'
   mssql-secrets: # Định nghĩa named volume 'mssql-secrets'
+
+
+
+# version: '3.4'
+
+# services:
+#   mssql:
+#     container_name: mssql-db
+#     hostname: mssql-db
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     user: root
+#     networks:
+#       - demo
+#     environment:
+#       ACCEPT_EULA: 'Y'
+#       SA_PASSWORD: 'admin@123'
+#       MSSQL_PID: 'Developer'
+#       MSSQL_TCP_PORT: 1433
+#       TZ: "Asia/Ho_Chi_Minh"
+#     ports:
+#       - "1455:1433"
+#     volumes:
+#       - mssql-data:/var/opt/mssql/data
+#       - mssql-log:/var/opt/mssql/log
+#       - mssql-secrets:/var/opt/mssql/secrets
+
+#   hairhub.api:
+#     container_name: hairhub-api # thêm tên container rõ ràng
+#     image: ${docker_registry-}hairhubapi
+#     networks:
+#       - demo
+#     ports:
+#       - "8080:80"   # Thay đổi cổng này thành 8080:80 nếu bạn muốn ứng dụng lắng nghe HTTP trên cổng 8080
+#       - "8443:443"   # Đảm bảo rằng ứng dụng cũng hỗ trợ HTTPS trên cổng 443
+#     build:
+#       context: .
+#       dockerfile: Hairhub.API/Dockerfile  # Đảm bảo Dockerfile nằm trong thư mục hairhub.api
+#     environment:
+#       ASPNETCORE_URLS: "https://+:443;http://+:80"  # Cấu hình lắng nghe cả HTTP và HTTPS
+#       ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=admin@123;"
+#       TZ: "Asia/Ho_Chi_Minh"
+#     depends_on:
+#       - mssql
+
+# networks:
+#   demo:
+#     name: demo
+
+# volumes:
+#   mssql-data: # Định nghĩa named volume 'mssql-data'
+#   mssql-log: # Định nghĩa named volume 'mssql-log'
+#   mssql-secrets: # Định nghĩa named volume 'mssql-secrets'
 
 
 
