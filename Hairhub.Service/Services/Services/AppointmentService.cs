@@ -73,7 +73,8 @@ namespace Hairhub.Service.Services.Services
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
-                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer)
+                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer) 
+                                                              || x.Status.Equals(AppointmentStatus.Fail)
                                                               ),
                                                    include: query => query.Include(a => a.Customer)
                                                                            .Include(a => a.AppointmentDetails)
