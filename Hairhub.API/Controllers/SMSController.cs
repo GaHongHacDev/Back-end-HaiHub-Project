@@ -14,6 +14,7 @@ using Vonage.Request;
 
 namespace Hairhub.API.Controllers
 {
+    // Comment
     [Route(ApiEndPointConstant.SMS.SMSEndpoint + "/[action]")]
     [ApiController]
     public class SMSController : ControllerBase
