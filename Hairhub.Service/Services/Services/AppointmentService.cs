@@ -172,7 +172,7 @@ namespace Hairhub.Service.Services.Services
                                             .Include(a => a.AppointmentDetails)
                                                 .ThenInclude(ad => ad.SalonEmployee)
                                                     .ThenInclude(se => se.SalonInformation)
-                 );
+                );
             if (appointment == null)
                 return null;
             var appointmentResponse = _mapper.Map<GetAppointmentResponse>(appointment);
