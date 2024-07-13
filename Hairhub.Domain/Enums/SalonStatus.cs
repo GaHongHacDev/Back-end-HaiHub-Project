@@ -14,6 +14,6 @@ namespace Hairhub.Domain.Enums
         public static string Edited = "EDITED";
         public static string Suspended = "SUSPENDED"; // bị report 4 lần => Nộp tiền để comeback
         public static string Creating = "CREATING";
-        public static string Disable = "DISABLE"; // bị report 5 lần => Xóa khỏi hệ thống || Không đóng tiền gia hạn || Tự nguyện dừng salon
+        public static string Disable = "DISABLE"; // bị report 5 lần => Xóa khỏi hệ thống  || Tự nguyện dừng salon
     }
 }

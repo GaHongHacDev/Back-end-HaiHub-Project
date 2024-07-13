@@ -12,6 +12,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Common.CommonService.Contract;
 using System.Data;
+using MailKit.Search;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -59,13 +60,42 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    //var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                    //                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
-                    //item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                     item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
                 }
             }
             return appointmentResponse;
+        }
+
+        public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid SalonId, int NumberOfDay)
+        {
+            NumberOfDay--;
+            if(NumberOfDay!=6 || NumberOfDay != 29)
+            {
+                throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
+            }
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync
+                                                (
+                                                    predicate: x => x.Status.Equals(AppointmentStatus.Successed) 
+                                                                    && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date,
+                                                    orderBy: x => x.OrderByDescending(x=>x.StartDate)
+                                                );
+            GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
+            if (appointments != null)
+            {
+                response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointments);
+                //Tính tiền HH mà salon chưa trả cho system
+                foreach (var appointment in appointments)
+                {
+                    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                }
+                //Tính tổng tiền HH của salon filter theo 7ngay/30ngay
+                foreach(var appointment in appointments)
+                {
+                    response.TotalComssion += (appointment.CommissionRate/100)*appointment.TotalPrice;
+                }
+            }
+            return response;
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
@@ -96,9 +126,6 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    //var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                    //                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
-                    //item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                     item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
                 }
             }
@@ -129,9 +156,6 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    //var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                    //                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
-                    //item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                     item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
                 }
             }
@@ -186,9 +210,6 @@ namespace Hairhub.Service.Services.Services
             };
             foreach (var item in appointmentResponse.Items)
             {
-                //var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                //                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
-                //item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
             }
             return appointmentResponse;
@@ -249,15 +270,38 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in appointmentResponse.Items)
                 {
-                    //var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                    //                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
-                    //item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                     item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
                 }
             }
             return appointmentResponse;
         }
 
+        public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status)
+        {
+            // Tạo biểu thức điều kiện ban đầu cho SalonId
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            if (!string.IsNullOrEmpty(status))
+            {
+                predicate = predicate.And(x => x.Status.Equals(status));
+            }
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetPagingListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation)
+                );
+            var appointmentResponse = _mapper.Map<List<GetAppointmentResponse>>(appointments);
+            if (appointmentResponse != null && appointmentResponse.Count > 0)
+            {
+                foreach (var item in appointmentResponse)
+                {
+                   item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
+                }
+            }
+            return appointmentResponse;
+        }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status)
         {
@@ -290,9 +334,6 @@ namespace Hairhub.Service.Services.Services
 
             foreach (var item in appointmentResponse.Items)
             {
-                //var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                //                                    .GetListAsync(predicate: x => x.AppointmentId == item.Id, include: x => x.Include(x => x.SalonEmployee).Include(y => y.ServiceHair));
-                //item.AppointmentDetails = _mapper.Map<List<GetAppointmentDetailResponse>>(appointmentDetails);
                 item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
             }
 
