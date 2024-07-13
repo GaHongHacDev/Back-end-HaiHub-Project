@@ -259,12 +259,12 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Route("{OwnerId}")]
-        public async Task<IActionResult> GetAppointmentBySalonIdNoPaging([FromRoute] Guid AccountId)
+        [Route("{SalonId}")]
+        public async Task<IActionResult> GetAppointmentBySalonIdNoPaging([FromRoute] Guid SalonId)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetAppointmentById(AccountId);
+                var appointmentsResponse = await _appointmentService.GetAppointmentSalonBySalonIdNoPaging(SalonId);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)

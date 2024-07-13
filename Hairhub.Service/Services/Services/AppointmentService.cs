@@ -718,6 +718,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x=>x.CommissionRate!=null && x.IsActive);
             var appointment = new Appointment()
             {
                 Id = id,
@@ -728,6 +729,7 @@ namespace Hairhub.Service.Services.Services
                 OriginalPrice = request.OriginalPrice,
                 DiscountedPrice = request.DiscountedPrice,
                 Status = AppointmentStatus.Booking,
+                CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);

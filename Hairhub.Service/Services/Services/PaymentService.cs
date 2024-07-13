@@ -164,7 +164,7 @@ namespace Hairhub.Service.Services.Services
                             payment.Description = "";
                             payment.PaymentDate = DateTime.Now;
                             payment.StartDate   = DateTime.Now;
-                            payment.EndDate = DateTime.Now.AddDays(config.NumberOfDay);
+                            payment.EndDate = DateTime.Now.AddDays((double)config.NumberOfDay);
                             payment.MethodBanking = "PayOS";
                             payment.Status = status;
                             // Save the transaction
