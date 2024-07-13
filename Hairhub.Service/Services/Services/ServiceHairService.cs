@@ -150,6 +150,7 @@ namespace Hairhub.Service.Services.Services
 
             if (updateServiceHairRequest.IsActive.HasValue)
             {
+
                 serviceHair.IsActive = updateServiceHairRequest.IsActive.Value;
             }
 

@@ -162,11 +162,11 @@ namespace Hairhub.Service.Services.Services
                                                         orderBy: y => y.OrderByDescending(y => y.EndTime));
             if (otpEmail == null)
             {
-                throw new NotFoundException("Cannot found otp!");
+                throw new NotFoundException("OTP không đúng. Vui lòng nhập lại");
             }
             if (otpEmail.EndTime < DateTime.Now)
             {
-                throw new Exception("Time out OTP!");
+                throw new Exception("OTP đã hết hạn");
             }
             if (!otpEmail.OtpKey.Equals(checkOtpRequest.OtpRequest))
             {

@@ -45,17 +45,17 @@ namespace Hairhub.API.Controllers
                 bool isValidOtp = await _emailService.CheckOtpEmail(CheckOtpRequest);
                 if (!isValidOtp)
                 {
-                    return BadRequest("Otp is invalid!");
+                    return BadRequest(new { message = "Otp không đúng. Vui lòng nhập lại" });
                 }
                 return Ok("Otp is valid!");
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 

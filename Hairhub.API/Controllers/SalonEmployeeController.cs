@@ -91,7 +91,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> UpdateSalonEmployee([FromRoute] Guid id, [FromBody] UpdateSalonEmployeeRequest updateSalonEmployeeRequest)
+        public async Task<IActionResult> UpdateSalonEmployee([FromRoute] Guid id, [FromForm] UpdateSalonEmployeeRequest updateSalonEmployeeRequest)
         {
             try
             {

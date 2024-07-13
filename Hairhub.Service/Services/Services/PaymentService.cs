@@ -29,6 +29,7 @@ using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using CloudinaryDotNet.Actions;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -164,7 +165,7 @@ namespace Hairhub.Service.Services.Services
                             payment.Description = "";
                             payment.PaymentDate = DateTime.Now;
                             payment.StartDate   = DateTime.Now;
-                            payment.EndDate = DateTime.Now.AddDays(config.NumberOfDay);
+                            payment.EndDate = DateTime.Now.AddDays((double)config.NumberOfDay);
                             payment.MethodBanking = "PayOS";
                             payment.Status = status;
                             // Save the transaction
@@ -244,7 +245,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
         {
-            Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
+           Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
            var firstPayment = new Payment { 
                Id = Guid.NewGuid(),
                Description = "Miễn phí 1 tháng đầu tiên",
@@ -262,6 +263,33 @@ namespace Hairhub.Service.Services.Services
             bool isCreated = await _unitOfWork.CommitAsync() > 0;
             return isCreated;
 
+        }
+
+        public async Task<bool> PaymentForCommissionRate(CreateFirstTimePaymentRequest createPaymentRequest)
+        {
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+            Guid salonownerid = createPaymentRequest.SalonOwnerId;
+            var firstPayment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                Description = "Tiền hoa hồng dựa trên lịch hẹn tháng đầu tiên",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(30),
+                PaymentDate = DateTime.Now,
+                SalonOWnerID = salonownerid,
+                MethodBanking = "None",
+                PaymentCode = new Random().Next(1, 1000000),
+                Status = PaymentStatus.Fake,
+                TotalAmount = 0,
+                ConfigId = config.Id,
+                PakageFee = config.PakageFee,
+                PakageName = config.PakageName,
+                CommissionRate = config.CommissionRate,                
+            };
+
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
         }
     }
 }

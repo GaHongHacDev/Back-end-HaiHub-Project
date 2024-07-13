@@ -141,6 +141,18 @@ namespace Hairhub.Service.Services.Services
             return salonInformationResponses;
         }
 
+        public async Task<List<GetSalonInformationResponse>> GetAllApprovedSalonInformationNoPaging()
+        {
+            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+           .GetListAsync(
+                predicate: x => x.Status.Equals(SalonStatus.Approved),
+               include: query => query.Include(s => s.SalonOwner).Include(x => x.Schedules)
+           );
+
+            var salonInformationResponses = _mapper.Map<List<GetSalonInformationResponse>>(salonInformations);
+            return salonInformationResponses;
+        }
+
         public async Task<IPaginate<GetSalonInformationResponse>> GetAllSalonByAdmin(int page, int size)
         {
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()

@@ -73,7 +73,8 @@ namespace Hairhub.Service.Services.Services
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
-                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer)
+                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer) 
+                                                              || x.Status.Equals(AppointmentStatus.Fail)
                                                               ),
                                                    include: query => query.Include(a => a.Customer)
                                                                            .Include(a => a.AppointmentDetails)
@@ -163,7 +164,7 @@ namespace Hairhub.Service.Services.Services
             var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == AccountId);
             if (customer == null)
             {
-                throw new NotFoundException($"Not found customer with id {AccountId}");
+                throw new NotFoundException($"Không tìm thấy id của khách hàng");
             }
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
@@ -192,6 +193,32 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse;
         }
+
+        public async Task<List<GetAppointmentResponse>> GetAppointmentSalonBySalonIdNoPaging(Guid salonId)
+        {
+
+            // Tạo biểu thức điều kiện ban đầu cho SalonId
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation)
+                );
+            var appointmentResponse = _mapper.Map<List<GetAppointmentResponse>>(appointments);
+
+            if (appointmentResponse != null && appointmentResponse.Count > 0)
+            {
+                foreach (var item in appointmentResponse)
+                {
+                    item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
+                }
+            }
+            return appointmentResponse;
+        }
+
         public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status)
         {
             // Tạo biểu thức điều kiện ban đầu cho SalonId
@@ -691,6 +718,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x=>x.CommissionRate!=null && x.IsActive);
             var appointment = new Appointment()
             {
                 Id = id,
@@ -701,6 +729,7 @@ namespace Hairhub.Service.Services.Services
                 OriginalPrice = request.OriginalPrice,
                 DiscountedPrice = request.DiscountedPrice,
                 Status = AppointmentStatus.Booking,
+                CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);

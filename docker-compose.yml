@@ -1,4 +1,54 @@
-﻿version: '3.4'
+﻿# version: '3.4'
+
+# services:
+#   mssql:
+#     container_name: mssql-db
+#     hostname: mssql-db
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     user: root
+#     networks:
+#       - demo
+#     environment:
+#       ACCEPT_EULA: 'Y'
+#       SA_PASSWORD: 'Admin@123'
+#       MSSQL_PID: 'Developer'
+#       MSSQL_TCP_PORT: 1433
+#       TZ: "Asia/Ho_Chi_Minh"
+#     ports:
+#       - "1455:1433"
+#     volumes:
+#       - mssql-data:/var/opt/mssql/data
+#       - mssql-log:/var/opt/mssql/log
+#       - mssql-secrets:/var/opt/mssql/secrets
+
+#   hairhub.api:
+#     image: ${DOCKER_REGISTRY-}hairhubapi
+#     networks:
+#       - demo
+#     ports:
+#       - "8080:80"
+#     build:
+#       context: .
+#       dockerfile: Hairhub.API/Dockerfile
+#     environment:
+#       ASPNETCORE_URLS: http://+:80
+#       ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;"
+#       TZ: "Asia/Ho_Chi_Minh"
+#     depends_on:
+#       - mssql
+
+# networks:
+#   demo:
+#     name: demo
+
+# volumes:
+#   mssql-data: 
+#   mssql-log: 
+#   mssql-secrets: 
+
+# COMMANT
+
+version: '3.4'
 
 services:
   mssql:
@@ -39,9 +89,10 @@ services:
 
 networks:
   demo:
-    name: demo
+    driver: bridge  # Thêm driver bridge để đảm bảo mạng demo được tạo với driver bridge
 
 volumes:
   mssql-data: 
   mssql-log: 
   mssql-secrets: 
+
