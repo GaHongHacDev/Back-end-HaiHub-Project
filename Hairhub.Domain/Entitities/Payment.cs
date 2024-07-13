@@ -21,7 +21,9 @@ namespace Hairhub.Domain.Entitities
         public int PaymentCode { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-
+        public string PakageName { get; set; }
+        public decimal? PakageFee { get; set; }
+        public decimal? CommissionRate { get; set; }
         // Navigation properties
         public virtual SalonOwner SalonOwner { get; set; }
         public virtual Config Config { get; set; }

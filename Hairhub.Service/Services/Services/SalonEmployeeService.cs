@@ -210,9 +210,10 @@ namespace Hairhub.Service.Services.Services
                 salonEmployee.Phone = updateSalonEmployeeRequest.Phone;
             }
 
-            if (!string.IsNullOrEmpty(updateSalonEmployeeRequest.Img))
+            if (updateSalonEmployeeRequest.Img!=null)
             {
-                salonEmployee.Img = updateSalonEmployeeRequest.Img;
+                var url = await _mediaService.UploadAnImage(updateSalonEmployeeRequest.Img, MediaPath.EMPLOYEE, salonEmployee.Id.ToString());
+                salonEmployee.Img = url;
             }
 
             salonEmployee.IsActive = updateSalonEmployeeRequest.IsActive;

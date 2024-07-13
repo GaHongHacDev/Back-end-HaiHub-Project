@@ -27,7 +27,7 @@ namespace Hairhub.Infrastructure
                 .Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
+           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
 
         // DBSet<>
@@ -336,6 +336,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.ReasonCancel).HasMaxLength(255).HasColumnName("reason_cancel").IsRequired(false);
                 entity.Property(e => e.CancelDate).HasColumnName("cancel_date").IsRequired(false);
                 entity.Property(e => e.QrCodeImg).HasMaxLength(255).HasColumnName("qr_code_img").IsRequired(false);
+                entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate");
                 entity.Property(e => e.Status).HasMaxLength(25).HasColumnName("status");
 
                 entity.HasOne(d => d.Customer)
@@ -515,7 +516,7 @@ namespace Hairhub.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.ConfigId).HasColumnName("config_id").IsRequired(false); ;
+                entity.Property(e => e.ConfigId).HasColumnName("config_id").IsRequired(false);
                 entity.Property(e => e.SalonOWnerID).HasColumnName("salon_owner_id");
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)").HasColumnName("total_amount");
                 entity.Property(e => e.PaymentDate).HasColumnName("payment_date");
@@ -525,6 +526,9 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.PaymentCode).HasColumnName("payment_code");
                 entity.Property(e => e.StartDate).HasColumnName("start_date");
                 entity.Property(e => e.EndDate).HasColumnName("end_date");
+                entity.Property(e => e.PakageName).HasMaxLength(100).HasColumnName("pakage_name");
+                entity.Property(e => e.PakageFee).HasColumnType("decimal(18, 2)").HasColumnName("pakage_fee").IsRequired(false);
+                entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate").IsRequired(false);
 
                 entity.HasOne(d => d.SalonOwner)
                       .WithMany(p => p.Payments)
@@ -546,11 +550,12 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.PakageName).HasMaxLength(100).HasColumnName("pakage_name");
-                entity.Property(e => e.Description).HasMaxLength(100).HasColumnName("description");
-                entity.Property(e => e.PakageFee).HasColumnType("decimal(18, 2)").HasColumnName("pakage_fee");
+                entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description");
+                entity.Property(e => e.PakageFee).HasColumnType("decimal(18, 2)").HasColumnName("pakage_fee").IsRequired(false);
+                entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate").IsRequired(false);
                 entity.Property(e => e.DateCreate).HasColumnName("date_create");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
-                entity.Property(e => e.NumberOfDay).HasColumnName("number_of_day");
+                entity.Property(e => e.NumberOfDay).HasColumnName("number_of_day").IsRequired(false);
             });
         }
     }

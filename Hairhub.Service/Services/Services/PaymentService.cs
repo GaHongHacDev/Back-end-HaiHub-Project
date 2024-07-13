@@ -75,8 +75,8 @@ namespace Hairhub.Service.Services.Services
                 var returnurl = _config["PayOS:ReturnUrl"];
                 var returnurlfail = _config["PayOS:ReturnUrlFail"];
 
-                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}";
-                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}";
+                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
+                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
 
                 PayOS pos = new PayOS(clientId, apikey, checksumkey);
                 // Prepare data for signature
@@ -164,7 +164,7 @@ namespace Hairhub.Service.Services.Services
                             payment.Description = "";
                             payment.PaymentDate = DateTime.Now;
                             payment.StartDate   = DateTime.Now;
-                            payment.EndDate = DateTime.Now.AddDays(config.NumberOfDay);
+                            payment.EndDate = DateTime.Now.AddDays((double)config.NumberOfDay);
                             payment.MethodBanking = "PayOS";
                             payment.Status = status;
                             // Save the transaction

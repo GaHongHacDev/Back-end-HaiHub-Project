@@ -26,6 +26,13 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetAllSalonInformationNoPaging()
+        {
+            var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformationNoPaging();
+            return Ok(salonInformationsResponse);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetAllSalonByAdmin([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetAllSalonByAdmin(page, size);
@@ -133,7 +140,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> UpdateSalonInformation([FromRoute] Guid id, [FromBody] UpdateSalonInformationRequest updateSalonInformationRequest)
+        public async Task<IActionResult> UpdateSalonInformation([FromRoute] Guid id, [FromForm] UpdateSalonInformationRequest updateSalonInformationRequest)
         {
             try
             {
