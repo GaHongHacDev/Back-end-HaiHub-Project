@@ -16,6 +16,7 @@ namespace Hairhub.Service.Services.IServices
         //Get
         Task<IPaginate<GetAppointmentResponse>> GetAllAppointment(int page, int size);
         Task<GetAppointmentResponse>? GetAppointmentById(Guid id);
+        Task<List<GetAppointmentResponse>> GetAppointmentSalonBySalonIdNoPaging(Guid salonId);
         Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest getAvailableTimeRequest);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size);
         Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId);

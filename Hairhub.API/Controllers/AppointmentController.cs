@@ -258,6 +258,25 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{OwnerId}")]
+        public async Task<IActionResult> GetAppointmentBySalonIdNoPaging([FromRoute] Guid AccountId)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetAppointmentById(AccountId);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
         {
