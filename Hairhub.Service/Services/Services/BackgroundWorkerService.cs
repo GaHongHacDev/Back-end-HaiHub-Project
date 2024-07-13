@@ -54,6 +54,7 @@ namespace Hairhub.Service.Services.Services
                 await ExecuteExpriredAppointment(stoppingToken);
             }
         }
+
         private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
         {
             try
