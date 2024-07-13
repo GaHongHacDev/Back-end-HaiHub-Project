@@ -406,6 +406,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("comment");
 
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("create_date");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");

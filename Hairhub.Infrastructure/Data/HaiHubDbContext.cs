@@ -25,7 +25,7 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
             //optionsBuilder.UseSqlServer(configuration.GetConnectionString("LocalContainConnectionString"));
         }
@@ -442,6 +442,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Rating).HasColumnName("rating").IsRequired(false);
                 entity.Property(e => e.Comment).HasMaxLength(256).HasColumnName("comment").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.CreateDate).HasColumnName("create_date");
 
                 entity.HasOne(d => d.Customer)
                       .WithMany(p => p.Feedbacks)

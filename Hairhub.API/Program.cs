@@ -1,4 +1,4 @@
-using BirthdayParty.WebApi.Constants;
+ï»¿using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Hubs;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
@@ -42,7 +42,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-//******************* Add services to the container  ****************************
+//******************* Add services to the container  **************************
 
 //Dependecy Injection
 builder.Services.AddUnitOfWork();
@@ -63,7 +63,7 @@ builder.Services.AddHostedService<BackgroundWorkerService>();
 builder.Services.AddDbContext<HaiHubDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.EnableSensitiveDataLogging(); // Thêm dòng này
+    options.EnableSensitiveDataLogging(); // ThÃªm dÃ²ng nÃ y
 });
 
 //Config SignalR RealTime

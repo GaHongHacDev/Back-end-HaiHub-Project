@@ -63,7 +63,7 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
+                var Configs = await _unitOfWork.GetRepository<Domain.Entitities.Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
                 var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
 
                 int amount = (int)Configs.PakageFee;
