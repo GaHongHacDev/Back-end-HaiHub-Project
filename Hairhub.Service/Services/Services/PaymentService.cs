@@ -263,5 +263,10 @@ namespace Hairhub.Service.Services.Services
             return isCreated;
 
         }
+
+        public Task<bool> PaymentForCommissionRate(CreateFirstTimePaymentRequest createPaymentRequest)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
