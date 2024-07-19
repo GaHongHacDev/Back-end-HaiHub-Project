@@ -16,6 +16,7 @@ namespace Hairhub.Domain.Entitities
         public int? Rating { get; set; }
         public string? Comment { get; set; }
         public bool IsActive { get; set; }
+        public DateTime CreateDate { get; set; }
 
         // Navigation properties
         public virtual Customer Customer { get; set; }

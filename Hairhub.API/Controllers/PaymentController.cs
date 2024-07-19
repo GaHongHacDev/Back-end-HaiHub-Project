@@ -43,6 +43,17 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
+        {
+            var result = await _paymentservice.PaymentForCommissionRate(createFirstTimePaymentRequest);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> GetStatusPayment(string ordercode, [FromBody] SavePaymentInfor paymentrequest)
         {
             var result = await _paymentservice.GetPaymentInfo(ordercode, paymentrequest);

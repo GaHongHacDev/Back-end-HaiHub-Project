@@ -21,6 +21,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, int? rating, int page, int size);
 
-        Task<IPaginate<GetFeedbackResponse>> GetFeedBackByAppointmentId(Guid id, int page, int size);
+        Task<GetFeedbackResponse> GetFeedBackByAppointmentId(Guid id);
+
+        Task<IPaginate<GetFeedbackResponse>> GetFeedbackByCustomerId(Guid id, int page, int size);
     }
 }

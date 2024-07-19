@@ -10,6 +10,7 @@ using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using static Vonage.ProactiveConnect.Lists.SyncStatus;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -92,24 +93,48 @@ namespace Hairhub.Service.Services.Services
             return reportResponse;
         }
 
-        public async Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, int page, int size)
+        public async Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, string? Status, int page, int size)
         {
-            var reports = await _unitOfWork.GetRepository<Report>()
-                                           .GetPagingListAsync
-                                           (
-                                              predicate: x => x.CustomerId == customerId,
-                                              include: x => x.Include(s => s.StaticFiles)
-                                                            .Include(s => s.SalonInformation)
-                                                                .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
-                                                            .Include(s => s.SalonInformation)
-                                                                .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
-                                                            .Include(s => s.Customer)
-                                                            .Include(s => s.Appointment)
-                                                                .ThenInclude(a => a.AppointmentDetails)
-                                                                    .ThenInclude(ad => ad.SalonEmployee),
-                                               page: page,
-                                               size: size
-                                           );
+            IPaginate<Report> reports;
+            if (String.IsNullOrWhiteSpace(Status))
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
+                               .GetPagingListAsync
+                               (
+                                  predicate: x => x.CustomerId == customerId,
+                                  include: x => x.Include(s => s.StaticFiles)
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                .Include(s => s.Customer)
+                                                .Include(s => s.Appointment)
+                                                    .ThenInclude(a => a.AppointmentDetails)
+                                                        .ThenInclude(ad => ad.SalonEmployee),
+                                   page: page,
+                                   size: size
+                               );
+            }
+            else
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
+                               .GetPagingListAsync
+                               (
+                                  predicate: x => x.CustomerId == customerId && x.Status.Equals(Status),
+                                  include: x => x.Include(s => s.StaticFiles)
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                .Include(s => s.SalonInformation)
+                                                    .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                .Include(s => s.Customer)
+                                                .Include(s => s.Appointment)
+                                                    .ThenInclude(a => a.AppointmentDetails)
+                                                        .ThenInclude(ad => ad.SalonEmployee),
+                                   page: page,
+                                   size: size
+                               );
+            }
+
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,
@@ -121,9 +146,12 @@ namespace Hairhub.Service.Services.Services
             return reportResponse;
         }
 
-        public async Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, int page, int size)
+        public async Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, string? status, int page, int size)
         {
-            var reports = await _unitOfWork.GetRepository<Report>()
+            IPaginate<Report> reports;
+            if (String.IsNullOrWhiteSpace(status))
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
                                            .GetPagingListAsync
                                            (
                                                predicate: x => x.SalonId == salonId,
@@ -139,6 +167,27 @@ namespace Hairhub.Service.Services.Services
                                                page: page,
                                                size: size
                                            );
+            }
+            else
+            {
+                reports = await _unitOfWork.GetRepository<Report>()
+                                           .GetPagingListAsync
+                                           (
+                                               predicate: x => x.SalonId == salonId && x.Status.Equals(status),
+                                               include: x => x.Include(s => s.StaticFiles)
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation
+                                                               .Include(s => s.SalonInformation)
+                                                                   .ThenInclude(si => si.SalonOwner) // Include SalonOwner from SalonInformation
+                                                               .Include(s => s.Customer)
+                                                               .Include(s => s.Appointment)
+                                                                   .ThenInclude(a => a.AppointmentDetails)
+                                                                       .ThenInclude(ad => ad.SalonEmployee),
+                                               page: page,
+                                               size: size
+                                           );
+            }
+
             var reportResponse = new Paginate<GetReportResponse>()
             {
                 Page = reports.Page,
@@ -194,7 +243,7 @@ namespace Hairhub.Service.Services.Services
                                   .SingleOrDefaultAsync
                                   (
                                    predicate: x => x.Id == request.AppointmentId
-                                               && ((x.Status.Equals(AppointmentStatus.Booking) && x.StartDate < DateTime.Now)
+                                               && ((x.Status.Equals(AppointmentStatus.Booking) && x.AppointmentDetails.OrderByDescending(s=>s.StartTime).FirstOrDefault().StartTime < DateTime.Now)
                                                || x.Status.Equals(AppointmentStatus.Successed)
                                                || x.Status.Equals(AppointmentStatus.CancelByCustomer))
                                   );
@@ -287,10 +336,10 @@ namespace Hairhub.Service.Services.Services
                             await SendMailNotificatinRemind(salon, (int)salon.NumberOfReported);
                             break;
                         case 4:
-                            salon = SuspendedSalon(salon);
+                            salon = await SuspendedSalon(salon, (int)salon.NumberOfReported);
                             break;
                         case 5:
-                            salon = RemoveFromSystem(salon);
+                            salon = await RemoveFromSystem(salon, (int)salon.NumberOfReported);
                             break;
 
                     }
@@ -320,18 +369,35 @@ namespace Hairhub.Service.Services.Services
         }
 
         // Xóa salon khởi hệ thống, reported = 5
-        private SalonInformation RemoveFromSystem(SalonInformation salon)
+        private async Task<SalonInformation> RemoveFromSystem(SalonInformation salon, int numberOfReported)
         {
             //Gửi mail hoặc sdt 
+            string subject = $"Thông báo từ hệ thống Hairhub: Salon {salon.Name} đã bị xóa khỏi hệ thống do vượt quá số lần vi phạm";
+            string bodyEmail = $"Chúng tôi xin thông báo rằng salon {salon.Name} của bạn đã đạt đến số lần báo cáo vi phạm tối đa cho phép là {numberOfReported} lần. " +
+                                $"Sau khi xem xét kỹ lưỡng và theo chính sách của chúng tôi, {salon.Name} sẽ bị xóa khỏi hệ thống.\r\n" +
+                                $"Chúng tôi hiểu rằng điều này có thể gây khó khăn cho bạn và chúng tôi rất tiếc phải thực hiện biện pháp này. " +
+                                $"Tuy nhiên, để đảm bảo chất lượng dịch vụ và sự hài lòng của khách hàng, chúng tôi buộc phải tuân thủ các quy định đã đề ra.\r\n" +
+                                $"Nếu bạn có bất kỳ thắc mắc hoặc muốn khiếu nại về quyết định này, xin vui lòng liên hệ với chúng tôi qua email này hoặc số điện thoại bên dưới trong vòng 7 ngày kể từ ngày nhận được thông báo.\r\n" +
+                                $"Chúng tôi rất mong nhận được sự thông cảm và hợp tác từ phía bạn.";
+            string userEmail = salon.SalonOwner.Email;
+            await _emailService.SendEmailWithBodyAsync(userEmail, subject, salon.SalonOwner.FullName, bodyEmail);
             //Chuyển trạng thái Salon
             salon.Status = SalonStatus.Disable;
             return salon;
         }
 
         // Đóng salon, nộp tiền để comeback, reported = 4
-        private SalonInformation SuspendedSalon(SalonInformation salon)
+        private async Task<SalonInformation> SuspendedSalon(SalonInformation salon, int numberOfReported)
         {
             //Gửi mail hoặc sdt
+            string subject = "Thông báo từ hệ thống Hairhub: Bạn đã bị báo cáo vi phạm và ngừng hoạt động salon tạm thời trên hệ thống";
+            string bodyEmail = $"Chúng tôi xin thông báo rằng salon {salon.Name} của bạn đã bị khóa tạm thời do số lần báo cáo vi phạm đã đạt {numberOfReported} lần. " +
+                $"Theo chính sách của chúng tôi, salon {salon.Name} sẽ bị khóa tạm thời để đảm bảo chất lượng dịch vụ và sự hài lòng của khách hàng. \r\n" +
+                $"Để mở lại hoạt động của salon, bạn cần liên hệ với quản trị viên và nộp khoản tiền phạt theo quy định. " +
+                $"Vui lòng liên hệ với chúng tôi qua email này hoặc số điện thoại bên dưới để biết thêm chi tiết về quy trình nộp phạt và mở khóa salon. " +
+                $"\r\nChúng tôi rất mong nhận được sự hợp tác từ phía quý vị để cùng nhau duy trì môi trường dịch vụ chất lượng và an toàn.";
+            string userEmail = salon.SalonOwner.Email;
+            await _emailService.SendEmailWithBodyAsync(userEmail, subject, salon.SalonOwner.FullName, bodyEmail);
             //Chuyển trạng thái Salon
             salon.Status = SalonStatus.Suspended;
             return salon;
@@ -342,8 +408,10 @@ namespace Hairhub.Service.Services.Services
         {
             //Gửi mail nhắc nhở
             string subject = "Thông báo từ hệ thống Hairhub: Bạn đã bị báo cáo vi phạm";
-            string bodyEmail = $"Chúng tôi nhận được thông báo từ khách hàng về một số vấn đề liên quan đến hoạt động của salon {salon.Name} của bạn lần thứ {numberOfReported} trên nền tảng Hairhub. Đây là một phần trong cam kết của chúng tôi để duy trì chất lượng dịch vụ và đảm bảo trải nghiệm tốt nhất cho người dùng. Vui lòng kiểm tra và xử lý các vấn đề đang xảy ra để đảm bảo rằng hoạt động của salon của bạn đáp ứng các tiêu chuẩn của chúng tôi. Mọi chi tiết liên hệ phản hồi qua mail này hoặc kiểm tra thông tin report trên HairHub để hiểu rõ hơn.";
-            string userEmail = salon.SalonOwner.Email;
+            string bodyEmail = $"Chúng tôi nhận được thông báo từ khách hàng về một số vấn đề liên quan đến hoạt động của salon {salon.Name} của bạn lần thứ {numberOfReported} trên nền tảng Hairhub. " +
+                $"Đây là một phần trong cam kết của chúng tôi để duy trì chất lượng dịch vụ và đảm bảo trải nghiệm tốt nhất cho người dùng. " +
+                $"Vui lòng kiểm tra và xử lý các vấn đề đang xảy ra để đảm bảo rằng hoạt động của salon của bạn đáp ứng các tiêu chuẩn của chúng tôi. " +
+                $"Mọi chi tiết liên hệ phản hồi qua mail này hoặc kiểm tra thông tin report trên HairHub để hiểu rõ hơn.";
             await _emailService.SendEmailWithBodyAsync(salon.SalonOwner.Email, subject, salon.SalonOwner.FullName, bodyEmail);
             return true;
         }

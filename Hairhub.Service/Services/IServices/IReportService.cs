@@ -14,8 +14,8 @@ namespace Hairhub.Service.Services.IServices
     public interface IReportService
     {
         Task<IPaginate<GetReportResponse>> GetAllReport(int page, int size);
-        Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, int page, int size);
-        Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, int page, int size);
+        Task<IPaginate<GetReportResponse>> GetReportByCustomerId(Guid customerId, string status, int page, int size);
+        Task<IPaginate<GetReportResponse>> GetReportBySalonId(Guid salonId, string status, int page, int size);
         Task<bool> CreateReport(CreateReportRequest request);
         Task<bool> ConfirmReport(Guid id, ConfirmReportRequest request);
         Task<IPaginate<GetReportResponse>> GetAllReportByRoleName(string roleNameReport, int page, int size);

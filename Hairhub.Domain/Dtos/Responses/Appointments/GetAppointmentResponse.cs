@@ -7,15 +7,17 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime StartDate { get; set; }
-        public Decimal TotalPrice { get; set; }
-        public Decimal OriginalPrice { get; set; }
-        public Decimal DiscountedPrice { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public decimal DiscountedPrice { get; set; }
         public bool? IsReportByCustomer { get; set; }
         public bool? IsReportBySalon { get; set; }
         public string? ReasonCancel { get; set; }
         public DateTime? CancelDate { get; set; }
         public string? QrCodeImg { get; set; }
+        public decimal? CommissionRate { get; set; }
         public string Status { get; set; }
+        public bool IsFeedback { get; set; }
         public List<GetAppointmentDetailResponse> AppointmentDetails { get; set; } = new List<GetAppointmentDetailResponse>();
         public AppointmentSalon SalonInformation { get; set; }
         public CustomerAppointment Customer { get; set; }

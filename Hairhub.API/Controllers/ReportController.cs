@@ -37,17 +37,17 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{customerId:Guid}")]
-        public async Task<IActionResult> GetReportByCustomerId([FromRoute] Guid customerId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetReportByCustomerId([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var reportsResponse = await _reportService.GetReportByCustomerId(customerId, page, size);
+            var reportsResponse = await _reportService.GetReportByCustomerId(customerId, status, page, size);
             return Ok(reportsResponse);
         }
 
         [HttpGet]
         [Route("{salonId:Guid}")]
-        public async Task<IActionResult> GetReportBySalonId([FromRoute] Guid salonId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetReportBySalonId([FromRoute] Guid salonId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var reportsResponse = await _reportService.GetReportBySalonId(salonId, page, size);
+            var reportsResponse = await _reportService.GetReportBySalonId(salonId, status, page, size);
             return Ok(reportsResponse);
         }
 

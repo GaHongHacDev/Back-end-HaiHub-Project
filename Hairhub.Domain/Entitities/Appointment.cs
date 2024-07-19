@@ -22,6 +22,7 @@ namespace Hairhub.Domain.Entitities
         public string? ReasonCancel { get; set; }
         public DateTime? CancelDate { get; set; }
         public string? QrCodeImg { get; set; }
+        public decimal? CommissionRate { get; set; }
         public string Status { get; set; }
 
 

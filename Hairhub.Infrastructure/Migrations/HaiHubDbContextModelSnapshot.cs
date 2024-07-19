@@ -106,6 +106,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("cancel_date");
 
+                    b.Property<decimal?>("CommissionRate")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("commission_rate");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_date");
@@ -301,25 +305,29 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<decimal?>("CommissionRate")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("commission_rate");
+
                     b.Property<DateTime>("DateCreate")
                         .HasColumnType("datetime2")
                         .HasColumnName("date_create");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<int>("NumberOfDay")
+                    b.Property<int?>("NumberOfDay")
                         .HasColumnType("int")
                         .HasColumnName("number_of_day");
 
-                    b.Property<decimal>("PakageFee")
+                    b.Property<decimal?>("PakageFee")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("pakage_fee");
 
@@ -406,6 +414,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("comment");
 
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("create_date");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");
@@ -478,6 +490,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<decimal?>("CommissionRate")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("commission_rate");
+
                     b.Property<Guid?>("ConfigId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("config_id");
@@ -495,6 +511,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("method_banking");
+
+                    b.Property<decimal?>("PakageFee")
+                        .HasColumnType("decimal(18, 2)")
+                        .HasColumnName("pakage_fee");
+
+                    b.Property<string>("PakageName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("pakage_name");
 
                     b.Property<int>("PaymentCode")
                         .HasColumnType("int")
