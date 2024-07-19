@@ -243,7 +243,7 @@ namespace Hairhub.Service.Services.Services
                                   .SingleOrDefaultAsync
                                   (
                                    predicate: x => x.Id == request.AppointmentId
-                                               && ((x.Status.Equals(AppointmentStatus.Booking) && x.StartDate < DateTime.Now)
+                                               && ((x.Status.Equals(AppointmentStatus.Booking) && x.AppointmentDetails.OrderByDescending(s=>s.StartTime).FirstOrDefault().StartTime < DateTime.Now)
                                                || x.Status.Equals(AppointmentStatus.Successed)
                                                || x.Status.Equals(AppointmentStatus.CancelByCustomer))
                                   );
