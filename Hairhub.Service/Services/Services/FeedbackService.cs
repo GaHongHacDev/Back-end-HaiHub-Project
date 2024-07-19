@@ -21,6 +21,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Vonage.NumberInsights;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -227,6 +228,49 @@ namespace Hairhub.Service.Services.Services
                     feedbacks.StaticFiles = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: x => x.FeedbackId == feedbacks.Id);
                 }
                 return _mapper.Map<GetFeedbackResponse>(feedbacks);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred: " + ex.Message, ex);
+            }
+        }
+
+        public async Task<IPaginate<GetFeedbackResponse>> GetFeedbackByCustomerId(Guid id, int page, int size)
+        {
+            try
+            {
+                var cus = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+                if(cus == null) {
+                    throw new InvalidOperationException("Không tìm thấy khách hàng này");
+                }
+                IPaginate<Feedback> feedbacks;                
+                feedbacks = await _unitOfWork.GetRepository<Feedback>()
+                    .GetPagingListAsync(
+                       predicate: x => x.IsActive == true && x.CustomerId == id,
+                       include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
+                       page: page,
+                       size: size);
+                
+
+                if (feedbacks == null || feedbacks.Items == null)
+                {
+                    throw new InvalidOperationException("Không tìm thấy đánh giá");
+                }
+
+                foreach (var feedback in feedbacks.Items)
+                {
+                    feedback.StaticFiles = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: x => x.FeedbackId == feedback.Id);
+                }
+
+                var feedbackResponses = new Paginate<GetFeedbackResponse>()
+                {
+                    Page = feedbacks.Page,
+                    Size = feedbacks.Size,
+                    Total = feedbacks.Total,
+                    TotalPages = feedbacks.TotalPages,
+                    Items = _mapper.Map<IList<GetFeedbackResponse>>(feedbacks.Items),
+                };
+                return feedbackResponses;
             }
             catch (Exception ex)
             {
