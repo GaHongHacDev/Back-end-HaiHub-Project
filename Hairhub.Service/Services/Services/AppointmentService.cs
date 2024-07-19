@@ -66,18 +66,21 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid SalonId, int NumberOfDay)
+        public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay)
         {
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date);
+
             NumberOfDay--;
             if(NumberOfDay!=6 || NumberOfDay != 29)
             {
                 throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
             }
+
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                 .GetListAsync
                                                 (
-                                                    predicate: x => x.Status.Equals(AppointmentStatus.Successed) 
-                                                                    && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date,
+                                                    predicate: predicate,
                                                     orderBy: x => x.OrderByDescending(x=>x.StartDate)
                                                 );
             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();

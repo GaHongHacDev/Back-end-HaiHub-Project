@@ -142,8 +142,8 @@ namespace Hairhub.Service.Services.Services
                     new Claim(ClaimTypes.Name, username),
                     new Claim(ClaimTypes.Role, roleName)
                 }),
-
-                Expires = DateTime.UtcNow.AddMinutes(10),
+                // Time Access Totken
+                Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
