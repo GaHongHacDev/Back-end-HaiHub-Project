@@ -20,12 +20,14 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<ResponsePayment>> GetPayments(int page, int size);
 
 
-        Task<bool> PaymentForCommissionRate(CreateFirstTimePaymentRequest createPaymentRequest);
+        Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest);
 
         Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest);
 
 
         Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size);
+
+        Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id);
 
     }
 }

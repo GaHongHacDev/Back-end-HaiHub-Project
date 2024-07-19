@@ -9,5 +9,6 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
     public class CreateFirstTimePaymentRequest
     {
         public Guid SalonOwnerId {  get; set; }
+        public Guid ConfigId { get; set; }
     }
 }

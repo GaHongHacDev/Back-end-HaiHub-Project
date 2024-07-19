@@ -279,7 +279,7 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status)
+        public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate)
         {
             // Tạo biểu thức điều kiện ban đầu cho SalonId
             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
@@ -287,6 +287,13 @@ namespace Hairhub.Service.Services.Services
             {
                 predicate = predicate.And(x => x.Status.Equals(status));
             }
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                predicate = predicate.And(x => x.StartDate >= startDate.Value && x.StartDate <= endDate.Value);
+            }
+
+
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
                     predicate: predicate,
