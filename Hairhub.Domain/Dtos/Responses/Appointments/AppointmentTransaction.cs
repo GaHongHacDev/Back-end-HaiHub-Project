@@ -8,7 +8,9 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
 {
     public class AppointmentTransaction
     {
-        public List<GetAppointmentTransactionResponse> GetAppointmentTransactionResponse { get; set; }
-        public decimal? CurrentComssion { get; set; }
+        public Guid Id { get; set; }
+        public DateTime StartDate { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal? CommissionRate { get; set; }
     }
 }

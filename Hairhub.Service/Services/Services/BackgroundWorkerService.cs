@@ -38,20 +38,29 @@ namespace Hairhub.Service.Services.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+
+            //    var now = DateTime.Now;
+            //    var nextMidnight = now.Date.AddDays(1);
+            //    var delayTime = nextMidnight - now;
+
+
+            //    await Task.Delay(delayTime, stoppingToken);
+
+            //    await ExecuteExpiredSalon(stoppingToken);
+
+
+            //    await ExecuteExpriredAppointment(stoppingToken);
+            //}
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Calculate delay time until next midnight
-                var now = DateTime.Now;
-                var nextMidnight = now.Date.AddDays(1); // Next midnight
-                var delayTime = nextMidnight - now;
-
-                // Wait until next midnight
-                await Task.Delay(delayTime, stoppingToken);
-                // Check Payment expired
-                await ExecuteExpriredSalon(stoppingToken);
-
-                //Check status appointment
+                // Thực hiện công việc của bạn ở đây
+                await ExecuteExpiredSalon(stoppingToken);
                 await ExecuteExpriredAppointment(stoppingToken);
+
+                // Đợi 30 giây
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
         }
 
@@ -91,7 +100,62 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        private async Task ExecuteExpriredSalon(CancellationToken stoppingToken)
+        //private async Task ExecuteExpriredSalon(CancellationToken stoppingToken)
+        //{
+        //    try
+        //    {
+        //        using (var scope = _scopeFactory.CreateScope())
+        //        {
+        //            var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        //            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
+        //            var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
+        //                include: x => x.Include(s => s.SalonOwner)
+        //            );
+
+        //            foreach (var salon in salons)
+        //            {
+        //                var latestPayment = await uow.GetRepository<Payment>()
+        //                    .SingleOrDefaultAsync(
+        //                        predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
+        //                        orderBy: o => o.OrderByDescending(o => o.EndDate)
+        //                    );
+
+        //                if (latestPayment != null)
+        //                {
+        //                    if (latestPayment.EndDate > DateTime.Now)
+        //                    {
+        //                        continue;
+        //                    }
+
+        //                    var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
+
+        //                    if (daysToExpiry < 3 && daysToExpiry > 0)
+        //                    {
+        //                        await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
+        //                    }
+
+        //                    if (latestPayment.EndDate < DateTime.Now && salon.Status != SalonStatus.Disable)
+        //                    {
+        //                        salon.Status = SalonStatus.Disable;
+        //                        uow.GetRepository<SalonInformation>().UpdateAsync(salon);
+        //                        uow.CommitAsync();
+        //                    }
+        //                }
+        //            }
+
+        //            _logger.LogInformation("Expired salons checked and updated at: {time}", DateTimeOffset.Now);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
+        //         Thực hiện xử lý lỗi tại đây nếu cần thiết
+        //    }
+        //}
+
+
+        private async Task ExecuteExpiredSalon(CancellationToken stoppingToken)
         {
             try
             {
@@ -99,38 +163,30 @@ namespace Hairhub.Service.Services.Services
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-
                     var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
-                        include: x => x.Include(s => s.SalonOwner)
+                        include: x => x.Include(s => s.SalonOwner),
+                        predicate: p => p.Status == SalonStatus.Approved
                     );
 
                     foreach (var salon in salons)
                     {
-                        var latestPayment = await uow.GetRepository<Payment>()
-                            .SingleOrDefaultAsync(
-                                predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
-                                orderBy: o => o.OrderByDescending(o => o.EndDate)
-                            );
+                        var latestPayment = await uow.GetRepository<Payment>().SingleOrDefaultAsync(
+                            predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
+                            orderBy: o => o.OrderByDescending(p => p.EndDate)
+                        );
 
                         if (latestPayment != null)
                         {
-                            if (latestPayment.EndDate > DateTime.Now)
-                            {
-                                continue;
-                            }
-
                             var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
-
-                            if (daysToExpiry < 3 && daysToExpiry > 0)
+                            if (daysToExpiry < 5 && daysToExpiry >= 0)
                             {
                                 await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
-                            }
-
-                            if (latestPayment.EndDate < DateTime.Now && salon.Status != SalonStatus.Disable)
+                            }                           
+                            if (latestPayment.EndDate < DateTime.Now && salon.Status != SalonStatus.OverDue)
                             {
-                                salon.Status = SalonStatus.Disable;
+                                salon.Status = SalonStatus.OverDue;
                                 uow.GetRepository<SalonInformation>().UpdateAsync(salon);
-                                uow.CommitAsync();
+                                await uow.CommitAsync();
                             }
                         }
                     }
@@ -141,9 +197,9 @@ namespace Hairhub.Service.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
-                // Thực hiện xử lý lỗi tại đây nếu cần thiết
             }
         }
+
 
     }
 }
