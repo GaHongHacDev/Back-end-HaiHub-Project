@@ -72,7 +72,7 @@ namespace Hairhub.Service.Services.Services
             predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date);
 
             NumberOfDay--;
-            if(NumberOfDay!=6 || NumberOfDay != 29)
+            if(NumberOfDay!=6 && NumberOfDay != 29)
             {
                 throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
             }
@@ -763,6 +763,10 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x=>x.CommissionRate!=null && x.IsActive);
+            if(config == null)
+            {
+                throw new NotFoundException("Không tìm thấy config phần trăm hoa hồng");
+            }
             var appointment = new Appointment()
             {
                 Id = id,
