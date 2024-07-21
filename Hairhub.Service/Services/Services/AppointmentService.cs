@@ -372,6 +372,16 @@ namespace Hairhub.Service.Services.Services
              }*/
             List<decimal> availbeTimeResponse = GenerateTimeSlot(salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60, salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60, 0.25m);
             var availableTimesDict = availbeTimeResponse.ToDictionary(timeSlot => timeSlot, timeSlot => new List<EmployeeAvailable>());
+            // Loại bỏ các time slots đã qua
+            decimal currentTime = DateTime.Now.Hour + (decimal)DateTime.Now.Minute / 60;
+            availableTimesDict = availableTimesDict
+                .Where(kvp => kvp.Key > currentTime)
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            if (availableTimesDict.Count == 0)
+            {
+                throw new NotFoundException("Đã qua giờ làm việc của salon, barber shop");
+            }
+
             if (!request.IsAnyOne)
             {
                 // Get all employees in the salon
