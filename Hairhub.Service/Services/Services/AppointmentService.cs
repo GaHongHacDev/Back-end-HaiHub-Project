@@ -281,21 +281,15 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate)
         {
-            // Tạo biểu thức điều kiện ban đầu cho SalonId
-            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
-            if (!string.IsNullOrEmpty(status))
-            {
-                predicate = predicate.And(x => x.Status.Equals(status));
-            }
 
-            if (startDate.HasValue && endDate.HasValue)
-            {
-                predicate = predicate.And(x => x.StartDate >= startDate.Value && x.StartDate <= endDate.Value);
-            }
-
-
+            var predicate = PredicateBuilder.New<Appointment>(x =>
+        x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) &&
+        (string.IsNullOrEmpty(status) || x.Status == status) &&
+        x.StartDate >= startDate.Value &&
+        x.StartDate <= endDate.Value
+    );
             var appointments = await _unitOfWork.GetRepository<Appointment>()
-                .GetPagingListAsync(
+                .GetListAsync(
                     predicate: predicate,
                     include: query => query.Include(a => a.Customer)
                                            .Include(a => a.AppointmentDetails)
@@ -303,14 +297,16 @@ namespace Hairhub.Service.Services.Services
                                                    .ThenInclude(se => se.SalonInformation)
                 );
             var appointmentResponse = _mapper.Map<List<GetAppointmentResponse>>(appointments);
+
             if (appointmentResponse != null && appointmentResponse.Count > 0)
             {
                 foreach (var item in appointmentResponse)
                 {
-                   item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
+                    item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
                 }
             }
             return appointmentResponse;
+
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status)
