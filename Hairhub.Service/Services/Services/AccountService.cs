@@ -114,6 +114,8 @@ namespace Hairhub.Service.Services.Services
             account.Id = Guid.NewGuid();
             account.RoleId = role.RoleId;
             account.IsActive = true;
+            account.CreatedDate = DateTime.UtcNow;
+
             if (RoleEnum.Customer.ToString().Equals(createAccountRequest.RoleName))
             {
                 var customer = _mapper.Map<Customer>(createAccountRequest);
