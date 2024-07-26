@@ -1,4 +1,5 @@
 ﻿using Hairhub.Domain.Dtos.Responses.Customers;
+using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Domain.Specifications;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetCustomerResponse>> GetCustomers(int page, int size);
         Task<GetCustomerResponse>? GetCustomerById(Guid id);
         Task<bool> CheckInByCustomer(string dataAES, Guid customerId);
+
+        //Task<DataOfMonths> GetCustomerofYearByAdmin(int year);
     }
 }

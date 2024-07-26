@@ -15,6 +15,7 @@ using System.Runtime.Intrinsics.Arm;
 using Hairhub.Common.Security;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Enums;
+using Hairhub.Domain.Dtos.Responses.Dashboard;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -94,5 +95,7 @@ namespace Hairhub.Service.Services.Services
             bool isInsert = await _unitOfWork.CommitAsync()>0;
             return isInsert;
         }
+
+        
     }
 }

@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Hairhub.Common.CommonService.Contract;
 using System.Data;
 using MailKit.Search;
+using Hairhub.Domain.Dtos.Responses.Dashboard;
+using static Vonage.ProactiveConnect.Lists.SyncStatus;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -960,6 +962,182 @@ namespace Hairhub.Service.Services.Services
                 await _emailService.SendEmailWithBodyAsync(Salon.SalonOwner.Email, "Thông báo hủy đơn đặt lịch trên Hairhub", Salon.Name, bodyEmail);
             }
             return isUpdate;
+        }
+
+        public async Task<DataOfMonths> GetAppointmentbyStatusByAdmin(string status, int year)
+        {
+            var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: p => p.Status == status && p.StartDate.Year == year);
+            var dataOfMonths = new DataOfMonths
+            {
+                Jan = appointments.Count(a => a.StartDate.Month == 1),
+                Feb = appointments.Count(a => a.StartDate.Month == 2),
+                March = appointments.Count(a => a.StartDate.Month == 3),
+                April = appointments.Count(a => a.StartDate.Month == 4),
+                May = appointments.Count(a => a.StartDate.Month == 5),
+                June = appointments.Count(a => a.StartDate.Month == 6),
+                July = appointments.Count(a => a.StartDate.Month == 7),
+                August = appointments.Count(a => a.StartDate.Month == 8),
+                September = appointments.Count(a => a.StartDate.Month == 9),
+                October = appointments.Count(a => a.StartDate.Month == 10),
+                November = appointments.Count(a => a.StartDate.Month == 11),
+                December = appointments.Count(a => a.StartDate.Month == 12)
+            };
+            return dataOfMonths;
+
+        }
+
+        public async Task<DataOfMonths> GetRevenueByAdmin(int year)
+        {
+            var payments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: p => p.StartDate.Year == year && p.Status == AppointmentStatus.Successed);
+            var dataOfMonths = new DataOfMonths
+            {
+                Jan = (int?)payments.Where(a => a.StartDate.Month == 1).Sum(a => a.TotalPrice),
+                Feb = (int?)payments.Where(a => a.StartDate.Month == 2).Sum(a => a.TotalPrice),
+                March = (int?)payments.Where(a => a.StartDate.Month == 3).Sum(a => a.TotalPrice),
+                April = (int?)payments.Where(a => a.StartDate.Month == 4).Sum(a => a.TotalPrice),
+                May = (int?)payments.Where(a => a.StartDate.Month == 5).Sum(a => a.TotalPrice),
+                June = (int?)payments.Where(a => a.StartDate.Month == 6).Sum(a => a.TotalPrice),
+                July = (int?)payments.Where(a => a.StartDate.Month == 7).Sum(a => a.TotalPrice),
+                August = (int?)payments.Where(a => a.StartDate.Month == 8).Sum(a => a.TotalPrice),
+                September = (int?)payments.Where(a => a.StartDate.Month == 9).Sum(a => a.TotalPrice),
+                October = (int?)payments.Where(a => a.StartDate.Month == 10).Sum(a => a.TotalPrice),
+                November = (int?)payments.Where(a => a.StartDate.Month == 11).Sum(a => a.TotalPrice),
+                December = (int?)payments.Where(a => a.StartDate.Month == 12).Sum(a => a.TotalPrice)
+            };
+            return dataOfMonths;
+        }
+
+        public async Task<DataOfMonths> GetCommissionByAdmin(int year)
+        {
+            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate.Year == year && p.Status == PaymentStatus.Paid);
+            var dataOfMonths = new DataOfMonths
+            {
+                Jan = (int?)payments.Where(a => a.PaymentDate.Month == 1).Sum(a => a.TotalAmount),
+                Feb = (int?)payments.Where(a => a.PaymentDate.Month == 2).Sum(a => a.TotalAmount),
+                March = (int?)payments.Where(a => a.PaymentDate.Month == 3).Sum(a => a.TotalAmount),
+                April = (int?)payments.Where(a => a.PaymentDate.Month == 4).Sum(a => a.TotalAmount),
+                May = (int?)payments.Where(a => a.PaymentDate.Month == 5).Sum(a => a.TotalAmount),
+                June = (int?)payments.Where(a => a.PaymentDate.Month == 6).Sum(a => a.TotalAmount),
+                July = (int?)payments.Where(a => a.PaymentDate.Month == 7).Sum(a => a.TotalAmount),
+                August = (int?)payments.Where(a => a.PaymentDate.Month == 8).Sum(a => a.TotalAmount),
+                September = (int?)payments.Where(a => a.PaymentDate.Month == 9).Sum(a => a.TotalAmount),
+                October = (int?)payments.Where(a => a.PaymentDate.Month == 10).Sum(a => a.TotalAmount),
+                November = (int?)payments.Where(a => a.PaymentDate.Month == 11).Sum(a => a.TotalAmount),
+                December = (int?)payments.Where(a => a.PaymentDate.Month == 12).Sum(a => a.TotalAmount)
+            };
+            return dataOfMonths;
+        }
+
+        public async Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? month, int? year)
+        {
+            if (month == 0)
+            {
+                month = DateTime.Now.Month;
+            }
+            if (year == 0)
+            {
+                year = DateTime.Now.Year;
+            }
+
+            // Lấy danh sách các appointments dựa trên tháng và năm
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(predicate: p => p.StartDate.Year == year && p.StartDate.Month == month &&
+                                               (p.Status == AppointmentStatus.CancelByCustomer ||
+                                                p.Status == AppointmentStatus.Fail ||
+                                                p.Status == AppointmentStatus.Successed));
+
+            var totalAppointments = appointments.Count;
+            if (totalAppointments == 0)
+            {
+                return new List<RatioData>(); // Không có appointment nào trong tháng và năm này
+            }
+
+            // Nhóm các appointments theo trạng thái và tính tỷ lệ phần trăm
+            var ratioData = appointments
+                .GroupBy(a => a.Status)
+                .Select(g => new RatioData
+                {
+                    Status = g.Key,
+                    Percentage = (double)g.Count() / totalAppointments * 100
+                })
+                .ToList();
+
+            // Tính tổng phần trăm của các trạng thái
+            double totalPercentage = ratioData.Sum(r => r.Percentage);
+
+            // Kiểm tra xem tổng phần trăm có bằng 100% hay không
+            bool isValid = Math.Abs(totalPercentage - 100) < 0.01; // Sử dụng độ chính xác nhỏ để kiểm tra tính hợp lệ
+
+            // Gán giá trị IsValid cho tất cả các đối tượng RatioData
+            foreach (var data in ratioData)
+            {
+                data.IsValid = isValid;
+            }
+
+            return ratioData;
+        }
+
+        public async Task<List<MonthlyRatioData>> GetPercentageOfAppointmentByAdmin(int? year)
+        {
+            var currentYear = DateTime.Now.Year;
+
+            // Kiểm tra nếu year được truyền vào là 0, thì lấy năm hiện tại
+            if (year == 0)
+            {
+                year = currentYear;
+            }
+
+            var monthlyData = new List<MonthlyRatioData>();
+
+            for (int month = 1; month <= 12; month++)
+            {
+                // Lấy danh sách các appointments dựa trên tháng và năm
+                var appointments = await _unitOfWork.GetRepository<Appointment>()
+                    .GetListAsync(predicate: p => p.StartDate.Year == year && p.StartDate.Month == month &&
+                                                   (p.Status == AppointmentStatus.CancelByCustomer ||
+                                                    p.Status == AppointmentStatus.Fail ||
+                                                    p.Status == AppointmentStatus.Successed));
+
+                var totalAppointments = appointments.Count;
+                if (totalAppointments == 0)
+                {
+                    monthlyData.Add(new MonthlyRatioData
+                    {
+                        Month = "Tháng " + month,
+                        Success = 0,
+                        Failed = 0,
+                        Canceled = 0
+                    });
+                    continue;
+                }
+
+                // Nhóm các appointments theo trạng thái và tính tỷ lệ phần trăm
+                var groupedAppointments = appointments
+                    .GroupBy(a => a.Status)
+                    .Select(g => new
+                    {
+                        Status = g.Key,
+                        Percentage = (double)g.Count() / totalAppointments * 100
+                    })
+                    .ToList();
+
+                var successPercentage = groupedAppointments
+                    .FirstOrDefault(g => g.Status == AppointmentStatus.Successed)?.Percentage ?? 0;
+                var failedPercentage = groupedAppointments
+                    .FirstOrDefault(g => g.Status == AppointmentStatus.Fail)?.Percentage ?? 0;
+                var canceledPercentage = groupedAppointments
+                    .FirstOrDefault(g => g.Status == AppointmentStatus.CancelByCustomer)?.Percentage ?? 0;
+
+                monthlyData.Add(new MonthlyRatioData
+                {
+                    Month = "Tháng " + month,
+                    Success = successPercentage,
+                    Failed = failedPercentage,
+                    Canceled = canceledPercentage
+                });
+            }
+
+            return monthlyData;
         }
 
         #endregion
