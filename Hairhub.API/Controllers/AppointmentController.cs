@@ -392,11 +392,11 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAppointmentRatioByStatus([FromQuery] int month,[FromQuery] int year)
+        public async Task<IActionResult> GetAppointmentRatioByStatus([FromQuery] int year)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetPercentagebyStatusOfAppointmentByAdmin(month,year);
+                var appointmentsResponse = await _appointmentService.GetPercentagebyStatusOfAppointmentByAdmin(year);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)

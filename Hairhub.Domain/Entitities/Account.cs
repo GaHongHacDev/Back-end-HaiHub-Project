@@ -15,6 +15,8 @@ namespace Hairhub.Domain.Entitities
 
         public string Password { get; set; }
 
+        public DateTime CreatedDate { get; set; }
+
         public Guid RoleId { get; set; }
 
         public bool IsActive {  get; set; }

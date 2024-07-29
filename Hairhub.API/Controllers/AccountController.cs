@@ -156,5 +156,49 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet]
+        
+        public async Task<IActionResult> GetNumberofAccountinYear([FromQuery]int? year)
+        {
+            try
+            {
+                var accooutReponse = await _accountService.GetNumberOfCustomerOnMonth(year);
+                if (accooutReponse == null)
+                {
+                    return BadRequest(new { message = "Không tìm thấy tài khoản" });
+                }
+                return Ok(accooutReponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
+        
+        public async Task<IActionResult> GetNumberofSalonOwnerinYear([FromQuery]int? year)
+        {
+            try
+            {
+                var accooutReponse = await _accountService.GetNumberOfSalonOwnerOnMonth(year);
+                if (accooutReponse == null)
+                {
+                    return BadRequest(new { message = "Không tìm thấy tài khoản" });
+                }
+                return Ok(accooutReponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

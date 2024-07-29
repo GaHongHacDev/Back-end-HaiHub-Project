@@ -74,7 +74,7 @@ namespace Hairhub.Service.Services.Services
             predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date);
 
             NumberOfDay--;
-            if(NumberOfDay!=6 || NumberOfDay != 29)
+            if(NumberOfDay!=6 && NumberOfDay != 29)
             {
                 throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
             }
@@ -370,6 +370,16 @@ namespace Hairhub.Service.Services.Services
              }*/
             List<decimal> availbeTimeResponse = GenerateTimeSlot(salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60, salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60, 0.25m);
             var availableTimesDict = availbeTimeResponse.ToDictionary(timeSlot => timeSlot, timeSlot => new List<EmployeeAvailable>());
+            // Loại bỏ các time slots đã qua
+            //decimal currentTime = DateTime.Now.Hour + (decimal)DateTime.Now.Minute / 60;
+            //availableTimesDict = availableTimesDict
+            //    .Where(kvp => kvp.Key > currentTime)
+            //    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            //if (availableTimesDict.Count == 0)
+            //{
+            //    throw new NotFoundException("Đã qua giờ làm việc của salon, barber shop");
+            //}
+
             if (!request.IsAnyOne)
             {
                 // Get all employees in the salon
@@ -768,6 +778,10 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x=>x.CommissionRate!=null && x.IsActive);
+            if(config == null)
+            {
+                throw new NotFoundException("Không tìm thấy config phần trăm hoa hồng");
+            }
             var appointment = new Appointment()
             {
                 Id = id,
@@ -966,6 +980,10 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<DataOfMonths> GetAppointmentbyStatusByAdmin(string status, int year)
         {
+            if (year == 0)
+            {
+                year = DateTime.Now.Year;
+            }
             var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: p => p.Status == status && p.StartDate.Year == year);
             var dataOfMonths = new DataOfMonths
             {
@@ -988,6 +1006,10 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<DataOfMonths> GetRevenueByAdmin(int year)
         {
+            if (year == 0)
+            {
+                year = DateTime.Now.Year;
+            }
             var payments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: p => p.StartDate.Year == year && p.Status == AppointmentStatus.Successed);
             var dataOfMonths = new DataOfMonths
             {
@@ -1009,6 +1031,10 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<DataOfMonths> GetCommissionByAdmin(int year)
         {
+            if (year == 0)
+            {
+                year = DateTime.Now.Year;
+            }
             var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate.Year == year && p.Status == PaymentStatus.Paid);
             var dataOfMonths = new DataOfMonths
             {
@@ -1028,60 +1054,71 @@ namespace Hairhub.Service.Services.Services
             return dataOfMonths;
         }
 
-        public async Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? month, int? year)
+        public async Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? year)
         {
-            if (month == 0)
-            {
-                month = DateTime.Now.Month;
-            }
-            if (year == 0)
+            if (year == 0 || year == null)
             {
                 year = DateTime.Now.Year;
             }
 
-            // Lấy danh sách các appointments dựa trên tháng và năm
             var appointments = await _unitOfWork.GetRepository<Appointment>()
-                .GetListAsync(predicate: p => p.StartDate.Year == year && p.StartDate.Month == month &&
+                .GetListAsync(predicate: p => p.StartDate.Year == year &&
                                                (p.Status == AppointmentStatus.CancelByCustomer ||
                                                 p.Status == AppointmentStatus.Fail ||
-                                                p.Status == AppointmentStatus.Successed));
+                                                p.Status == AppointmentStatus.Successed ||
+                                                p.Status == AppointmentStatus.Booking));
 
             var totalAppointments = appointments.Count;
+
+            
+            var ratioData = new List<RatioData>
+            {
+                new RatioData { Status = "Thành công", Percentage = 0 },
+                new RatioData { Status = "Thất bại", Percentage = 0 },
+                new RatioData { Status = "Hủy bởi khách hàng", Percentage = 0 },
+            };
+
             if (totalAppointments == 0)
             {
-                return new List<RatioData>(); // Không có appointment nào trong tháng và năm này
+                return ratioData;
             }
 
-            // Nhóm các appointments theo trạng thái và tính tỷ lệ phần trăm
-            var ratioData = appointments
+            
+            var groupedData = appointments
                 .GroupBy(a => a.Status)
                 .Select(g => new RatioData
                 {
-                    Status = g.Key,
+                    Status = GetStatusLabel(g.Key),
                     Percentage = (double)g.Count() / totalAppointments * 100
                 })
                 .ToList();
 
-            // Tính tổng phần trăm của các trạng thái
-            double totalPercentage = ratioData.Sum(r => r.Percentage);
-
-            // Kiểm tra xem tổng phần trăm có bằng 100% hay không
-            bool isValid = Math.Abs(totalPercentage - 100) < 0.01; // Sử dụng độ chính xác nhỏ để kiểm tra tính hợp lệ
-
-            // Gán giá trị IsValid cho tất cả các đối tượng RatioData
-            foreach (var data in ratioData)
+            foreach (var data in groupedData)
             {
-                data.IsValid = isValid;
+                var ratio = ratioData.FirstOrDefault(r => r.Status == data.Status);
+                if (ratio != null)
+                {
+                    ratio.Percentage = data.Percentage;
+                }
             }
 
             return ratioData;
         }
 
+        private string GetStatusLabel(string status)
+        {
+            return status switch
+            {
+                var s when s == AppointmentStatus.Successed => "Thành công",
+                var s when s == AppointmentStatus.Fail => "Thất bại",
+                var s when s == AppointmentStatus.CancelByCustomer => "Hủy bởi khách hàng",
+                _ => "Khác"
+            };
+        }
+
         public async Task<List<MonthlyRatioData>> GetPercentageOfAppointmentByAdmin(int? year)
         {
-            var currentYear = DateTime.Now.Year;
-
-            // Kiểm tra nếu year được truyền vào là 0, thì lấy năm hiện tại
+            var currentYear = DateTime.Now.Year;     
             if (year == 0)
             {
                 year = currentYear;
@@ -1091,7 +1128,6 @@ namespace Hairhub.Service.Services.Services
 
             for (int month = 1; month <= 12; month++)
             {
-                // Lấy danh sách các appointments dựa trên tháng và năm
                 var appointments = await _unitOfWork.GetRepository<Appointment>()
                     .GetListAsync(predicate: p => p.StartDate.Year == year && p.StartDate.Month == month &&
                                                    (p.Status == AppointmentStatus.CancelByCustomer ||
@@ -1110,8 +1146,6 @@ namespace Hairhub.Service.Services.Services
                     });
                     continue;
                 }
-
-                // Nhóm các appointments theo trạng thái và tính tỷ lệ phần trăm
                 var groupedAppointments = appointments
                     .GroupBy(a => a.Status)
                     .Select(g => new
@@ -1139,6 +1173,10 @@ namespace Hairhub.Service.Services.Services
 
             return monthlyData;
         }
+
+        
+
+
 
         #endregion
 

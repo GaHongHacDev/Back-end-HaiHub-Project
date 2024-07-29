@@ -1,6 +1,7 @@
 ﻿using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
+using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Domain.Entitities;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,9 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> ActiveAccount(Guid id);
         Task<bool> ChangePassword(Guid id, ChangePasswordRequest changePasswordRequest);
         Task<GetAccountResponse> GetAccountById(Guid id);
+
+        Task<DataOfMonths> GetNumberOfCustomerOnMonth(int? year);
+
+        Task<DataOfMonths> GetNumberOfSalonOwnerOnMonth(int? year);
     }
 }

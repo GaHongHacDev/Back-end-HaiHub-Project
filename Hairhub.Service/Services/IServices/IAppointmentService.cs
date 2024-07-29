@@ -25,6 +25,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid SalonId, string? Status);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status);
         Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate);
+        Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay);
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
@@ -39,9 +40,10 @@ namespace Hairhub.Service.Services.IServices
 
         Task<DataOfMonths> GetCommissionByAdmin(int year);
 
-        Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? month, int? year);
+        Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? year);
 
         Task<List<MonthlyRatioData>> GetPercentageOfAppointmentByAdmin(int? year);
+
     }
 }
 

@@ -28,7 +28,6 @@ using System.Threading.Tasks;
     {
         public string Status { get; set; }
         public double Percentage { get; set; }
-        public bool IsValid { get; set; }
     }
 
 
