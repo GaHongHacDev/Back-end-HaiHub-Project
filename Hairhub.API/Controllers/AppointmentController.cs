@@ -337,15 +337,13 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-
         [HttpGet]
-        [Route("{SalonId:Guid}")]
-        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] int NumberOfDay)
+        
+        public async Task<IActionResult> GetAppointmentbyStatusByAdmin([FromQuery]string status, [FromQuery] int year)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetAppointmentTransaction(SalonId, NumberOfDay);
+                var appointmentsResponse = await _appointmentService.GetAppointmentbyStatusByAdmin(status, year);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)
@@ -357,5 +355,76 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GetRevenueByAdmin([FromQuery]int year)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetRevenueByAdmin(year);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCommissionByAdmin([FromQuery] int year)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetCommissionByAdmin(year);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAppointmentRatioByStatus([FromQuery] int year)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetPercentagebyStatusOfAppointmentByAdmin(year);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAppointmentRatioInYear([FromQuery] int year)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetPercentageOfAppointmentByAdmin(year);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

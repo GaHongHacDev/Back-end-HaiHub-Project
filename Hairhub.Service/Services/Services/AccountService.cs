@@ -9,6 +9,7 @@ using Hairhub.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Domain.Dtos.Responses.Dashboard;
 
 
 namespace Hairhub.Service.Services.Services
@@ -192,6 +193,48 @@ namespace Hairhub.Service.Services.Services
             }
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
+        }
+
+        public async Task<DataOfMonths> GetNumberOfCustomerOnMonth(int? year)
+        {
+            var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: p => p.CreatedDate.Year == year && p.Role.RoleName == RoleEnum.Customer.ToString());
+            var dataOfMonths = new DataOfMonths
+            {
+                Jan = accounts.Count(a => a.CreatedDate.Month == 1),
+                Feb = accounts.Count(a => a.CreatedDate.Month == 2),
+                March = accounts.Count(a => a.CreatedDate.Month == 3),
+                April = accounts.Count(a => a.CreatedDate.Month == 4),
+                May = accounts.Count(a => a.CreatedDate.Month == 5),
+                June = accounts.Count(a => a.CreatedDate.Month == 6),
+                July = accounts.Count(a => a.CreatedDate.Month == 7),
+                August = accounts.Count(a => a.CreatedDate.Month == 8),
+                September = accounts.Count(a => a.CreatedDate.Month == 9),
+                October = accounts.Count(a => a.CreatedDate.Month == 10),
+                November = accounts.Count(a => a.CreatedDate.Month == 11),
+                December = accounts.Count(a => a.CreatedDate.Month == 12)
+            };
+            return dataOfMonths;
+        }
+
+        public async Task<DataOfMonths> GetNumberOfSalonOwnerOnMonth(int? year)
+        {
+            var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: p => p.CreatedDate.Year == year && p.Role.RoleName == RoleEnum.SalonOwner.ToString());
+            var dataOfMonths = new DataOfMonths
+            {
+                Jan = accounts.Count(a => a.CreatedDate.Month == 1),
+                Feb = accounts.Count(a => a.CreatedDate.Month == 2),
+                March = accounts.Count(a => a.CreatedDate.Month == 3),
+                April = accounts.Count(a => a.CreatedDate.Month == 4),
+                May = accounts.Count(a => a.CreatedDate.Month == 5),
+                June = accounts.Count(a => a.CreatedDate.Month == 6),
+                July = accounts.Count(a => a.CreatedDate.Month == 7),
+                August = accounts.Count(a => a.CreatedDate.Month == 8),
+                September = accounts.Count(a => a.CreatedDate.Month == 9),
+                October = accounts.Count(a => a.CreatedDate.Month == 10),
+                November = accounts.Count(a => a.CreatedDate.Month == 11),
+                December = accounts.Count(a => a.CreatedDate.Month == 12)
+            };
+            return dataOfMonths;
         }
     }
 }
