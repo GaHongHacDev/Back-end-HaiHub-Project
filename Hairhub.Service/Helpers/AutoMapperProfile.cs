@@ -76,6 +76,7 @@ namespace Hairhub.Service.Helpers
             CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap();
             CreateMap<Appointment, GetAppointmentResponse>()
                 .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation));
+            CreateMap<AppointmentTransaction, Appointment>().ReverseMap();
 
             //SalonOwner
             CreateMap<GetSalonOwnerResponse, SalonOwner>().ReverseMap();

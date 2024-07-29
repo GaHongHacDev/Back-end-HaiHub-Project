@@ -2,6 +2,7 @@
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using Hairhub.Domain.Dtos.Responses.Customers;
+using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Domain.Specifications;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid SalonId, string? Status);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status);
         Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate);
+        Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay);
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
@@ -33,6 +35,15 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteAppoinmentById(Guid id);
         Task<bool> ActiveAppointment(Guid id);
 
+        Task<DataOfMonths> GetAppointmentbyStatusByAdmin(string status, int year);
+        Task<DataOfMonths> GetRevenueByAdmin(int year);
+
+        Task<DataOfMonths> GetCommissionByAdmin(int year);
+
+        Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? year);
+
+        Task<List<MonthlyRatioData>> GetPercentageOfAppointmentByAdmin(int? year);
 
     }
 }
+

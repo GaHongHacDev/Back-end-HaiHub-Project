@@ -332,12 +332,13 @@ namespace Hairhub.Service.Services.Services
             {
                 return 0;
             }
-            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.SalonOwner.Id 
-                            && p.Status == PaymentStatus.Fake);
+
+            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
             if (payment == null)
             {
                 return 0;
             }
+
             var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
 
             decimal totalAmount = 0;
