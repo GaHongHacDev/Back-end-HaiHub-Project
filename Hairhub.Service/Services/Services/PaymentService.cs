@@ -29,6 +29,7 @@ using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Microsoft.EntityFrameworkCore;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using CloudinaryDotNet.Actions;
+using Hairhub.Domain.Enums;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -40,10 +41,12 @@ namespace Hairhub.Service.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+        private readonly IAppointmentService _appointmentservice;
 
-        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper)
+        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper, IAppointmentService appointmentService)
         {
             _payOSSettings = settings.Value;
+            _appointmentservice = appointmentService;
             _client = client;
             _unitOfWork = unitOfWork;
             _config = config;
@@ -65,8 +68,10 @@ namespace Hairhub.Service.Services.Services
             {
                 var Configs = await _unitOfWork.GetRepository<Domain.Entitities.Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
                 var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
+                var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == SalonOwner.Id);
 
-                int amount = (int)Configs.PakageFee;
+
+                int amount = (int)await AmountofCommissionRateInMonthBySalon(Salon.Id);
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.Description;
                 var clientId = _config["PayOS:ClientId"];
@@ -140,7 +145,7 @@ namespace Hairhub.Service.Services.Services
                 var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);
-
+                var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == createPaymentRequest.SalonOwnerId);
                 var response = await _client.SendAsync(request);
                 bool isStatus = false;
                 if (response.IsSuccessStatusCode)
@@ -154,23 +159,50 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-                            var payment = _mapper.Map<Payment>(createPaymentRequest);
-                            payment.Id = Guid.NewGuid();
-                            payment.ConfigId = config.Id;
-                            payment.SalonOWnerID = createPaymentRequest.SalonOWnerID;
-                            payment.TotalAmount = (int)paymentInfo["amount"];
-                            payment.PaymentCode = (int)paymentInfo["orderCode"];
-                            payment.Description = "";
-                            payment.PaymentDate = DateTime.Now;
-                            payment.StartDate   = DateTime.Now;
-                            payment.EndDate = DateTime.Now.AddDays((double)config.NumberOfDay);
-                            payment.MethodBanking = "PayOS";
-                            payment.Status = status;
-                            // Save the transaction
-                            await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
-                            isStatus = await _unitOfWork.CommitAsync() > 0;
-                            return isStatus;
+                            if (salon.Status == SalonStatus.Approved)
+                            {
+                                var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+                                var payment = _mapper.Map<Payment>(createPaymentRequest);
+                                payment.Id = Guid.NewGuid();
+                                payment.ConfigId = config.Id;
+                                payment.SalonOWnerID = createPaymentRequest.SalonOwnerId;
+                                payment.TotalAmount = (int)paymentInfo["amount"];
+                                payment.PaymentCode = (int)paymentInfo["orderCode"];
+                                payment.Description = "";
+                                payment.PaymentDate = DateTime.Now;
+                                payment.StartDate = DateTime.Now;
+                                payment.EndDate = DateTime.Now.AddDays((double)config.NumberOfDay);
+                                payment.MethodBanking = "PayOS";
+                                payment.Status = PaymentStatus.Paid;
+                                // Save the transaction
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                                await PaymentForCommissionRate(createPaymentRequest);
+                                isStatus = await _unitOfWork.CommitAsync() > 0;
+                                
+                            } else if( salon.Status == SalonStatus.OverDue) {
+                                var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+                                var payment = _mapper.Map<Payment>(createPaymentRequest);
+                                payment.Id = Guid.NewGuid();
+                                payment.ConfigId = config.Id;
+                                payment.SalonOWnerID = createPaymentRequest.SalonOwnerId;
+                                payment.TotalAmount = (int)paymentInfo["amount"];
+                                payment.PaymentCode = (int)paymentInfo["orderCode"];
+                                payment.Description = "";
+                                payment.PaymentDate = DateTime.Now;
+                                payment.StartDate = DateTime.Now;
+                                payment.EndDate = DateTime.Now.AddDays((double)config.NumberOfDay);
+                                payment.MethodBanking = "PayOS";
+                                payment.Status = PaymentStatus.Paid;
+                                salon.Status = SalonStatus.Approved;
+
+                                // Save the transaction
+                                _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                                await PaymentForCommissionRate(createPaymentRequest);
+                                isStatus = await _unitOfWork.CommitAsync() > 0;
+                                return isStatus;
+                            }
+                            
 
                         }
                         return isStatus;
@@ -244,7 +276,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
         {
-            Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
+           Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
            var firstPayment = new Payment { 
                Id = Guid.NewGuid(),
                Description = "Miễn phí 1 tháng đầu tiên",
@@ -264,9 +296,57 @@ namespace Hairhub.Service.Services.Services
 
         }
 
-        public Task<bool> PaymentForCommissionRate(CreateFirstTimePaymentRequest createPaymentRequest)
+        public async Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
         {
-            throw new NotImplementedException();
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+            Guid salonownerid = createPaymentRequest.SalonOwnerId;
+            var firstPayment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                Description = "Tiền hoa hồng dựa trên lịch hẹn tháng đầu tiên",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(30),
+                PaymentDate = DateTime.Now,
+                SalonOWnerID = salonownerid,
+                MethodBanking = "None",
+                PaymentCode = new Random().Next(1, 1000000),
+                Status = PaymentStatus.Fake,
+                TotalAmount = 0,
+                ConfigId = config.Id,
+                PakageFee = config.PakageFee,
+                PakageName = config.PakageName,
+                CommissionRate = config.CommissionRate,                
+            };
+
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
+        }
+
+
+
+        public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id)
+        {
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (salon == null)
+            {
+                return 0;
+            }
+            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.SalonOwner.Id 
+                            && p.Status == PaymentStatus.Fake);
+            if (payment == null)
+            {
+                return 0;
+            }
+            var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
+
+            decimal totalAmount = 0;
+            foreach (var appointment in appointments)
+            {
+                totalAmount += appointment.TotalPrice;
+            }
+
+            return totalAmount;
         }
     }
 }

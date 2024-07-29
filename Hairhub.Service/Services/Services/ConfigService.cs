@@ -36,6 +36,7 @@ namespace Hairhub.Service.Services.Services
                     PakageFee = request.PakageFee,
                     Description = request.Description,
                     NumberOfDay = request.NumberOfDay,
+                    CommissionRate = request.CommissionRate,
                     DateCreate = DateTime.Now,
                     IsActive = request.IsActive,
                 };

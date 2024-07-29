@@ -72,7 +72,7 @@ namespace Hairhub.Service.Services.Services
             predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date);
 
             NumberOfDay--;
-            if(NumberOfDay!=6 || NumberOfDay != 29)
+            if(NumberOfDay!=6 && NumberOfDay != 29)
             {
                 throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
             }
@@ -279,7 +279,7 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status)
+        public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate)
         {
             // Tạo biểu thức điều kiện ban đầu cho SalonId
             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
@@ -287,6 +287,13 @@ namespace Hairhub.Service.Services.Services
             {
                 predicate = predicate.And(x => x.Status.Equals(status));
             }
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                predicate = predicate.And(x => x.StartDate >= startDate.Value && x.StartDate <= endDate.Value);
+            }
+
+
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
                     predicate: predicate,
@@ -365,6 +372,16 @@ namespace Hairhub.Service.Services.Services
              }*/
             List<decimal> availbeTimeResponse = GenerateTimeSlot(salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60, salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60, 0.25m);
             var availableTimesDict = availbeTimeResponse.ToDictionary(timeSlot => timeSlot, timeSlot => new List<EmployeeAvailable>());
+            // Loại bỏ các time slots đã qua
+            //decimal currentTime = DateTime.Now.Hour + (decimal)DateTime.Now.Minute / 60;
+            //availableTimesDict = availableTimesDict
+            //    .Where(kvp => kvp.Key > currentTime)
+            //    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            //if (availableTimesDict.Count == 0)
+            //{
+            //    throw new NotFoundException("Đã qua giờ làm việc của salon, barber shop");
+            //}
+
             if (!request.IsAnyOne)
             {
                 // Get all employees in the salon
@@ -763,6 +780,10 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x=>x.CommissionRate!=null && x.IsActive);
+            if(config == null)
+            {
+                throw new NotFoundException("Không tìm thấy config phần trăm hoa hồng");
+            }
             var appointment = new Appointment()
             {
                 Id = id,
