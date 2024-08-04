@@ -29,5 +29,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id);
 
+        Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id);
+
     }
 }
