@@ -47,6 +47,7 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<IConfigService, ConfigService>();
             services.AddScoped<IApprovalService, ApprovalService>();
             services.AddScoped<ISMSService, SMSService>();
+            services.AddScoped<IGeminiAIService, GeminiAIService>();
             return services;
         }
         public static IServiceCollection AddDIRepositories(this IServiceCollection services)
