@@ -25,7 +25,7 @@ namespace Hairhub.API.Controllers
         }
 
         // POST api/user/login
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {

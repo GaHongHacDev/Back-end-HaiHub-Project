@@ -349,5 +349,46 @@ namespace Hairhub.Service.Services.Services
 
             return totalAmount;
         }
+
+        public async Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id)
+        {
+            var payment = await _unitOfWork.GetRepository<Payment>()
+        .SingleOrDefaultAsync(
+            predicate: p => p.Id == id && p.Status == PaymentStatus.Fake,
+            include: i => i.Include(m => m.SalonOwner)
+        );
+
+            if (payment == null)
+            {
+                throw new Exception("Payment not found");
+            }
+
+            
+            var responsePayment = new ResponsePayment
+            {
+                Id = payment.Id,
+                TotalAmount = payment.TotalAmount,
+                PaymentDate = payment.PaymentDate,
+                MethodBanking = payment.MethodBanking,
+                Description = payment.Description,
+                Status = payment.Status,
+                PaymentCode = payment.PaymentCode,
+                StartDate = payment.StartDate,
+                EndDate = payment.EndDate,
+                SalonOwners = new SalonOwnerPaymentResponse
+                {
+                    Id = payment.SalonOwner.Id,
+                    FullName = payment.SalonOwner.FullName,
+                    Email = payment.SalonOwner.Email,
+                    Phone = payment.SalonOwner.Phone,
+                    Address = payment.SalonOwner.Address,
+                    Img = payment.SalonOwner.Img
+                },                
+            };
+
+            return responsePayment;
+
+
+        }
     }
 }
