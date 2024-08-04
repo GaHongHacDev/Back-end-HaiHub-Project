@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hairhub.Service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e1c2eaaa231759d014310a46506332ad68b50dcc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea5f2ec5f6829dff6d86323a2bc8d7bec45ad5d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hairhub.Service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hairhub.Service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
