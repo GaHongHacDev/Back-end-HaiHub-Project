@@ -1,5 +1,6 @@
 ﻿using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Hubs;
+using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
@@ -54,7 +55,10 @@ builder.Services.AddDIAccessor();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Add services to the container.
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<GeminiAIService>(client =>
+{
+    client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/v1beta/");
+});
 builder.Services.AddHttpContextAccessor();
 
 
