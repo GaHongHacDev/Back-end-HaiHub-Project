@@ -86,6 +86,16 @@ namespace Hairhub.API.Controllers
             }
             return Ok(result);
         }
-
+        [HttpGet]
+        [Route("{ownerId:Guid}")]
+        public async Task<IActionResult> GetInformationPaymentOfSalonOwner([FromRoute] Guid ownerId)
+        {
+            var result = await _paymentservice.GetInformationPaymentOfSalon(ownerId);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
     }
 }
