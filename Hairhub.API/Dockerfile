@@ -16,6 +16,8 @@ COPY ["Hairhub.Service/Hairhub.Service.csproj", "Hairhub.Service/"]
 RUN dotnet restore "Hairhub.API/Hairhub.API.csproj"
 COPY . .
 WORKDIR "/src/Hairhub.API"
+RUN dotnet dev-certs https --clean
+RUN dotnet dev-certs https --trust
 RUN dotnet build "Hairhub.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
@@ -26,8 +28,6 @@ RUN dotnet publish "Hairhub.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN dotnet dev-certs https --clean
-RUN dotnet dev-certs https --trust
 ENTRYPOINT ["dotnet", "Hairhub.API.dll"]
 
 # Đặt biến môi trường để xác định URL mà ứng dụng sẽ lắng nghe
