@@ -80,7 +80,7 @@ services:
     networks:
       - demo
     ports:
-      - "8443:443"  # Cổng HTTPS
+      - "443:443"  # Cổng HTTPS
       - "8080:80"   # Cổng HTTP (nếu cần)
     environment:
       ASPNETCORE_URLS: "https://+:443;http://+:80"
