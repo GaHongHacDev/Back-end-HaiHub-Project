@@ -81,7 +81,7 @@ services:
       - demo
     ports:
       - "443:443"  # Cổng HTTPS
-      - "80:80"   # Cổng HTTP (nếu cần)
+      - "8080:80"   # Cổng HTTP (nếu cần)
     environment:
       ASPNETCORE_URLS: "https://+:443;http://+:80"
       ConnectionStrings__DefaultConnection: "Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;"
