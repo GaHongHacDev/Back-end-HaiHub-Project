@@ -203,7 +203,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetNumberofSalonOwnerApproved()
+        public async Task<IActionResult> GetNumberofCustomerApproved()
         {
             try
             {
@@ -225,7 +225,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
 
-        public async Task<IActionResult> GetNumberofCustomerApproved()
+        public async Task<IActionResult> GetNumberofSalonOwnerApproved()
         {
             try
             {
