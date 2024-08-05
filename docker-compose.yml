@@ -48,6 +48,61 @@
 
 # COMMANT
 
+# version: '3.4'
+
+# services:
+#   mssql:
+#     container_name: mssql-db-new  # Đổi tên container để tránh xung đột
+#     hostname: mssql-db
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     user: root
+#     networks:
+#       - demo
+#     environment:
+#       - ACCEPT_EULA=Y
+#       - SA_PASSWORD=Admin@123
+#       - MSSQL_PID=Developer
+#       - MSSQL_TCP_PORT=1433
+#       - TZ=Asia/Ho_Chi_Minh
+#     ports:
+#       - "1456:1433"
+#     volumes:
+#       - mssql-data:/var/opt/mssql/data
+#       - mssql-log:/var/opt/mssql/log
+#       - mssql-secrets:/var/opt/mssql/secrets
+
+#   hairhub.api:
+#     container_name: hairhub-api-new  # Đổi tên container để tránh xung đột
+#     build:
+#       context: .
+#       dockerfile: Hairhub.API/Dockerfile
+#     image: hairhubapi
+#     networks:
+#       - demo
+#     ports:
+#       - "8444:443"  # Cổng HTTPS
+#       - "8085:80"   # Cổng HTTP (nếu cần)
+#     environment:
+#       - ASPNETCORE_URLS=https://+:443;http://+:80
+#       - ConnectionStrings__DefaultConnection=Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;
+#       - ASPNETCORE_Kestrel__Certificates__Default__Password=Tien2002@
+#       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+#       - TZ=Asia/Ho_Chi_Minh
+#     volumes:
+#       - /var/docker/certs:/https:ro
+#     depends_on:
+#       - mssql
+
+# networks:
+#   demo:
+#     driver: bridge
+
+# volumes:
+#   mssql-data: 
+#   mssql-log: 
+#   mssql-secrets:
+
+
 version: '3.4'
 
 services:
@@ -85,11 +140,11 @@ services:
     environment:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionStrings__DefaultConnection=Server=mssql-db;Database=HairHubDB;User Id=sa;Password=Admin@123;
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=Tien2002@
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/fullchain.pem
+      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/https/privkey.pem
       - TZ=Asia/Ho_Chi_Minh
     volumes:
-      - /var/docker/certs:/https:ro
+      - /etc/letsencrypt/live/gahonghac.net:/https:ro
     depends_on:
       - mssql
 
@@ -101,4 +156,3 @@ volumes:
   mssql-data: 
   mssql-log: 
   mssql-secrets:
-
