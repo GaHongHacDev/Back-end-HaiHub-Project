@@ -14,7 +14,8 @@ using Hairhub.Common.CommonService.Contract;
 using System.Data;
 using MailKit.Search;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
-using static Vonage.ProactiveConnect.Lists.SyncStatus;
+
+
 
 namespace Hairhub.Service.Services.Services
 {
@@ -25,6 +26,7 @@ namespace Hairhub.Service.Services.Services
         private readonly IAppointmentDetailService _appointmentDetailService;
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
+
 
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService, IEmailService emailService)
         {
