@@ -71,10 +71,10 @@ namespace Hairhub.Service.Services.Services
                 var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == SalonOwner.Id);
 
 
-                int amount = (int)await AmountofCommissionRateInMonthBySalon(Salon.Id);
+                int amount = (int)await AmountofCommissionRateInMonthBySalon(Salon.Id, (decimal)Configs.CommissionRate);
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.Description;
-                var clientId = _config["PayOS:ClientId"];
+                string? clientId = _config["PayOS:ClientId"];
                 var apikey = _config["PayOS:APIKey"];
                 var checksumkey = _config["PayOS:ChecksumKey"];
                 var returnurl = _config["PayOS:ReturnUrl"];
@@ -235,7 +235,7 @@ namespace Hairhub.Service.Services.Services
                  include: query => query.Include(x => x.SalonOwner)
                          .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
                          .Include(x => x.Config),
-                 predicate: x => x.SalonOWnerID == ownerid,
+                 predicate: x => x.SalonOWnerID == ownerid && x.Status == PaymentStatus.Paid,
                  page: page,
                  size: size);
 
@@ -255,7 +255,7 @@ namespace Hairhub.Service.Services.Services
         {
 
             var payments = await _unitOfWork.GetRepository<Payment>()
-            .GetPagingListAsync(
+            .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid,
                 include: query => query.Include(x => x.SalonOwner)
                                         .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
                                         .Include(x => x.Config),
@@ -325,7 +325,7 @@ namespace Hairhub.Service.Services.Services
 
 
 
-        public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id)
+        public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commissionRate)
         {
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == id);
             if (salon == null)
@@ -341,22 +341,23 @@ namespace Hairhub.Service.Services.Services
 
             var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
 
-            decimal totalAmount = 0;
+            decimal totalCommission = 0;
             foreach (var appointment in appointments)
             {
-                totalAmount += appointment.TotalPrice;
+                decimal commissionAmount = appointment.TotalPrice * commissionRate;
+                totalCommission += commissionAmount;
             }
 
-            return totalAmount;
+            return totalCommission;
         }
 
         public async Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id)
         {
             var payment = await _unitOfWork.GetRepository<Payment>()
-        .SingleOrDefaultAsync(
-            predicate: p => p.Id == id && p.Status == PaymentStatus.Fake,
-            include: i => i.Include(m => m.SalonOwner)
-        );
+                        .SingleOrDefaultAsync(
+                            predicate: p => p.SalonOWnerID == id && p.Status == PaymentStatus.Fake,
+                            include: i => i.Include(m => m.SalonOwner)
+                        );
 
             if (payment == null)
             {
@@ -367,7 +368,7 @@ namespace Hairhub.Service.Services.Services
             var responsePayment = new ResponsePayment
             {
                 Id = payment.Id,
-                TotalAmount = payment.TotalAmount,
+                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)0.1),
                 PaymentDate = payment.PaymentDate,
                 MethodBanking = payment.MethodBanking,
                 Description = payment.Description,

@@ -88,8 +88,11 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(srvEmployee);
                 }
             }
-            existSalon.Status = SalonStatus.Pending;
-            _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(existSalon);
+            if (existSalon.Status != SalonStatus.Approved)
+            {
+                existSalon.Status = SalonStatus.Pending;
+                _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(existSalon);
+            }
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
