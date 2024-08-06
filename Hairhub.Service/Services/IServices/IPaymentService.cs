@@ -27,7 +27,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size);
 
-        Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id);
+        Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commisionrate);
 
         Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id);
 
