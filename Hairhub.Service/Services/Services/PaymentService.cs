@@ -368,7 +368,7 @@ namespace Hairhub.Service.Services.Services
             var responsePayment = new ResponsePayment
             {
                 Id = payment.Id,
-                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)0.1),
+                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)payment.CommissionRate!),
                 PaymentDate = payment.PaymentDate,
                 MethodBanking = payment.MethodBanking,
                 Description = payment.Description,
