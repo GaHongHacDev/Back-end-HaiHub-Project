@@ -59,7 +59,7 @@ namespace Hairhub.Service.Services.Services
             var existconfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: e => e.Id == id);
             if (existconfig == null)
             {
-                throw new NotFoundException("ServiceHair not found!");
+                throw new NotFoundException("Không tìm thấy Config này ");
             }
             _unitofwork.GetRepository<Config>().DeleteAsync(existconfig);
             bool isUpdate = await _unitofwork.CommitAsync() > 0;
@@ -100,7 +100,7 @@ namespace Hairhub.Service.Services.Services
 
             if (existConfig == null)
             {
-                throw new KeyNotFoundException("Cannot Find Config");
+                throw new KeyNotFoundException("Không tìm thấy Config này ");
             }
             existConfig = _mapper.Map<Config>(request);
             existConfig.Id = id;

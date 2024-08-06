@@ -236,5 +236,19 @@ namespace Hairhub.Service.Services.Services
             };
             return dataOfMonths;
         }
+
+        public async Task<int> GetCustomersActive()
+        {
+            var customers = await _unitOfWork.GetRepository<Customer>().GetListAsync(predicate: p => p.Account.IsActive == true);
+
+            return customers.Count;
+        }
+
+        public async Task<int> GetSalonsActive()
+        {
+            var salons = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: p => p.Status == SalonStatus.Approved);
+
+            return salons.Count;
+        }
     }
 }
