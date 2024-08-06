@@ -10,6 +10,7 @@ using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -41,7 +42,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest)
         {
-            var existSalon = _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == createServiceHairRequest.SalonInformationId);
+            var existSalon = _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == createServiceHairRequest.SalonInformationId);
             if (existSalon == null)
             {
                 throw new NotFoundException($"Not found salon with id {createServiceHairRequest.SalonInformationId}");
@@ -51,13 +52,13 @@ namespace Hairhub.Service.Services.Services
             var url = await _mediaService.UploadAnImage(createServiceHairRequest.Img, MediaPath.SERVICE_HAIR, serviceHair.Id.ToString());
             serviceHair.Img = url;
             await _unitOfWork.GetRepository<ServiceHair>().InsertAsync(serviceHair);
-            bool isInsert = await _unitOfWork.CommitAsync()>0;
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
 
         public async Task<bool> DeleteServiceHairById(Guid id)
         {
-            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id == id );
+            var serviceHair = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: x => x.Id == id);
             var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(predicate: p => p.ServiceHairId == serviceHair.Id);
 
             if (serviceHair == null)
@@ -105,6 +106,26 @@ namespace Hairhub.Service.Services.Services
             if (serviceHairResponse == null)
                 return null;
             return _mapper.Map<GetServiceHairResponse>(serviceHairResponse);
+        }
+
+        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(int page, int size, Guid salonInformationId)
+        {
+            var serviceHairs = await _unitOfWork.GetRepository<ServiceHair>()
+                                                .GetPagingListAsync(
+                                                                predicate: s => s.SalonInformationId == salonInformationId,
+                                                   page: page,
+                                                   size: size
+                                                );
+
+            var serviceHairResponses = new Paginate<GetServiceHairResponse>()
+            {
+                Page = serviceHairs.Page,
+                Size = serviceHairs.Size,
+                Total = serviceHairs.Total,
+                TotalPages = serviceHairs.TotalPages,
+                Items = _mapper.Map<IList<GetServiceHairResponse>>(serviceHairs.Items),
+            };
+            return serviceHairResponses;
         }
 
         public async Task<IEnumerable<GetServiceHairResponse>> GetServiceHairBySalonInformationId(Guid salonInformationId)

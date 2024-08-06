@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
+using Hairhub.API.Hubs;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Exceptions;
@@ -7,6 +8,7 @@ using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Hairhub.API.Controllers
 {
@@ -15,10 +17,12 @@ namespace Hairhub.API.Controllers
     public class AppointmentController : BaseController
     {
         private readonly IAppointmentService _appointmentService;
+        private readonly IHubContext<BookAppointmentHub> _hubContext;
 
-        public AppointmentController(IMapper mapper, IAppointmentService appointmentService) : base(mapper)
+        public AppointmentController(IMapper mapper, IAppointmentService appointmentService, IHubContext<BookAppointmentHub> hubContext) : base(mapper)
         {
             _appointmentService = appointmentService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -126,12 +130,19 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {
             try
-            {
-                var accoutResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
-                if (accoutResponse == false)
+            {               
+                var accountResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
+                if (accountResponse == false)
                 {
                     return NotFound(new { message = "Không thể tạo lịch hẹn" });
                 }
+
+                await _hubContext.Clients.All.SendAsync("AppointmentCreated", new
+                {
+                    Message = "Lịch hẹn đã được đặt thành công",
+                    AppointmentDetails = createAppointmentRequest
+                });
+
                 return Ok("Tạo lịch hẹn thành công");
             }
             catch (NotFoundException ex)
@@ -414,6 +425,25 @@ namespace Hairhub.API.Controllers
             try
             {
                 var appointmentsResponse = await _appointmentService.GetPercentageOfAppointmentByAdmin(year);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid salonId, [FromQuery] int numberOfDay)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetAppointmentTransaction(salonId , numberOfDay);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)

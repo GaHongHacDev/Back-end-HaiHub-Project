@@ -99,62 +99,6 @@ namespace Hairhub.Service.Services.Services
                 // Thực hiện xử lý lỗi tại đây nếu cần thiết
             }
         }
-
-        //private async Task ExecuteExpriredSalon(CancellationToken stoppingToken)
-        //{
-        //    try
-        //    {
-        //        using (var scope = _scopeFactory.CreateScope())
-        //        {
-        //            var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        //            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-
-        //            var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
-        //                include: x => x.Include(s => s.SalonOwner)
-        //            );
-
-        //            foreach (var salon in salons)
-        //            {
-        //                var latestPayment = await uow.GetRepository<Payment>()
-        //                    .SingleOrDefaultAsync(
-        //                        predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
-        //                        orderBy: o => o.OrderByDescending(o => o.EndDate)
-        //                    );
-
-        //                if (latestPayment != null)
-        //                {
-        //                    if (latestPayment.EndDate > DateTime.Now)
-        //                    {
-        //                        continue;
-        //                    }
-
-        //                    var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
-
-        //                    if (daysToExpiry < 3 && daysToExpiry > 0)
-        //                    {
-        //                        await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
-        //                    }
-
-        //                    if (latestPayment.EndDate < DateTime.Now && salon.Status != SalonStatus.Disable)
-        //                    {
-        //                        salon.Status = SalonStatus.Disable;
-        //                        uow.GetRepository<SalonInformation>().UpdateAsync(salon);
-        //                        uow.CommitAsync();
-        //                    }
-        //                }
-        //            }
-
-        //            _logger.LogInformation("Expired salons checked and updated at: {time}", DateTimeOffset.Now);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
-        //         Thực hiện xử lý lỗi tại đây nếu cần thiết
-        //    }
-        //}
-
-
         private async Task ExecuteExpiredSalon(CancellationToken stoppingToken)
         {
             try

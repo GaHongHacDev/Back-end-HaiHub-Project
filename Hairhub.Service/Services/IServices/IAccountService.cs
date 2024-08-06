@@ -23,5 +23,10 @@ namespace Hairhub.Service.Services.IServices
         Task<DataOfMonths> GetNumberOfCustomerOnMonth(int? year);
 
         Task<DataOfMonths> GetNumberOfSalonOwnerOnMonth(int? year);
+
+
+        Task<int> GetCustomersActive();
+
+        Task<int> GetSalonsActive();
     }
 }
