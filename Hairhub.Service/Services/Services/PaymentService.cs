@@ -327,7 +327,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commissionRate)
         {
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
             if (salon == null)
             {
                 return 0;
@@ -356,7 +356,7 @@ namespace Hairhub.Service.Services.Services
             var payment = await _unitOfWork.GetRepository<Payment>()
                         .SingleOrDefaultAsync(
                             predicate: p => p.SalonOWnerID == id && p.Status == PaymentStatus.Fake,
-                            include: i => i.Include(m => m.SalonOwner)
+                            include: i => i.Include(m => m.SalonOwner).Include(n => n.Config)
                         );
 
             if (payment == null)
@@ -384,7 +384,11 @@ namespace Hairhub.Service.Services.Services
                     Phone = payment.SalonOwner.Phone,
                     Address = payment.SalonOwner.Address,
                     Img = payment.SalonOwner.Img
-                },                
+                },      
+                Config = new ConfigPaymentResponse
+                {
+                    PakageName = payment.PakageName,
+                }
             };
 
             return responsePayment;
