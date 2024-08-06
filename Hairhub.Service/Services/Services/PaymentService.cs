@@ -71,7 +71,7 @@ namespace Hairhub.Service.Services.Services
                 var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == SalonOwner.Id);
 
 
-                int amount = (int)await AmountofCommissionRateInMonthBySalon(Salon.Id, (decimal)Configs.CommissionRate);
+                int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.Description;
                 string? clientId = _config["PayOS:ClientId"];
@@ -344,7 +344,7 @@ namespace Hairhub.Service.Services.Services
             decimal totalCommission = 0;
             foreach (var appointment in appointments)
             {
-                decimal commissionAmount = appointment.TotalPrice * commissionRate;
+                decimal commissionAmount = appointment.TotalPrice * (commissionRate / 100);
                 totalCommission += commissionAmount;
             }
 
