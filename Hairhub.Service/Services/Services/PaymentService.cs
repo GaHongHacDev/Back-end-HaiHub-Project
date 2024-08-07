@@ -30,6 +30,8 @@ using Microsoft.EntityFrameworkCore;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Enums;
+using System.Net;
+using Hairhub.Domain.Exceptions;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -339,17 +341,18 @@ namespace Hairhub.Service.Services.Services
                             predicate: p => p.SalonOWnerID == id && p.Status == PaymentStatus.Fake,
                             include: i => i.Include(m => m.SalonOwner).Include(n => n.Config)
                         );
-
             if (payment == null)
             {
-                throw new Exception("Payment not found");
+                throw new NotFoundException("Payment not found");
             }
-
-            
+            if (payment.EndDate.Date > DateTime.Now.Date)
+            {
+                throw new NotFoundException($"Chưa tới ngày thanh toán, ngày thanh toán của bạn là {payment.EndDate}");
+            }
             var responsePayment = new ResponsePayment
             {
                 Id = payment.Id,
-                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)payment.CommissionRate),
+                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)payment.CommissionRate!),
                 PaymentDate = payment.PaymentDate,
                 MethodBanking = payment.MethodBanking,
                 Description = payment.Description,
