@@ -2,6 +2,7 @@
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Requests.Payment;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -90,12 +91,23 @@ namespace Hairhub.API.Controllers
         [Route("{ownerId:Guid}")]
         public async Task<IActionResult> GetInformationPaymentOfSalonOwner([FromRoute] Guid ownerId)
         {
-            var result = await _paymentservice.GetInformationPaymentOfSalon(ownerId);
-            if (result == null)
+            try
             {
-                return BadRequest();
+                var result = await _paymentservice.GetInformationPaymentOfSalon(ownerId);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Thất bại trong việc thanh toán" });
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }
