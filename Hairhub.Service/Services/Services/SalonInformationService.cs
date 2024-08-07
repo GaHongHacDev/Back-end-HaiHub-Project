@@ -11,6 +11,7 @@ using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
+using Hairhub.Service.Helpers;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using LinqKit;
@@ -287,7 +288,8 @@ namespace Hairhub.Service.Services.Services
            
         }
 
-        public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "")
+        public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", 
+                                        string? salonAddress = "", string? salonName = "", double? latitude = 0, double? longtitude = 0, double? distance = 0)
         {
             if (serviceName == null && salonAddress == null && salonName == null)
             {
@@ -306,9 +308,15 @@ namespace Hairhub.Service.Services.Services
 
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
                                                      .GetListAsync(
-                                                         predicate: x => x.Status.Equals(SalonStatus.Approved) && x.Name.ToLower().Contains(salonName.ToLower()) && x.Address.ToLower().Contains(salonAddress.ToLower()),
+                                                         predicate: x => x.Status.Equals(SalonStatus.Approved) 
+                                                         && x.Name.ToLower().Contains(salonName.ToLower()) 
+                                                         && x.Address.ToLower().Contains(salonAddress.ToLower()),
                                                          include: query => query.Include(s => s.SalonOwner)
                                                      );
+            if (latitude!=null && longtitude!=null && distance!=null)
+            {
+                salonInformations.Where(x => DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance);
+            }
             var listSalon = _mapper.Map<List<SearchSalonByNameAddressServiceResponse>>(salonInformations);
             var result = new List<SearchSalonByNameAddressServiceResponse>();
 
