@@ -72,11 +72,16 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay)
         {
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
+            if(salon == null)
+            {
+                throw new NotFoundException("Không tìm thấy salon, barber shop");
+            }
             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
             predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date);
 
             NumberOfDay--;
-            if(NumberOfDay!=6 && NumberOfDay != 29)
+            if (NumberOfDay != 6 && NumberOfDay != 29)
             {
                 throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
             }
@@ -85,21 +90,27 @@ namespace Hairhub.Service.Services.Services
                                                 .GetListAsync
                                                 (
                                                     predicate: predicate,
-                                                    orderBy: x => x.OrderByDescending(x=>x.StartDate)
+                                                    orderBy: x => x.OrderByDescending(x => x.StartDate)
                                                 );
             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
+            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
+            if (payment == null)
+            {
+                throw new NotFoundException("Không tìm thấy salon, barber shop hoặc thông tin thanh toán");
+            }
             if (appointments != null)
             {
                 response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointments);
                 //Tính tiền HH mà salon chưa trả cho system
                 foreach (var appointment in appointments)
-                {
-                    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                }
+                    if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate && appointment.Status.Equals(AppointmentStatus.Successed))
+                    {
+                        response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                    }
                 //Tính tổng tiền HH của salon filter theo 7ngay/30ngay
-                foreach(var appointment in appointments)
+                foreach (var appointment in appointments)
                 {
-                    response.TotalComssion += (appointment.CommissionRate/100)*appointment.TotalPrice;
+                    response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
                 }
             }
             return response;
@@ -110,7 +121,7 @@ namespace Hairhub.Service.Services.Services
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                .GetPagingListAsync(
                                                    predicate: x => x.CustomerId == CustomerId && (x.Status.Equals(AppointmentStatus.Successed)
-                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer) 
+                                                              || x.Status.Equals(AppointmentStatus.CancelByCustomer)
                                                               || x.Status.Equals(AppointmentStatus.Fail)
                                                               ),
                                                    include: query => query.Include(a => a.Customer)
@@ -779,8 +790,8 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
-            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x=>x.CommissionRate!=null && x.IsActive);
-            if(config == null)
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x => x.CommissionRate != null && x.IsActive);
+            if (config == null)
             {
                 throw new NotFoundException("Không tìm thấy config phần trăm hoa hồng");
             }
@@ -944,7 +955,7 @@ namespace Hairhub.Service.Services.Services
                                                          (
                                                            predicate: x => x.Id == id && cancelApointmentRequest.CustomerId == x.CustomerId,
                                                            include: x => x.Include(x => x.AppointmentDetails).ThenInclude(s => s.SalonEmployee).ThenInclude(s => s.SalonInformation).ThenInclude(s => s.SalonOwner)
-                                                                          .Include(s=>s.Customer)
+                                                                          .Include(s => s.Customer)
                                                          );
 
             if (appoinment == null)
@@ -1072,7 +1083,7 @@ namespace Hairhub.Service.Services.Services
 
             var totalAppointments = appointments.Count;
 
-            
+
             var ratioData = new List<RatioData>
             {
                 new RatioData { Status = "Thành công", Percentage = 0 },
@@ -1085,7 +1096,7 @@ namespace Hairhub.Service.Services.Services
                 return ratioData;
             }
 
-            
+
             var groupedData = appointments
                 .GroupBy(a => a.Status)
                 .Select(g => new RatioData
@@ -1120,7 +1131,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<List<MonthlyRatioData>> GetPercentageOfAppointmentByAdmin(int? year)
         {
-            var currentYear = DateTime.Now.Year;     
+            var currentYear = DateTime.Now.Year;
             if (year == 0)
             {
                 year = currentYear;
@@ -1176,7 +1187,7 @@ namespace Hairhub.Service.Services.Services
             return monthlyData;
         }
 
-        
+
 
 
 
