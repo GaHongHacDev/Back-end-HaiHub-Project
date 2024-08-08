@@ -981,14 +981,15 @@ namespace Hairhub.Service.Services.Services
 
             appoinment.Status = AppointmentStatus.CancelByCustomer;
             appoinment.ReasonCancel = cancelApointmentRequest.reasonCancel;
+            appoinment.CancelDate = DateTime.Now;
+            //Delete QR image
+            await _mediaService.DeleteImageAsync(appoinment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
             appoinment.QrCodeImg = "";
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
 
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (isUpdate)
             {
-                //Delete QR image
-                await _mediaService.DeleteImageAsync(appoinment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
                 //Send mail notification
                 DateTime TimeBook = appoinment.AppointmentDetails.OrderBy(s => s.StartTime).FirstOrDefault().StartTime;
                 SalonInformation Salon = appoinment.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation;

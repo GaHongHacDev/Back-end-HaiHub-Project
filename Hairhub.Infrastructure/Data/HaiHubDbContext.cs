@@ -336,7 +336,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.DiscountedPrice).HasColumnName("discounted_price").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.IsReportByCustomer).HasColumnName("is_report_by_customer").IsRequired(false);
                 entity.Property(e => e.IsReportBySalon).HasColumnName("is_report_by_salon").IsRequired(false);
-                entity.Property(e => e.ReasonCancel).HasMaxLength(255).HasColumnName("reason_cancel").IsRequired(false);
+                entity.Property(e => e.ReasonCancel).HasMaxLength(255).HasColumnName("reason_cancel");
                 entity.Property(e => e.CancelDate).HasColumnName("cancel_date").IsRequired(false);
                 entity.Property(e => e.QrCodeImg).HasMaxLength(255).HasColumnName("qr_code_img").IsRequired(false);
                 entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate");

@@ -88,11 +88,11 @@ namespace Hairhub.Service.Services.Services
                             appointmentDetail.Status = AppointmentStatus.Fail;
                             uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
                         }
+                        //Delete QR image
+                        await mediaService.DeleteImageAsync(appointment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
                         appointment.Status = AppointmentStatus.Fail;
                         appointment.QrCodeImg = "";
                         uow.GetRepository<Appointment>().UpdateAsync(appointment);
-                        //Delete QR image
-                        await mediaService.DeleteImageAsync(appointment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
                     }
                     uow.CommitAsync();
                     _logger.LogInformation("Expired salappointment checked and updated at: {time}", DateTimeOffset.Now);
