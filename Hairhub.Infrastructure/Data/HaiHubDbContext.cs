@@ -365,9 +365,9 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.ServiceName).HasMaxLength(100).HasColumnName("service_name");
                 entity.Property(e => e.DescriptionServiceHair).HasMaxLength(255).HasColumnName("description_service_hair");
-                entity.Property(e => e.PriceServiceHair).HasColumnName("price_service_hair");
+                entity.Property(e => e.PriceServiceHair).HasColumnType("decimal(18,2)").HasColumnName("price_service_hair");
                 entity.Property(e => e.ImgServiceHair).HasMaxLength(255).HasColumnName("img_service_hair");
-                entity.Property(e => e.TimeServiceHair).HasColumnName("time_service_hair");
+                entity.Property(e => e.TimeServiceHair).HasColumnType("decimal(10,2)").HasColumnName("time_service_hair");
 
                 entity.HasOne(d => d.SalonEmployee)
                       .WithMany(p => p.AppointmentDetails)

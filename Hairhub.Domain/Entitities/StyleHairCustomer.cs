@@ -11,8 +11,6 @@ namespace Hairhub.Domain.Entitities
     {
         [Key]
         public Guid Id { get; set; }
-
-        [Required]
         public Guid CustomerId { get; set; }
         public string Title { get; set; }
 

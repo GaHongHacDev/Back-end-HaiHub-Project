@@ -227,7 +227,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("status");
 
                     b.Property<decimal?>("TimeServiceHair")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(10,2)")
                         .HasColumnName("time_service_hair");
 
                     b.HasKey("Id");
