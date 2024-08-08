@@ -302,9 +302,9 @@ namespace Hairhub.Service.Services.Services
                     Items = new List<SearchSalonByNameAddressServiceResponse>(),
                 };
             }
-            serviceName = serviceName ?? string.Empty;
-            salonAddress = salonAddress ?? string.Empty;
-            salonName = salonName ?? string.Empty;
+            serviceName = serviceName!.Trim() ?? string.Empty;
+            salonAddress = salonAddress!.Trim() ?? string.Empty;
+            salonName = salonName!.Trim() ?? string.Empty;
 
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
                                                      .GetListAsync(
