@@ -89,6 +89,7 @@ namespace Hairhub.Service.Services.Services
                             uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
                         }
                         appointment.Status = AppointmentStatus.Fail;
+                        appointment.QrCodeImg = "";
                         uow.GetRepository<Appointment>().UpdateAsync(appointment);
                         //Delete QR image
                         await mediaService.DeleteImageAsync(appointment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
