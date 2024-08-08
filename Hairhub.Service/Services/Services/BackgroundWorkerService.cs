@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Hairhub.Domain.Enums;
+using Hairhub.Common.ThirdParties.Contract;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -72,6 +73,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                    var mediaService = scope.ServiceProvider.GetRequiredService<IMediaService>();
 
                     var appontments = await uow.GetRepository<Appointment>().GetListAsync(
                         predicate: x => x.Status.Equals(AppointmentStatus.Booking)
@@ -88,6 +90,8 @@ namespace Hairhub.Service.Services.Services
                         }
                         appointment.Status = AppointmentStatus.Fail;
                         uow.GetRepository<Appointment>().UpdateAsync(appointment);
+                        //Delete QR image
+                        await mediaService.DeleteImageAsync(appointment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
                     }
                     uow.CommitAsync();
                     _logger.LogInformation("Expired salappointment checked and updated at: {time}", DateTimeOffset.Now);

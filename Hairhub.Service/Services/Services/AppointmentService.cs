@@ -14,6 +14,7 @@ using Hairhub.Common.CommonService.Contract;
 using System.Data;
 using MailKit.Search;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
+using Hairhub.Common.ThirdParties.Contract;
 
 
 
@@ -26,15 +27,17 @@ namespace Hairhub.Service.Services.Services
         private readonly IAppointmentDetailService _appointmentDetailService;
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
+        private readonly IMediaService _mediaService;
 
-
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, IQRCodeService qrCodeService, IEmailService emailService)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, 
+                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _appointmentDetailService = appointmentDetailService;
             _qrCodeService = qrCodeService;
             _emailService = emailService;
+            _mediaService = mediaService;
         }
 
         #region GET
@@ -983,6 +986,9 @@ namespace Hairhub.Service.Services.Services
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (isUpdate)
             {
+                //Delete QR image
+                await _mediaService.DeleteImageAsync(appoinment.QrCodeImg, MediaPath.QR_APPOINTMENT);
+                //Send mail notification
                 DateTime TimeBook = appoinment.AppointmentDetails.OrderBy(s => s.StartTime).FirstOrDefault().StartTime;
                 SalonInformation Salon = appoinment.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation;
                 string bodyEmail = $"Chúng tôi rất tiếc phải thông báo rằng khách hàng {appoinment.Customer.FullName} của bạn đã hủy lịch hẹn cắt tóc có thời gian vào {TimeBook.Hour}:{TimeBook.Minute} ngày {appoinment.StartDate.Day}, tháng {appoinment.StartDate.Month}, năm {appoinment.StartDate.Year}. Lý do: {cancelApointmentRequest.reasonCancel}. Vui lòng kiểm tra lại lịch trình của bạn để biết thêm chi tiết";
