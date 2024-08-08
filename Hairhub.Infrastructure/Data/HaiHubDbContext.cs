@@ -25,9 +25,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("TienConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("TienConnectionString"));
         }
 
         // DBSet<>
@@ -49,6 +49,8 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<Config> configs { get; set; }
         public virtual DbSet<Report> reports { get; set; }
         public virtual DbSet<ServiceEmployee> ServiceEmployees { get; set; }
+        public virtual DbSet<StyleHairCustomer> StyleHairCustomers { get; set; }
+        public virtual DbSet<ImageStyle> ImageStyles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -557,6 +559,43 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.DateCreate).HasColumnName("date_create");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
                 entity.Property(e => e.NumberOfDay).HasColumnName("number_of_day").IsRequired(false);
+            });
+
+            modelBuilder.Entity<StyleHairCustomer>(entity =>
+            {
+                entity.ToTable("style_hair_customer");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+                entity.Property(e => e.Title).HasMaxLength(100).HasColumnName("title");
+                entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description").IsRequired(false);
+                entity.Property(e => e.CreatedDate).HasColumnName("created_at");
+                entity.Property(e => e.UpdateddAt).HasColumnName("updated_at").IsRequired(false);
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+                entity.HasOne(d => d.Customer)
+                      .WithMany(p => p.StyleHairCustomers)
+                      .HasForeignKey(d => d.CustomerId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_customer_style_hair_customer");
+            });
+
+            modelBuilder.Entity<ImageStyle>(entity =>
+            {
+                entity.ToTable("image_style");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.StyleHairCustomerId).HasColumnName("style_hair_customer_id");
+                entity.Property(e => e.UrlImage).HasColumnName("url_image");
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+                entity.HasOne(d => d.StyleHairCustomer)
+                      .WithMany(p => p.ImageStyles)
+                      .HasForeignKey(d => d.StyleHairCustomerId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_image_style_style_hair_customer");
             });
         }
     }
