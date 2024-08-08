@@ -291,20 +291,20 @@ namespace Hairhub.Service.Services.Services
         public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", 
                                         string? salonAddress = "", string? salonName = "", double? latitude = 0, double? longtitude = 0, double? distance = 0)
         {
-            if (serviceName == null && salonAddress == null && salonName == null)
-            {
-                return new Paginate<SearchSalonByNameAddressServiceResponse>()
-                {
-                    Page = page,
-                    Size = size,
-                    Total = 0,
-                    TotalPages = 0,
-                    Items = new List<SearchSalonByNameAddressServiceResponse>(),
-                };
-            }
-            serviceName = serviceName!.Trim() ?? string.Empty;
-            salonAddress = salonAddress!.Trim() ?? string.Empty;
-            salonName = salonName!.Trim() ?? string.Empty;
+            //if (serviceName == null && salonAddress == null && salonName == null)
+            //{
+            //    return new Paginate<SearchSalonByNameAddressServiceResponse>()
+            //    {
+            //        Page = page,
+            //        Size = size,
+            //        Total = 0,
+            //        TotalPages = 0,
+            //        Items = new List<SearchSalonByNameAddressServiceResponse>(),
+            //    };
+            //}
+            serviceName = serviceName?.Trim() ?? string.Empty;
+            salonAddress = salonAddress?.Trim() ?? string.Empty;
+            salonName = salonName?.Trim() ?? string.Empty;
 
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
                                                      .GetListAsync(
