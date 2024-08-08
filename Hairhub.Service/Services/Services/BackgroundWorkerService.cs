@@ -74,8 +74,8 @@ namespace Hairhub.Service.Services.Services
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
                     var appontments = await uow.GetRepository<Appointment>().GetListAsync(
-                        predicate: x => x.Status.Equals(AppointmentStatus.Booking) 
-                                && x.StartDate.Date == DateTime.Now.AddDays(-1).Date,
+                        predicate: x => x.Status == AppointmentStatus.Booking 
+                                && x.StartDate <= DateTime.Now.AddDays(-1),
                         include: x => x.Include(s => s.AppointmentDetails)
                     );
 
