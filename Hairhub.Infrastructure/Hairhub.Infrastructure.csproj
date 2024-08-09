@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Hairhub.Service\Hairhub.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
