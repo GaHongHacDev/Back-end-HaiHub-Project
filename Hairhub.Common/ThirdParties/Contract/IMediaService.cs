@@ -11,5 +11,6 @@ namespace Hairhub.Common.ThirdParties.Contract
     {
         Task<string> UploadAnImage(IFormFile file, string pathFolder, string nameOfImg);
         Task<string> UploadAVideo(IFormFile file, string pathFolder, string nameOfImg);
+        Task<bool> DeleteImageAsync(string urlImage, string path);
     }
 }

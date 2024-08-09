@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
+using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
@@ -14,9 +16,12 @@ namespace Hairhub.API.Controllers
     public class AccountController : BaseController
     {
         private IAccountService _accountService;
-        public AccountController(IMapper mapper, IAccountService accountService) : base(mapper)
+        private readonly IMediaService mediaService;
+
+        public AccountController(IMapper mapper, IAccountService accountService, IMediaService mediaService) : base(mapper)
         {
             _accountService = accountService;
+            this.mediaService = mediaService;
         }
 
         [HttpPost]

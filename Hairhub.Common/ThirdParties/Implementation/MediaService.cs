@@ -55,10 +55,32 @@ namespace Hairhub.Common.ThirdParties.Implementation
 
             if (result.Error != null)
             {
-                throw new Exception(result.Error.Message);
+                throw new Exception($"Error upload image: {result.Error.Message}");
             }
 
             return result.SecureUrl.ToString();
+        }
+        private string ExtractPublicIdFromUrl(string url, string path)
+        {
+            // Delete origin url
+            int index = url.IndexOf(path);
+            if (index != -1)
+            {
+                url = url.Substring(index);
+            }
+            else
+            {
+                throw new Exception("Đường dẫn tệp bị sai");
+            }
+            // Delete extension url
+            string[] extensions = { ".bmp", ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            foreach (string extension in extensions)
+                if (url.EndsWith(extension))
+                {
+                    url = url.Substring(0, url.Length - extension.Length);
+                    break;
+                }
+            return url;
         }
 
         public async Task<string> UploadAVideo(IFormFile file, string pathFolder, string nameOfImg)
@@ -91,6 +113,33 @@ namespace Hairhub.Common.ThirdParties.Implementation
                 }
 
                 return uploadResult.SecureUrl.ToString();
+            }
+        }
+
+        public async Task<bool> DeleteImageAsync(string urlImage, string path)
+        {
+            try
+            {
+                string publicId = ExtractPublicIdFromUrl(urlImage, path);
+
+                var account = new Account(_cloudName, _apiKey, apiSecret);
+                _cloudinary = new Cloudinary(account);
+
+                var deleteParams = new DeletionParams(publicId);
+                var result = await _cloudinary.DestroyAsync(deleteParams);
+
+                if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new Exception($"Error deleting image: {result.Error.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting image: {ex.Message}");
             }
         }
     }
