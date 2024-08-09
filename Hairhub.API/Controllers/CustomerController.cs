@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Customers;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
@@ -58,6 +59,52 @@ namespace Hairhub.API.Controllers
             {
                 var Customer = await _customerService.GetCustomerById(id);
                 return Ok(Customer);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        
+        public async Task<IActionResult> SaveAsCustomerImageHistory([FromForm]CustomerImageHistoryRequest request)
+        {
+            try
+            {
+                var result = await _customerService.SaveAsCustomerImageHistory(request);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Thất bại trong việc tạo lịch sử" });
+                }
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetCustomerImageHistoryByCustomerId([FromRoute]Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var result = await _customerService.GetCustomerImagesHistory(id, page, size);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Thất bại trong việc lấy lịch sử"});
+                }
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
