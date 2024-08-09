@@ -25,9 +25,11 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
+
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
 
-           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("TienConnectionString"));
+
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("TienConnectionString"));
         }
 
         // DBSet<>

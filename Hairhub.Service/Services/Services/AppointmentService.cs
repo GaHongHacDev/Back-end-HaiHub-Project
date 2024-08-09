@@ -607,11 +607,11 @@ namespace Hairhub.Service.Services.Services
                 {
                     if (i == 0)
                     {
-                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ thứ nhất - {serviceHair.ServiceName} vào {(int)request.AvailableSlot}:{(int)((request.AvailableSlot - (int)request.AvailableSlot) * 60)}");
+                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ - {serviceHair.ServiceName} vào {(int)request.AvailableSlot}:{(int)((request.AvailableSlot - (int)request.AvailableSlot) * 60)}");
                     }
                     else
                     {
-                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ thứ {i + 1} - {serviceHair.ServiceName}");
+                        throw new NotFoundException($"Không tìm thấy nhân viên phục vụ cho dịch vụ - {serviceHair.ServiceName}");
                     }
                 }
                 // Caculate waiting time for another time in services > 1

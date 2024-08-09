@@ -66,8 +66,7 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpPost]
-        
+        [HttpPost]        
         public async Task<IActionResult> SaveAsCustomerImageHistory([FromForm]CustomerImageHistoryRequest request)
         {
             try
@@ -77,7 +76,7 @@ namespace Hairhub.API.Controllers
                 {
                     return BadRequest(new { message = "Thất bại trong việc tạo lịch sử" });
                 }
-                return Ok(result);
+                return Ok(new { success = result, message = "Tạo thành công" });
             }
             catch (NotFoundException ex)
             {
@@ -101,6 +100,52 @@ namespace Hairhub.API.Controllers
                     return BadRequest(new { message = "Thất bại trong việc lấy lịch sử"});
                 }
                 return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateCustomerImageHistory([FromRoute] Guid id, [FromForm] UpdateCustomerImageHistoryRequest request)
+        {
+            try
+            {
+                var result = await _customerService.UpdateCustomerImagesHistory(id, request);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Thất bại trong việc lấy lịch sử" });
+                }
+                return Ok(new { success = result, message = "Cập nhập  thành công" });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> DeleteCustomerImageHistory([FromRoute] Guid id)
+        {
+            try
+            {
+                var result = await _customerService.DeleteCustomerImageHistory(id);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Thất bại trong việc xoa lịch sử" });
+                }
+                return Ok(new { success = result, message = "Xóa thành công" });
             }
             catch (NotFoundException ex)
             {

@@ -23,5 +23,9 @@ namespace Hairhub.Service.Services.IServices
 
 
         Task<IPaginate<CustomerImageHistoryResponse>> GetCustomerImagesHistory(Guid customerId, int page, int size);
+
+        Task<bool> DeleteCustomerImageHistory(Guid Id);
+
+        Task<bool> UpdateCustomerImagesHistory(Guid Id, UpdateCustomerImageHistoryRequest request);
     }
 }
