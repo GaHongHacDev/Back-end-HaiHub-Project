@@ -1199,7 +1199,7 @@ namespace Hairhub.Service.Services.Services
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
-                    predicate: x=>x.CustomerId == customerId && x.Status.Equals(status??""),
+                    predicate: x=>x.CustomerId == customerId && x.Status.Contains(status??""),
                     include: query => query.Include(a => a.Customer)
                                            .Include(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
