@@ -1195,7 +1195,7 @@ namespace Hairhub.Service.Services.Services
             return monthlyData;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentByCustomerIdStatus(int page, int size, Guid customerId, string status)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentByCustomerIdStatus(int page, int size, Guid customerId, string? status)
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
