@@ -299,6 +299,7 @@ namespace Hairhub.Service.Services.Services
                             predicate: x => x.Status.Equals(SalonStatus.Approved)
                             && x.Name.ToLower().Contains(salonName.ToLower())
                             && x.Address.ToLower().Contains(salonAddress.ToLower())
+                            && x.ServiceHairs.FirstOrDefault(s=>s.ServiceName.Contains(serviceName))!=null
                             && DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance,
                             include: query => query.Include(s => s.SalonOwner),
                             page: page,
@@ -312,7 +313,8 @@ namespace Hairhub.Service.Services.Services
                                          .GetPagingListAsync(
                                              predicate: x => x.Status.Equals(SalonStatus.Approved)
                                              && x.Name.ToLower().Contains(salonName.ToLower())
-                                             && x.Address.ToLower().Contains(salonAddress.ToLower()),
+                                             && x.Address.ToLower().Contains(salonAddress.ToLower())
+                                             && x.ServiceHairs.FirstOrDefault(s => s.ServiceName.Contains(serviceName)) != null,
                                              include: query => query.Include(s => s.SalonOwner),
                                              page: page,
                                              size: size
