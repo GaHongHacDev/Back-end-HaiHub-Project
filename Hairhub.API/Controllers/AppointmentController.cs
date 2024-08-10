@@ -47,7 +47,26 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{customerId:Guid}")]
+        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string status, [FromQuery] int page, [FromQuery] int size)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetAppointmentByCustomerIdStatus(page, size, customerId, status);
+                if (appointmentResponse == null)
+                {
+                    return NotFound(new { message = "Lỗi không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -66,7 +85,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
         [HttpGet]
@@ -84,7 +103,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
