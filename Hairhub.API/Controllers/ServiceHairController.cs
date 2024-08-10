@@ -17,19 +17,11 @@ namespace Hairhub.API.Controllers
         {
             _serviceHairService = serviceHairService;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAllServiceHair([FromQuery] int page=1, [FromQuery] int size=10)
         {
             var serviceHairsResponse = await _serviceHairService.GetAllServiceHair(page, size);
-            return Ok(serviceHairsResponse);
-        }
-
-        [HttpGet]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> GetServiceHairBySalonIdPaging([FromRoute] Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
-        {
-            var serviceHairsResponse = await _serviceHairService.GetServiceHairBySalonIdPaging(page, size, id);
             return Ok(serviceHairsResponse);
         }
 

@@ -47,26 +47,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("{customerId:Guid}")]
-        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
-        {
-            try
-            {
-                var appointmentResponse = await _appointmentService.GetAppointmentByCustomerIdStatus(page, size, customerId, status!);
-                if (appointmentResponse == null)
-                {
-                    return NotFound(new { message = "Lỗi không tìm thấy đơn đặt lịch" });
-                }
-                return Ok(appointmentResponse);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ex.Message);
             }
         }
 
@@ -85,7 +66,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ex.Message);
             }
         }
         [HttpGet]
@@ -103,7 +84,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ex.Message);
             }
         }
 
@@ -444,25 +425,6 @@ namespace Hairhub.API.Controllers
             try
             {
                 var appointmentsResponse = await _appointmentService.GetPercentageOfAppointmentByAdmin(year);
-                return Ok(appointmentsResponse);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("{salonId:Guid}")]
-        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid salonId, [FromQuery] int numberOfDay)
-        {
-            try
-            {
-                var appointmentsResponse = await _appointmentService.GetAppointmentTransaction(salonId , numberOfDay);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)
