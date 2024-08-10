@@ -53,11 +53,11 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{customerId:Guid}")]
-        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string status, [FromQuery] int page, [FromQuery] int size)
+        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentByCustomerIdStatus(page, size, customerId, status);
+                var appointmentResponse = await _appointmentService.GetAppointmentByCustomerIdStatus(page, size, customerId, status!);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Lỗi không tìm thấy đơn đặt lịch" });
