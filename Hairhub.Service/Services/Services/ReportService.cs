@@ -10,7 +10,6 @@ using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.EntityFrameworkCore;
-using static Vonage.ProactiveConnect.Lists.SyncStatus;
 
 namespace Hairhub.Service.Services.Services
 {

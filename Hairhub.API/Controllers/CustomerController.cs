@@ -143,7 +143,7 @@ namespace Hairhub.API.Controllers
                 var result = await _customerService.DeleteCustomerImageHistory(id);
                 if (result == null)
                 {
-                    return BadRequest(new { message = "Thất bại trong việc xoa lịch sử" });
+                    return BadRequest(new { message = "Thất bại trong việc xóa lịch sử" });
                 }
                 return Ok(new { success = result, message = "Xóa thành công" });
             }
