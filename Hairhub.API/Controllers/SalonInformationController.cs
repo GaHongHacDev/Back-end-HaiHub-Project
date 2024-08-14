@@ -96,12 +96,15 @@ namespace Hairhub.API.Controllers
             [FromQuery] string? serviceName = null,
             [FromQuery] string? salonAddress = null,
             [FromQuery] string? salonName = null,
+            [FromQuery] double? latitude = null,
+            [FromQuery] double? longitude = null,
+            [FromQuery] double? distance = null,
             [FromQuery] int page = 1,
             [FromQuery] int size = 10)
         {
             try
             {
-                var salonInformationResponse = await _salonInformationService.SearchSalonByNameAddressService(page, size, serviceName, salonAddress, salonName);
+                var salonInformationResponse = await _salonInformationService.SearchSalonByNameAddressService(page, size, serviceName, salonAddress, salonName, latitude, longitude, distance);
                 return Ok(salonInformationResponse);
             }
             catch (NotFoundException ex)

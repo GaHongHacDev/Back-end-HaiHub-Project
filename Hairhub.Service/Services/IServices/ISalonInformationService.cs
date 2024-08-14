@@ -22,6 +22,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteSalonInformationById(Guid id);
         Task<bool> ActiveSalonInformation(Guid id);
         Task<GetSalonInformationResponse>? GetSalonByOwnerId(Guid ownerId);
-        Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "");
+        Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "",
+                                        string? salonAddress = "", string? salonName = "", double? latitude = 0, double? longtitude = 0, double? distance = 0);
     }
 }

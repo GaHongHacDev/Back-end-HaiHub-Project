@@ -183,6 +183,15 @@ namespace Hairhub.Service.Helpers
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();
             CreateMap<StaticFile, FileFeedbackResponse>().ReverseMap();
+
+
+            //Customer Image History
+            CreateMap<StyleHairCustomer, CustomerImageHistoryResponse>()
+            .ForMember(dest => dest.ImageStyles, opt => opt.MapFrom(src => src.ImageStyles))
+            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer));
+
+            CreateMap<Customer, Customers>(); // Assuming Customer -> Customers mapping
+            CreateMap<ImageStyle, ImageStyles>();
         }
     }
 }

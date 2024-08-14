@@ -1,5 +1,7 @@
-﻿using Hairhub.Domain.Dtos.Responses.Customers;
+﻿using Hairhub.Domain.Dtos.Requests.Customers;
+using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
+using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Specifications;
 using System;
 using System.Collections.Generic;
@@ -16,5 +18,14 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> CheckInByCustomer(string dataAES, Guid customerId);
 
         //Task<DataOfMonths> GetCustomerofYearByAdmin(int year);
+
+        Task<bool> SaveAsCustomerImageHistory(CustomerImageHistoryRequest request);
+
+
+        Task<IPaginate<CustomerImageHistoryResponse>> GetCustomerImagesHistory(Guid customerId, int page, int size);
+
+        Task<bool> DeleteCustomerImageHistory(Guid Id);
+
+        Task<bool> UpdateCustomerImagesHistory(Guid Id, UpdateCustomerImageHistoryRequest request);
     }
 }
