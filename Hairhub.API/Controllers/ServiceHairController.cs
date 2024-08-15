@@ -59,6 +59,21 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{salonInformationId:Guid}")]
+        public async Task<IActionResult> GetServiceHairBySalonIdPaging([FromRoute] Guid salonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var services = await _serviceHairService.GetServiceHairBySalonIdPaging(page, size, salonInformationId);
+                return Ok(services);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
 
         [HttpPost]
