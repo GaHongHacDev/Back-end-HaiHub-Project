@@ -8,22 +8,39 @@ namespace Hairhub.Service.Helpers
 {
     public static class DistanceMap
     {
-        private const double EarthRadius = 6371.0; // Radius of the Earth in kilometers
+        private const decimal EarthRadius = 6371m; // Radius of the Earth in kilometers
 
-        public static double GetDistance(double lat1, double lon1, double lat2, double lon2)
+        public static decimal GetDistance(decimal lat1, decimal lon1, decimal lat2, decimal lon2)
         {
-            var dLat = DegreesToRadians(lat2 - lat1);
-            var dLon = DegreesToRadians(lon2 - lon1);
-            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                    Math.Cos(DegreesToRadians(lat1)) * Math.Cos(DegreesToRadians(lat2)) *
-                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            return EarthRadius * c;
+            try
+            {
+                // Convert decimal degrees to radians
+                decimal dLat = DegreesToRadians(lat2 - lat1);
+                decimal dLon = DegreesToRadians(lon2 - lon1);
+
+                // Convert latitudes from decimal degrees to radians
+                decimal lat1Rad = DegreesToRadians(lat1);
+                decimal lat2Rad = DegreesToRadians(lat2);
+
+                // Haversine formula
+                decimal a = (decimal)Math.Sin((double)(dLat / 2)) * (decimal)Math.Sin((double)(dLat / 2)) +
+                            (decimal)Math.Cos((double)lat1Rad) * (decimal)Math.Cos((double)lat2Rad) *
+                            (decimal)Math.Sin((double)(dLon / 2)) * (decimal)Math.Sin((double)(dLon / 2));
+
+                decimal c = 2 * (decimal)Math.Atan2((double)Math.Sqrt((double)a), (double)Math.Sqrt(1 - (double)a));
+
+                return EarthRadius * c;
+            }
+            catch (Exception ex)
+            {
+                // Use a more specific exception type if possible
+                throw new InvalidOperationException("Error calculating distance.", ex);
+            }
         }
 
-        private static double DegreesToRadians(double degrees)
+        private static decimal DegreesToRadians(decimal degrees)
         {
-            return degrees * (Math.PI / 180.0);
+            return degrees * (decimal)Math.PI / 180;
         }
     }
 }

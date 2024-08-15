@@ -768,16 +768,14 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
 
-                    b.Property<string>("Latitude")
-                        .IsRequired()
+                    b.Property<decimal>("Latitude")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
+                        .HasColumnType("decimal(18,10)")
                         .HasColumnName("latitude");
 
-                    b.Property<string>("Longitude")
-                        .IsRequired()
+                    b.Property<decimal>("Longitude")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
+                        .HasColumnType("decimal(18,10)")
                         .HasColumnName("longitude");
 
                     b.Property<string>("Name")

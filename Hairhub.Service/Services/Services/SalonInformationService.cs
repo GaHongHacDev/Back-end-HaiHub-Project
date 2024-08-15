@@ -16,7 +16,9 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Drawing.Printing;
 using System.Linq;
 
 namespace Hairhub.Service.Services.Services
@@ -270,14 +272,14 @@ namespace Hairhub.Service.Services.Services
                 salonInformation.Img = await _mediaService.UploadAnImage(updateSalonInformationRequest.Image, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             }
 
-            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Longitude))
+            if (updateSalonInformationRequest.Longitude!=null)
             {
-                salonInformation.Longitude = updateSalonInformationRequest.Longitude;
+                salonInformation.Longitude = (decimal)updateSalonInformationRequest.Longitude;
             }
 
-            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Latitude))
+            if (updateSalonInformationRequest.Latitude != null)
             {
-                salonInformation.Latitude = updateSalonInformationRequest.Latitude;
+                salonInformation.Latitude = (decimal)updateSalonInformationRequest.Latitude;
             }
 
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
@@ -286,7 +288,7 @@ namespace Hairhub.Service.Services.Services
         }
 
         public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "",
-                                        string? salonAddress = "", string? salonName = "", double? latitude = 0, double? longtitude = 0, double? distance = 0)
+                                        string? salonAddress = "", string? salonName = "", decimal? latitude = 0, decimal? longtitude = 0, decimal? distance = 0)
         {
             serviceName = serviceName?.Trim() ?? string.Empty;
             salonAddress = salonAddress?.Trim() ?? string.Empty;
@@ -294,18 +296,39 @@ namespace Hairhub.Service.Services.Services
             IPaginate<SalonInformation> salonInformations;
             if (latitude != null && longtitude != null && distance != null)
             {
-                salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
-                        .GetPagingListAsync(
+                var salonQuery = await _unitOfWork.GetRepository<SalonInformation>()
+                        .GetListAsync(
                             predicate: x => x.Status.Equals(SalonStatus.Approved)
                             && x.Name.ToLower().Contains(salonName.ToLower())
                             && x.Address.ToLower().Contains(salonAddress.ToLower())
-                            && x.ServiceHairs.FirstOrDefault(s=>s.ServiceName.Contains(serviceName))!=null
-                            && DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance,
-                            include: query => query.Include(s => s.SalonOwner),
-                            page: page,
-                            size: size
+                            && x.ServiceHairs.FirstOrDefault(s => s.ServiceName.Contains(serviceName)) != null,
+                            include: query => query.Include(s => s.SalonOwner)
                         );
-                //salonInformations.Where(x => DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance);
+                // Lọc theo khoảng cách
+                var filterSalon = salonQuery
+                    .Where(x => DistanceMap.GetDistance((decimal)latitude, (decimal)longtitude, x.Latitude, x.Longitude) <= distance)
+                    .ToList(); // Chuyển thành danh sách để tính tổng số mục
+
+                // Tính tổng số mục và số trang
+                int total = filterSalon.Count;
+                int totalPages = (int)Math.Ceiling((double)total / size);
+
+                // Lấy dữ liệu cho trang hiện tại
+                var pagedItems = filterSalon
+                    .Skip((page - 1) * size)
+                    .Take(size)
+                    .ToList();
+
+                // Tạo đối tượng phân trang
+                salonInformations = new Paginate<SalonInformation>
+                {
+                    Page = page,
+                    Size = size,
+                    Total = total,
+                    TotalPages = totalPages,
+                    Items = pagedItems,
+                };
+                //salonInformations.Items. = salonInformations.Items.Where(x => DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance);
             }
             else
             {
