@@ -168,7 +168,7 @@ namespace Hairhub.Service.Services.Services
             {
                 IPaginate<Feedback> feedbacks;
 
-                if (rating == 0)
+                if (rating == null)
                 {
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
