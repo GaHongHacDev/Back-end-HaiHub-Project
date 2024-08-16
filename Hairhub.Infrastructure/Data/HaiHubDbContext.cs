@@ -33,7 +33,7 @@ namespace Hairhub.Infrastructure
         }
 
         // DBSet<>
-        public virtual DbSet<Account> Accounts { get; set; } z
+        public virtual DbSet<Account> Accounts { get; set; } 
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }
