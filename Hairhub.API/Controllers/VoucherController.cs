@@ -57,11 +57,17 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> GetVoucherBySalonId([FromRoute] Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetVoucherBySalonId(
+        [FromRoute] Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 10,
+        [FromQuery] string search = null,
+        [FromQuery] string filter = null,
+        [FromQuery] string orderby = null)
         {
             try
             {
-                var Voucher = await _voucherService.GetVoucherbySalonId(id, page, size);
+                var Voucher = await _voucherService.GetVoucherbySalonId(id, page, size, orderby, filter, search);
                 if (Voucher == null)
                 {
                     return NotFound("Cannont find this voucher!");

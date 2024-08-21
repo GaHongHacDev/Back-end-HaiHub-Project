@@ -7,6 +7,7 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -153,24 +154,78 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<List<GetVoucherResponse>>(voucherResponse);
         }
 
-        public async Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size)
+        public async Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size, string orderby, string filter, string search)
         {
-            var voucher = await _unitofwork.GetRepository<Voucher>()
-          .GetPagingListAsync(
-                predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true,
-              include: query => query.Include(s => s.SalonInformation),
-              page: page,
-              size: size
-          );
+            var predicate = PredicateBuilder.New<Voucher>(s => s.SalonInformationId == id);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                predicate = predicate.And(s => s.Code.Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                if (filter.Equals("true", StringComparison.OrdinalIgnoreCase) || filter.Equals("false", StringComparison.OrdinalIgnoreCase))
+                {
+                    bool isActive = bool.Parse(filter);
+                    predicate = predicate.And(s => s.IsActive == isActive);
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid value for filter. Expected 'true' or 'false'.");
+                }
+            }
+
+
+            Func<IQueryable<Voucher>, IOrderedQueryable<Voucher>> orderBy = null;
+
+            if (!string.IsNullOrWhiteSpace(orderby))
+            {
+                if (orderby.Equals("giá tăng dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.MinimumOrderAmount);
+                }
+                else if (orderby.Equals("giá giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.MinimumOrderAmount);
+                }
+                else if (orderby.Equals("ngày hết hạn tăng dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.ExpiryDate);
+                }
+                else if (orderby.Equals("ngày hết hạn giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.ExpiryDate);
+                }
+                else if (orderby.Equals("phần trăm tăng dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.DiscountPercentage);
+                }
+                else if (orderby.Equals("phần trăm giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.DiscountPercentage);
+                }
+            }
+
+
+            var vouchers = await _unitofwork.GetRepository<Voucher>()
+                                                .GetPagingListAsync(
+                                                    predicate: predicate,
+                                                    orderBy: orderBy,
+                                                    page: page,
+                                                    size: size
+                                                );
+
 
             var voucherResponses = new Paginate<GetVoucherResponse>()
             {
-                Page = voucher.Page,
-                Size = voucher.Size,
-                Total = voucher.Total,
-                TotalPages = voucher.TotalPages,
-                Items = _mapper.Map<IList<GetVoucherResponse>>(voucher.Items),
+                Page = vouchers.Page,
+                Size = vouchers.Size,
+                Total = vouchers.Total,
+                TotalPages = vouchers.TotalPages,
+                Items = _mapper.Map<IList<GetVoucherResponse>>(vouchers.Items),
             };
+
             return voucherResponses;
         }
 

@@ -1,4 +1,5 @@
-﻿using Hairhub.Domain.Dtos.Requests.ServiceHairs;
+﻿using CloudinaryDotNet;
+using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Specifications;
 using System;
@@ -14,7 +15,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetServiceHairResponse>> GetAllServiceHair(int page, int size);
         Task<GetServiceHairResponse>? GetServiceHairById(Guid id);
         Task<IEnumerable<GetServiceHairResponse>> GetServiceHairBySalonInformationId(Guid salonInformationId);
-        Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(int page, int size, Guid salonInformationId);
+        Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(Guid id, int page, int size, string orderby, string filter, string search);
         Task<bool> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest);
         Task<bool> UpdateServiceHairById(Guid id, UpdateServiceHairRequest updateServiceHairRequest);
         Task<bool> DeleteServiceHairById(Guid id);

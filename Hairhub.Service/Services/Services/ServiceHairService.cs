@@ -9,8 +9,10 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq.Expressions;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -108,15 +110,62 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetServiceHairResponse>(serviceHairResponse);
         }
 
-        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(int page, int size, Guid salonInformationId)
+        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(Guid id, int page, int size, string orderby, string filter, string search)
         {
+            
+            var predicate = PredicateBuilder.New<ServiceHair>(s => s.SalonInformationId == id);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                predicate = predicate.And(s => s.ServiceName.Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                if (filter.Equals("true", StringComparison.OrdinalIgnoreCase) || filter.Equals("false", StringComparison.OrdinalIgnoreCase))
+                {
+                    bool isActive = bool.Parse(filter);
+                    predicate = predicate.And(s => s.IsActive == isActive);
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid value for filter. Expected 'true' or 'false'.");
+                }
+            }
+
+
+            Func<IQueryable<ServiceHair>, IOrderedQueryable<ServiceHair>> orderBy = null;
+
+            if (!string.IsNullOrWhiteSpace(orderby))
+            {
+                if (orderby.Equals("giá giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.Price);
+                }
+                else if (orderby.Equals("giá giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.Price);
+                }
+                else if (orderby.Equals("thời gian tăng dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.Time);
+                }
+                else if (orderby.Equals("thời gian giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.Time);
+                }
+            }
+
+            
             var serviceHairs = await _unitOfWork.GetRepository<ServiceHair>()
                                                 .GetPagingListAsync(
-                                                                predicate: s => s.SalonInformationId == salonInformationId,
-                                                   page: page,
-                                                   size: size
+                                                    predicate: predicate,
+                                                    orderBy: orderBy,
+                                                    page: page,
+                                                    size: size
                                                 );
 
+            
             var serviceHairResponses = new Paginate<GetServiceHairResponse>()
             {
                 Page = serviceHairs.Page,
@@ -125,6 +174,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = serviceHairs.TotalPages,
                 Items = _mapper.Map<IList<GetServiceHairResponse>>(serviceHairs.Items),
             };
+
             return serviceHairResponses;
         }
 
