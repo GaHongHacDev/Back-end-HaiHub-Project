@@ -27,6 +27,23 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+<<<<<<< HEAD
+=======
+        public async Task<IActionResult> GetServiceHairBySalonIdPaging(
+        [FromRoute] Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 10,
+        [FromQuery] string search = null,
+        [FromQuery] string filter = null,
+        [FromQuery] string orderby = null)
+        {
+            var serviceHairsResponse = await _serviceHairService.GetServiceHairBySalonIdPaging(id, page, size, orderby, filter, search);
+            return Ok(serviceHairsResponse);
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+>>>>>>> ChauHien
         public async Task<IActionResult> GetServiceHairById([FromRoute] Guid id)
         {
             try
