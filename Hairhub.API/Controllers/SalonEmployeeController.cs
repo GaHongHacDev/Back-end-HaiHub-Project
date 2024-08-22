@@ -49,11 +49,12 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{SalonInformationId:Guid}")]
-        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid SalonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid SalonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10, 
+                                                                              [FromQuery] bool? orderByName=null, [FromQuery] bool? isActive = null, [FromQuery] string? nameEmployee = null)
         {
             try
             {
-                var salonEmployeeResponse = await _salonEmployeeService.GetSalonEmployeeBySalonInformationId(SalonInformationId, page, size);
+                var salonEmployeeResponse = await _salonEmployeeService.GetSalonEmployeeBySalonInformationId(SalonInformationId, page, size, orderByName, isActive, nameEmployee);
                 if (salonEmployeeResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy dịch vụ" });

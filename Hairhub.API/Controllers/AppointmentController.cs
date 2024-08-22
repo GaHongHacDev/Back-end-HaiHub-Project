@@ -6,6 +6,7 @@ using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -25,6 +26,7 @@ namespace Hairhub.API.Controllers
             _hubContext = hubContext;
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpGet]
         public async Task<IActionResult> GetAllAppointment([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
