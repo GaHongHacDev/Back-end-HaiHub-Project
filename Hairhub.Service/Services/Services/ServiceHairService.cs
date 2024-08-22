@@ -110,7 +110,7 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetServiceHairResponse>(serviceHairResponse);
         }
 
-        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(Guid id, int page, int size, string orderby, string filter, string search)
+        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(Guid id, int page, int size, string? orderby, bool? filter, string? search)
         {
             
             var predicate = PredicateBuilder.New<ServiceHair>(s => s.SalonInformationId == id);
@@ -120,17 +120,9 @@ namespace Hairhub.Service.Services.Services
                 predicate = predicate.And(s => s.ServiceName.Contains(search));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter))
+            if (filter.HasValue)
             {
-                if (filter.Equals("true", StringComparison.OrdinalIgnoreCase) || filter.Equals("false", StringComparison.OrdinalIgnoreCase))
-                {
-                    bool isActive = bool.Parse(filter);
-                    predicate = predicate.And(s => s.IsActive == isActive);
-                }
-                else
-                {
-                    throw new ArgumentException("Invalid value for filter. Expected 'true' or 'false'.");
-                }
+                predicate = predicate.And(x => x.IsActive == filter.Value);
             }
 
 

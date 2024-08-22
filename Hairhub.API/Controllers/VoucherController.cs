@@ -61,9 +61,9 @@ namespace Hairhub.API.Controllers
         [FromRoute] Guid id,
         [FromQuery] int page = 1,
         [FromQuery] int size = 10,
-        [FromQuery] string search = null,
-        [FromQuery] string filter = null,
-        [FromQuery] string orderby = null)
+        [FromQuery] string? search = null,
+        [FromQuery] bool? filter = null,
+        [FromQuery] string? orderby = null)
         {
             try
             {
