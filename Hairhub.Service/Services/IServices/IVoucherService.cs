@@ -24,7 +24,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteVoucherAsync(Guid id);
 
-        Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size, string orderby, string filter, string search);
+        Task<IPaginate<GetVoucherResponse?>> GetVoucherbySalonId(Guid id, int page, int size, string? orderby, bool? filter, string? search);
 
         Task<IPaginate<GetVoucherResponse?>> GetVouchersByExpiredDate(Guid salonId, int page, int size);
         Task<List<GetVoucherResponse>> GetVoucherbySalonId(Guid id);
