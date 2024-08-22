@@ -138,7 +138,7 @@ namespace Hairhub.Service.Services.Services
 
             if (!string.IsNullOrWhiteSpace(orderby))
             {
-                if (orderby.Equals("giá giảm dần", StringComparison.OrdinalIgnoreCase))
+                if (orderby.Equals("giá tăng dần", StringComparison.OrdinalIgnoreCase))
                 {
                     orderBy = q => q.OrderBy(s => s.Price);
                 }
