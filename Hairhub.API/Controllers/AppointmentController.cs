@@ -26,7 +26,7 @@ namespace Hairhub.API.Controllers
             _hubContext = hubContext;
         }
 
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles ="Customer")]
         [HttpGet]
         public async Task<IActionResult> GetAllAppointment([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
