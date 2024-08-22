@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hairhub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class NewDatabaseversion11Addimagestylehairandimagestyle : Migration
+    public partial class UpdateSalonInformationtableinlongtitudeandlatitudedecimal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -266,8 +266,8 @@ namespace Hairhub.Infrastructure.Migrations
                     description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     img = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     rate = table.Column<decimal>(type: "decimal(18,1)", nullable: true),
-                    longitude = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    latitude = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    longitude = table.Column<decimal>(type: "decimal(18,10)", maxLength: 150, nullable: false),
+                    latitude = table.Column<decimal>(type: "decimal(18,10)", maxLength: 150, nullable: false),
                     total_rating = table.Column<int>(type: "int", nullable: false),
                     total_reviewer = table.Column<int>(type: "int", nullable: false),
                     number_of_reported = table.Column<int>(type: "int", nullable: true),

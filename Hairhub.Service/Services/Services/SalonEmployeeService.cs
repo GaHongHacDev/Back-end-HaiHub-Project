@@ -11,7 +11,10 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq.Expressions;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -165,19 +168,43 @@ namespace Hairhub.Service.Services.Services
             return _mapper.Map<GetSalonEmployeeResponse>(salonEmployeeResponse);
         }
 
-        public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size)
+        public async Task<IPaginate<GetSalonEmployeeResponse>> GetSalonEmployeeBySalonInformationId(Guid SalonInformationId, int page, int size, bool? orderName, 
+                                                                                                    bool? isActive, string? nameEmployee)
         {
+            Expression<Func<SalonEmployee, bool>> predicate = x => x.SalonInformationId.Equals(SalonInformationId);
+
+            if (isActive.HasValue)
+            {
+                predicate = predicate.And(x => x.IsActive == isActive.Value);
+            }
+
+            if (!string.IsNullOrEmpty(nameEmployee))
+            {
+                predicate = predicate.And(x => x.FullName.Contains(nameEmployee));
+            }
+
+            Func<IQueryable<SalonEmployee>, IOrderedQueryable<SalonEmployee>> orderBy = null;
+            if (orderName.HasValue)
+            {
+                orderBy = orderName.Value
+                    ? (Func<IQueryable<SalonEmployee>, IOrderedQueryable<SalonEmployee>>)(q => q.OrderBy(x => x.FullName))
+                    : (Func<IQueryable<SalonEmployee>, IOrderedQueryable<SalonEmployee>>)(q => q.OrderByDescending(x => x.FullName));
+            }
+
             var salonEmployees = await _unitOfWork.GetRepository<SalonEmployee>()
                                                   .GetPagingListAsync(
-                                                      predicate: x => x.SalonInformationId.Equals(SalonInformationId),
+                                                      predicate: predicate,
+                                                      orderBy: orderBy,
                                                       include: query => query.Include(s => s.Schedules)
                                                                              .Include(s => s.ServiceEmployees)
                                                                              .ThenInclude(se => se.ServiceHair),
                                                       page: page,
                                                       size: size
                                                   );
+
             if (salonEmployees == null)
                 return null;
+
             var salonEmployeeResponses = new Paginate<GetSalonEmployeeResponse>()
             {
                 Page = salonEmployees.Page,
@@ -186,6 +213,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = salonEmployees.TotalPages,
                 Items = _mapper.Map<IList<GetSalonEmployeeResponse>>(salonEmployees.Items),
             };
+
             return salonEmployeeResponses;
         }
 

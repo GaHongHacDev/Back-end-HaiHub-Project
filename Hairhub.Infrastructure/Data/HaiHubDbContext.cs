@@ -26,14 +26,14 @@ namespace Hairhub.Infrastructure
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("TienConnectionString"));
+          //  optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
         }
 
         // DBSet<>
-        public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<Account> Accounts { get; set; } 
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }
@@ -257,8 +257,8 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Img).HasMaxLength(200).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Address).HasMaxLength(150).HasColumnName("address");
                 entity.Property(e => e.Rate).HasColumnType("decimal(18,1)").HasColumnName("rate");
-                entity.Property(e => e.Longitude).HasMaxLength(150).HasColumnName("longitude");
-                entity.Property(e => e.Latitude).HasMaxLength(150).HasColumnName("latitude");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(18,10)").HasMaxLength(150).HasColumnName("longitude");
+                entity.Property(e => e.Latitude).HasColumnType("decimal(18,10)").HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.TotalRating).HasColumnName("total_rating");
                 entity.Property(e => e.TotalReviewer).HasColumnName("total_reviewer");
                 entity.Property(e => e.NumberOfReported).HasColumnName("number_of_reported");

@@ -19,7 +19,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSalonInformation([FromQuery] int page=1, [FromQuery] int size=10)
+        public async Task<IActionResult> GetAllSalonInformation([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformation(page, size);
             return Ok(salonInformationsResponse);
@@ -40,7 +40,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSalonByStatus([FromQuery]string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetSalonByStatus([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(status, page, size);
             return Ok(salonInformationsResponse);
@@ -81,7 +81,7 @@ namespace Hairhub.API.Controllers
                 var salonInformationResponse = await _salonInformationService.GetSalonByOwnerId(ownerId);
                 return Ok(salonInformationResponse);
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(new { message = "Cannot find this SalonInformation!" });
             }
@@ -96,15 +96,19 @@ namespace Hairhub.API.Controllers
             [FromQuery] string? serviceName = null,
             [FromQuery] string? salonAddress = null,
             [FromQuery] string? salonName = null,
-            [FromQuery] double? latitude = null,
-            [FromQuery] double? longitude = null,
-            [FromQuery] double? distance = null,
+            [FromQuery] decimal? latitude = null,
+            [FromQuery] decimal? longtitude = null,
+            [FromQuery] decimal? distance = null,
             [FromQuery] int page = 1,
             [FromQuery] int size = 10)
         {
             try
             {
-                var salonInformationResponse = await _salonInformationService.SearchSalonByNameAddressService(page, size, serviceName, salonAddress, salonName, latitude, longitude, distance);
+                var salonInformationResponse = await _salonInformationService
+                                                        .SearchSalonByNameAddressService(
+                                                                                         page, size, serviceName, salonAddress, salonName,
+                                                                                         latitude, longtitude, distance
+                                                                                         );
                 return Ok(salonInformationResponse);
             }
             catch (NotFoundException ex)

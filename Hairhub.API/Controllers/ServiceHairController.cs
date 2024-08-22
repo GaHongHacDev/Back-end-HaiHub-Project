@@ -17,7 +17,7 @@ namespace Hairhub.API.Controllers
         {
             _serviceHairService = serviceHairService;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAllServiceHair([FromQuery] int page=1, [FromQuery] int size=10)
         {
@@ -41,6 +41,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+
         public async Task<IActionResult> GetServiceHairById([FromRoute] Guid id)
         {
             try
@@ -72,6 +73,8 @@ namespace Hairhub.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
 
 
 

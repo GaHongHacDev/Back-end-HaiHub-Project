@@ -14,7 +14,7 @@ namespace Hairhub.Domain.Dtos.Requests.SalonInformations
         public string? Address { get; set; }
         public string? Description { get; set; }
         public IFormFile? Image {  get; set; }
-        public string? Longitude { get; set; }
-        public string? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
     }
 }
