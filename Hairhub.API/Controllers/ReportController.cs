@@ -5,6 +5,7 @@ using Hairhub.Domain.Dtos.Requests.Reports;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAllReport([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var reportsResponse = await _reportService.GetAllReport(page, size);
@@ -29,6 +31,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAllReportByRoleName([FromQuery] string roleName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var reportsResponse = await _reportService.GetAllReportByRoleName(roleName, page, size);
@@ -36,14 +39,15 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.Customer)]
         [Route("{customerId:Guid}")]
         public async Task<IActionResult> GetReportByCustomerId([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var reportsResponse = await _reportService.GetReportByCustomerId(customerId, status, page, size);
             return Ok(reportsResponse);
         }
-
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         [Route("{salonId:Guid}")]
         public async Task<IActionResult> GetReportBySalonId([FromRoute] Guid salonId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
@@ -52,6 +56,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> CreateReport([FromForm] CreateReportRequest createReportRequest)
         {
             try
@@ -75,6 +80,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> ConfirmReport([FromRoute] Guid id, [FromBody] ConfirmReportRequest confirmReportRequest)
         {
             try

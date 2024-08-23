@@ -31,6 +31,47 @@ namespace Hairhub.Service.Services.Services
             _configuaration = configuaration;
             _mapper = mapper;
         }
+
+        private string GenerateToken(string username, string roleName)
+        {
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var key = Encoding.UTF8.GetBytes(_configuaration["JWTSettings:Key"]);
+
+            //var tokenDescriptor = new SecurityTokenDescriptor
+            //{
+            //    Subject = new ClaimsIdentity(new Claim[]
+            //    {
+            //        new Claim(ClaimTypes.Name, username),
+            //        new Claim(ClaimTypes.Email, username),
+            //        new Claim(ClaimTypes.Role, roleName)
+            //    }),
+            //    // Time Access Totken
+            //    Expires = DateTime.UtcNow.AddMinutes(10),
+            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            //};
+            //var token = tokenHandler.CreateToken(tokenDescriptor);
+            //return tokenHandler.WriteToken(token);
+
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuaration["JWTSettings:Key"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.Role, roleName)
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                Issuer = _configuaration["JWTSettings:Issuer"], 
+                Audience = _configuaration["JWTSettings:Audience"], 
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
         public async Task<LoginResponse> Login(string userName, string password)
         {
 
@@ -42,10 +83,10 @@ namespace Hairhub.Service.Services.Services
             {
                 return null;
             }
-            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
-            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
-            Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
-            if (salonOwner==null && customer == null && admin==null)
+            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            if (salonOwner == null && customer == null && admin == null)
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
@@ -60,18 +101,21 @@ namespace Hairhub.Service.Services.Services
                 AccountId = account.Id,
                 Expires = DateTime.UtcNow.AddDays(30),
             };
-            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken); 
+            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken);
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             if (!isInsert)
             {
                 throw new Exception("Cannot insert token to DB");
             }
-            return new LoginResponse() 
-                        {
-                            AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id,  RoleName = account.Role?.RoleName,
-                            CustomerResponse = customer!=null?_mapper.Map<CustomerLoginResponse>(customer):null, 
-                            SalonOwnerResponse = salonOwner!=null?_mapper.Map<SalonOwnerLoginResponse>(salonOwner):null,
-                            AdminResponse = admin!=null?_mapper.Map<AdminLoginResponse>(admin): null
+            return new LoginResponse()
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccountId = account.Id,
+                RoleName = account.Role?.RoleName,
+                CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
+                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
+                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null
             };
         }
 
@@ -79,8 +123,8 @@ namespace Hairhub.Service.Services.Services
         {
             var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
                 .SingleOrDefaultAsync(
-                                        predicate: x=>x.AccessToken.Equals(accessToken) && x.Expires>=DateTime.Now,
-                                        include: x=>x.Include(y=>y.Account.Role));
+                                        predicate: x => x.AccessToken.Equals(accessToken) && x.Expires >= DateTime.Now,
+                                        include: x => x.Include(y => y.Account.Role));
             if (refreshTokenEntity == null)
             {
                 throw new NotFoundException("Không tìm thấy access token!");
@@ -89,7 +133,7 @@ namespace Hairhub.Service.Services.Services
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            if (salonOwner == null && customer == null && admin==null)
+            if (salonOwner == null && customer == null && admin == null)
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
@@ -130,26 +174,6 @@ namespace Hairhub.Service.Services.Services
             return new RefreshTokenResponse() { AccessToken = refreshTokenEntity.AccessToken, RefreshToken = refreshTokenEntity.RefreshToken };
         }
 
-        private string GenerateToken(string username, string roleName)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuaration["JWTSettings:Key"]);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, username),
-                    new Claim(ClaimTypes.Role, roleName)
-                }),
-                // Time Access Totken
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -168,7 +192,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Refresh token not found!");
             }
             _unitOfWork.GetRepository<RefreshTokenAccount>().DeleteRangeAsync(refreshTokens);
-            bool isDelete = await _unitOfWork.CommitAsync()>0;
+            bool isDelete = await _unitOfWork.CommitAsync() > 0;
             return isDelete;
         }
     }

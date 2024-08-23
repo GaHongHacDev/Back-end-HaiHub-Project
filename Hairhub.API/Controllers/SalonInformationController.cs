@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -19,6 +20,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllSalonInformation([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformation(page, size);
@@ -26,6 +28,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllSalonInformationNoPaging()
         {
             var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformationNoPaging();
@@ -33,6 +36,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAllSalonByAdmin([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetAllSalonByAdmin(page, size);
@@ -40,6 +44,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> GetSalonByStatus([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(status, page, size);
