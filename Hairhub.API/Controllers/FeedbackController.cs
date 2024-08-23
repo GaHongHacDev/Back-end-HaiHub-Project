@@ -111,7 +111,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        public async Task<IActionResult> GetFeedBackBySalonId([FromRoute]Guid id, [FromQuery] int rating, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetFeedBackBySalonId([FromRoute]Guid id, [FromQuery] int? rating, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
