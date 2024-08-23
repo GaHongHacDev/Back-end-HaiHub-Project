@@ -58,6 +58,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> LogOut(LogoutRequest logoutRequest)
         {
             try
@@ -77,6 +78,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{accessToken}")]
+        [Authorize]
         public async Task<IActionResult> FetchUser( string accessToken)
         {
             try

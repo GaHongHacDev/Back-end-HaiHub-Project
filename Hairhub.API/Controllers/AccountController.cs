@@ -4,6 +4,7 @@ using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromForm] UpdateAccountRequest updateAccountRequest)
         {
             try
@@ -67,6 +69,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> ActiveAccount([FromRoute] Guid id)
         {
             try
@@ -90,6 +93,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> ChangePassword([FromRoute] Guid id, [FromBody] ChangePasswordRequest changePasswordRequest)
         {
             try
@@ -113,6 +117,7 @@ namespace Hairhub.API.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> DeleteAccount([FromRoute] Guid id)
         {
             try
@@ -136,6 +141,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAccountById([FromRoute] Guid id)
         {
             try
@@ -156,8 +162,9 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpGet]
-        
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetNumberofAccountinYear([FromQuery]int? year)
         {
             try
@@ -179,7 +186,7 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpGet]
-        
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetNumberofSalonOwnerinYear([FromQuery]int? year)
         {
             try
@@ -202,7 +209,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetNumberofCustomerApproved()
         {
             try
@@ -224,7 +231,7 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpGet]
-
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetNumberofSalonOwnerApproved()
         {
             try
