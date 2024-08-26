@@ -60,16 +60,37 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CheckExistEmail([FromBody] CheckExistEmailResrequest request)
+        public async Task<IActionResult> CheckNonExistEmail([FromBody] CheckExistEmailResrequest request)
         {
             try
             {
                 bool isExistEmail = await _emailService.CheckExistEmail(request);
                 if (!isExistEmail)
                 {
-                    return Ok("Email valid");
+                    return Ok("Email hợp lệ");
                 }
                 return Ok("Email đã tồn tại trên hệ thống!");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> CheckExistEmail([FromBody] CheckExistEmailResrequest request)
+        {
+            try
+            {
+                bool isExistEmail = await _emailService.CheckExistEmail(request);
+                if (isExistEmail)
+                {
+                    return Ok("gửi OTP thành công");
+                }
+                return Ok("Email không tồn tại trên hệ thống!");
             }
             catch (NotFoundException ex)
             {

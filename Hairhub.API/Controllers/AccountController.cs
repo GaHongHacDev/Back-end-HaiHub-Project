@@ -245,5 +245,29 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+
+        [HttpPost]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> ForgotPassword([FromRoute]Guid id, ForgotPasswordRequest request)
+        {
+            try
+            {
+                var result = await _accountService.ForgotPassword(id,request);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Không tồn tại Email này" });
+                }
+                return Ok(new { success = result, message = "Lấy Password thành công" });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
