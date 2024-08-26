@@ -60,7 +60,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CheckNonExistEmail([FromBody] CheckExistEmailResrequest request)
+        public async Task<IActionResult> CheckExistEmail([FromBody] CheckExistEmailResrequest request)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> CheckExistEmail([FromBody] CheckExistEmailResrequest request)
+        public async Task<IActionResult> CheckNonExistEmail([FromBody] CheckExistEmailResrequest request)
         {
             try
             {
