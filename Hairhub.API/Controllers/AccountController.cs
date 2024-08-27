@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
-using Hairhub.Common.ThirdParties.Contract;
-using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
@@ -16,12 +14,9 @@ namespace Hairhub.API.Controllers
     public class AccountController : BaseController
     {
         private IAccountService _accountService;
-        private readonly IMediaService mediaService;
-
-        public AccountController(IMapper mapper, IAccountService accountService, IMediaService mediaService) : base(mapper)
+        public AccountController(IMapper mapper, IAccountService accountService) : base(mapper)
         {
             _accountService = accountService;
-            this.mediaService = mediaService;
         }
 
         [HttpPost]
@@ -240,6 +235,30 @@ namespace Hairhub.API.Controllers
                     return BadRequest(new { message = "Không tìm thấy tài khoản" });
                 }
                 return Ok(accooutReponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> ForgotPassword([FromRoute]Guid id, ForgotPasswordRequest request)
+        {
+            try
+            {
+                var result = await _accountService.ForgotPassword(id,request);
+                if (result == null)
+                {
+                    return BadRequest(new { message = "Không tồn tại Email này" });
+                }
+                return Ok(new { success = result, message = "Lấy Password thành công" });
             }
             catch (NotFoundException ex)
             {

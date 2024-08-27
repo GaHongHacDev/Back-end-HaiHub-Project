@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairhub.Infrastructure.Migrations
 {
     [DbContext(typeof(HaiHubDbContext))]
-    [Migration("20240809093446_New Database version 1.1 - Add imagestylehair and imagestyle")]
-    partial class NewDatabaseversion11Addimagestylehairandimagestyle
+    [Migration("20240815074647_Update SalonInformation table in longtitude and latitude decimal")]
+    partial class UpdateSalonInformationtableinlongtitudeandlatitudedecimal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -771,16 +771,14 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("img");
 
-                    b.Property<string>("Latitude")
-                        .IsRequired()
+                    b.Property<decimal>("Latitude")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
+                        .HasColumnType("decimal(18,10)")
                         .HasColumnName("latitude");
 
-                    b.Property<string>("Longitude")
-                        .IsRequired()
+                    b.Property<decimal>("Longitude")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
+                        .HasColumnType("decimal(18,10)")
                         .HasColumnName("longitude");
 
                     b.Property<string>("Name")

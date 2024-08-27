@@ -5,6 +5,7 @@ using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace Hairhub.API.Controllers
         
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAllVoucher([FromQuery]int page=1, [FromQuery]int size=10) {
             
             var listVoucher = await _voucherService.GetVoucherAsync(page, size);
@@ -31,6 +33,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetVoucherById([FromRoute] Guid id)
         {
             try
@@ -49,6 +52,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAdminVoucher([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var listVoucher = await _voucherService.GetAdminVoucher(page, size);
@@ -57,6 +61,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetVoucherBySalonId(
         [FromRoute] Guid id,
         [FromQuery] int page = 1,
@@ -83,6 +88,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetVoucherBySalonIdNoPaging([FromRoute] Guid id)
         {
             try
@@ -97,6 +103,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetVoucherByCode(string code)
         {
             try
@@ -116,6 +123,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateVoucher([FromBody]CreateVoucherRequest request)
         {
             try
@@ -139,6 +147,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> UpdateVoucher([FromRoute]Guid id, [FromBody]UpdateVoucherRequest request)
         {
             try
@@ -156,6 +165,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> DeleteVoucher([FromRoute]Guid id)
         {
             try

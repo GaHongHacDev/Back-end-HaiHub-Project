@@ -16,7 +16,9 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Drawing.Printing;
 using System.Linq;
 
 namespace Hairhub.Service.Services.Services
@@ -102,7 +104,7 @@ namespace Hairhub.Service.Services.Services
                 foreach (var employee in employees)
                 {
                     var existingAppointments = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
-                                               predicate: a => a.SalonEmployeeId == employee.Id 
+                                               predicate: a => a.SalonEmployeeId == employee.Id
                                                && a.Status == AppointmentStatus.Booking && a.StartTime > DateTime.UtcNow.Date);
                     if (existingAppointments.Any())
                     {
@@ -112,7 +114,7 @@ namespace Hairhub.Service.Services.Services
                 salonInformation.Status = SalonStatus.Disable;
                 _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
                 bool isUpdate = await _unitOfWork.CommitAsync() > 0;
-                return isUpdate;                
+                return isUpdate;
 
             }
             catch (Exception ex)
@@ -270,55 +272,79 @@ namespace Hairhub.Service.Services.Services
                 salonInformation.Img = await _mediaService.UploadAnImage(updateSalonInformationRequest.Image, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             }
 
-            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Longitude))
+            if (updateSalonInformationRequest.Longitude!=null)
             {
-                salonInformation.Longitude = updateSalonInformationRequest.Longitude;
+                salonInformation.Longitude = (decimal)updateSalonInformationRequest.Longitude;
             }
 
-            if (!string.IsNullOrEmpty(updateSalonInformationRequest.Latitude))
+            if (updateSalonInformationRequest.Latitude != null)
             {
-                salonInformation.Latitude = updateSalonInformationRequest.Latitude;
+                salonInformation.Latitude = (decimal)updateSalonInformationRequest.Latitude;
             }
 
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
-
-
-           
         }
 
-        public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", 
-                                        string? salonAddress = "", string? salonName = "", double? latitude = 0, double? longtitude = 0, double? distance = 0)
+        public async Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "",
+                                        string? salonAddress = "", string? salonName = "", decimal? latitude = 0, decimal? longtitude = 0, decimal? distance = 0)
         {
-            //if (serviceName == null && salonAddress == null && salonName == null)
-            //{
-            //    return new Paginate<SearchSalonByNameAddressServiceResponse>()
-            //    {
-            //        Page = page,
-            //        Size = size,
-            //        Total = 0,
-            //        TotalPages = 0,
-            //        Items = new List<SearchSalonByNameAddressServiceResponse>(),
-            //    };
-            //}
             serviceName = serviceName?.Trim() ?? string.Empty;
             salonAddress = salonAddress?.Trim() ?? string.Empty;
             salonName = salonName?.Trim() ?? string.Empty;
-
-            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
-                                                     .GetListAsync(
-                                                         predicate: x => x.Status.Equals(SalonStatus.Approved) 
-                                                         && x.Name.ToLower().Contains(salonName.ToLower()) 
-                                                         && x.Address.ToLower().Contains(salonAddress.ToLower()),
-                                                         include: query => query.Include(s => s.SalonOwner)
-                                                     );
-            if (latitude!=null && longtitude!=null && distance!=null)
+            IPaginate<SalonInformation> salonInformations;
+            if (latitude != null && longtitude != null && distance != null)
             {
-                salonInformations.Where(x => DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance);
+                var salonQuery = await _unitOfWork.GetRepository<SalonInformation>()
+                        .GetListAsync(
+                            predicate: x => x.Status.Equals(SalonStatus.Approved)
+                            && x.Name.ToLower().Contains(salonName.ToLower())
+                            && x.Address.ToLower().Contains(salonAddress.ToLower())
+                            && x.ServiceHairs.FirstOrDefault(s => s.ServiceName.Contains(serviceName)) != null,
+                            include: query => query.Include(s => s.SalonOwner)
+                        );
+                // Lọc theo khoảng cách
+                var filterSalon = salonQuery
+                    .Where(x => DistanceMap.GetDistance((decimal)latitude, (decimal)longtitude, x.Latitude, x.Longitude) <= distance)
+                    .ToList(); // Chuyển thành danh sách để tính tổng số mục
+
+                // Tính tổng số mục và số trang
+                int total = filterSalon.Count;
+                int totalPages = (int)Math.Ceiling((double)total / size);
+
+                // Lấy dữ liệu cho trang hiện tại
+                var pagedItems = filterSalon
+                    .Skip((page - 1) * size)
+                    .Take(size)
+                    .ToList();
+
+                // Tạo đối tượng phân trang
+                salonInformations = new Paginate<SalonInformation>
+                {
+                    Page = page,
+                    Size = size,
+                    Total = total,
+                    TotalPages = totalPages,
+                    Items = pagedItems,
+                };
+                //salonInformations.Items. = salonInformations.Items.Where(x => DistanceMap.GetDistance((double)latitude!, (double)longtitude!, double.Parse(x.Latitude), double.Parse(x.Longitude)) <= distance);
             }
-            var listSalon = _mapper.Map<List<SearchSalonByNameAddressServiceResponse>>(salonInformations);
-            var result = new List<SearchSalonByNameAddressServiceResponse>();
+            else
+            {
+                salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+                                         .GetPagingListAsync(
+                                             predicate: x => x.Status.Equals(SalonStatus.Approved)
+                                             && x.Name.ToLower().Contains(salonName.ToLower())
+                                             && x.Address.ToLower().Contains(salonAddress.ToLower())
+                                             && x.ServiceHairs.FirstOrDefault(s => s.ServiceName.Contains(serviceName)) != null,
+                                             include: query => query.Include(s => s.SalonOwner),
+                                             page: page,
+                                             size: size
+                                         );
+            }
+            var listSalon = _mapper.Map<List<SearchSalonByNameAddressServiceResponse>>(salonInformations.Items);
+            //var result = new List<SearchSalonByNameAddressServiceResponse>();
 
             foreach (var salon in listSalon)
             {
@@ -335,16 +361,15 @@ namespace Hairhub.Service.Services.Services
                     {
                         salon.Vouchers = _mapper.Map<List<SearchSalonVoucherRespnse>>(vouchers);
                     }
-                    result.Add(salon);
                 }
             }
             return new Paginate<SearchSalonByNameAddressServiceResponse>()
             {
-                Page = page,
-                Size = size,
-                Total = result.Count,
-                TotalPages = (int)Math.Ceiling((double)result.Count / size),
-                Items = result,
+                Page = salonInformations.Page,
+                Size = salonInformations.Size,
+                Total = salonInformations.Total,
+                TotalPages = salonInformations.TotalPages,
+                Items = listSalon,
             };
         }
 

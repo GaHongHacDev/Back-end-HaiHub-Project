@@ -5,6 +5,7 @@ using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -143,7 +144,7 @@ namespace Hairhub.API.Controllers
                 var result = await _customerService.DeleteCustomerImageHistory(id);
                 if (result == null)
                 {
-                    return BadRequest(new { message = "Thất bại trong việc xoa lịch sử" });
+                    return BadRequest(new { message = "Thất bại trong việc xóa lịch sử" });
                 }
                 return Ok(new { success = result, message = "Xóa thành công" });
             }
@@ -156,5 +157,7 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        
     }
 }

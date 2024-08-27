@@ -21,7 +21,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using Vonage.NumberInsights;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -169,7 +168,7 @@ namespace Hairhub.Service.Services.Services
             {
                 IPaginate<Feedback> feedbacks;
 
-                if (rating == 0)
+                if (rating == null)
                 {
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
