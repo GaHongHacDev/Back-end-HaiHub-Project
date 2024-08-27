@@ -19,6 +19,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetSchedules(int page=1, int size=10) {
             try
             {
@@ -32,6 +33,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetScheduleById(Guid id) {
             try
             {
@@ -48,6 +50,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateSchedule(CreateScheduleRequest request)
         {
             try
@@ -62,6 +65,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPatch]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> UpdateSchedule(Guid id, UpdateScheduleRequest request) { 
             try
             {
@@ -75,6 +79,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPatch]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> DeleteSchedule(Guid id)
         {
             try
