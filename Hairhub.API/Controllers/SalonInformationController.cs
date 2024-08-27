@@ -20,7 +20,6 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllSalonInformation([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformation(page, size);
@@ -28,7 +27,6 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllSalonInformationNoPaging()
         {
             var salonInformationsResponse = await _salonInformationService.GetAllApprovedSalonInformationNoPaging();
@@ -52,7 +50,6 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetSalonSuggestion()
         {
             var salonInformationsResponses = await _salonInformationService.GetSalonSuggestion();
@@ -61,7 +58,6 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetSalonInformationById([FromRoute] Guid id)
         {
             try
@@ -100,7 +96,6 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetSalonByServiceNameAddress(
             [FromQuery] string? serviceName = null,
             [FromQuery] string? salonAddress = null,
