@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -19,6 +20,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllServiceHair([FromQuery] int page=1, [FromQuery] int size=10)
         {
             var serviceHairsResponse = await _serviceHairService.GetAllServiceHair(page, size);
@@ -27,6 +29,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetServiceHairBySalonIdPaging(
         [FromRoute] Guid id,
         [FromQuery] int page = 1,
@@ -41,7 +44,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetServiceHairById([FromRoute] Guid id)
         {
             try
@@ -61,6 +64,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonInformationId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetServiceHairBySalonInformationId([FromRoute]Guid salonInformationId)
         {
             try
@@ -79,6 +83,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateServiceHair([FromForm] CreateServiceHairRequest createServiceHairRequest)
         {
             try
@@ -102,6 +107,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> UpdateServiceHair([FromRoute] Guid id, [FromForm] UpdateServiceHairRequest updateServiceHairRequest)
         {
             try
@@ -130,6 +136,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> DeleteServiceHair([FromRoute] Guid id)
         {
             {
@@ -155,6 +162,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> ActiveServiceHair([FromRoute] Guid id)
         {
             try

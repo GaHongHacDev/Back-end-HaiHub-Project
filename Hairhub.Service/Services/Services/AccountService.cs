@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 
 namespace Hairhub.Service.Services.Services
@@ -42,7 +43,11 @@ namespace Hairhub.Service.Services.Services
             var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.Id == id);
             if (!changePasswordRequest.CurrentPassword.Equals(account.Password))
             {
-                throw new Exception("Current password is not correct!");
+                throw new Exception("Mật khẩu hiện tại không đúng!!");
+            }
+            if (!changePasswordRequest.NewPassword.Equals(changePasswordRequest.ConfirmNewPassword))
+            {
+                throw new Exception("Không trùng khớp!!");
             }
             account.Password = changePasswordRequest.NewPassword;
             _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
@@ -249,6 +254,18 @@ namespace Hairhub.Service.Services.Services
             var salons = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: p => p.Status == SalonStatus.Approved);
 
             return salons.Count;
+        }
+
+        public async Task<bool> ForgotPassword(Guid id, ForgotPasswordRequest request)
+        {
+            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.Id == id);
+            if (!request.NewPassword.Equals(request.ConfirmNewPassword))
+            {
+                throw new Exception("Không trùng khớp!!");
+            }
+            account.Password = request.NewPassword;
+            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
+            return await _unitOfWork.CommitAsync() > 0;
         }
     }
 }

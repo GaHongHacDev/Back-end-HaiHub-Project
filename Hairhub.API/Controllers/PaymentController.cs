@@ -4,6 +4,7 @@ using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Requests.Payment;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> SendPaymentLink(CreatePaymentRequest request)
         {
             var result = await _paymentservice.CreatePaymentUrlRegisterCreator(request);
@@ -33,6 +35,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
         {
             var result = await _paymentservice.CreateFirstTimePayment(createFirstTimePaymentRequest);
@@ -44,6 +47,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
         {
             var result = await _paymentservice.PaymentForCommissionRate(createFirstTimePaymentRequest);
@@ -55,6 +59,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetStatusPayment(string ordercode, [FromBody] SavePaymentInfor paymentrequest)
         {
             var result = await _paymentservice.GetPaymentInfo(ordercode, paymentrequest);
@@ -66,6 +71,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetPayments(int page=1, int size = 10)
         {
             var result = await _paymentservice.GetPayments(page, size);
@@ -78,6 +84,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{ownerId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetPaymentByOwnerId([FromRoute] Guid ownerId, int page=1, int size=10)
         {
             var result = await _paymentservice.GetPaymentBySalonOwnerID(ownerId, page, size);
@@ -89,6 +96,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         [Route("{ownerId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetInformationPaymentOfSalonOwner([FromRoute] Guid ownerId)
         {
             try

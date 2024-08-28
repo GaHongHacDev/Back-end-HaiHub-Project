@@ -1,4 +1,5 @@
-﻿using Hairhub.Domain.Dtos.Requests.Customers;
+﻿using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Requests.Customers;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Domain.Entitities;
@@ -27,5 +28,8 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteCustomerImageHistory(Guid Id);
 
         Task<bool> UpdateCustomerImagesHistory(Guid Id, UpdateCustomerImageHistoryRequest request);
+
+
+        
     }
 }

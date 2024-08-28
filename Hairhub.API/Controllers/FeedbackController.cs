@@ -4,6 +4,7 @@ using Hairhub.Domain.Dtos.Requests.Schedule;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetFeedbacks(int page=1, int size = 10)
         {
             try
@@ -36,6 +38,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetFeedbackById(Guid id)
         {
             try
@@ -54,6 +57,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CreateFeedback([FromForm]CreateFeedbackRequest request)
         {
             try
@@ -77,6 +81,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPatch]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> UpdateFeedback(Guid id, UpdateFeedbackRequest request)
         {
             try
@@ -96,6 +101,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPatch]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> DeleteFeedback(Guid id)
         {
             try
@@ -111,6 +117,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetFeedBackBySalonId([FromRoute]Guid id, [FromQuery] int? rating, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
@@ -126,6 +133,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetFeedBackByAppointmentId([FromRoute] Guid id)
         {
             try
@@ -142,6 +150,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetFeedBackByCustomerId([FromRoute] Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try

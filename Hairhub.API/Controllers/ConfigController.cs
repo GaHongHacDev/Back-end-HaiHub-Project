@@ -4,6 +4,7 @@ using Hairhub.Domain.Dtos.Requests.Config;
 using Hairhub.Domain.Dtos.Requests.Voucher;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -22,14 +23,17 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAllConfig([FromQuery] int page=1, [FromQuery] int size = 10)
         {
 
             var listconfig = await _configservice.GetConfigs(page, size);
             return Ok(listconfig);
         }
+
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetConfigById([FromRoute] Guid id)
         {
             try
@@ -46,10 +50,10 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
 
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> CreateConfig([FromBody]CreateConfigRequest request)
         {
             try
@@ -70,6 +74,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> UpdateConfig([FromRoute] Guid id, [FromBody]UpdateConfigRequest request)
         {
             try
@@ -92,6 +97,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> DeleteConfig([FromRoute]Guid id)
         {
             try

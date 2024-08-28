@@ -4,7 +4,9 @@ using Hairhub.Domain.Dtos.Requests.Customers;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -21,6 +23,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAllCustomer([FromQuery] int page=1, [FromQuery] int size=10) {
             try
             {
@@ -34,6 +37,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CheckInByCustomer(CheckInRequest checkInRequest)
         {
             try
@@ -53,6 +57,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetUserById([FromRoute] Guid id)
         {
             try
@@ -66,7 +71,8 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpPost]        
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> SaveAsCustomerImageHistory([FromForm]CustomerImageHistoryRequest request)
         {
             try
@@ -90,6 +96,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetCustomerImageHistoryByCustomerId([FromRoute]Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
@@ -113,6 +120,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> UpdateCustomerImageHistory([FromRoute] Guid id, [FromForm] UpdateCustomerImageHistoryRequest request)
         {
             try
@@ -136,6 +144,7 @@ namespace Hairhub.API.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> DeleteCustomerImageHistory([FromRoute] Guid id)
         {
             try
@@ -156,5 +165,7 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        
     }
 }

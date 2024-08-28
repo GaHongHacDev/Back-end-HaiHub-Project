@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -33,6 +34,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAllSalonByAdmin([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetAllSalonByAdmin(page, size);
@@ -40,6 +42,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetSalonByStatus([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(status, page, size);
@@ -74,6 +77,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{ownerId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetSalonInformationByOwnerId([FromRoute] Guid ownerId)
         {
             try
@@ -123,6 +127,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateSalonInformation([FromForm] CreateSalonInformationRequest createSalonInformationRequest)
         {
             try
@@ -147,6 +152,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> UpdateSalonInformation([FromRoute] Guid id, [FromForm] UpdateSalonInformationRequest updateSalonInformationRequest)
         {
             try
@@ -175,6 +181,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> DeleteSalonInformation([FromRoute] Guid id)
         {
             {
@@ -200,6 +207,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> ActiveSalonInformation([FromRoute] Guid id)
         {
             try

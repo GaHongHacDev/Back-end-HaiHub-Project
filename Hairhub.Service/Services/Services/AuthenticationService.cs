@@ -32,6 +32,34 @@ namespace Hairhub.Service.Services.Services
             _mapper = mapper;
         }
 
+        public async Task<FetchUserResponse> FetchUser(string accessToken)
+        {
+            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
+                .SingleOrDefaultAsync(
+                                        predicate: x => x.AccessToken.Equals(accessToken) && x.Expires >= DateTime.Now,
+                                        include: x => x.Include(y => y.Account.Role));
+            if (refreshTokenEntity == null)
+            {
+                throw new NotFoundException("Không tìm thấy access token!");
+            }
+            var account = refreshTokenEntity.Account;
+            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            if (salonOwner == null && customer == null && admin == null)
+            {
+                throw new NotFoundException("Không tìm thấy tài khoản");
+            }
+            return new FetchUserResponse()
+            {
+                AccountId = account.Id,
+                RoleName = account.Role?.RoleName,
+                CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
+                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
+                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null
+            };
+        }
+
         private string GenerateToken(string username, string roleName)
         {
             //var tokenHandler = new JwtSecurityTokenHandler();
@@ -91,7 +119,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
             // authentication successful so generate jwt token and refresh token
-            var accessToken = GenerateToken(account.UserName, account.Role.RoleName);
+            var accessToken = GenerateToken(account.UserName, account.Role.RoleName!);
             var refreshToken = GenerateRefreshToken();
             var newRefrehToken = new RefreshTokenAccount()
             {
@@ -119,34 +147,6 @@ namespace Hairhub.Service.Services.Services
             };
         }
 
-        public async Task<FetchUserResponse> FetchUser(string accessToken)
-        {
-            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
-                .SingleOrDefaultAsync(
-                                        predicate: x => x.AccessToken.Equals(accessToken) && x.Expires >= DateTime.Now,
-                                        include: x => x.Include(y => y.Account.Role));
-            if (refreshTokenEntity == null)
-            {
-                throw new NotFoundException("Không tìm thấy access token!");
-            }
-            var account = refreshTokenEntity.Account;
-            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            if (salonOwner == null && customer == null && admin == null)
-            {
-                throw new NotFoundException("Không tìm thấy tài khoản");
-            }
-            return new FetchUserResponse()
-            {
-                AccountId = account.Id,
-                RoleName = account.Role?.RoleName,
-                CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
-                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
-                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null
-            };
-        }
-
         public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)
         {
             var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
@@ -157,13 +157,13 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("RefreshToken not found or expired");
             }
 
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == refreshTokenEntity.AccountId);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == refreshTokenEntity.AccountId, include: x=>x.Include(s=>s.Role));
             if (account == null)
             {
                 throw new Exception("Account not found or expired");
             }
 
-            var accessToken = GenerateToken(account.UserName, account.RoleId.ToString());
+            var accessToken = GenerateToken(account.UserName, account.Role.RoleName!);
             refreshTokenEntity.AccessToken = accessToken;
             _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
