@@ -4,6 +4,7 @@ using Hairhub.Domain.Dtos.Requests.Approval;
 using Hairhub.Domain.Dtos.Responses.Approval;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -22,6 +23,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<ActionResult<IPaginate<GetApprovalResponse>>> GetApprovals(int page = 1, int size = 10)
         {
             var approvals = await _approvalService.GetApprovals(page, size);
@@ -29,6 +31,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet("salon/{salonId}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<ActionResult<List<GetApprovalResponse>>> GetSalonApprovals(Guid salonId)
         {
             var approvals = await _approvalService.GetSalonApprovals(salonId);
@@ -36,6 +39,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<ActionResult<GetApprovalResponse>> GetApprovalById(Guid id)
         {
             var approval = await _approvalService.GetApprovalById(id);
@@ -43,6 +47,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<ActionResult> CreateApproval([FromBody] CreateApprovalRequest request)
         {
             if (await _approvalService.CreateApproval(request))
@@ -53,6 +58,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<ActionResult> UpdateApproval(Guid id, [FromBody] UpdateApprovalRequest request)
         {
             if (await _approvalService.UpdateApproval(id, request))
@@ -63,6 +69,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<ActionResult> DeleteApproval(Guid id)
         {
             if (await _approvalService.DeleteApproval(id))

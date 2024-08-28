@@ -18,7 +18,6 @@ namespace Hairhub.Infrastructure
 
         }
 
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -26,10 +25,9 @@ namespace Hairhub.Infrastructure
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-
-           //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+//           optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
         }
 
         // DBSet<>
