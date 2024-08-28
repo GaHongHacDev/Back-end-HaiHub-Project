@@ -255,12 +255,11 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        [Route("{id:Guid}")]
-        public async Task<IActionResult> ForgotPassword([FromRoute]Guid id, ForgotPasswordRequest request)
+        public async Task<IActionResult> ForgotPassword(string username, ForgotPasswordRequest request)
         {
             try
             {
-                var result = await _accountService.ForgotPassword(id,request);
+                var result = await _accountService.ForgotPassword(username,request);
                 if (result == null)
                 {
                     return BadRequest(new { message = "Không tồn tại Email này" });
