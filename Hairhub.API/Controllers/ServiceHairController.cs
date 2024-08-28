@@ -64,7 +64,6 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonInformationId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetServiceHairBySalonInformationId([FromRoute]Guid salonInformationId)
         {
             try

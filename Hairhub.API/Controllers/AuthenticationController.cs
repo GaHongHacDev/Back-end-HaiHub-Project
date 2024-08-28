@@ -78,7 +78,6 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{accessToken}")]
-        [Authorize]
         public async Task<IActionResult> FetchUser( string accessToken)
         {
             try
