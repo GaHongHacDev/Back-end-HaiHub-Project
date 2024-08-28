@@ -18,7 +18,6 @@ namespace Hairhub.Infrastructure
 
         }
 
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -28,7 +27,7 @@ namespace Hairhub.Infrastructure
 
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-          // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+//           optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
         }
 
         // DBSet<>
