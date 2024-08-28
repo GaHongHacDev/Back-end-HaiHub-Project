@@ -14,11 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hairhub.Service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aaa81fded02cef58cf780487bad59a650ff6b0bf")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21a7ddca0150b7850d6b0c4b8fb4c05629a6be63")]
->>>>>>> deploy-backup
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae655cbb54358334897661e3d8d012dfbfe99fda")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hairhub.Service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hairhub.Service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

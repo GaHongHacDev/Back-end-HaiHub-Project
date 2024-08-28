@@ -9,7 +9,9 @@ namespace Hairhub.Domain.Dtos.Requests.Accounts
 {
     public class ForgotPasswordRequest
     {
-
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string? Email { get; set; }
         [Required]
         [DataType(DataType.Password)]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
