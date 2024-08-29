@@ -256,9 +256,9 @@ namespace Hairhub.Service.Services.Services
             return salons.Count;
         }
 
-        public async Task<bool> ForgotPassword(string username, ForgotPasswordRequest request)
+        public async Task<bool> ForgotPassword(ForgotPasswordRequest request)
         {
-            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.UserName == username);
+            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.UserName == request.Email);
             if (!request.NewPassword.Equals(request.ConfirmNewPassword))
             {
                 throw new Exception("Không trùng khớp!!");
