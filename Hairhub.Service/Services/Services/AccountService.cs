@@ -70,7 +70,7 @@ namespace Hairhub.Service.Services.Services
                 .SingleOrDefaultAsync(
                     predicate: x => x.Id == id,
                     include: source => source.Include(a => a.Role)
-                 );
+                );
             if (account == null)
             {
                 throw new NotFoundException("Tài khoản không tồn tại");
@@ -84,6 +84,7 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Tài khoản không tồn tại");
                 }
                 response = _mapper.Map<GetAccountResponse>(customer);
+                response.Id = customer.Id;
             }
             else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
             {
@@ -94,6 +95,7 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Tài khoản không tồn tại");
                 }
                 response = _mapper.Map<GetAccountResponse>(salonOwner);
+                response.Id = salonOwner.Id;
             }
             else
             {
