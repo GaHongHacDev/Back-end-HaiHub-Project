@@ -153,7 +153,7 @@ namespace Hairhub.API.Controllers
                 return Ok("Tạo lịch hẹn thành công");
             }
             catch (NotFoundException ex)
-            {
+            {           
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
