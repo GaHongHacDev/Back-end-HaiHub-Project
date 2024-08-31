@@ -130,7 +130,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Map Hub and define route of hub
+// MapHub and define route of hub 
 app.MapHub<BookAppointmentHub>("/book-appointment-hub");
 
 app.Run();
