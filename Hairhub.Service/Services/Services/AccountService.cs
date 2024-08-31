@@ -174,7 +174,10 @@ namespace Hairhub.Service.Services.Services
                 var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALONOWNER_AVATAR, salonOwner.Id.ToString());
                 salonOwner.AccountId = account.Id;
                 salonOwner.FullName = updateAccountRequest.FullName;
-                salonOwner.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth;
+                if (updateAccountRequest.DayOfBirth!=null)
+                {
+                    salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;
+                }
                 salonOwner.Gender = updateAccountRequest.Gender;
                 salonOwner.Phone = updateAccountRequest.Phone;
                 salonOwner.Address = updateAccountRequest.Address;
