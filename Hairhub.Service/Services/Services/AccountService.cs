@@ -173,13 +173,10 @@ namespace Hairhub.Service.Services.Services
                 }
                 var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.SALONOWNER_AVATAR, salonOwner.Id.ToString());
                 salonOwner.AccountId = account.Id;
-                salonOwner.FullName = updateAccountRequest.FullName;
-                if (updateAccountRequest.DayOfBirth!=null)
-                {
-                    salonOwner.DayOfBirth = updateAccountRequest.DayOfBirth;
-                }
+                salonOwner.FullName = updateAccountRequest.FullName!;
+                salonOwner.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth!;
                 salonOwner.Gender = updateAccountRequest.Gender;
-                salonOwner.Phone = updateAccountRequest.Phone;
+                salonOwner.Phone = updateAccountRequest.Phone!;
                 salonOwner.Address = updateAccountRequest.Address;
                 salonOwner.Img = urlImg;
                 _unitOfWork.GetRepository<SalonOwner>().UpdateAsync(salonOwner);
@@ -193,10 +190,10 @@ namespace Hairhub.Service.Services.Services
                 }
                 var urlImg = await _mediaService.UploadAnImage(updateAccountRequest.Img, MediaPath.CUSTOMER_AVATAR, customer.Id.ToString());
                 customer.AccountId = account.Id;
-                customer.FullName = updateAccountRequest.FullName;
-                customer.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth;
-                customer.Gender = updateAccountRequest.Gender;
-                customer.Phone = updateAccountRequest.Phone;
+                customer.FullName = updateAccountRequest.FullName!;
+                customer.DayOfBirth = (DateTime)updateAccountRequest.DayOfBirth!;
+                customer.Gender = updateAccountRequest.Gender!;
+                customer.Phone = updateAccountRequest.Phone!;
                 customer.Address = updateAccountRequest.Address;
                 customer.Img = urlImg;
                 _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
