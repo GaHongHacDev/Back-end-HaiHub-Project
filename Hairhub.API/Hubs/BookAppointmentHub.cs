@@ -13,5 +13,6 @@ namespace Hairhub.API.Hubs
         {
             await Clients.All.SendAsync("BookAppointmentMessage", message);
         }
+
     }
 }

@@ -79,7 +79,7 @@ builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
-        policy => { policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod(); });
+        policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
 });
 
 // Jwt configuration starts here
