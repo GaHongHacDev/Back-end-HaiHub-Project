@@ -18,7 +18,6 @@ namespace Hairhub.API.Controllers
     public class AppointmentController : BaseController
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly IHubContext<BookAppointmentHub> _hubContext;
 
         public AppointmentController(IMapper mapper, IAppointmentService appointmentService, IHubContext<BookAppointmentHub> hubContext) : base(mapper)
         {
@@ -143,13 +142,6 @@ namespace Hairhub.API.Controllers
                 {
                     return NotFound(new { message = "Không thể tạo lịch hẹn" });
                 }
-
-                await _hubContext.Clients.All.SendAsync("AppointmentCreated", new
-                {
-                    Message = "Lịch hẹn đã được đặt thành công",
-                    AppointmentDetails = createAppointmentRequest
-                });
-
                 return Ok("Tạo lịch hẹn thành công");
             }
             catch (NotFoundException ex)
