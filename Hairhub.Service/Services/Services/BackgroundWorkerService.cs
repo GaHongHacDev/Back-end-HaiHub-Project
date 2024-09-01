@@ -61,7 +61,7 @@ namespace Hairhub.Service.Services.Services
                 await ExecuteExpriredAppointment(stoppingToken);
 
                 // Đợi 30 giây
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
             }
         }
 
