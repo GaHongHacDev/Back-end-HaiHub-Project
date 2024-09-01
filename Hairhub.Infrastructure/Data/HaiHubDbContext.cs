@@ -25,9 +25,9 @@ namespace Hairhub.Infrastructure
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-           optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
+           optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-          // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+           //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
         }
 
         // DBSet<>
@@ -169,7 +169,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.FullName).HasMaxLength(128).HasColumnName("full_name");
                 entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender").IsRequired(false);
                 entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth").IsRequired(false);
-                entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email").IsRequired(false);
+                entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email");
                 entity.Property(e => e.Address).HasMaxLength(256).HasColumnName("address").IsRequired(false);
                 entity.Property(e => e.Img).HasMaxLength(200).HasColumnName("img").IsRequired(false);
 
@@ -307,10 +307,10 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.AccountId).HasColumnName("account_id");
                 entity.Property(e => e.FullName).HasMaxLength(128).HasColumnName("full_name");
-                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender");
-                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth");
+                entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender").IsRequired(false);
+                entity.Property(e => e.DayOfBirth).HasColumnName("day_of_birth").IsRequired(false);
                 entity.Property(e => e.Email).HasMaxLength(128).HasColumnName("email");
-                entity.Property(e => e.Phone).HasMaxLength(50).HasColumnName("phone").IsRequired(false);
+                entity.Property(e => e.Phone).HasMaxLength(50).HasColumnName("phone");
                 entity.Property(e => e.Address).HasMaxLength(250).HasColumnName("address").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.NumberOfReported).HasColumnName("number_of_report").IsRequired(false);

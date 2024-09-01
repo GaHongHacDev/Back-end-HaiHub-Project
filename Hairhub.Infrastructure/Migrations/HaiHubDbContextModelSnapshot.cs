@@ -391,6 +391,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("number_of_report");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("phone");
