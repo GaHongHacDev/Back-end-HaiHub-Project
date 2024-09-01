@@ -19,10 +19,9 @@ namespace Hairhub.API.Controllers
     {
         private readonly IAppointmentService _appointmentService;
 
-        public AppointmentController(IMapper mapper, IAppointmentService appointmentService, IHubContext<BookAppointmentHub> hubContext) : base(mapper)
+        public AppointmentController(IMapper mapper, IAppointmentService appointmentService) : base(mapper)
         {
             _appointmentService = appointmentService;
-            _hubContext = hubContext;
         }
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
