@@ -6,6 +6,7 @@ using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -121,10 +122,16 @@ app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
+app.MapPost("broadcast", async (string message, IHubContext<BookAppointmentHub, IBookAppointmentHub> context) =>
+{
+    await context.Clients.All.RecieveMessage(message);
+
+    return Results.NoContent();
+});
+
 // MapHub and define route of hub 
-app.MapHub<BookAppointmentHub>("/book-appointment-hub");
+app.MapHub<BookAppointmentHub>("book-appointment-hub");
 
 app.Run();

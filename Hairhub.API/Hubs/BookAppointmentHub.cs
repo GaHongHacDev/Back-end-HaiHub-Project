@@ -2,16 +2,16 @@
 
 namespace Hairhub.API.Hubs
 {
-    public sealed class BookAppointmentHub : Hub
+    public sealed class BookAppointmentHub : Hub<IBookAppointmentHub>
     {
         public override async Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("ConnectSignalR", $"{Context.ConnectionId} has connected SignalR. Connect SigalR successfully");
+            await Clients.All.RecieveMessage($"{Context.ConnectionId} has joined");
         }
 
         public async Task SendMessage(string message)
         {
-            await Clients.All.SendAsync("BookAppointmentMessage", message);
+            await Clients.All.RecieveMessage($"{Context.ConnectionId}: {message}");
         }
     }
 }
