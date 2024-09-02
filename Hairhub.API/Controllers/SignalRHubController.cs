@@ -11,9 +11,9 @@ namespace Hairhub.API.Controllers
     [ApiController]
     public class SignalRHubController : BaseController
     {
-        private readonly IHubContext<BookAppointmentHub, IBookAppointmentHub> _hubContext;
+        private readonly IHubContext<BookAppointmentHub> _hubContext;
 
-        public SignalRHubController(IHubContext<BookAppointmentHub, IBookAppointmentHub> hubContext, IMapper mapper) : base(mapper)   
+        public SignalRHubController(IHubContext<BookAppointmentHub> hubContext, IMapper mapper) : base(mapper)   
         {
             _hubContext = hubContext;
         }
@@ -21,7 +21,8 @@ namespace Hairhub.API.Controllers
         [HttpPost("broadcast")]
         public async Task<IActionResult> BroadcastMessage([FromBody] string message)
         {
-            await _hubContext.Clients.All.RecieveMessage(message);
+            var timestamp = DateTime.Now;
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", message, timestamp);
             return NoContent();
         }
     }

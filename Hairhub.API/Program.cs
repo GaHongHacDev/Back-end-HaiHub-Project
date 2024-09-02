@@ -130,13 +130,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapPost("broadcast", async (string message, IHubContext<BookAppointmentHub, IBookAppointmentHub> context) =>
-{
-    await context.Clients.All.RecieveMessage(message);
-
-    return Results.NoContent();
-});
-
 // MapHub and define route of hub 
 app.MapHub<BookAppointmentHub>("book-appointment-hub");
 
