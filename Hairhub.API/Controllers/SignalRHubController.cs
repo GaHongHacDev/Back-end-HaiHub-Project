@@ -19,10 +19,10 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost("broadcast")]
-        public async Task<IActionResult> BroadcastMessage([FromBody] string message)
+        public async Task<IActionResult> BroadcastMessage([FromBody] string message, [FromBody] string ServiceId)
         {
             var timestamp = DateTime.Now;
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", message, timestamp);
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", message, timestamp, ServiceId);
             return NoContent();
         }
     }
