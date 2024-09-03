@@ -29,7 +29,7 @@ namespace Hairhub.Service.Services.Services
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
 
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService, 
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
                                     IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
@@ -76,7 +76,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay)
         {
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
-            if(salon == null)
+            if (salon == null)
             {
                 throw new NotFoundException("Không tìm thấy salon, barber shop");
             }
@@ -379,12 +379,39 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Salon, barber shop không hoạt động vào thời gian này");
             }
-            //****************************************
-            /* if (salonSchedule.EndTime)
-             {
+            DateTime dateTime = DateTime.Now;
+            TimeOnly timeOnlyNow = TimeOnly.FromDateTime(dateTime);
+            decimal timeStartSchedule = salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60;
+            decimal timeEndSchedule = salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60;
 
-             }*/
-            List<decimal> availbeTimeResponse = GenerateTimeSlot(salonSchedule.StartTime.Hour + (decimal)salonSchedule.StartTime.Minute / 60, salonSchedule.EndTime.Hour + (decimal)salonSchedule.EndTime.Minute / 60, 0.25m);
+            if (salonSchedule.DayOfWeek.Equals(DateTime.Now.DayOfWeek.ToString()))
+            {
+                // Now between start and end schedule of salon schedule
+                if (salonSchedule.StartTime <= timeOnlyNow && salonSchedule.EndTime >= timeOnlyNow)
+                {
+                    bool checkTime = true;
+                    decimal start = salonSchedule.StartTime.Hour + salonSchedule.StartTime.Minute / 60m;
+                    decimal end = salonSchedule.EndTime.Hour + salonSchedule.EndTime.Minute / 60m;
+                    for (decimal i = start; i <= end; i += 0.25m)
+                        if (timeOnlyNow.Hour + timeOnlyNow.Minute / 60m <= i)
+                        {
+                            timeStartSchedule = i + 1;
+                            checkTime = false;
+                            break;
+                        }
+                    if (timeStartSchedule > timeEndSchedule || checkTime)
+                    {
+                        return result;
+                    }
+                }
+
+                if (timeOnlyNow >= salonSchedule.EndTime)
+                {
+                    return result;
+                }
+            }
+
+            List<decimal> availbeTimeResponse = GenerateTimeSlot(timeStartSchedule, timeEndSchedule, 0.25m);
             var availableTimesDict = availbeTimeResponse.ToDictionary(timeSlot => timeSlot, timeSlot => new List<EmployeeAvailable>());
             // Loại bỏ các time slots đã qua
             //decimal currentTime = DateTime.Now.Hour + (decimal)DateTime.Now.Minute / 60;
@@ -771,6 +798,7 @@ namespace Hairhub.Service.Services.Services
 
             return true;
         }
+
         private List<decimal> GenerateTimeSlot(decimal begin, decimal end, decimal step)
         {
             int count = (int)((end - begin) / step) + 1;
@@ -800,7 +828,7 @@ namespace Hairhub.Service.Services.Services
             }
 
             //Kiểm tra lịch làm việc employee
-            
+
 
             var appointment = new Appointment()
             {
@@ -1203,7 +1231,7 @@ namespace Hairhub.Service.Services.Services
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
-                    predicate: x=>x.CustomerId == customerId && x.Status.Contains(status??""),
+                    predicate: x => x.CustomerId == customerId && x.Status.Contains(status ?? ""),
                     include: query => query.Include(a => a.Customer)
                                            .Include(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
@@ -1234,7 +1262,7 @@ namespace Hairhub.Service.Services.Services
             status = string.IsNullOrEmpty(status) ? "" : status;
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
-                    predicate: x=>x.CustomerId == customerId && x.Status.Contains(status),
+                    predicate: x => x.CustomerId == customerId && x.Status.Contains(status),
                     include: query => query.Include(a => a.Customer)
                                            .Include(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
