@@ -6,6 +6,7 @@ using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -76,6 +77,17 @@ builder.Services.AddDbContext<HaiHubDbContext>(options =>
 builder.Services.AddSignalR();
 
 // Setting CORS for all sources
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: CorsConstant.PolicyName,
+//        policy =>
+//        {
+//            policy.WithOrigins("http://localhost:5173") // Chỉ định origin cụ thể
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod()
+//                  .AllowCredentials(); // Phải có AllowCredentials khi gửi credentials
+//        });
+//});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
@@ -121,10 +133,9 @@ app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 // MapHub and define route of hub 
-app.MapHub<BookAppointmentHub>("/book-appointment-hub");
+app.MapHub<BookAppointmentHub>("book-appointment-hub");
 
 app.Run();

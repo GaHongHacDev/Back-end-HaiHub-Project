@@ -798,6 +798,10 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Không tìm thấy config phần trăm hoa hồng");
             }
+
+            //Kiểm tra lịch làm việc employee
+            
+
             var appointment = new Appointment()
             {
                 Id = id,
