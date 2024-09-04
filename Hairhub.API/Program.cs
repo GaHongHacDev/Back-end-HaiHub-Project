@@ -77,16 +77,21 @@ builder.Services.AddDbContext<HaiHubDbContext>(options =>
 builder.Services.AddSignalR();
 
 // Setting CORS for all sources
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: CorsConstant.PolicyName,
+//        policy =>
+//        {
+//            policy.WithOrigins("http://localhost:5173") // Chỉ định origin cụ thể
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod()
+//                  .AllowCredentials(); // Phải có AllowCredentials khi gửi credentials
+//        });
+//});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173") // Chỉ định origin cụ thể
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); // Phải có AllowCredentials khi gửi credentials
-        });
+        policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
 });
 
 // Jwt configuration starts here
