@@ -18,6 +18,8 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing.Printing;
 using System.Linq;
 
@@ -361,6 +363,30 @@ namespace Hairhub.Service.Services.Services
                     {
                         salon.Vouchers = _mapper.Map<List<SearchSalonVoucherRespnse>>(vouchers);
                     }
+                }
+
+                if(longtitude!=null && latitude !=null && distance != null)
+                {
+                    salon.Distance = DistanceMap.GetDistance(salon.Latitude, salon.Longitude, (decimal)latitude, (decimal)longtitude);
+                }
+                else
+                {
+                    salon.Distance = null;
+                }
+                TimeOnly timeOnlyNow = TimeOnly.FromDateTime(DateTime.Now);
+                string dayOfWeek = DateTime.Now.DayOfWeek.ToString();
+                var salonSchedule = await _unitOfWork.GetRepository<Schedule>()
+                                           .SingleOrDefaultAsync(
+                                                                 predicate: x => x.SalonId == salon.Id
+                                                                      && x.DayOfWeek.Equals(dayOfWeek)
+                                                                      && x.IsActive);
+                if (timeOnlyNow >= salonSchedule.StartTime && timeOnlyNow <= salonSchedule.EndTime)
+                {
+                    salon.OperatingStatus = "Đang hoạt động";
+                }
+                else
+                {
+                    salon.OperatingStatus = "Đã qua thời gian làm việc";
                 }
             }
             return new Paginate<SearchSalonByNameAddressServiceResponse>()
