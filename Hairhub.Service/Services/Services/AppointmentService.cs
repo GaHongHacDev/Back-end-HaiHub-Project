@@ -837,7 +837,7 @@ namespace Hairhub.Service.Services.Services
                                                                                 (x.StartTime <= appointmentItem.StartTime && x.EndTime>= appointmentItem.EndTime)) 
                                                                                 && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
                                                             );
-                if (appointmentDetailDomain == null)
+                if (appointmentDetailDomain != null)
                 {
                     throw new Exception("Thời gian vừa có khách hàng đặt. Hãy đặt lại ở khung giờ khác nhé");
                 }
