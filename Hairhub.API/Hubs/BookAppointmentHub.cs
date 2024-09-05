@@ -11,7 +11,6 @@ namespace Hairhub.API.Hubs
             await Clients.All.SendAsync("ReceiveMessage", message, timestamp);
         }
 
-        // Thay đổi serviceId từ string sang List<string>
         public async Task SendMessage(string message, List<string> serviceIds)
         {
             var timestamp = DateTime.Now;
