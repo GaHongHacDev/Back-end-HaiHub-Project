@@ -828,7 +828,20 @@ namespace Hairhub.Service.Services.Services
             }
 
             //Kiểm tra lịch làm việc employee
-
+            foreach(var appointmentItem in request.AppointmentDetails)
+            {
+                var appointmentDetailDomain = _unitOfWork.GetRepository<AppointmentDetail>()
+                                                            .SingleOrDefaultAsync(
+                                                                predicate: x=> ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
+                                                                                (x.EndTime > appointmentItem.StartTime && x.EndTime <= appointmentItem.EndTime) ||
+                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime>= appointmentItem.EndTime)) 
+                                                                                && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
+                                                            );
+                if (appointmentDetailDomain == null)
+                {
+                    throw new Exception("Thời gian vừa có khách hàng đặt. Hãy đặt lại ở khung giờ khác nhé");
+                }
+            }
 
             var appointment = new Appointment()
             {
