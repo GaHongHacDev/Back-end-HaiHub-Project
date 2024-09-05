@@ -11,10 +11,10 @@ namespace Hairhub.API.Hubs
             await Clients.All.SendAsync("ReceiveMessage", message, timestamp);
         }
 
-        public async Task SendMessage(string message,string dateappointment, List<string> serviceIds)
+        public async Task SendMessage(string message,string dateappointment, List<string> serviceIds, string salonId)
         {
             var timestamp = DateTime.Now;
-            await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId}: {message}",dateappointment, timestamp, serviceIds);
+            await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId}: {message}",dateappointment, timestamp, serviceIds, salonId);
         }
     }
 }
