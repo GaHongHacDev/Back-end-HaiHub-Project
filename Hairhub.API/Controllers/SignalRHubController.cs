@@ -22,13 +22,18 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> BroadcastMessage([FromBody] BroadcastMessageRequest request)
         {
             var timestamp = DateTime.Now;
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", request.Message, timestamp, request.ServiceId);
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", request.Message, request.DateAppointment, timestamp, request.SalonId, request.ServiceId);
             return NoContent();
         }
     }
     public class BroadcastMessageRequest
     {
         public string Message { get; set; }
-        public string ServiceId { get; set; }
+
+        public string DateAppointment { get; set; }
+        public string SalonId { get; set; }
+        public List<string> ServiceId { get; set; }
+
+        
     }
 }
