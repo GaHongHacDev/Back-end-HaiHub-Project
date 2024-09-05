@@ -74,7 +74,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         [Route("{salonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status ,[FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
@@ -361,7 +361,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
         {
             try
