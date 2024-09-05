@@ -815,12 +815,6 @@ namespace Hairhub.Service.Services.Services
         #region Create Update Delete Active
         public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
         {
-            Guid id = Guid.NewGuid();
-            string url = await _qrCodeService.GenerateQR(id);
-            if (String.IsNullOrEmpty(url))
-            {
-                throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
-            }
             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x => x.CommissionRate != null && x.IsActive);
             if (config == null)
             {
@@ -830,11 +824,11 @@ namespace Hairhub.Service.Services.Services
             //Kiểm tra lịch làm việc employee
             foreach(var appointmentItem in request.AppointmentDetails)
             {
-                var appointmentDetailDomain = _unitOfWork.GetRepository<AppointmentDetail>()
+                var appointmentDetailDomain = await _unitOfWork.GetRepository<AppointmentDetail>()
                                                             .SingleOrDefaultAsync(
                                                                 predicate: x=> ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
                                                                                 (x.EndTime > appointmentItem.StartTime && x.EndTime <= appointmentItem.EndTime) ||
-                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime>= appointmentItem.EndTime)) 
+                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime >= appointmentItem.EndTime)) 
                                                                                 && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
                                                             );
                 if (appointmentDetailDomain != null)
@@ -843,6 +837,12 @@ namespace Hairhub.Service.Services.Services
                 }
             }
 
+            Guid id = Guid.NewGuid();
+            string url = await _qrCodeService.GenerateQR(id);
+            if (String.IsNullOrEmpty(url))
+            {
+                throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
+            }
             var appointment = new Appointment()
             {
                 Id = id,

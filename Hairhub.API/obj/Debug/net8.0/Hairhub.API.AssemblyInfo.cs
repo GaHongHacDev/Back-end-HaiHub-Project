@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hairhub.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bcd0eeeed01418692c5a32b1d2f69ab48bd60f44")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+392f82ae3abf1786f96b7c1262c0fb82509be373")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hairhub.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hairhub.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
