@@ -131,11 +131,7 @@ namespace Hairhub.Service.Services.Services
                             {
                                 await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
                             }                        
-                            if(daysToExpiry == 0)
-                            {
-                                salon.Status = SalonStatus.Disable;
-                            }
-                            if (latestPayment.EndDate < DateTime.Now && salon.Status != SalonStatus.OverDue)
+                            if (latestPayment.EndDate < DateTime.Now)
                             {
                                 salon.Status = SalonStatus.OverDue;
                                 uow.GetRepository<SalonInformation>().UpdateAsync(salon);

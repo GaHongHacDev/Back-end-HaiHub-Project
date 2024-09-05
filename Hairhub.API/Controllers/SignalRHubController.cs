@@ -29,6 +29,6 @@ namespace Hairhub.API.Controllers
     public class BroadcastMessageRequest
     {
         public string Message { get; set; }
-        public string ServiceId { get; set; }
+        public List<string> ServiceId { get; set; }
     }
 }
