@@ -361,7 +361,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
         {
             try

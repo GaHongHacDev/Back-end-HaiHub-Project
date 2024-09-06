@@ -427,7 +427,7 @@ namespace Hairhub.Service.Services.Services
             {
                 // Get all employees in the salon
                 var employee = await _unitOfWork.GetRepository<SalonEmployee>()
-                                                 .SingleOrDefaultAsync(predicate: x => x.Id == request.SalonEmployeeId && x.IsActive);
+                                                 .SingleOrDefaultAsync(predicate: x => x.Id == request.SalonEmployeeId && x.IsActive );
 
                 if (employee == null)
                 {
@@ -504,9 +504,19 @@ namespace Hairhub.Service.Services.Services
             }
             else if (request.IsAnyOne) //Xủ lý khi chọn employee nào cũng được
             {
-                // Get all employees in the salon
-                var employees = await _unitOfWork.GetRepository<SalonEmployee>()
-                                                 .GetListAsync(predicate: x => x.SalonInformationId == request.SalonId && x.IsActive);
+                //Xủ lý khi chọn employee nào cũng được => IsAnyOne = true
+                var serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
+                                                           .SingleOrDefaultAsync(predicate: x => x.Id == request.ServiceHairId && x.IsActive);
+                var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync
+                                                  (
+                                                    predicate: x => x.SalonInformationId == request.SalonId &&
+                                                                    x.ServiceEmployees.Any(se => se.ServiceHairId == request.ServiceHairId)
+                                                                    && x.IsActive == true
+                                                  );
+                if (employees == null)
+                {
+                    throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop có thể phục vụ dịch vụ này");
+                }
 
                 if (employees == null)
                 {
@@ -526,20 +536,9 @@ namespace Hairhub.Service.Services.Services
                     {
                         continue;
                     }
-
-                    var serviceEmployee = await _unitOfWork.GetRepository<ServiceEmployee>()
-                                                           .SingleOrDefaultAsync(predicate: x => x.ServiceHairId == request.ServiceHairId
-                                                                                      && x.SalonEmployeeId == employee.Id
-                                                                                      && x.ServiceHair.IsActive,
-                                                                                include: x => x.Include(y => y.ServiceHair));
-                    if (serviceEmployee == null) // Employee không thực hiện srv này => Continue
-                    {
-                        continue;
-                    }
-
                     // Get time work of employee
                     var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
-                    var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60 - serviceEmployee.ServiceHair.Time;
+                    var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60 - serviceHair.Time;
 
                     // Define list time work of employee
                     List<decimal> timeSlotEmployee = GenerateTimeSlot(startSchedule, endSchedule, 0.25m);
@@ -557,6 +556,30 @@ namespace Hairhub.Service.Services.Services
                         decimal end = ParseTimeToDecimal(item.EndTime);
                         await Console.Out.WriteLineAsync(start + " : " + end);
                         timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                    }
+
+                    int i = 0;
+                    while (timeSlotEmployee.Count > 0 && i < timeSlotEmployee.Count - 1) 
+                    {
+                        if (i + 1 < timeSlotEmployee.Count && timeSlotEmployee[i] + 0.25m != timeSlotEmployee[i + 1] && 0.25m <= serviceHair.Time)
+                        {
+                            timeSlotEmployee.Remove(timeSlotEmployee[i]);
+                        }
+                        else
+                        {
+                            for (int j = i + 1; j < timeSlotEmployee.Count - 1; j++) 
+                            {
+                                if (j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m == timeSlotEmployee[j + 1] && timeSlotEmployee[j] - timeSlotEmployee[i] >= serviceHair.Time)
+                                {
+                                    break;
+                                }
+                                else if (j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m != timeSlotEmployee[j + 1] && timeSlotEmployee[j] - timeSlotEmployee[i] < serviceHair.Time)
+                                {
+                                    timeSlotEmployee.RemoveAll(slot => slot >= timeSlotEmployee[i] && slot <= timeSlotEmployee[j]);
+                                }
+                            }
+                        }
+                        i++;
                     }
 
                     foreach (var timeSlot in timeSlotEmployee)
