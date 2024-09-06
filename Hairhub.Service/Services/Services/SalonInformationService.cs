@@ -380,7 +380,11 @@ namespace Hairhub.Service.Services.Services
                                                                  predicate: x => x.SalonId == salon.Id
                                                                       && x.DayOfWeek.Equals(dayOfWeek)
                                                                       && x.IsActive);
-                if (timeOnlyNow >= salonSchedule.StartTime && timeOnlyNow <= salonSchedule.EndTime)
+                if (salonSchedule == null)
+                {
+                    salon.OperatingStatus = "Không hoạt động vào hôm nay";
+                }
+                else if(timeOnlyNow >= salonSchedule.StartTime && timeOnlyNow <= salonSchedule.EndTime)
                 {
                     salon.OperatingStatus = "Đang hoạt động";
                 }
