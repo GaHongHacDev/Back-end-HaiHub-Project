@@ -341,7 +341,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
         {
             try
