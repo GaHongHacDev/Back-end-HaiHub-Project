@@ -99,7 +99,7 @@ namespace Hairhub.Service.Services.Services
             var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
             if (payment == null)
             {
-                throw new NotFoundException("Không tìm thấy salon, barber shop hoặc thông tin thanh toán");
+                throw new NotFoundException("Không tìm thấy thông tin thanh toán");
             }
             if (appointments != null)
             {
@@ -427,7 +427,7 @@ namespace Hairhub.Service.Services.Services
             {
                 // Get all employees in the salon
                 var employee = await _unitOfWork.GetRepository<SalonEmployee>()
-                                                 .SingleOrDefaultAsync(predicate: x => x.Id == request.SalonEmployeeId && x.IsActive );
+                                                 .SingleOrDefaultAsync(predicate: x => x.Id == request.SalonEmployeeId && x.IsActive);
 
                 if (employee == null)
                 {
@@ -526,73 +526,79 @@ namespace Hairhub.Service.Services.Services
                 var tempAvailableTimes = new Dictionary<decimal, List<EmployeeAvailable>>();
 
                 foreach (var employee in employees)
-                {
-                    // Get schedule by id
-                    var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
-                                                       .SingleOrDefaultAsync(predicate: x => x.EmployeeId == employee.Id
-                                                                                  && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString())
-                                                                                  && x.IsActive);
-                    if (scheduleEmp == null)
+                    if (employee.Id.ToString().Equals("3644a197-4c84-4e6d-a4b1-5e9c82363d25"))
                     {
-                        continue;
-                    }
-                    // Get time work of employee
-                    var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
-                    var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60 - serviceHair.Time;
-
-                    // Define list time work of employee
-                    List<decimal> timeSlotEmployee = GenerateTimeSlot(startSchedule, endSchedule, 0.25m);
-
-                    // Get appointment detail => Check available time
-                    var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                              .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                                 && x.StartTime.Date == request.Day.Date
-                                                                                 && x.EndTime.Date == request.Day.Date
-                                                                                 && x.Status.Equals(AppointmentStatus.Booking));
-
-                    foreach (var item in appointmentDetails)
-                    {
-                        decimal start = ParseTimeToDecimal(item.StartTime);
-                        decimal end = ParseTimeToDecimal(item.EndTime);
-                        await Console.Out.WriteLineAsync(start + " : " + end);
-                        timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
-                    }
-
-                    int i = 0;
-                    while (timeSlotEmployee.Count > 0 && i < timeSlotEmployee.Count - 1) 
-                    {
-                        if (i + 1 < timeSlotEmployee.Count && timeSlotEmployee[i] + 0.25m != timeSlotEmployee[i + 1] && 0.25m <= serviceHair.Time)
+                        // Get schedule by id
+                        var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
+                                                           .SingleOrDefaultAsync(predicate: x => x.EmployeeId == employee.Id
+                                                                                      && x.DayOfWeek.Equals(request.Day.DayOfWeek.ToString())
+                                                                                      && x.IsActive);
+                        if (scheduleEmp == null)
                         {
-                            timeSlotEmployee.Remove(timeSlotEmployee[i]);
+                            continue;
                         }
-                        else
+                        // Get time work of employee
+                        var startSchedule = scheduleEmp.StartTime.Hour + (decimal)scheduleEmp.StartTime.Minute / 60;
+                        var endSchedule = scheduleEmp.EndTime.Hour + (decimal)scheduleEmp.EndTime.Minute / 60;
+
+                        // Define list time work of employee
+                        List<decimal> timeSlotEmployee = GenerateTimeSlot(startSchedule, endSchedule, 0.25m);
+
+                        // Get appointment detail => Check available time
+                        var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                                  .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
+                                                                                     && x.StartTime.Date == request.Day.Date
+                                                                                     && x.EndTime.Date == request.Day.Date
+                                                                                     && x.Status.Equals(AppointmentStatus.Booking));
+
+                        foreach (var item in appointmentDetails)
                         {
-                            for (int j = i + 1; j < timeSlotEmployee.Count - 1; j++) 
+                            decimal start = ParseTimeToDecimal(item.StartTime);
+                            decimal end = ParseTimeToDecimal(item.EndTime);
+                            await Console.Out.WriteLineAsync(start + " : " + end);
+                            timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                        }
+
+                        int i = 0;
+                        while (timeSlotEmployee.Count > 0 && i < timeSlotEmployee.Count && timeSlotEmployee[i]+serviceHair.Time > timeEndSchedule)
+                        {
+                            if (i + 1 < timeSlotEmployee.Count && timeSlotEmployee[i] + 0.25m != timeSlotEmployee[i + 1] && 0.25m <= serviceHair.Time)
                             {
-                                if (j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m == timeSlotEmployee[j + 1] && timeSlotEmployee[j] - timeSlotEmployee[i] >= serviceHair.Time)
+                                timeSlotEmployee.Remove(timeSlotEmployee[i]);
+                            }
+                            else
+                            {
+                                bool check = false;
+                                for (int j = i + 1; j < timeSlotEmployee.Count; j++)
                                 {
-                                    break;
-                                }
-                                else if (j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m != timeSlotEmployee[j + 1] && timeSlotEmployee[j] - timeSlotEmployee[i] < serviceHair.Time)
-                                {
-                                    timeSlotEmployee.RemoveAll(slot => slot >= timeSlotEmployee[i] && slot <= timeSlotEmployee[j]);
+                                    if (((j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m == timeSlotEmployee[j + 1]) || j == timeSlotEmployee.Count-1) 
+                                            && timeSlotEmployee[j] - timeSlotEmployee[i] + 0.25m >= serviceHair.Time)
+                                    {
+                                        i++;
+                                        break;
+                                    }
+                                    else if (j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m != timeSlotEmployee[j + 1] && timeSlotEmployee[j] - timeSlotEmployee[i] + 0.25m < serviceHair.Time)
+                                    {
+                                        timeSlotEmployee.RemoveAll(slot => slot >= timeSlotEmployee[i] && slot <= timeSlotEmployee[j]);
+                                        break;
+                                    }
                                 }
                             }
                         }
-                        i++;
-                    }
 
-                    foreach (var timeSlot in timeSlotEmployee)
-                    {
-                        if (availableTimesDict.ContainsKey(timeSlot))
+                        timeSlotEmployee.RemoveAll(slot => slot > timeEndSchedule - serviceHair.Time && slot <= timeEndSchedule);
+
+                        foreach (var timeSlot in timeSlotEmployee)
                         {
-                            if (!availableTimesDict[timeSlot].Any(ea => ea.Id == employee.Id))
+                            if (availableTimesDict.ContainsKey(timeSlot))
                             {
-                                availableTimesDict[timeSlot].Add(new EmployeeAvailable { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
+                                if (!availableTimesDict[timeSlot].Any(ea => ea.Id == employee.Id))
+                                {
+                                    availableTimesDict[timeSlot].Add(new EmployeeAvailable { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
+                                }
                             }
                         }
                     }
-                }
 
                 // Loại bỏ các thời gian không có nhân viên nào
                 availableTimesDict = availableTimesDict
@@ -845,13 +851,13 @@ namespace Hairhub.Service.Services.Services
             }
 
             //Kiểm tra lịch làm việc employee
-            foreach(var appointmentItem in request.AppointmentDetails)
+            foreach (var appointmentItem in request.AppointmentDetails)
             {
                 var appointmentDetailDomain = await _unitOfWork.GetRepository<AppointmentDetail>()
                                                             .SingleOrDefaultAsync(
-                                                                predicate: x=> ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
+                                                                predicate: x => ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
                                                                                 (x.EndTime > appointmentItem.StartTime && x.EndTime <= appointmentItem.EndTime) ||
-                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime >= appointmentItem.EndTime)) 
+                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime >= appointmentItem.EndTime))
                                                                                 && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
                                                             );
                 if (appointmentDetailDomain != null)
