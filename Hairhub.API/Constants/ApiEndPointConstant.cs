@@ -119,5 +119,11 @@
             public const string ReportsEndpoint = ApiEndpoint + "/reports";
 
         }
+
+        public static class SignalR
+        {
+            public const string SignalRsEndpoint = ApiEndpoint + "/signalRs";
+            
+        }
     }
 }

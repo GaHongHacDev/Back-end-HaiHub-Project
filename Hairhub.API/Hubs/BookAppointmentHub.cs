@@ -6,12 +6,15 @@ namespace Hairhub.API.Hubs
     {
         public override async Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("ConnectSignalR", $"{Context.ConnectionId} has connected SignalR. Connect SigalR successfully");
+            var message = $"{Context.ConnectionId} has joined";
+            var timestamp = DateTime.Now;
+            await Clients.All.SendAsync("ReceiveMessage", message, timestamp);
         }
 
-        public async Task SendMessage(string message)
+        public async Task SendMessage(string message,string dateappointment, List<string> serviceIds, string salonId)
         {
-            await Clients.All.SendAsync("BookAppointmentMessage", message);
+            var timestamp = DateTime.Now;
+            await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId}: {message}",dateappointment, timestamp, salonId, serviceIds);
         }
     }
 }
