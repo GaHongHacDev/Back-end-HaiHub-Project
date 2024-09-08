@@ -15,6 +15,7 @@ using System.Data;
 using MailKit.Search;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Common.ThirdParties.Contract;
+using System;
 
 
 
@@ -336,7 +337,7 @@ namespace Hairhub.Service.Services.Services
                     item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
                 }
             }
-            return appointmentResponse;
+            return appointmentResponse!;
         }
 
         public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate)
@@ -1341,19 +1342,61 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentCustomerByStatus(Guid customerId, string? status, int page, int size)
+        //25cb20ef-6cb2-4db9-aa19-8f5c918ee6dd
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentCustomerByStatus(Guid customerId, string? status, bool isAscending, DateTime? date, int page, int size)
         {
             status = string.IsNullOrEmpty(status) ? "" : status;
-            var appointments = await _unitOfWork.GetRepository<Appointment>()
-                .GetPagingListAsync(
-                    predicate: x => x.CustomerId == customerId && x.Status.Contains(status),
-                    include: query => query.Include(a => a.Customer)
-                                           .Include(a => a.AppointmentDetails)
-                                               .ThenInclude(ad => ad.SalonEmployee)
-                                                   .ThenInclude(se => se.SalonInformation),
-                    page: page,
-                    size: size
-                );
+            ExpressionStarter<Appointment> predicate;
+            if (date.HasValue)
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.CustomerId == customerId && x.Status.Contains(status) && x.StartDate.Date == date.Value.Date);
+
+            }
+            else
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.CustomerId == customerId && x.Status.Contains(status));
+            }
+            IPaginate<Appointment> appointments;
+            if (isAscending)
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetPagingListAsync(
+                                                    predicate: predicate,
+                                                    include: query => query.Include(a => a.Customer)
+                                                                           .Include(a => a.AppointmentDetails)
+                                                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                                                   .ThenInclude(se => se.SalonInformation),
+                                                    orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                                                                            .OrderByDescending(ad => ad.StartTime)!
+                                                                            .FirstOrDefault()!.StartTime),
+                                                    page: page,
+                                                    size: size
+                                                );
+            }
+            else
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                                .GetPagingListAsync(
+                                    predicate: predicate,
+                                    include: query => query.Include(a => a.Customer)
+                                                           .Include(a => a.AppointmentDetails)
+                                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                                   .ThenInclude(se => se.SalonInformation),
+                                    orderBy: query => query.OrderByDescending(a => a.AppointmentDetails!
+                                                            .OrderByDescending(ad => ad.StartTime)!
+                                                            .FirstOrDefault()!.StartTime),
+                                    page: page,
+                                    size: size
+                                );
+            }
+            // Xắp sếp appointment detail tăng dần
+            foreach (var appointment in appointments.Items)
+            {
+                appointment.AppointmentDetails = appointment.AppointmentDetails
+                    .OrderBy(ad => ad.StartTime)
+                    .ToList();
+            }
+
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
@@ -1371,11 +1414,6 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse;
         }
-
-
-
-
-
         #endregion
 
     }
