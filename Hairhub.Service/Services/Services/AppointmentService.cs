@@ -261,45 +261,63 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status, bool isAscending, DateTime? date)
         {
-            // Tạo biểu thức điều kiện ban đầu cho SalonId
-            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            ExpressionStarter<Appointment> predicate;
+            if (date.HasValue)
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) && x.StartDate.Date == date.Value.Date);
+
+            }
+            else
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            }
+
             if (!string.IsNullOrEmpty(status))
             {
                 predicate = predicate.And(x => x.Status.Equals(status));
             }
-            //var appointments = await _unitOfWork.GetRepository<Appointment>()
-            //    .GetPagingListAsync(
-            //        predicate: predicate,
-            //        include: query => query.Include(a => a.Customer)
-            //                               .Include(a => a.AppointmentDetails)
-            //                                   .ThenInclude(ad => ad.SalonEmployee)
-            //                                       .ThenInclude(se => se.SalonInformation),
-            //        page: page,
-            //        size: size
-            //    );
 
-            var appointments = await _unitOfWork.GetRepository<Appointment>()
-                .GetPagingListAsync(
-                    predicate: predicate,
-                    include: query => query.Include(a => a.Customer)
-                                           .Include(a => a.AppointmentDetails)
-                                               .ThenInclude(ad => ad.SalonEmployee)
-                                                   .ThenInclude(se => se.SalonInformation),
-                    // Sắp xếp Appointment theo StartDate của AppointmentDetail giảm dần
-                    orderBy: query => query.OrderByDescending(a => a.AppointmentDetails!
-                        .OrderByDescending(ad => ad.StartTime)!
-                        .FirstOrDefault()!.StartTime),
-                    page: page,
-                    size: size
-                );
+            IPaginate<Appointment> appointments;
+            if (isAscending)
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                    .GetPagingListAsync(
+                        predicate: predicate,
+                        include: query => query.Include(a => a.Customer)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee)
+                                                       .ThenInclude(se => se.SalonInformation),
+                        orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                            .OrderByDescending(ad => ad.StartTime)!
+                            .FirstOrDefault()!.StartTime),
+                        page: page,
+                        size: size
+                    );
+            }
+            else
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                    .GetPagingListAsync(
+                        predicate: predicate,
+                        include: query => query.Include(a => a.Customer)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee)
+                                                       .ThenInclude(se => se.SalonInformation),
+                        orderBy: query => query.OrderByDescending(a => a.AppointmentDetails!
+                            .OrderByDescending(ad => ad.StartTime)!
+                            .FirstOrDefault()!.StartTime),
+                        page: page,
+                        size: size
+                    );
+            }
 
-            // Sau khi lấy danh sách Appointment, sắp xếp các AppointmentDetails bên trong mỗi Appointment theo StartDate tăng dần.
+            // Xắp sếp appointment detail tăng dần
             foreach (var appointment in appointments.Items)
             {
                 appointment.AppointmentDetails = appointment.AppointmentDetails
-                    .OrderBy(ad => ad.StartTime) // Sắp xếp theo thứ tự tăng dần
+                    .OrderBy(ad => ad.StartTime)
                     .ToList();
             }
 
