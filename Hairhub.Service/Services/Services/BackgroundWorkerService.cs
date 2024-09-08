@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Hairhub.Domain.Enums;
 using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Domain.Dtos.Requests.Payment;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -112,6 +113,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                    var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
                     var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
                         include: x => x.Include(s => s.SalonOwner),
                         predicate: p => p.Status == SalonStatus.Approved
@@ -123,20 +125,33 @@ namespace Hairhub.Service.Services.Services
                             predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
                             orderBy: o => o.OrderByDescending(p => p.EndDate)
                         );
-
+                        var amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate);
                         if (latestPayment != null)
                         {
-                            var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
-                            if (daysToExpiry < 5 && daysToExpiry > 0)
+                            if (amount == 0)
                             {
-                                await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
-                            }                        
-                            if (latestPayment.EndDate < DateTime.Now)
-                            {
-                                salon.Status = SalonStatus.OverDue;
-                                uow.GetRepository<SalonInformation>().UpdateAsync(salon);
-                                await uow.CommitAsync();
+                                var paymentInfor = new SavePaymentInfor
+                                {
+                                    SalonOwnerId = salon.SalonOwner.Id,
+                                    ConfigId = (Guid)latestPayment.ConfigId
+                                };
+                                await paymentService.PaymentForCommissionRate(paymentInfor);
                             }
+                            if (amount > 0)
+                            {
+                                var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
+                                if (daysToExpiry < 5 && daysToExpiry > 0)
+                                {
+                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
+                                }
+                                if (latestPayment.EndDate < DateTime.Now)
+                                {
+                                    salon.Status = SalonStatus.OverDue;
+                                    uow.GetRepository<SalonInformation>().UpdateAsync(salon);
+                                    await uow.CommitAsync();
+                                }
+                            }
+                            
                         }
                     }
 
