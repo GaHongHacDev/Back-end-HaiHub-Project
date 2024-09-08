@@ -269,6 +269,17 @@ namespace Hairhub.Service.Services.Services
             {
                 predicate = predicate.And(x => x.Status.Equals(status));
             }
+            //var appointments = await _unitOfWork.GetRepository<Appointment>()
+            //    .GetPagingListAsync(
+            //        predicate: predicate,
+            //        include: query => query.Include(a => a.Customer)
+            //                               .Include(a => a.AppointmentDetails)
+            //                                   .ThenInclude(ad => ad.SalonEmployee)
+            //                                       .ThenInclude(se => se.SalonInformation),
+            //        page: page,
+            //        size: size
+            //    );
+
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
                     predicate: predicate,
@@ -276,9 +287,22 @@ namespace Hairhub.Service.Services.Services
                                            .Include(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
                                                    .ThenInclude(se => se.SalonInformation),
+                    // Sắp xếp Appointment theo StartDate của AppointmentDetail giảm dần
+                    orderBy: query => query.OrderByDescending(a => a.AppointmentDetails!
+                        .OrderByDescending(ad => ad.StartTime)!
+                        .FirstOrDefault()!.StartTime),
                     page: page,
                     size: size
                 );
+
+            // Sau khi lấy danh sách Appointment, sắp xếp các AppointmentDetails bên trong mỗi Appointment theo StartDate tăng dần.
+            foreach (var appointment in appointments.Items)
+            {
+                appointment.AppointmentDetails = appointment.AppointmentDetails
+                    .OrderBy(ad => ad.StartTime) // Sắp xếp theo thứ tự tăng dần
+                    .ToList();
+            }
+
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
                 Page = appointments.Page,
@@ -560,7 +584,7 @@ namespace Hairhub.Service.Services.Services
                         }
 
                         int i = 0;
-                        while (timeSlotEmployee.Count > 0 && i < timeSlotEmployee.Count && timeSlotEmployee[i]+serviceHair.Time > timeEndSchedule)
+                        while (timeSlotEmployee.Count > 0 && i < timeSlotEmployee.Count && timeSlotEmployee[i] + serviceHair.Time > timeEndSchedule)
                         {
                             if (i + 1 < timeSlotEmployee.Count && timeSlotEmployee[i] + 0.25m != timeSlotEmployee[i + 1] && 0.25m <= serviceHair.Time)
                             {
@@ -571,7 +595,7 @@ namespace Hairhub.Service.Services.Services
                                 bool check = false;
                                 for (int j = i + 1; j < timeSlotEmployee.Count; j++)
                                 {
-                                    if (((j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m == timeSlotEmployee[j + 1]) || j == timeSlotEmployee.Count-1) 
+                                    if (((j + 1 < timeSlotEmployee.Count && timeSlotEmployee[j] + 0.25m == timeSlotEmployee[j + 1]) || j == timeSlotEmployee.Count - 1)
                                             && timeSlotEmployee[j] - timeSlotEmployee[i] + 0.25m >= serviceHair.Time)
                                     {
                                         i++;
