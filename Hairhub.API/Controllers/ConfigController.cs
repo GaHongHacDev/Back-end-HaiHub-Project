@@ -116,7 +116,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpPost]
         
-        
+       
         public async Task<IActionResult> GetConfigIdofCommissioRate()
         {
             try
