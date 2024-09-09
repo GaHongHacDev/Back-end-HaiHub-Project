@@ -570,7 +570,7 @@ namespace Hairhub.Service.Services.Services
                 var tempAvailableTimes = new Dictionary<decimal, List<EmployeeAvailable>>();
 
                 foreach (var employee in employees)
-                    if (employee.Id.ToString().Equals("3644a197-4c84-4e6d-a4b1-5e9c82363d25"))
+                    //if (employee.Id.ToString().Equals("3644a197-4c84-4e6d-a4b1-5e9c82363d25"))
                     {
                         // Get schedule by id
                         var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
