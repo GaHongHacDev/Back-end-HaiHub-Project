@@ -97,7 +97,8 @@ namespace Hairhub.Service.Services.Services
                                                     orderBy: x => x.OrderByDescending(x => x.StartDate)
                                                 );
             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
-            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
+            var payment = await _unitOfWork.GetRepository<Payment>()
+                                            .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x=>x.OrderByDescending(s=>s.StartDate));
             if (payment == null)
             {
                 throw new NotFoundException("Không tìm thấy thông tin thanh toán");
