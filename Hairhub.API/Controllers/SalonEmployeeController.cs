@@ -134,9 +134,9 @@ namespace Hairhub.API.Controllers
                     var isDelete = await _salonEmployeeService.DeleteSalonEmployeeById(id);
                     if (!isDelete)
                     {
-                        return BadRequest("Cannot delete this SalonEmployee!");
+                        return BadRequest("Không thể xóa nhân viên này!");
                     }
-                    return Ok("Delete SalonEmployee successfully!");
+                    return Ok("Xóa nhân viên thành công!");
                 }
                 catch (NotFoundException ex)
                 {

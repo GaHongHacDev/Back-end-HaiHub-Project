@@ -109,6 +109,11 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        
+        public async Task<Guid> GetConfigIdofCommissionRate()
+        {
+            var config = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.CommissionRate != null);
+            Guid id = config.Id;
+            return id;
+        }
     }
 }

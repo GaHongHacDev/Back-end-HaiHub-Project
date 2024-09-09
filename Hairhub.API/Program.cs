@@ -92,7 +92,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
         policy => {
-            policy.WithOrigins("http://localhost:5173", "https://www.hairhub.com.vn", "https://hairhub.id.vn")
+            policy.WithOrigins("http://localhost:5173", "https://www.hairhub.com.vn", "https://hairhub.id.vn", "http://localhost:3010")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();  // Allow credentials for CORS
