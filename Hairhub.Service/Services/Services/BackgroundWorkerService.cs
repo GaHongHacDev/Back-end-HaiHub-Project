@@ -125,9 +125,10 @@ namespace Hairhub.Service.Services.Services
                             predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
                             orderBy: o => o.OrderByDescending(p => p.EndDate)
                         );
-                        var amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate);
+                        
                         if (latestPayment != null)
                         {
+                            decimal amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate);
                             if (amount == 0)
                             {
                                 var paymentInfor = new SavePaymentInfor
