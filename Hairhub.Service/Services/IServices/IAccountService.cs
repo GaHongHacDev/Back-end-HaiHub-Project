@@ -28,6 +28,6 @@ namespace Hairhub.Service.Services.IServices
         Task<int> GetCustomersActive();
 
         Task<int> GetSalonsActive();
-        Task<bool> ForgotPassword(string username,ForgotPasswordRequest request);
+        Task<bool> ForgotPassword(ForgotPasswordRequest request);
     }
 }

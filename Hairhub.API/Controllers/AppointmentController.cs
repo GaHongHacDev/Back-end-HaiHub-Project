@@ -18,13 +18,13 @@ namespace Hairhub.API.Controllers
     public class AppointmentController : BaseController
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly IHubContext<BookAppointmentHub> _hubContext;
 
-        public AppointmentController(IMapper mapper, IAppointmentService appointmentService, IHubContext<BookAppointmentHub> hubContext) : base(mapper)
+        public AppointmentController(IMapper mapper, IAppointmentService appointmentService) : base(mapper)
         {
             _appointmentService = appointmentService;
-            _hubContext = hubContext;
+
         }
+
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllAppointment([FromQuery] int page = 1, [FromQuery] int size = 10)
@@ -72,9 +72,30 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("{SalonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] int NumberOfDay)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.GetAppointmentTransaction(SalonId, NumberOfDay);
+                if (appointmentResponse == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy transaction" });
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet]
         [Route("{salonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status ,[FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
@@ -133,7 +154,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+       // [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {
             try
@@ -144,16 +165,16 @@ namespace Hairhub.API.Controllers
                     return NotFound(new { message = "Không thể tạo lịch hẹn" });
                 }
 
-                await _hubContext.Clients.All.SendAsync("AppointmentCreated", new
-                {
-                    Message = "Lịch hẹn đã được đặt thành công",
-                    AppointmentDetails = createAppointmentRequest
-                });
+                //await _hubContext.Clients.All.SendAsync("AppointmentCreated", new
+                //{
+                //    Message = "Lịch hẹn đã được đặt thành công",
+                //    AppointmentDetails = createAppointmentRequest
+                //});
 
                 return Ok("Tạo lịch hẹn thành công");
             }
             catch (NotFoundException ex)
-            {
+            {           
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
@@ -320,7 +341,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
         {
             try

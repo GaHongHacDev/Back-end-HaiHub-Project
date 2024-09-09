@@ -19,6 +19,8 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public int TotalRating { get; set; }
         public decimal Rate { get; set; }
         public int TotalReviewer { get; set; }
+        public string OperatingStatus { get; set; }
+        public decimal? Distance { get; set; }
         public bool IsActive { get; set; }
         public List<SearchSalonServiceResponse> Services { get; set; } = new List<SearchSalonServiceResponse>();
         public List<SearchSalonVoucherRespnse> Vouchers { get; set; } = new List<SearchSalonVoucherRespnse>();

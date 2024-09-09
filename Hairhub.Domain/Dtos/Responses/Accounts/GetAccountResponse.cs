@@ -8,6 +8,7 @@ namespace Hairhub.Domain.Dtos.Responses.Accounts
 {
     public class GetAccountResponse
     {
+        public Guid Id { get; set; }
         public Guid? RoleId { get; set; }
         public string Phone { get; set; }
         public string Password { get; set; }

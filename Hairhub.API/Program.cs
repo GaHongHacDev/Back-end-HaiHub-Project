@@ -6,6 +6,7 @@ using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,17 +14,16 @@ using System.ComponentModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//Config swagger
+
+// Config swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    //c.SwaggerDoc("v1", new OpenApiInfo{
-    //    Title = "JWTToken_Auth_API",
-    //    Version = "v1"
-    //});
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
@@ -33,29 +33,29 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
+            new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
-                    Scheme = "oauth2",
-                    Name = "Bearer",
-                    In = ParameterLocation.Header,
-                },
-                new List<string>()
-            }
-        });
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
 });
 
-//******************* Add services to the container  **************************
+// ******************* Add services to the container  **************************
 
-//Dependecy Injection
+// Dependency Injection
 builder.Services.AddUnitOfWork();
 builder.Services.AddDIServices();
 builder.Services.AddDIRepositories();
 builder.Services.AddDIAccessor();
 
-//Auto Mapping
+// Auto Mapping
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // Add services to the container.
@@ -65,30 +65,46 @@ builder.Services.AddHttpClient<GeminiAIService>(client =>
 });
 builder.Services.AddHttpContextAccessor();
 
-
-//Add Background Service 
+// Add Background Service 
 builder.Services.AddHostedService<BackgroundWorkerService>();
 builder.Services.AddDbContext<HaiHubDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.EnableSensitiveDataLogging(); // Thêm dòng này
+    options.EnableSensitiveDataLogging();
 });
 
-//Config SignalR RealTime
+// Config SignalR RealTime
 builder.Services.AddSignalR();
 
-//Setting Cors for all source
+// Setting CORS for all sources
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: CorsConstant.PolicyName,
+//        policy =>
+//        {
+//            policy.WithOrigins("http://localhost:5173") // Chỉ định origin cụ thể
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod()
+//                  .AllowCredentials(); // Phải có AllowCredentials khi gửi credentials
+//        });
+//});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
-        policy => { policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod(); });
+        policy => {
+            policy.WithOrigins("http://localhost:5173", "https://www.hairhub.com.vn", "https://hairhub.id.vn")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();  // Allow credentials for CORS
+        });
 });
 
-//Jwt configuration starts here
+// Jwt configuration starts here
 var jwtIssuer = builder.Configuration.GetSection("JwtSettings:Issuer").Get<string>();
 var jwtAudience = builder.Configuration.GetSection("JwtSettings:Audience").Get<string>();
 var jwtKey = builder.Configuration.GetSection("JwtSettings:Key").Get<string>();
-//Config JWT
+
+// Config JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>
  {
@@ -103,13 +119,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
      };
  });
+
 builder.Services.AddAuthorization();
 
-
-
-//****BUILD
+// **** BUILD
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -124,10 +138,9 @@ app.UseCors(CorsConstant.PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-// Map Hub and define route of hub
+// MapHub and define route of hub 
 app.MapHub<BookAppointmentHub>("book-appointment-hub");
 
 app.Run();

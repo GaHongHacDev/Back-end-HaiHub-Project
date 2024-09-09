@@ -52,7 +52,6 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{SalonInformationId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid SalonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10, 
                                                                               [FromQuery] bool? orderByName=null, [FromQuery] bool? isActive = null, [FromQuery] string? nameEmployee = null)
         {
@@ -135,9 +134,9 @@ namespace Hairhub.API.Controllers
                     var isDelete = await _salonEmployeeService.DeleteSalonEmployeeById(id);
                     if (!isDelete)
                     {
-                        return BadRequest("Cannot delete this SalonEmployee!");
+                        return BadRequest("Không thể xóa nhân viên này!");
                     }
-                    return Ok("Delete SalonEmployee successfully!");
+                    return Ok("Xóa nhân viên thành công!");
                 }
                 catch (NotFoundException ex)
                 {

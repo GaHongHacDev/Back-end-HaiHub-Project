@@ -40,7 +40,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> UpdateAccount([FromRoute] Guid id, [FromForm] UpdateAccountRequest updateAccountRequest)
         {
             try
@@ -255,16 +255,16 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> ForgotPassword(string username, ForgotPasswordRequest request)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
         {
             try
             {
-                var result = await _accountService.ForgotPassword(username,request);
+                var result = await _accountService.ForgotPassword(request);
                 if (result == null)
                 {
                     return BadRequest(new { message = "Không tồn tại Email này" });
                 }
-                return Ok(new { success = result, message = "Lấy Password thành công" });
+                return Ok(new { success = result, message = "Lấy Password thành công"});
             }
             catch (NotFoundException ex)
             {

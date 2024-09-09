@@ -68,11 +68,19 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                var Configs = await _unitOfWork.GetRepository<Domain.Entitities.Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
+                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
                 var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
-                var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == SalonOwner.Id);
+                if (SalonOwner == null)
+                {
+                    throw new Exception("SalonOwner is null.");
+                }
+                
 
-
+                var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == request.SalonOWnerID);
+                if (Salon == null)
+                {
+                    throw new Exception("Salon is null.");
+                }
                 int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
                 var orderCode = new Random().Next(1, 1000000);
                 var description = request.Description;

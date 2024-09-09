@@ -107,7 +107,7 @@ namespace Hairhub.Service.Services.Services
                 var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == id);
                 var existingappointmentdetail = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
                                                 predicate: p => p.SalonEmployeeId == salonEmployee.Id 
-                                                && p.Appointment.StartDate > DateTime.Now.Date && p.Appointment.Status == AppointmentStatus.Booking
+                                                && p.Appointment.StartDate >= DateTime.Now.Date && p.Appointment.Status == AppointmentStatus.Booking
                                                 , include: i => i.Include(o => o.Appointment)
                                                 );                
                 if (salonEmployee == null)
@@ -115,7 +115,7 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Không tìm thấy nhân viên này");
                 }
                 
-                if (existingappointmentdetail == null)
+                if (existingappointmentdetail == null || existingappointmentdetail.Count == 0)
                 {
                     salonEmployee.IsActive = false;
                     _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
