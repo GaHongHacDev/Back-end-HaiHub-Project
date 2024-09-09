@@ -114,7 +114,25 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [HttpPost]
         
+        
+        public async Task<IActionResult> GetConfigIdofCommissioRate()
+        {
+            try
+            {
+                var config = await _configservice.GetConfigIdofCommissionRate();
+                if (config == null)
+                {
+                    return BadRequest("Không có config");
+                }
+                return Ok(config);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
