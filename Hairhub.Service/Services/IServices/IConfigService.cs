@@ -23,5 +23,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> UpdateConfigAsync(Guid id, UpdateConfigRequest request);
 
         Task<bool> DeleteConfigAsync(Guid id);
+
+        Task<Guid> GetConfigIdofCommissionRate();
     }
 }

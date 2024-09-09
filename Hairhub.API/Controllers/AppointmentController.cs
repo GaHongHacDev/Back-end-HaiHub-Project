@@ -75,7 +75,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{SalonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] int NumberOfDay)
         {
             try
@@ -95,12 +95,12 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status ,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status, [FromQuery] bool isAscending, [FromQuery] DateTime? date, [FromQuery] string? customerName,[FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status);
+                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, date, customerName);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
@@ -323,11 +323,12 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{customerId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] int page, [FromQuery] int size)
+        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] bool isAscending, 
+                                                                          [FromQuery] DateTime? date, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetAppointmentCustomerByStatus(customerId, status, page, size);
+                var appointmentsResponse = await _appointmentService.GetAppointmentCustomerByStatus(customerId, status, isAscending, date, page, size);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)

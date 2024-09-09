@@ -11,6 +11,8 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public Guid Id { get; set; }
         public DateTime StartDate { get; set; }
         public decimal TotalPrice { get; set; }
+        public string Status { get; set; }
+
         public decimal? CommissionRate { get; set; }
     }
 }

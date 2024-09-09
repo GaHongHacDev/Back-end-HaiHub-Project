@@ -95,7 +95,7 @@ namespace Hairhub.Service.Services.Services
                         appointment.QrCodeImg = "";
                         uow.GetRepository<Appointment>().UpdateAsync(appointment);
                     }
-                    uow.CommitAsync();
+                    await uow.CommitAsync();
                     _logger.LogInformation("Expired salappointment checked and updated at: {time}", DateTimeOffset.Now);
                 }
             }
@@ -128,13 +128,13 @@ namespace Hairhub.Service.Services.Services
                         
                         if (latestPayment != null)
                         {
-                            decimal amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate);
+                            decimal amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate!);
                             if (amount == 0)
                             {
                                 var paymentInfor = new SavePaymentInfor
                                 {
                                     SalonOwnerId = salon.SalonOwner.Id,
-                                    ConfigId = (Guid)latestPayment.ConfigId
+                                    ConfigId = (Guid)latestPayment.ConfigId!
                                 };
                                 await paymentService.PaymentForCommissionRate(paymentInfor);
                             }
@@ -143,7 +143,7 @@ namespace Hairhub.Service.Services.Services
                                 var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
                                 if (daysToExpiry < 5 && daysToExpiry > 0)
                                 {
-                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
+                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email!, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]!);
                                 }
                                 if (latestPayment.EndDate < DateTime.Now)
                                 {
