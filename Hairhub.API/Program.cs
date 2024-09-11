@@ -12,6 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
+using Hairhub.Domain.JsonConverter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +102,12 @@ builder.Services.AddCors(options =>
                   .AllowCredentials();  // Allow credentials for CORS
         });
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+    });
 
 // Jwt configuration starts here
 var jwtIssuer = builder.Configuration.GetSection("JwtSettings:Issuer").Get<string>();

@@ -20,5 +20,9 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteSchedule(Guid id);
         Task<bool> CreateScheduleEmployee(CreateScheduleRequest request);
         Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId);
+
+        Task<bool> UpdateScheduleofEmployee(Guid id, UpdateScheduleEmployeeRequest request);
+
+        Task<bool> UpdateScheduleofSalon(Guid id, UpdateScheduleEmployeeRequest request);
     }
 }
