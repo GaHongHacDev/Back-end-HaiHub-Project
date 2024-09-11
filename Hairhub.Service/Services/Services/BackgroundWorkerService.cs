@@ -78,7 +78,7 @@ namespace Hairhub.Service.Services.Services
 
                     var appontments = await uow.GetRepository<Appointment>().GetListAsync(
                         predicate: x => x.Status.Equals(AppointmentStatus.Booking)
-                                && x.StartDate == DateTime.Now.AddDays(-1),
+                                && x.StartDate.Date < DateTime.Now.Date,
                         include: x => x.Include(s => s.AppointmentDetails)
                     );
 
