@@ -168,5 +168,118 @@ namespace Hairhub.Service.Services.Services
             bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
             return isSuccessful;
         }
+
+        public async Task<bool> UpdateScheduleofEmployee(Guid id, UpdateScheduleEmployeeRequest request)
+        {
+            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: p => p.EmployeeId == id && p.DayOfWeek == request.DayofWeeks);
+
+            if (schedule == null)
+            {
+                throw new Exception($"Nhân viên này chưa có lịch làm việc vào {request.DayofWeeks}");
+            }
+
+            if (schedule.SalonId != null || schedule.EmployeeId != null)
+            {
+                var appointments = await _unitOfWork.GetRepository<AppointmentDetail>()
+            .GetListAsync(x =>
+                x.SalonEmployeeId == id &&
+                x.Status.Equals(AppointmentStatus.Booking) && x.StartTime > DateTime.UtcNow
+            );
+                var dayOfWeekEnum = Enum.Parse<DayOfWeek>(request.DayofWeeks, true);
+                var filteredAppointments = appointments
+                    .Where(x =>
+                        x.StartTime.DayOfWeek == dayOfWeekEnum &&
+                        x.StartTime.TimeOfDay >= schedule.StartTime.ToTimeSpan() &&
+                        x.EndTime.TimeOfDay <= schedule.EndTime.ToTimeSpan()
+                    ).ToList();
+
+
+                if (!request.IsActive)
+                {
+                    if (appointments.Count > 0)
+                    {
+                        throw new Exception("Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn vào khung giờ này");
+                    }
+
+                    schedule.IsActive = false;
+                }
+                else
+                {
+                    if (appointments.Count > 0)
+                    {
+                        throw new Exception("Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn vào khung giờ này");
+                    }
+
+                    schedule.StartTime = request.StartTime;
+                    schedule.EndTime = request.EndTime;
+                }
+                _unitOfWork.GetRepository<Schedule>().UpdateAsync(schedule);
+
+                bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
+                return isSuccessful;
+            }
+            else
+            {
+                throw new Exception("Lịch làm việc không hợp lệ.");
+            }
+        }
+
+
+        public async Task<bool> UpdateScheduleofSalon(Guid id, UpdateScheduleEmployeeRequest request)
+        {
+            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: p => p.SalonId == id && p.DayOfWeek == request.DayofWeeks);
+
+            if (schedule == null)
+            {
+                throw new Exception($"Salon này chưa có lịch làm việc vào {request.DayofWeeks}");
+            }
+
+            if (schedule.SalonId != null || schedule.EmployeeId != null)
+            {
+                var appointments = await _unitOfWork.GetRepository<AppointmentDetail>()
+            .GetListAsync(x =>
+                x.SalonEmployee.SalonInformationId == id &&
+                x.Status.Equals(AppointmentStatus.Booking) && x.StartTime > DateTime.UtcNow, include: i => i.Include(m => m.Appointment)
+            );
+                var dayOfWeekEnum = Enum.Parse<DayOfWeek>(request.DayofWeeks, true);
+                var filteredAppointments = appointments
+                    .Where(x =>
+                        x.StartTime.DayOfWeek == dayOfWeekEnum &&
+                        x.StartTime.TimeOfDay >= schedule.StartTime.ToTimeSpan() &&
+                        x.EndTime.TimeOfDay <= schedule.EndTime.ToTimeSpan()
+                    ).ToList();
+
+
+                if (!request.IsActive)
+                {
+                    if (appointments.Count > 0)
+                    {
+                        throw new Exception("Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn vào khung giờ này");
+                    }
+
+                    schedule.IsActive = false;
+                }
+                else
+                {
+                    if (appointments.Count > 0)
+                    {
+                        throw new Exception("Bạn không thể cập nhật giờ làm việc vì đang có lịch hẹn vào khung giờ này");
+                    }
+
+                    schedule.StartTime = request.StartTime;
+                    schedule.EndTime = request.EndTime;
+                }
+                _unitOfWork.GetRepository<Schedule>().UpdateAsync(schedule);
+
+                bool isSuccessful = await _unitOfWork.CommitAsync() > 0;
+                return isSuccessful;
+            }
+            else
+            {
+                throw new Exception("Lịch làm việc không hợp lệ.");
+            }
+        }
     }
 }
+    
+
