@@ -74,7 +74,7 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay)
+        public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate)
         {
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
             if (salon == null)
@@ -82,13 +82,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy salon, barber shop");
             }
             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
-            predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && DateTime.Now.AddDays(-NumberOfDay).Date <= x.StartDate.Date);
-
-            NumberOfDay--;
-            if (NumberOfDay != 6 && NumberOfDay != 29)
-            {
-                throw new Exception("Chỉ được chọn 7 ngày hoặc 30 ngày để filter");
-            }
+            predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
 
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                 .GetListAsync

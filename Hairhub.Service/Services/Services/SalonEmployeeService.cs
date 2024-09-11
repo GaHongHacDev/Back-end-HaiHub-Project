@@ -55,6 +55,28 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException($"Not found salon with id {request.SalonInformationId}");
             }
+            var scheduleSalon = await _unitOfWork.GetRepository<Schedule>().GetListAsync(predicate: x=>x.SalonId == request.SalonInformationId);
+            //Check schedule employee and salon
+            foreach(var emp in request.SalonEmployees)
+            {
+                foreach (var scheduleEmp in emp.ScheduleEmployees)
+                {
+                    var salonDayOfWeek = scheduleSalon.FirstOrDefault(s => s.DayOfWeek.ToLower().Equals(scheduleEmp.Date!.ToLower()));
+                    if (!salonDayOfWeek!.IsActive && scheduleEmp.IsActive)
+                    {
+                        throw new Exception($"Salon, barber shop không có lịch làm việc vào {scheduleEmp.Date}");
+                    }
+                    if (scheduleEmp.StartTime<salonDayOfWeek!.StartTime)
+                    {
+                        throw new Exception($"Salon, barber shop bắt đầu làm việc từ {salonDayOfWeek.StartTime}");
+                    }
+                    else if (scheduleEmp.EndTime>salonDayOfWeek!.EndTime)
+                    {
+                        throw new Exception($"Salon, barber shop kết thúc giờ làm việc vào {salonDayOfWeek.EndTime}");
+                    }
+                }
+
+            }
             //create employee
             foreach(var item in request.SalonEmployees)
             {

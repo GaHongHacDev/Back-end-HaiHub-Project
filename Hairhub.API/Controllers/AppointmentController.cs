@@ -76,11 +76,11 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{SalonId:Guid}")]
         //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] int NumberOfDay)
+        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentTransaction(SalonId, NumberOfDay);
+                var appointmentResponse = await _appointmentService.GetAppointmentTransaction(SalonId, startDate, endDate);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy transaction" });
