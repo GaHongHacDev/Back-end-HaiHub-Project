@@ -40,30 +40,30 @@ namespace Hairhub.Service.Services.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //while (!stoppingToken.IsCancellationRequested)
-            //{
-
-            //    var now = DateTime.Now;
-            //    var nextMidnight = now.Date.AddDays(1);
-            //    var delayTime = nextMidnight - now;
-
-
-            //    await Task.Delay(delayTime, stoppingToken);
-
-            //    await ExecuteExpiredSalon(stoppingToken);
-
-
-            //    await ExecuteExpriredAppointment(stoppingToken);
-            //}
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Thực hiện công việc của bạn ở đây
-                await ExecuteExpiredSalon(stoppingToken);
-                await ExecuteExpriredAppointment(stoppingToken);
 
-                // Đợi 30 giây
-                await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+                var now = DateTime.Now;
+                var nextmidnight = now.Date.AddDays(1);
+                var delaytime = nextmidnight - now;
+
+
+                await Task.Delay(delaytime, stoppingToken);
+
+                await ExecuteExpiredSalon(stoppingToken);
+
+
+                await ExecuteExpriredAppointment(stoppingToken);
             }
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    // Thực hiện công việc của bạn ở đây
+            //    await ExecuteExpiredSalon(stoppingToken);
+            //    await ExecuteExpriredAppointment(stoppingToken);
+
+            //    // Đợi 30 giây
+            //    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+            //}
         }   
 
         private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)

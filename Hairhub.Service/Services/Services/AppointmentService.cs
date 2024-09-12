@@ -82,7 +82,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy salon, barber shop");
             }
             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
-            predicate = predicate.And(x => x.Status == AppointmentStatus.Successed && startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
+            predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
 
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                 .GetListAsync
@@ -99,18 +99,51 @@ namespace Hairhub.Service.Services.Services
             }
             if (appointments != null)
             {
-                response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointments);
-                //Tính tiền HH mà salon chưa trả cho system
-                foreach (var appointment in appointments)
-                    if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate && appointment.Status.Equals(AppointmentStatus.Successed))
-                    {
-                        response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                    }
-                //Tính tổng tiền HH của salon filter theo 7ngay/30ngay
+                int canceledAppointmentCount = 0;
+                int successedAppointmentCount = 0;
+                int failedAppointmentCount = 0;
+                List<Appointment> appointmentsResponse = new List<Appointment>();
+
                 foreach (var appointment in appointments)
                 {
-                    response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                    ////Tính tiền HH mà salon chưa trả cho system
+                    //if (appointment.Status.Equals(AppointmentStatus.Successed) && appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate && appointment.Status.Equals(AppointmentStatus.Successed))
+                    //{
+                    //    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                    //}
+                    ////Tính tổng tiền HH của salon từ start_date đến end_date
+                    //if (appointment.Status.Equals(AppointmentStatus.Successed))
+                    //{
+                    //    response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                    //}
+                    switch (appointment.Status)
+                    {
+                        case AppointmentStatus.Successed:
+                            appointmentsResponse.Add(appointment);
+                            //Tính tiền HH mà salon chưa trả cho system
+                            if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
+                            {
+                                response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                            }
+                            //Tính tổng tiền HH của salon từ start_date đến end_date
+                            response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                            //Tổng appointment thành công
+                            successedAppointmentCount++;
+                            break;
+                        case AppointmentStatus.Fail:
+                            //Tổng appointment thất bại
+                            failedAppointmentCount++;
+                            break;
+                        case AppointmentStatus.CancelByCustomer:
+                            //Tổng appointment bị khách hàng hủy
+                            canceledAppointmentCount++;
+                            break;
+                    }
                 }
+                response.CanceledAppointmentCount = canceledAppointmentCount;
+                response.SuccessedAppointmentCount = successedAppointmentCount;
+                response.FailedAppointmentCount = failedAppointmentCount;
+                response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
             }
             return response;
         }

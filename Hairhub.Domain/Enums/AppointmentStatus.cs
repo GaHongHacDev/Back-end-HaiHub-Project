@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Hairhub.Domain.Enums
 {
-    public class AppointmentStatus
+    public static class AppointmentStatus
     {
-        public static string Booking = "BOOKING";
-        public static string CancelByCustomer = "CANCEL_BY_CUSTOMER";
-        public static string Fail = "FAILED";
-        public static string Successed = "SUCCESSED";
+        public const string Booking = "BOOKING";
+        public const string CancelByCustomer = "CANCEL_BY_CUSTOMER";
+        public const string Fail = "FAILED";
+        public const string Successed = "SUCCESSED";
     }
 }
