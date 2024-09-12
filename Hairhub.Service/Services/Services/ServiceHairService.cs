@@ -221,5 +221,10 @@ namespace Hairhub.Service.Services.Services
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
         }
+
+        public Task<bool> UpdateServiceHairofEmployee(Guid employeeId, UpdateServiceHairRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

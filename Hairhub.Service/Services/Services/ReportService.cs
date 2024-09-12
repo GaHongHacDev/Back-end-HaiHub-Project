@@ -59,12 +59,15 @@ namespace Hairhub.Service.Services.Services
             return reportResponse;
         }
 
-        public async Task<IPaginate<GetReportResponse>> GetAllReportByRoleName(string roleNameReport, int page, int size)
+        public async Task<IPaginate<GetReportResponse>> GetAllReportByRoleName(string? status, bool sortdate, string roleNameReport, int page, int size)
         {
             var reports = await _unitOfWork.GetRepository<Report>()
                                            .GetPagingListAsync
                                            (
-                                               predicate: x => x.RoleNameReport.Equals(roleNameReport),
+                                               predicate: x => x.RoleNameReport.Equals(roleNameReport) && (string.IsNullOrEmpty(status) || x.Status == status),
+                                               orderBy: o => sortdate
+                                                            ? o.OrderBy(c => c.CreateDate)  
+                                                            : o.OrderByDescending(c => c.CreateDate),
                                                include: x => x.Include(s => s.StaticFiles)
                                                                .Include(s => s.SalonInformation)
                                                                    .ThenInclude(si => si.Schedules) // Include schedules from SalonInformation

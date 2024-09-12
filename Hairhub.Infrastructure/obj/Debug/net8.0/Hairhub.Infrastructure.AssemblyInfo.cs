@@ -14,23 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hairhub.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7ba0946eb5550cd45da2cb1aa322fbdc1382529")]
-=======
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a5a6bd7d73f10529c9fd988d69fcbd47036ebb43")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae28778b479e19830f59791a82740d33253ab349")]
->>>>>>> f7ba0946eb5550cd45da2cb1aa322fbdc1382529
->>>>>>> c6fe9b78e9977b81c323b0ba9f948c4713fec7ce
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+82b4790e78999966c71cd4c7dde8b8413eec6a20")]
->>>>>>> 54c31d432f3763b87fbf8814796dcdc5c1d17a2d
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3185b122a8fd1035e1fd55e6a8be2c3c29738016")]
->>>>>>> ChauHien
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bbc2f47ab7756e515c96fc208b48e14b551f10c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hairhub.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hairhub.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

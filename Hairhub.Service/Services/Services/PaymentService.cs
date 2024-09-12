@@ -242,13 +242,13 @@ namespace Hairhub.Service.Services.Services
             return paginateResponse;
         }
 
-        public async Task<IPaginate<ResponsePayment>> GetPayments(int page, int size)
+        public async Task<IPaginate<ResponsePayment>> GetPayments(string? email, int page, int size)
         {
 
             var payments = await _unitOfWork.GetRepository<Payment>()
-            .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid,
+            .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid && (string.IsNullOrEmpty(email) || x.SalonOwner.Email == email),
                 include: query => query.Include(x => x.SalonOwner)
-                                        .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
+                                        .ThenInclude(x => x.SalonInformations)
                                         .Include(x => x.Config),
                 page: page,
                 size: size);

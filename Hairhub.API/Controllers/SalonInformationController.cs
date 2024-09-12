@@ -43,9 +43,9 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetSalonByStatus([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetSalonByStatus([FromQuery] string? name, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(status, page, size);
+            var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(name, status, page, size);
             return Ok(salonInformationsResponse);
         }
 
