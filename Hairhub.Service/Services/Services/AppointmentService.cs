@@ -91,12 +91,12 @@ namespace Hairhub.Service.Services.Services
                                                     orderBy: x => x.OrderByDescending(x => x.StartDate)
                                                 );
             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
-            //var payment = await _unitOfWork.GetRepository<Payment>()
-            //                                .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
-            //if (payment == null)
-            //{
-            //    throw new NotFoundException("Không tìm thấy thông tin thanh toán");
-            //}
+            var payment = await _unitOfWork.GetRepository<Payment>()
+                                            .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
+            if (payment == null)
+            {
+                throw new NotFoundException("Không tìm thấy thông tin thanh toán");
+            }
             if (appointments != null)
             {
                 int canceledAppointmentCount = 0;
@@ -121,10 +121,10 @@ namespace Hairhub.Service.Services.Services
                         case AppointmentStatus.Successed:
                             appointmentsResponse.Add(appointment);
                             //Tính tiền HH mà salon chưa trả cho system
-                            //if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
-                            //{
-                            //    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                            //}
+                            if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
+                            {
+                                response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                            }
                             //Tính tổng tiền HH của salon từ start_date đến end_date
                             response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
                             //Tổng appointment thành công
