@@ -24,10 +24,10 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAllCustomer([FromQuery] int page=1, [FromQuery] int size=10) {
+        public async Task<IActionResult> GetAllCustomer([FromQuery] string? email, [FromQuery] bool? status, [FromQuery] int page=1, [FromQuery] int size=10) {
             try
             {
-                var customers = await _customerService.GetCustomers(page, size);
+                var customers = await _customerService.GetCustomers(email, status, page, size);
                 return Ok(customers);
             }
             catch (Exception ex)
@@ -48,6 +48,7 @@ namespace Hairhub.API.Controllers
                     return BadRequest(new { message = "Checkin thất bại. Vui lòng thử lại" });
                 }
                 return Ok("Checkin thành công");
+
             }
             catch (Exception ex)
             {

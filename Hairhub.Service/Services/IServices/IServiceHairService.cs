@@ -20,5 +20,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> UpdateServiceHairById(Guid id, UpdateServiceHairRequest updateServiceHairRequest);
         Task<bool> DeleteServiceHairById(Guid id);
         Task<bool> ActiveServiceHair(Guid id);
+
+        Task<bool> UpdateServiceHairofEmployee(Guid employeeId, UpdateServiceHairRequest request);
     }
 }

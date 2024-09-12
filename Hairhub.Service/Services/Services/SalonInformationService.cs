@@ -22,6 +22,7 @@ using System;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing.Printing;
 using System.Linq;
+using static QRCoder.PayloadGenerator;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -178,28 +179,20 @@ namespace Hairhub.Service.Services.Services
             return salonInformationResponses;
         }
 
-        public async Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? status, int page, int size)
+        public async Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? name, string? status, int page, int size)
         {
-            IPaginate<SalonInformation> salonInformations;
-            if (status == null || String.IsNullOrWhiteSpace(status))
-            {
-                salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
-                                                        .GetPagingListAsync(
-                                                           include: query => query.Include(s => s.SalonOwner),
-                                                           page: page,
-                                                           size: size
-                                                        );
-            }
-            else
-            {
-                salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
-                                        .GetPagingListAsync(
-                                            predicate: x => x.Status.Equals(status),
-                                           include: query => query.Include(s => s.SalonOwner),
-                                           page: page,
-                                           size: size
-                                        );
-            }
+            
+
+            var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
+        .GetPagingListAsync(
+            predicate: c =>
+            (string.IsNullOrEmpty(name) || c.Name.Contains(name)) &&
+                (string.IsNullOrEmpty(status) || c.Status == status),  
+            include: query => query.Include(s => s.SalonOwner),
+            page: page,
+            size: size
+        );
+
             var salonInformationResponses = new Paginate<GetSalonInformationResponse>()
             {
                 Page = salonInformations.Page,

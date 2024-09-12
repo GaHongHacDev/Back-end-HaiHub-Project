@@ -23,7 +23,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> SendPaymentLink(CreatePaymentRequest request)
         {
             var result = await _paymentservice.CreatePaymentUrlRegisterCreator(request);
@@ -35,7 +35,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
         {
             var result = await _paymentservice.CreateFirstTimePayment(createFirstTimePaymentRequest);
@@ -47,7 +47,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
         {
             var result = await _paymentservice.PaymentForCommissionRate(createFirstTimePaymentRequest);
@@ -59,7 +59,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetStatusPayment(string ordercode, [FromBody] SavePaymentInfor paymentrequest)
         {
             var result = await _paymentservice.GetPaymentInfo(ordercode, paymentrequest);
@@ -71,10 +71,10 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetPayments(int page=1, int size = 10)
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetPayments([FromQuery]string? email, int page=1, int size = 10)
         {
-            var result = await _paymentservice.GetPayments(page, size);
+            var result = await _paymentservice.GetPayments(email, page, size);
             if (result == null)
             {
                 return BadRequest();
@@ -84,7 +84,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{ownerId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetPaymentByOwnerId([FromRoute] Guid ownerId, int page=1, int size=10)
         {
             var result = await _paymentservice.GetPaymentBySalonOwnerID(ownerId, page, size);
@@ -96,7 +96,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         [Route("{ownerId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetInformationPaymentOfSalonOwner([FromRoute] Guid ownerId)
         {
             try
