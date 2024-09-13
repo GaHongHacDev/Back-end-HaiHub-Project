@@ -129,14 +129,18 @@ namespace Hairhub.Service.Services.Services
                         if (latestPayment != null)
                         {
                             decimal amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate!);
+                            
                             if (amount == 0)
                             {
-                                var paymentInfor = new SavePaymentInfor
+                                if(latestPayment.EndDate < DateTime.Now)
                                 {
-                                    SalonOwnerId = salon.SalonOwner.Id,
-                                    ConfigId = (Guid)latestPayment.ConfigId!
-                                };
-                                await paymentService.PaymentForCommissionRate(paymentInfor);
+                                    var paymentInfor = new SavePaymentInfor
+                                    {
+                                        SalonOwnerId = salon.SalonOwner.Id,
+                                        ConfigId = (Guid)latestPayment.ConfigId!
+                                    };
+                                    await paymentService.PaymentForCommissionRate(paymentInfor);
+                                }                               
                             }
                             if (amount > 0)
                             {

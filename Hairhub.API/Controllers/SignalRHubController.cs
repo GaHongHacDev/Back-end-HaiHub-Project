@@ -22,7 +22,7 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> BroadcastMessage([FromBody] BroadcastMessageRequest request)
         {
             var timestamp = DateTime.Now;
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", request.Message, request.DateAppointment, timestamp, request.SalonId, request.ServiceId);
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", request.Message, request.DateAppointment, timestamp, request.SalonId, request.ServiceId, request.OwnerId);
             return NoContent();
         }
     }
@@ -34,6 +34,6 @@ namespace Hairhub.API.Controllers
         public string SalonId { get; set; }
         public List<string> ServiceId { get; set; }
 
-        
+        public string OwnerId { get; set; }
     }
 }

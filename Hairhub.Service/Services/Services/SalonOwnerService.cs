@@ -51,7 +51,7 @@ namespace Hairhub.Service.Services.Services
         .GetPagingListAsync(
             predicate: c =>
                 (string.IsNullOrEmpty(email) || c.Email.Contains(email)) &&
-                (!status.HasValue || c.Account.IsActive == status.Value),  // Nullable bool handling
+                (!status.HasValue || c.Account.IsActive == status.Value),  
             include: query => query.Include(s => s.Account),
             page: page,
             size: size

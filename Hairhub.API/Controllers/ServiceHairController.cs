@@ -182,5 +182,31 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> UpdateServicehairofEmployee([FromRoute] Guid id, [FromQuery] List<Guid> newServicehairId,[FromQuery] List<Guid> ServicehairIdRemove)
+        {
+            try
+            {
+                var isSuccessed = await _serviceHairService.UpdateServiceHairofEmployee(id, newServicehairId, ServicehairIdRemove); 
+                if (!isSuccessed)
+                {
+                    return BadRequest("Không thể cập nhật");
+                }
+                return Ok("Cập nhật thành công");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

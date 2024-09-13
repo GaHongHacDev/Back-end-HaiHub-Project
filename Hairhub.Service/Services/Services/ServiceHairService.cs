@@ -222,9 +222,57 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public Task<bool> UpdateServiceHairofEmployee(Guid employeeId, UpdateServiceHairRequest request)
+        public async Task<bool> UpdateServiceHairofEmployee(Guid employeeId, List<Guid> addnewserviceid, List<Guid> serviceidRemove)
         {
-            throw new NotImplementedException();
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == employeeId);
+            if (employee == null) {
+
+                throw new Exception("Không tồn tại nhân viên này");
+            }
+            if (serviceidRemove != null)
+            {
+                
+                foreach (var serviceid in serviceidRemove) {
+                    
+                    var servicehair = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceid);
+
+                    var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                    predicate: p => p.SalonEmployeeId == employeeId 
+                                                    && p.ServiceHairId == serviceid 
+                                                    && p.Status == AppointmentStatus.Booking
+                                                    && p.StartTime > DateTime.UtcNow);
+                    if (appointment.Count > 0) {
+                        throw new Exception("Không thể thay đổi dịch vụ vì còn lịch hẹn khác");
+                    }
+
+                    _unitOfWork.GetRepository<ServiceEmployee>().DeleteAsync(servicehair);
+                }
+                                
+            }
+            if(addnewserviceid != null)
+            {
+                List<ServiceEmployee> newservicehairs = new List<ServiceEmployee>();
+                foreach (var newserviceid  in addnewserviceid)
+                {
+
+                    var servicehairinSalon = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: p => p.Id == newserviceid && p.SalonInformationId == employee.SalonInformationId);
+                    if(servicehairinSalon == null)
+                    {
+                        throw new Exception("không có dịch vụ này trong salon");
+                    }
+                    ServiceEmployee newservicehair = new ServiceEmployee
+                    {
+                        Id = Guid.NewGuid(),
+                        ServiceHairId = servicehairinSalon.Id,
+                        SalonEmployeeId = employeeId,
+                    };
+                    newservicehairs.Add(newservicehair);
+                }
+                await _unitOfWork.GetRepository<ServiceEmployee>().InsertRangeAsync(newservicehairs);
+                
+            }
+            bool isUpdated = _unitOfWork.Commit() > 0;
+            return isUpdated;
         }
     }
 }
