@@ -234,7 +234,7 @@ namespace Hairhub.Service.Services.Services
                 
                 foreach (var serviceid in request.removeServiceID) {
                     
-                    var servicehair = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceid);
+                    var servicehair = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceid && p.SalonEmployeeId == employeeId);
 
                     var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
                                     predicate: p => p.SalonEmployeeId == employeeId 
@@ -251,10 +251,9 @@ namespace Hairhub.Service.Services.Services
             }
             if(request.addServiceID != null)
             {
-                List<ServiceEmployee> newservicehairs = new List<ServiceEmployee>();
+                
                 foreach (var newserviceid  in request.addServiceID)
                 {
-
                     var servicehairinSalon = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: p => p.Id == newserviceid && p.SalonInformationId == employee.SalonInformationId);
                     if(servicehairinSalon == null)
                     {
@@ -266,10 +265,8 @@ namespace Hairhub.Service.Services.Services
                         ServiceHairId = servicehairinSalon.Id,
                         SalonEmployeeId = employeeId,
                     };
-                    newservicehairs.Add(newservicehair);
-                }
-                await _unitOfWork.GetRepository<ServiceEmployee>().InsertRangeAsync(newservicehairs);
-                
+                    await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(newservicehair);
+                }    
             }
             bool isUpdated = _unitOfWork.Commit() > 0;
             return isUpdated;
