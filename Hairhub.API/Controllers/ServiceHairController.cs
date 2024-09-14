@@ -186,11 +186,11 @@ namespace Hairhub.API.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> UpdateServicehairofEmployee([FromRoute] Guid id, [FromQuery] List<Guid> newServicehairId,[FromQuery] List<Guid> ServicehairIdRemove)
+        public async Task<IActionResult> UpdateServicehairofEmployee([FromRoute] Guid id, UpdateServiceHairofEmployee request)
         {
             try
             {
-                var isSuccessed = await _serviceHairService.UpdateServiceHairofEmployee(id, newServicehairId, ServicehairIdRemove); 
+                var isSuccessed = await _serviceHairService.UpdateServiceHairofEmployee(id, request); 
                 if (!isSuccessed)
                 {
                     return BadRequest("Không thể cập nhật");

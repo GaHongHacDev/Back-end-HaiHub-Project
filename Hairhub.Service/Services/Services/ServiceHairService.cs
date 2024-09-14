@@ -222,17 +222,17 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<bool> UpdateServiceHairofEmployee(Guid employeeId, List<Guid> addnewserviceid, List<Guid> serviceidRemove)
+        public async Task<bool> UpdateServiceHairofEmployee(Guid employeeId, UpdateServiceHairofEmployee request)
         {
             var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == employeeId);
             if (employee == null) {
 
                 throw new Exception("Không tồn tại nhân viên này");
             }
-            if (serviceidRemove != null)
+            if (request.removeServiceID != null)
             {
                 
-                foreach (var serviceid in serviceidRemove) {
+                foreach (var serviceid in request.removeServiceID) {
                     
                     var servicehair = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceid);
 
@@ -249,10 +249,10 @@ namespace Hairhub.Service.Services.Services
                 }
                                 
             }
-            if(addnewserviceid != null)
+            if(request.addServiceID != null)
             {
                 List<ServiceEmployee> newservicehairs = new List<ServiceEmployee>();
-                foreach (var newserviceid  in addnewserviceid)
+                foreach (var newserviceid  in request.addServiceID)
                 {
 
                     var servicehairinSalon = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: p => p.Id == newserviceid && p.SalonInformationId == employee.SalonInformationId);
