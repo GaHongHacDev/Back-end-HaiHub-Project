@@ -68,7 +68,7 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
+                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);               
                 var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
                 if (SalonOwner == null)
                 {
@@ -82,7 +82,8 @@ namespace Hairhub.Service.Services.Services
                     throw new Exception("Salon is null.");
                 }
                 int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
-                var orderCode = new Random().Next(1, 1000000);
+                string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+                long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
                 var description = request.Description;
                 string? clientId = _config["PayOS:ClientId"];
                 var apikey = _config["PayOS:APIKey"];
@@ -129,7 +130,7 @@ namespace Hairhub.Service.Services.Services
                     buyerPhone: SalonOwner.Phone, // Provide a valid currency
                     buyerEmail: SalonOwner.Email,
                     buyerAddress: SalonOwner.Address,
-                    expiredAt: (int)expiredAt.ToUnixTimeSeconds()
+                    expiredAt: (int)DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds()
                 );
 
                 paymentData.items.Add(new ItemData(SalonOwner.FullName, 1, amount));
