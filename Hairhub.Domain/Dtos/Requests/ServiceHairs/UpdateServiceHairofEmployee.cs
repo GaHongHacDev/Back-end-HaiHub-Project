@@ -8,9 +8,7 @@ namespace Hairhub.Domain.Dtos.Requests.ServiceHairs
 {
     public class UpdateServiceHairofEmployee
     {
-        public List<Guid>? removeServiceID {  get; set; }
-
-        public List<Guid>? addServiceID { get; set;}
+        public List<Guid>? listServiceID {  get; set; }
 
     }
 }

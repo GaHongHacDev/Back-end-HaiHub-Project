@@ -228,48 +228,39 @@ namespace Hairhub.Service.Services.Services
             if (employee == null) {
 
                 throw new Exception("Không tồn tại nhân viên này");
-            }
-            if (request.removeServiceID != null)
-            {
-                
-                foreach (var serviceid in request.removeServiceID) {
-                    
-                    var servicehair = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceid && p.SalonEmployeeId == employeeId);
+            }           
 
-                    var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
-                                    predicate: p => p.SalonEmployeeId == employeeId 
-                                                    && p.ServiceHairId == serviceid 
-                                                    && p.Status == AppointmentStatus.Booking
-                                                    && p.StartTime > DateTime.UtcNow);
-                    if (appointment.Count > 0) {
-                        throw new Exception("Không thể thay đổi dịch vụ vì còn lịch hẹn khác");
-                    }
-
-                    _unitOfWork.GetRepository<ServiceEmployee>().DeleteAsync(servicehair);
-                }
-                                
-            }
-            if(request.addServiceID != null)
+            if (request.listServiceID != null)
             {
-                
-                foreach (var newserviceid  in request.addServiceID)
+                foreach (var serviceID in request.listServiceID)
                 {
-                    var servicehairinSalon = await _unitOfWork.GetRepository<ServiceHair>().SingleOrDefaultAsync(predicate: p => p.Id == newserviceid && p.SalonInformationId == employee.SalonInformationId);
-                    if(servicehairinSalon == null)
+                    var serviceEmployee = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceID && p.SalonEmployeeId == employee.Id);
+
+                    if (serviceEmployee != null) {
+                        var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
+                                               predicate: p => p.SalonEmployeeId == employeeId 
+                                                               && p.ServiceHairId == serviceID
+                                                               && p.Status == AppointmentStatus.Booking
+                                                              && p.StartTime > DateTime.UtcNow);
+                        if (appointment.Count > 0) {
+                           throw new Exception("Không thể thay đổi dịch vụ vì còn lịch hẹn khác");
+                        }
+
+                       _unitOfWork.GetRepository<ServiceEmployee>().DeleteAsync(serviceEmployee);
+                    } else
                     {
-                        throw new Exception("không có dịch vụ này trong salon");
-                    }
-                    ServiceEmployee newservicehair = new ServiceEmployee
-                    {
+                        ServiceEmployee se = new ServiceEmployee {
                         Id = Guid.NewGuid(),
-                        ServiceHairId = servicehairinSalon.Id,
-                        SalonEmployeeId = employeeId,
-                    };
-                    await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(newservicehair);
-                }    
+                        ServiceHairId = serviceID,
+                        SalonEmployeeId = employee.Id,  
+                        };
+                        await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(se);
+                    }
+
+                }                
             }
-            bool isUpdated = _unitOfWork.Commit() > 0;
-            return isUpdated;
+            bool isSuccess = await _unitOfWork.CommitAsync() > 0;
+            return isSuccess;
         }
     }
 }
