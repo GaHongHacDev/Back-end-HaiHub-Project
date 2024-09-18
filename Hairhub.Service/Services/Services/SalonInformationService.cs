@@ -70,6 +70,7 @@ namespace Hairhub.Service.Services.Services
             salonInformation.TotalRating = 0;
             salonInformation.TotalReviewer = 0;
             salonInformation.NumberOfReported = 0;
+            salonInformation.CreatedAt = DateTime.Now;
             await _unitOfWork.GetRepository<SalonInformation>().InsertAsync(salonInformation);
             foreach (var scheduleRequest in createSalonInformationRequest.SalonInformationSchedules)
             {
@@ -276,7 +277,7 @@ namespace Hairhub.Service.Services.Services
             {
                 salonInformation.Latitude = (decimal)updateSalonInformationRequest.Latitude;
             }
-
+            salonInformation.UpdatedAt = DateTime.Now;
             _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salonInformation);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;

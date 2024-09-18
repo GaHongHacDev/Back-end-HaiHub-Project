@@ -152,7 +152,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> UpdateSalonInformation([FromRoute] Guid id, [FromForm] UpdateSalonInformationRequest updateSalonInformationRequest)
         {
             try

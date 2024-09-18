@@ -106,16 +106,6 @@ namespace Hairhub.Service.Services.Services
 
                 foreach (var appointment in appointments)
                 {
-                    ////Tính tiền HH mà salon chưa trả cho system
-                    //if (appointment.Status.Equals(AppointmentStatus.Successed) && appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate && appointment.Status.Equals(AppointmentStatus.Successed))
-                    //{
-                    //    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                    //}
-                    ////Tính tổng tiền HH của salon từ start_date đến end_date
-                    //if (appointment.Status.Equals(AppointmentStatus.Successed))
-                    //{
-                    //    response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                    //}
                     switch (appointment.Status)
                     {
                         case AppointmentStatus.Successed:

@@ -759,6 +759,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Description")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)")
@@ -810,6 +814,10 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<int>("TotalReviewer")
                         .HasColumnType("int")
                         .HasColumnName("total_reviewer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("update_at");
 
                     b.HasKey("Id");
 
