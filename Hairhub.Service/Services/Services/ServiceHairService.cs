@@ -13,6 +13,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq.Expressions;
+using System.Net.WebSockets;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -222,9 +223,43 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public Task<bool> UpdateServiceHairofEmployee(Guid employeeId, UpdateServiceHairRequest request)
+        public async Task<bool> UpdateServiceHairofEmployee(Guid employeeId, UpdateServiceHairofEmployee request)
         {
-            throw new NotImplementedException();
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == employeeId);
+            if (employee == null) {
+
+                throw new Exception("Không tồn tại nhân viên này");
+            }
+            var serviceEmployee = await _unitOfWork.GetRepository<ServiceEmployee>().GetListAsync(predicate: p => p.SalonEmployeeId == employee.Id);
+            var currentServiceIds = serviceEmployee.Select(p => p.ServiceHairId).ToList(); 
+            var newServiceIds = request.listServiceID; 
+
+            
+            var servicesToDelete = serviceEmployee.Where(se => !newServiceIds.Contains(se.ServiceHairId)).ToList();
+
+            
+            var servicesToAdd = newServiceIds.Where(serviceId => !currentServiceIds.Contains(serviceId)).ToList();
+
+            
+            foreach (var serviceToDelete in servicesToDelete)
+            {
+                _unitOfWork.GetRepository<ServiceEmployee>().DeleteAsync(serviceToDelete);
+            }
+
+            
+            foreach (var serviceIdToAdd in servicesToAdd)
+            {
+                var newServiceEmployee = new ServiceEmployee
+                {
+                    Id = Guid.NewGuid(),
+                    ServiceHairId = serviceIdToAdd,
+                    SalonEmployeeId = employee.Id
+                };
+                await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(newServiceEmployee);
+            }
+
+            bool isSuccess = await _unitOfWork.CommitAsync() > 0;
+            return isSuccess;
         }
     }
 }
