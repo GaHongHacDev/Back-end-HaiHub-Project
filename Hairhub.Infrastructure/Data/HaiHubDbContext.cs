@@ -24,16 +24,10 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-<<<<<<< HEAD
-           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+          // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
-           optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
-=======
-          optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+           optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
-
->>>>>>> 77d6474195d20d68584fb60c88af2c0093e17b67
         }
 
         public virtual DbSet<Account> Accounts { get; set; } 
