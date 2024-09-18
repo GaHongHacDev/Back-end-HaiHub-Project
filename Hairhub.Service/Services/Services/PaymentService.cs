@@ -81,7 +81,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new Exception("Salon is null.");
                 }
-                int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
+                int amount = 10000;
                 string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
                 long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
                 var description = request.Description;

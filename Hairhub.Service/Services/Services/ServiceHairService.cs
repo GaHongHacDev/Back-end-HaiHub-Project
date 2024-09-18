@@ -13,6 +13,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq.Expressions;
+using System.Net.WebSockets;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -228,37 +229,35 @@ namespace Hairhub.Service.Services.Services
             if (employee == null) {
 
                 throw new Exception("Không tồn tại nhân viên này");
-            }           
-
-            if (request.listServiceID != null)
-            {
-                foreach (var serviceID in request.listServiceID)
-                {
-                    var serviceEmployee = await _unitOfWork.GetRepository<ServiceEmployee>().SingleOrDefaultAsync(predicate: p => p.ServiceHairId == serviceID && p.SalonEmployeeId == employee.Id);
-
-                    if (serviceEmployee != null) {
-                        var appointment = await _unitOfWork.GetRepository<AppointmentDetail>().GetListAsync(
-                                               predicate: p => p.SalonEmployeeId == employeeId 
-                                                               && p.ServiceHairId == serviceID
-                                                               && p.Status == AppointmentStatus.Booking
-                                                              && p.StartTime > DateTime.UtcNow);
-                        if (appointment.Count > 0) {
-                           throw new Exception("Không thể thay đổi dịch vụ vì còn lịch hẹn khác");
-                        }
-
-                       _unitOfWork.GetRepository<ServiceEmployee>().DeleteAsync(serviceEmployee);
-                    } else
-                    {
-                        ServiceEmployee se = new ServiceEmployee {
-                        Id = Guid.NewGuid(),
-                        ServiceHairId = serviceID,
-                        SalonEmployeeId = employee.Id,  
-                        };
-                        await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(se);
-                    }
-
-                }                
             }
+            var serviceEmployee = await _unitOfWork.GetRepository<ServiceEmployee>().GetListAsync(predicate: p => p.SalonEmployeeId == employee.Id);
+            var currentServiceIds = serviceEmployee.Select(p => p.ServiceHairId).ToList(); 
+            var newServiceIds = request.listServiceID; 
+
+            
+            var servicesToDelete = serviceEmployee.Where(se => !newServiceIds.Contains(se.ServiceHairId)).ToList();
+
+            
+            var servicesToAdd = newServiceIds.Where(serviceId => !currentServiceIds.Contains(serviceId)).ToList();
+
+            
+            foreach (var serviceToDelete in servicesToDelete)
+            {
+                _unitOfWork.GetRepository<ServiceEmployee>().DeleteAsync(serviceToDelete);
+            }
+
+            
+            foreach (var serviceIdToAdd in servicesToAdd)
+            {
+                var newServiceEmployee = new ServiceEmployee
+                {
+                    Id = Guid.NewGuid(),
+                    ServiceHairId = serviceIdToAdd,
+                    SalonEmployeeId = employee.Id
+                };
+                await _unitOfWork.GetRepository<ServiceEmployee>().InsertAsync(newServiceEmployee);
+            }
+
             bool isSuccess = await _unitOfWork.CommitAsync() > 0;
             return isSuccess;
         }
