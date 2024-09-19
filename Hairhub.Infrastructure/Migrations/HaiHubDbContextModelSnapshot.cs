@@ -708,6 +708,24 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("address");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_of_birth");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("email");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -730,7 +748,6 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("phone");
@@ -740,6 +757,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("salon_information_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("SalonInformationId");
 
@@ -1322,11 +1341,18 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonEmployee", b =>
                 {
+                    b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
+                        .WithMany("SalonEmployees")
+                        .HasForeignKey("AccountId")
+                        .HasConstraintName("FK_account_salon_employee");
+
                     b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
                         .WithMany("SalonEmployees")
                         .HasForeignKey("SalonInformationId")
                         .IsRequired()
                         .HasConstraintName("FK_salon_information_salon_employee");
+
+                    b.Navigation("Account");
 
                     b.Navigation("SalonInformation");
                 });
@@ -1443,6 +1469,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Customers");
 
                     b.Navigation("RefreshTokenAccounts");
+
+                    b.Navigation("SalonEmployees");
 
                     b.Navigation("SalonOwners");
                 });

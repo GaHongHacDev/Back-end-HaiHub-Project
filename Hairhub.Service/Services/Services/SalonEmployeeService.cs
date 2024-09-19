@@ -46,6 +46,11 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
+        public async Task<bool> CreateAccountEmployee()
+        {
+            return true;
+        }
+
         public async Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest request)
         {
             //check exist salon
