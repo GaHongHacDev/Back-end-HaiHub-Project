@@ -12,6 +12,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public string? Gender { get; set; }
         public string Phone { get; set; }
         public string Img { get; set; }
+        public string Email { get; set; }
         public int totalSuccessedAppointment {  get; set; } = 0;
         public int totalFailedAppointment { get; set; } = 0;
         public int totalCanceledAppointment { get; set; } = 0;

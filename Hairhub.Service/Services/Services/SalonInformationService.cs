@@ -421,7 +421,6 @@ namespace Hairhub.Service.Services.Services
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync( predicate: x=>x.SalonInformationId == SalonId);
             foreach (var employee in employees) 
             {
-                
                 var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                     .GetListAsync(
                                                                     x=>x.AppointmentDetails.Any(x=>x.SalonEmployeeId == employee.Id) 

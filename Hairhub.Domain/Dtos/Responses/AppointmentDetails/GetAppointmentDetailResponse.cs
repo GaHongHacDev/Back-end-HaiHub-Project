@@ -12,12 +12,17 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetails
     {
         public Guid Id { get; set; }
         public Guid SalonInformationId { get; set; }
-        public string FullName { get; set; }
-        public string? Gender { get; set; }
+        public string FullName { get; set; } //
+        public string? Gender { get; set; } //
         public string? Phone { get; set; }
-        public string Img { get; set; }
-        public bool IsActive { get; set; }
+        public string Img { get; set; } //
+        public string? Email { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string? Address { get; set; }
+        public bool IsActive { get; set; } //
+        public Guid? AccountId { get; set; }
     }
+
     public class ServiceHairResponse
     {
         public Guid Id { get; set; }

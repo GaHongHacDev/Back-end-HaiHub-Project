@@ -169,7 +169,44 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{email}")]
+        public async Task<IActionResult> CheckEmailAccountEmployee([FromRoute] string email)
+        {
+            try
+            {
+                var response = await _salonEmployeeService.CheckEmailAccountEmployee(email);
+                if (response == false)
+                {
+                    throw new NotFoundException("Email đã tồn tại");
+                }
+                return Ok(email);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest( new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAccountEmployee([FromBody] CreateAccountEmployeeRequest createAccountEmployeeRequest)
+        {
+            try
+            {
+                var response = await _salonEmployeeService.CreateAccountEmployee(createAccountEmployeeRequest);
+                return Ok(createAccountEmployeeRequest);
+            }
+            catch(NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
     }
