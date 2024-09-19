@@ -175,6 +175,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{email}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CheckEmailAccountEmployee([FromRoute] string email)
         {
             try
@@ -193,6 +194,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAccountEmployee([FromBody] CreateAccountEmployeeRequest createAccountEmployeeRequest)
         {
             try
