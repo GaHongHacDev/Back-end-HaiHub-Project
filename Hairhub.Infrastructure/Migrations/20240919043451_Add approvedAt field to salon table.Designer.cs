@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairhub.Infrastructure.Migrations
 {
     [DbContext(typeof(HaiHubDbContext))]
-    [Migration("20240901082041_Update table account")]
-    partial class Updatetableaccount
+    [Migration("20240919043451_Add approvedAt field to salon table")]
+    partial class AddapprovedAtfieldtosalontable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -762,6 +762,14 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
 
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("approved_at");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Description")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)")
@@ -813,6 +821,10 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<int>("TotalReviewer")
                         .HasColumnType("int")
                         .HasColumnName("total_reviewer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("update_at");
 
                     b.HasKey("Id");
 

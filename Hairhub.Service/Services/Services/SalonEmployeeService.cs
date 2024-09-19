@@ -176,7 +176,7 @@ namespace Hairhub.Service.Services.Services
             return salonEmployeeResponses;
         }
 
-        public async Task<GetSalonEmployeeResponse>? GetSalonEmployeeById(Guid id)
+        public async Task<GetSalonEmployeeResponse?> GetSalonEmployeeById(Guid id)
         {
             SalonEmployee salonEmployeeResponse = await _unitOfWork
                 .GetRepository<SalonEmployee>()

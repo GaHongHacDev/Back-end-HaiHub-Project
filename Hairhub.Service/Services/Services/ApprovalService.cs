@@ -93,13 +93,17 @@ namespace Hairhub.Service.Services.Services
             }
 
             salonInformation.Status = request.Status;
+            if (request.Status.Equals(SalonStatus.Approved))
+            {
+                salonInformation.ApprovedAt = DateTime.UtcNow;
+            }
 
             Approval newApproval = new Approval()
             {
                 Id = Guid.NewGuid(),
                 SalonInformationId = request.SalonInformationId,
                 AdminId = request.AdminId,
-                ReasonReject = request.Status == SalonStatus.Rejected ? request.ReasonReject : null,
+                ReasonReject = request.Status.Equals(SalonStatus.Rejected) ? request.ReasonReject : null,
                 CreateDate = DateTime.UtcNow
             };
 

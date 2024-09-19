@@ -182,13 +182,13 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? name, string? status, int page, int size)
         {
-            
+
 
             var salonInformations = await _unitOfWork.GetRepository<SalonInformation>()
         .GetPagingListAsync(
             predicate: c =>
             (string.IsNullOrEmpty(name) || c.Name.Contains(name)) &&
-                (string.IsNullOrEmpty(status) || c.Status == status),  
+                (string.IsNullOrEmpty(status) || c.Status == status),
             include: query => query.Include(s => s.SalonOwner),
             page: page,
             size: size
@@ -268,7 +268,7 @@ namespace Hairhub.Service.Services.Services
                 salonInformation.Img = await _mediaService.UploadAnImage(updateSalonInformationRequest.Image, MediaPath.SALON_AVATAR, salonInformation.Id.ToString());
             }
 
-            if (updateSalonInformationRequest.Longitude!=null)
+            if (updateSalonInformationRequest.Longitude != null)
             {
                 salonInformation.Longitude = (decimal)updateSalonInformationRequest.Longitude;
             }
@@ -359,7 +359,7 @@ namespace Hairhub.Service.Services.Services
                     }
                 }
 
-                if(longtitude!=null && latitude !=null && distance != null)
+                if (longtitude != null && latitude != null && distance != null)
                 {
                     salon.Distance = DistanceMap.GetDistance(salon.Latitude, salon.Longitude, (decimal)latitude, (decimal)longtitude);
                 }
@@ -378,7 +378,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     salon.OperatingStatus = "Không hoạt động vào hôm nay";
                 }
-                else if(timeOnlyNow >= salonSchedule.StartTime && timeOnlyNow <= salonSchedule.EndTime)
+                else if (timeOnlyNow >= salonSchedule.StartTime && timeOnlyNow <= salonSchedule.EndTime)
                 {
                     salon.OperatingStatus = "Đang hoạt động";
                 }
@@ -408,6 +408,50 @@ namespace Hairhub.Service.Services.Services
                 );
 
             return _mapper.Map<List<SalonSuggesstionResponse>>(salons);
+        }
+
+        public async Task<ReviewRevenueReponse> ReviewRevenue(Guid SalonId, DateTime startDate, DateTime endDate)
+        {
+            ReviewRevenueReponse result = new ReviewRevenueReponse();
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == SalonId);
+            if (salon == null) 
+            {
+                throw new NotFoundException($"Không tìm thấy salon/barber shop với id {SalonId}");
+            }
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync( predicate: x=>x.SalonInformationId == SalonId);
+            foreach (var employee in employees) 
+            {
+                
+                var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                    .GetListAsync(
+                                                                    x=>x.AppointmentDetails.Any(x=>x.SalonEmployeeId == employee.Id) 
+                                                                    && !x.Status.Equals(AppointmentStatus.Booking)
+                                                                    && x.StartDate.Date >= startDate.Date
+                                                                    && x.StartDate <= endDate.Date
+                                                                 );
+                ReviewRevenueEmployee reviewRevenueEmployee = new ReviewRevenueEmployee();
+                reviewRevenueEmployee = _mapper.Map<ReviewRevenueEmployee>(employee);
+
+                foreach (var appointment in appointments) 
+                {                    
+                    switch (appointment.Status)
+                    {
+                        case AppointmentStatus.Successed:
+                            reviewRevenueEmployee.totalSuccessedAppointment++;
+                            reviewRevenueEmployee.totalRevuenueEmployee += appointment.TotalPrice;
+                            break;
+                        case AppointmentStatus.Fail:
+                            reviewRevenueEmployee.totalFailedAppointment++;
+                            break;
+                        case AppointmentStatus.CancelByCustomer:
+                            reviewRevenueEmployee.totalCanceledAppointment++;
+                            break;
+                    }
+                }
+                result.totalRevenue += reviewRevenueEmployee.totalRevuenueEmployee;
+                result.employees.Add(reviewRevenueEmployee);
+            }
+            return result;
         }
     }
 }

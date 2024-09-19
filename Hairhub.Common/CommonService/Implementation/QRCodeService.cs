@@ -24,7 +24,7 @@ namespace Hairhub.Common.CommonService.Implementation
             _mediaService = media;
         }
 
-        public async Task<string> DecodeQR(string hashedAppointmentData)
+        public string? DecodeQR(string hashedAppointmentData)
         {
             return String.IsNullOrEmpty(hashedAppointmentData) == true ? null : hashedAppointmentData;
         }

@@ -759,6 +759,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
 
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("approved_at");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");

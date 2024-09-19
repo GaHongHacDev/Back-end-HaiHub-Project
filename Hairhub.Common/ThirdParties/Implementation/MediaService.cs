@@ -23,9 +23,9 @@ namespace Hairhub.Common.ThirdParties.Implementation
         public MediaService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _cloudName = _configuration["Cloudinary:cloud_name"];
-            _apiKey = _configuration["Cloudinary:api_key"];
-            apiSecret = _configuration["Cloudinary:api_secret"];
+            _cloudName = _configuration["Cloudinary:cloud_name"]!;
+            _apiKey = _configuration["Cloudinary:api_key"]!;
+            apiSecret = _configuration["Cloudinary:api_secret"]!;
         }
         public async Task<string> UploadAnImage(IFormFile file, string pathFolder, string nameOfImg)
         {
@@ -105,7 +105,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
             using (var stream = file.OpenReadStream())
             {
                 uploadParams.File = new FileDescription(file.FileName, stream);
-                var uploadResult = _cloudinary.Upload(uploadParams);
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
                 if (uploadResult.Error != null)
                 {
