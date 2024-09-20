@@ -12,9 +12,10 @@ namespace Hairhub.Domain.Dtos.Requests.Feedbacks
         public Guid SalonId { get; set; }
         public Guid CustomerId { get; set; }
         public Guid AppointmentId { get; set; }
-        public int? Rating { get; set; }
+        public IList<FeedbackDetailRequest> FeedbackDetailRequests { get; set; }
         public string? Comment { get; set; }
         public List<IFormFile>? ImgFeedbacks { get; set; }
         //public IFormFile? Video { get; set; }
     }
+
 }
