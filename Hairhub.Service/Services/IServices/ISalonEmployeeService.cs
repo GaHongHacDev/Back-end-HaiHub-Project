@@ -19,5 +19,6 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteSalonEmployeeById(Guid id);
         Task<bool> ActiveSalonEmployee(Guid id);
         Task<bool> CreateAccountEmployee(CreateAccountEmployeeRequest request);
+        Task<IList<GetEmployeeHighRatingResponse>> GetEmployeeHighRating(int? numberOfDay);
     }
 }

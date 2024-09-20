@@ -112,6 +112,7 @@ namespace Hairhub.Service.Services.Services
                 }
 
             }
+
             //create employee
             foreach (var item in request.SalonEmployees)
             {
@@ -313,6 +314,22 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
+        }
+
+        public async Task<IList<GetEmployeeHighRatingResponse>> GetEmployeeHighRating(int? numberOfDay)
+        {
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>()
+                                            .GetListAsync(
+                                                          predicate: x => x.IsActive && x.SalonInformation.Status.Equals(SalonStatus.Approved) && x.Rating!=0,
+                                                            orderBy: q => q.OrderByDescending(s => s.Rating)
+                                                                            .ThenByDescending(s => s.RatingCount),
+                                                            take: 10
+                                                         );
+            if (employees==null)
+            {
+                employees = new List<SalonEmployee>();
+            }
+            return _mapper.Map<IList<GetEmployeeHighRatingResponse>>(employees);
         }
     }
 }
