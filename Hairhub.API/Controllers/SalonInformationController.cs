@@ -228,5 +228,25 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> ReviewRevenue([FromRoute] Guid id, [FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
+        {
+            try
+            {
+                var result = await _salonInformationService.ReviewRevenue(id, startTime, endTime);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

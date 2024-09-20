@@ -24,13 +24,13 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-          optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+          //  optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
         }
 
-        public virtual DbSet<Account> Accounts { get; set; } 
+        public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
         public virtual DbSet<Role> roles { get; set; }
@@ -190,13 +190,26 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Gender).HasMaxLength(10).HasColumnName("gender").IsRequired(false);
                 entity.Property(e => e.Phone).HasMaxLength(32).HasColumnName("phone");
                 entity.Property(e => e.Img).HasMaxLength(200).HasColumnName("img");
+                entity.Property(e => e.Email).HasMaxLength(200).HasColumnName("email").IsRequired(false);
+                entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth").IsRequired(false); ;
+                entity.Property(e => e.Address).HasMaxLength(200).HasColumnName("address").IsRequired(false);
+                entity.Property(e => e.Rating).HasColumnName("rating").IsRequired(false);
+                entity.Property(e => e.RatingCount).HasColumnName("rating_count").IsRequired(false);
+                entity.Property(e => e.RatingSum).HasColumnName("rating_sum").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.AccountId).HasColumnName("account_id").IsRequired(false);
 
                 entity.HasOne(d => d.SalonInformation)
                       .WithMany(p => p.SalonEmployees)
                       .HasForeignKey(d => d.SalonInformationId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_salon_information_salon_employee");
+
+                entity.HasOne(d => d.Account) 
+                     .WithMany(p => p.SalonEmployees)
+                     .HasForeignKey(d => d.AccountId)
+                     .OnDelete(DeleteBehavior.ClientSetNull)
+                     .HasConstraintName("FK_account_salon_employee");
             });
 
             modelBuilder.Entity<ServiceEmployee>(entity =>
@@ -258,6 +271,9 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Latitude).HasColumnType("decimal(18,10)").HasMaxLength(150).HasColumnName("latitude");
                 entity.Property(e => e.TotalRating).HasColumnName("total_rating");
                 entity.Property(e => e.TotalReviewer).HasColumnName("total_reviewer");
+                entity.Property(e => e.UpdatedAt).HasColumnName("update_at").IsRequired(false);
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired(false);
+                entity.Property(e => e.ApprovedAt).HasColumnName("approved_at").IsRequired(false);
                 entity.Property(e => e.NumberOfReported).HasColumnName("number_of_reported");
                 entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
 

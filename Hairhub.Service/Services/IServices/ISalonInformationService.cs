@@ -24,5 +24,6 @@ namespace Hairhub.Service.Services.IServices
         Task<GetSalonInformationResponse>? GetSalonByOwnerId(Guid ownerId);
         Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "",
                                         string? salonAddress = "", string? salonName = "", decimal? latitude = 0, decimal? longtitude = 0, decimal? distance = 0);
+        Task<ReviewRevenueReponse> ReviewRevenue(Guid SalonId, DateTime startDate, DateTime endDate);
     }
 }

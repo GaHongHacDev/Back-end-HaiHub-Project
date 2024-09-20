@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hairhub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateSalonInformationtableinlongtitudeandlatitudedecimal : Migration
+    public partial class AddapprovedAtfieldtosalontable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,7 +107,7 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     account_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    phone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    phone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     full_name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     day_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
@@ -271,6 +271,9 @@ namespace Hairhub.Infrastructure.Migrations
                     total_rating = table.Column<int>(type: "int", nullable: false),
                     total_reviewer = table.Column<int>(type: "int", nullable: false),
                     number_of_reported = table.Column<int>(type: "int", nullable: true),
+                    update_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    approved_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>

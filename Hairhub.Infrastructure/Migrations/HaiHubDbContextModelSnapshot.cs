@@ -708,6 +708,24 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("address");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_of_birth");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("email");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -730,16 +748,26 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("phone");
+
+                    b.Property<decimal?>("Rating")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("RatingCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RatingSum")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("SalonInformationId");
 
@@ -758,6 +786,14 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("address");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("approved_at");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Description")
                         .HasMaxLength(250)
@@ -810,6 +846,10 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<int>("TotalReviewer")
                         .HasColumnType("int")
                         .HasColumnName("total_reviewer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("update_at");
 
                     b.HasKey("Id");
 
@@ -1310,11 +1350,18 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonEmployee", b =>
                 {
+                    b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
+                        .WithMany("SalonEmployees")
+                        .HasForeignKey("AccountId")
+                        .HasConstraintName("FK_account_salon_employee");
+
                     b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
                         .WithMany("SalonEmployees")
                         .HasForeignKey("SalonInformationId")
                         .IsRequired()
                         .HasConstraintName("FK_salon_information_salon_employee");
+
+                    b.Navigation("Account");
 
                     b.Navigation("SalonInformation");
                 });
@@ -1431,6 +1478,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Customers");
 
                     b.Navigation("RefreshTokenAccounts");
+
+                    b.Navigation("SalonEmployees");
 
                     b.Navigation("SalonOwners");
                 });

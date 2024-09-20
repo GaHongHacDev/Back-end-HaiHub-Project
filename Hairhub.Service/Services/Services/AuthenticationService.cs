@@ -16,6 +16,7 @@ using AutoMapper;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using CloudinaryDotNet.Core;
+using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -46,7 +47,9 @@ namespace Hairhub.Service.Services.Services
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            if (salonOwner == null && customer == null && admin == null)
+            SalonEmployee salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+
+            if (salonOwner == null && customer == null && admin == null && salonEmployee==null)
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
@@ -56,7 +59,8 @@ namespace Hairhub.Service.Services.Services
                 RoleName = account.Role?.RoleName,
                 CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
                 SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
-                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null
+                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null,
+                SalonEmployeeResponse = salonEmployee !=null ? _mapper.Map<SalonEmployeeResponse>(salonEmployee) : null,
             };
         }
 
@@ -114,7 +118,8 @@ namespace Hairhub.Service.Services.Services
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
-            if (salonOwner == null && customer == null && admin == null)
+            SalonEmployee salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            if (salonOwner == null && customer == null && admin == null && salonEmployee==null)
             {
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
@@ -135,6 +140,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Cannot insert token to DB");
             }
+
             return new LoginResponse()
             {
                 AccessToken = accessToken,
@@ -143,7 +149,8 @@ namespace Hairhub.Service.Services.Services
                 RoleName = account.Role?.RoleName,
                 CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
                 SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
-                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null
+                AdminResponse = admin != null ? _mapper.Map<AdminLoginResponse>(admin) : null,
+                SalonEmployeeResponse = salonEmployee != null ? _mapper.Map<SalonEmployeeResponse>(salonEmployee) : null,
             };
         }
 

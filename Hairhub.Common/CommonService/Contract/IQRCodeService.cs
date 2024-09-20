@@ -9,6 +9,6 @@ namespace Hairhub.Common.CommonService.Contract
     public interface IQRCodeService
     {
         Task<string> GenerateQR(Guid AppointmentId);
-        Task<string> DecodeQR(string hashedAppointmentData);
+        string DecodeQR(string hashedAppointmentData);
     }
 }
