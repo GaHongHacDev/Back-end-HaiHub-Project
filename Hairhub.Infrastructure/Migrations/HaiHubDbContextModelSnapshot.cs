@@ -752,6 +752,15 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(32)")
                         .HasColumnName("phone");
 
+                    b.Property<decimal?>("Rating")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("RatingCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RatingSum")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");

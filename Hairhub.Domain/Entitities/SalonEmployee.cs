@@ -20,6 +20,9 @@ namespace Hairhub.Domain.Entitities
         public string? Address { get; set; }
         public bool IsActive { get; set; } //
         public Guid? AccountId { get; set; }
+        public int? RatingCount { get; set; }
+        public int? RatingSum { get; set; }
+        public decimal? Rating {  get; set; }
         public Account? Account { get; set; }
 
         public SalonInformation SalonInformation { get; set; }
