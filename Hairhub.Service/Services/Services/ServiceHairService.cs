@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
@@ -95,6 +97,28 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = serviceHairs.TotalPages,
                 Items = _mapper.Map<IList<GetServiceHairResponse>>(serviceHairs.Items),
             };
+            return serviceHairResponses;
+        }
+
+        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairByEmployeeId(Guid employeeId, int page, int size)
+        {
+            var serviceHairs = await _unitOfWork.GetRepository<ServiceHair>()
+                                                .GetPagingListAsync(
+                                                    predicate: x=>x.IsActive && x.ServiceEmployees.Any(x=>x.SalonEmployeeId == employeeId),
+                                                    page: page,
+                                                    size: size
+                                                );
+
+
+            var serviceHairResponses = new Paginate<GetServiceHairResponse>()
+            {
+                Page = serviceHairs.Page,
+                Size = serviceHairs.Size,
+                Total = serviceHairs.Total,
+                TotalPages = serviceHairs.TotalPages,
+                Items = _mapper.Map<IList<GetServiceHairResponse>>(serviceHairs.Items),
+            };
+
             return serviceHairResponses;
         }
 

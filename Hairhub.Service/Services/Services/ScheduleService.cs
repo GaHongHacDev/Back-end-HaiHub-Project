@@ -28,13 +28,20 @@ namespace Hairhub.Service.Services.Services
             this._unitOfWork = _unitOfWork;
             this._mapper = _mapper;
         }
+        public async Task<IList<GetScheduleResponse>> GetScheduleByEmployeeId(Guid id)
+        {
+            var schedules = await _unitOfWork.GetRepository<Schedule>()
+            .GetListAsync(
+                predicate: x => x.EmployeeId == id
+            );
+            return _mapper.Map<List<GetScheduleResponse>>(schedules);
+        }
 
         public async Task<IPaginate<GetScheduleResponse>> GetSchedules(int page, int size)
         {
             var schedules = await _unitOfWork.GetRepository<Schedule>()
             .GetPagingListAsync(
                 predicate: x => x.IsActive == true,
-                include: query => query.Include(s => s.SalonEmployee),
                 page: page,
                 size: size
             );
@@ -52,12 +59,10 @@ namespace Hairhub.Service.Services.Services
         }
 
         public async Task<List<GetScheduleResponse>> GetSalonSchedules(Guid salonId)
-        {
-            ;
+        {;
             var schedules = await _unitOfWork.GetRepository<Schedule>()
             .GetListAsync(
-                predicate: x => x.SalonId == salonId,
-                include: query => query.Include(s => s.SalonInformation)
+                predicate: x => x.SalonId == salonId
             );
             if (schedules == null)
             {
@@ -69,8 +74,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<GetScheduleResponse> GetScheduleById(Guid id)
         {
             var schedule = await _unitOfWork.GetRepository<Schedule>()
-               .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id),
-               include: x => x.Include(s => s.SalonEmployee));
+               .SingleOrDefaultAsync(predicate: x => x.Id.Equals(id));
 
             var scheduleResponse = _mapper.Map<GetScheduleResponse>(schedule);
 

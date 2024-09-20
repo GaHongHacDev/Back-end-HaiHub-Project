@@ -59,6 +59,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Email đã tồn tại");
             }
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == request.EmployeeId);
+            if (employee.AccountId != null) 
+            {
+                throw new NotFoundException("Nhân viên đã có tài khoản");
+            }
             Account accountEmployee = new Account();
             accountEmployee.UserName = request.Email;
             accountEmployee.Password = AesEncoding.GenerateRandomPassword();
@@ -67,8 +72,7 @@ namespace Hairhub.Service.Services.Services
             accountEmployee.IsActive = true;
             accountEmployee.CreatedDate = DateTime.Now;
             accountEmployee.Id = Guid.NewGuid();
-
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x=>x.Id == request.EmployeeId);
+            
             employee.Email = request.Email;
             employee.AccountId = accountEmployee.Id;
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(employee);

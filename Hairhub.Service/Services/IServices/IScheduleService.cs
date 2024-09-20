@@ -15,6 +15,7 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<IPaginate<GetScheduleResponse>> GetSchedules(int page, int size);
         Task<GetScheduleResponse> GetScheduleById(Guid id);
+        Task<IList<GetScheduleResponse>> GetScheduleByEmployeeId(Guid id);
         Task<bool> CreateSchedule(CreateScheduleRequest request);
         Task<bool> UpdateSchedule(Guid id, UpdateScheduleRequest request);
         Task<bool> DeleteSchedule(Guid id);
