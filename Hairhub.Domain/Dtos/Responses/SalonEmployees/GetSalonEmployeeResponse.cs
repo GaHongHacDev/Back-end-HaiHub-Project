@@ -13,11 +13,19 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
     public class GetSalonEmployeeResponse
     {
         public Guid Id { get; set; }
-        public string FullName { get; set; }
-        public string? Gender { get; set; }
+        public Guid SalonInformationId { get; set; }
+        public string FullName { get; set; } //
+        public string? Gender { get; set; } //
         public string? Phone { get; set; }
-        public string Img { get; set; }
-        public bool IsActive { get; set; }
+        public string Img { get; set; } //
+        public string? Email { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string? Address { get; set; }
+        public bool IsActive { get; set; } //
+        public Guid? AccountId { get; set; }
+        public int? RatingCount { get; set; }
+        public int? RatingSum { get; set; }
+        public decimal? Rating { get; set; }
         public List<ScheduleEmployeeResponse> Schedules { get; set; }
         public List<GetServiceHairResponse>  ServiceHairs { get; set; }
     }

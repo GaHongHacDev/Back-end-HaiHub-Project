@@ -16,7 +16,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public string? Img { get; set; }
         public decimal Longitude { get; set; }
         public decimal Latitude { get; set; }
-        public int TotalRating { get; set; }
+        public decimal TotalRating { get; set; }
         public decimal Rate { get; set; }
         public int TotalReviewer { get; set; }
         public string OperatingStatus { get; set; }

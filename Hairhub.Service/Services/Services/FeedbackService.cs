@@ -135,11 +135,11 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
                 }
 
-                int totalRating = existingSalon.TotalRating;
+                decimal totalRating = existingSalon.TotalRating;
                 int totalReview = existingSalon.TotalReviewer + 1;
-                existingSalon.Rate = (decimal)(totalRating + (decimal)(ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
+                existingSalon.Rate = (totalRating + (decimal)(ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
                 existingSalon.TotalReviewer = totalReview;
-                existingSalon.TotalRating = totalRating + ratingSum/request.FeedbackDetailRequests.Count;
+                existingSalon.TotalRating = totalRating + (decimal)ratingSum/request.FeedbackDetailRequests.Count;
 
                 var salon = _mapper.Map<SalonInformation>(existingSalon);
 
