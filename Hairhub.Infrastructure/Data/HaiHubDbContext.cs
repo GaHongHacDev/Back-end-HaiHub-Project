@@ -192,7 +192,10 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Img).HasMaxLength(200).HasColumnName("img");
                 entity.Property(e => e.Email).HasMaxLength(200).HasColumnName("email").IsRequired(false);
                 entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth").IsRequired(false); ;
-                entity.Property(e => e.Address).HasMaxLength(200).HasColumnName("address").IsRequired(false); ;
+                entity.Property(e => e.Address).HasMaxLength(200).HasColumnName("address").IsRequired(false);
+                entity.Property(e => e.Rating).HasColumnName("rating").IsRequired(false);
+                entity.Property(e => e.RatingCount).HasColumnName("rating_count").IsRequired(false);
+                entity.Property(e => e.RatingSum).HasColumnName("rating_sum").IsRequired(false);
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
                 entity.Property(e => e.AccountId).HasColumnName("account_id").IsRequired(false);
 
