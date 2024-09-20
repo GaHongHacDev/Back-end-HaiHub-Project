@@ -211,10 +211,9 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CheckExistEmail(CheckExistEmailResrequest checkExistEmailResrequest)
         {
-            var email = checkExistEmailResrequest.Email.ToLower();
-            var emailSalon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
-            var emailCustomer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
-            if (emailSalon == null && emailCustomer==null)
+            var email = checkExistEmailResrequest.Email.ToLower().Trim();
+            var emailAccount = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(email));
+            if (emailAccount == null)
             {
                 return false;
             }

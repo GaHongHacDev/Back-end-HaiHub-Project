@@ -173,26 +173,6 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("{email}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CheckEmailAccountEmployee([FromRoute] string email)
-        {
-            try
-            {
-                var response = await _salonEmployeeService.CheckEmailAccountEmployee(email);
-                if (response == false)
-                {
-                    throw new NotFoundException("Email đã tồn tại");
-                }
-                return Ok(email);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest( new { message = ex.Message });
-            }
-        }
-
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAccountEmployee([FromBody] CreateAccountEmployeeRequest createAccountEmployeeRequest)

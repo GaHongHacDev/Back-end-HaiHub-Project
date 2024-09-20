@@ -81,37 +81,6 @@ namespace Hairhub.Service.Services.Services
             return isSuccess;
         }
 
-        public async Task<bool> CheckEmailAccountEmployee(string email)
-        {
-            email = email.Trim();
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(email) && x.IsActive);
-            if (account == null)
-            {
-                return true;
-            }
-            else
-            {
-                //if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
-                //{
-                //    throw new NotFoundException("Email đã được tạo với 1 tài khoản khách hàng đặt lịch");
-                //}
-                //else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
-                //{
-                //    throw new NotFoundException("Email đã được tạo với 1 tài khoản chủ tiệm tóc");
-                //}
-                //else if (account.Role.RoleName.Equals(RoleEnum.SalonEmployee.ToString()))
-                //{
-                //    throw new NotFoundException("Email đã tồn tại với 1 tài khoản nhân viên");
-                //}
-                //else if (account.Role.RoleName.Equals(RoleEnum.Admin.ToString()))
-                //{
-                //    throw new NotFoundException("Email admin không được tạo tài khoản khác");
-                //}
-                //throw new NotFoundException("Email đã tồn tại");
-                return false;
-            }
-        }
-
         public async Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest request)
         {
             //check exist salon
