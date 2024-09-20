@@ -94,7 +94,7 @@ namespace Hairhub.API.Controllers
         }
 
 
-        [HttpPatch]
+        [HttpPut]
         [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> UpdateScheduleofEmployee([FromRoute]Guid id, UpdateScheduleEmployeeRequest request)
@@ -102,6 +102,22 @@ namespace Hairhub.API.Controllers
             try
             {
                 var isSuccessfull = await _scheduleService.UpdateScheduleofEmployee(id, request);
+                return Ok(isSuccessfull);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> UpdateScheduleofSalon([FromRoute] Guid id, UpdateScheduleEmployeeRequest request)
+        {
+            try
+            {
+                var isSuccessfull = await _scheduleService.UpdateScheduleofSalon(id, request);
                 return Ok(isSuccessfull);
             }
             catch (Exception ex)

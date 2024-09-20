@@ -68,7 +68,7 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);
+                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);               
                 var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
                 if (SalonOwner == null)
                 {
@@ -82,7 +82,8 @@ namespace Hairhub.Service.Services.Services
                     throw new Exception("Salon is null.");
                 }
                 int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
-                var orderCode = new Random().Next(1, 1000000);
+                string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+                long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
                 var description = request.Description;
                 string? clientId = _config["PayOS:ClientId"];
                 var apikey = _config["PayOS:APIKey"];
@@ -129,7 +130,7 @@ namespace Hairhub.Service.Services.Services
                     buyerPhone: SalonOwner.Phone, // Provide a valid currency
                     buyerEmail: SalonOwner.Email,
                     buyerAddress: SalonOwner.Address,
-                    expiredAt: (int)expiredAt.ToUnixTimeSeconds()
+                    expiredAt: (int)DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds()
                 );
 
                 paymentData.items.Add(new ItemData(SalonOwner.FullName, 1, amount));
@@ -242,13 +243,16 @@ namespace Hairhub.Service.Services.Services
             return paginateResponse;
         }
 
-        public async Task<IPaginate<ResponsePayment>> GetPayments(int page, int size)
+        public async Task<IPaginate<ResponsePayment>> GetPayments(string? valueSearch, int page, int size)
         {
 
             var payments = await _unitOfWork.GetRepository<Payment>()
-            .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid,
+                .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid 
+                                                    && (string.IsNullOrEmpty(valueSearch) 
+                                                    || x.SalonOwner.Email!.ToLower().Contains(valueSearch.Trim().ToLower()) 
+                                                    || x.SalonOwner.SalonInformations.Any(x=>x.Name.ToLower().Contains(valueSearch.Trim().ToLower()))),
                 include: query => query.Include(x => x.SalonOwner)
-                                        .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
+                                        .ThenInclude(x => x.SalonInformations)
                                         .Include(x => x.Config),
                 page: page,
                 size: size);

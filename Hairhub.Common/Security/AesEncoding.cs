@@ -68,5 +68,22 @@ namespace Hairhub.Common.Security
                 }
             }
         }
+
+        public static string GenerateRandomPassword()
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyz";
+            const string numbers = "0123456789";
+            var random = new Random();
+            char firstChar = chars[random.Next(chars.Length)];
+            firstChar = char.ToUpper(firstChar);
+
+            string middleChars = new string(Enumerable.Repeat(chars + numbers, 6)
+                                                      .Select(s => s[random.Next(s.Length)])
+                                                      .ToArray());
+            char lastChar = numbers[random.Next(numbers.Length)];
+            string password = firstChar + middleChars + lastChar;
+
+            return password;
+        }
     }
 }

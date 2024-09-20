@@ -76,11 +76,11 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{SalonId:Guid}")]
         //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] int NumberOfDay)
+        public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentTransaction(SalonId, NumberOfDay);
+                var appointmentResponse = await _appointmentService.GetAppointmentTransaction(SalonId, startDate, endDate);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy transaction" });
@@ -95,7 +95,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonId:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status, [FromQuery] bool isAscending, [FromQuery] DateTime? date, [FromQuery] string? customerName,[FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
@@ -154,7 +154,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-       // [Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {
             try
@@ -342,7 +342,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
         {
             try

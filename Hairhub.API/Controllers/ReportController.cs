@@ -32,9 +32,9 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAllReportByRoleName([FromQuery] string roleName, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetAllReportByRoleName([FromQuery] string? status, [FromQuery] bool sortdate, [FromQuery] string roleName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var reportsResponse = await _reportService.GetAllReportByRoleName(roleName, page, size);
+            var reportsResponse = await _reportService.GetAllReportByRoleName(status, sortdate, roleName, page, size);
             return Ok(reportsResponse);
         }
 

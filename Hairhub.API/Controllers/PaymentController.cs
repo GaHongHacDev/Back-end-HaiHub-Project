@@ -72,9 +72,9 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetPayments(int page=1, int size = 10)
+        public async Task<IActionResult> GetPayments([FromQuery]string? email, int page=1, int size = 10)
         {
-            var result = await _paymentservice.GetPayments(page, size);
+            var result = await _paymentservice.GetPayments(email, page, size);
             if (result == null)
             {
                 return BadRequest();

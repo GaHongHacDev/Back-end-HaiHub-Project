@@ -45,14 +45,17 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
-        public async Task<IPaginate<GetSalonOwnerResponse>> GetAllSalonOwner(int page, int size)
+        public async Task<IPaginate<GetSalonOwnerResponse>> GetAllSalonOwner(string? email, bool? status, int page, int size)
         {
             var salonowners = await _unitOfWork.GetRepository<SalonOwner>()
-           .GetPagingListAsync(
-               include: query => query.Include(s => s.Account),
-               page: page,
-               size: size
-           );
+        .GetPagingListAsync(
+            predicate: c =>
+                (string.IsNullOrEmpty(email) || c.Email.Contains(email)) &&
+                (!status.HasValue || c.Account.IsActive == status.Value),  
+            include: query => query.Include(s => s.Account),
+            page: page,
+            size: size
+        );
 
             var salonownerResponses = new Paginate<GetSalonOwnerResponse>()
             {

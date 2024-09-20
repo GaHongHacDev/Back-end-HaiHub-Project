@@ -21,6 +21,9 @@ namespace Hairhub.Domain.Entitities
         public int TotalRating {  get; set; }
         public int TotalReviewer {  get; set; }
         public int? NumberOfReported { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? CreatedAt {  get; set; } 
+        public DateTime? ApprovedAt { get; set; }
         public string Status { get; set; }
 
         public virtual SalonOwner SalonOwner { get; set; }

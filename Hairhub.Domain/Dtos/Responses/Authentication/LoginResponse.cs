@@ -1,4 +1,5 @@
-﻿using Hairhub.Domain.Entitities;
+﻿using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
+using Hairhub.Domain.Entitities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,6 +18,7 @@ namespace Hairhub.Domain.Dtos.Responses.Authentication
         public CustomerLoginResponse? CustomerResponse {  get; set; }
         public SalonOwnerLoginResponse? SalonOwnerResponse {  get; set; }
         public AdminLoginResponse? AdminResponse {  get; set; }
+        public SalonEmployeeResponse? SalonEmployeeResponse { get; set; }
     }
 
     public class CustomerLoginResponse

@@ -17,7 +17,7 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request);
         Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest);
-        Task<IPaginate<ResponsePayment>> GetPayments(int page, int size);
+        Task<IPaginate<ResponsePayment>> GetPayments(string? email, int page, int size);
 
 
         Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest);
