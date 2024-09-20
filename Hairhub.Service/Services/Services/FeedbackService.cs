@@ -86,19 +86,41 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Salon, barber shop không tồn tại");
                 }
-
+                int ratingSum = request.FeedbackDetailRequests.Sum(s => s.Rating);
                 Feedback newFeedback = new Feedback()
                 {
                     Id = Guid.NewGuid(),
                     CustomerId = request.CustomerId,
                     AppointmentId = request.AppointmentId,
-                    Rating = request.Rating,
+                    Rating = ratingSum / request.FeedbackDetailRequests.Count,
                     Comment = request.Comment,
                     IsActive = true,
                     CreateDate = DateTime.Now,
                 };
 
                 await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
+
+                foreach (var item in request.FeedbackDetailRequests)
+                {
+                    var appointmentDetail = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                                .SingleOrDefaultAsync(
+                                                                                      predicate: x=>x.Id == item.AppointmentDetailId 
+                                                                                                && x.Status.Equals(AppointmentStatus.Successed)
+                                                                                     );
+                    if (appointmentDetail == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy lịch hẹn chi tiết có trạng thái thành công với id {item.AppointmentDetailId}");
+                    }
+                    var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x=>x.Id == appointmentDetail.SalonEmployeeId);
+                    if (employee == null)
+                    {
+                        throw new NotFoundException($"Không tìm thấy nhân viên với id {employee!.Id}");
+                    }
+                    employee.RatingCount++;
+                    employee.RatingSum += item.Rating;
+                    employee.Rating = employee.RatingSum/employee.RatingCount;
+                    _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(employee);
+                }
 
                 for (int i = 0; i < request.ImgFeedbacks.Count; i++)
                 {
@@ -113,11 +135,11 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
                 }
 
-                int totalRating = existingSalon.TotalRating;
+                decimal totalRating = existingSalon.TotalRating;
                 int totalReview = existingSalon.TotalReviewer + 1;
-                existingSalon.Rate = (int)(totalRating + request.Rating) / totalReview;
+                existingSalon.Rate = (totalRating + (decimal)(ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
                 existingSalon.TotalReviewer = totalReview;
-                existingSalon.TotalRating = (int)(totalRating + request.Rating);
+                existingSalon.TotalRating = totalRating + (decimal)ratingSum/request.FeedbackDetailRequests.Count;
 
                 var salon = _mapper.Map<SalonInformation>(existingSalon);
 
