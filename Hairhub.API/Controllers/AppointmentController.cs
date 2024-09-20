@@ -497,5 +497,84 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{id:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> RevenueandNumberofAppointment([FromRoute] Guid id, [FromQuery]DateTime? startdate, [FromQuery] DateTime enddate)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.RevenueandNumberofAppointment(id, startdate, enddate);
+                var formattedResponse = new
+                {
+                    TotalRevenue = appointmentsResponse.Item1,
+                    TotalAppointmentSuccessed = appointmentsResponse.Item2,
+                    
+                };
+                return Ok(formattedResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> RateAppointmentByStatus([FromRoute] Guid id, [FromQuery] DateTime? startdate, [FromQuery] DateTime enddate)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.RateofAppointmentByStatus(id, startdate, enddate);
+                var formattedResponse = new
+                {
+                    SuccessedRate = appointmentsResponse.Item1,
+                    FailedRate = appointmentsResponse.Item2,
+                    CancelByCustomerRate = appointmentsResponse.Item3
+                };
+                return Ok(formattedResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> NumberAppointmentByStatus([FromRoute] Guid id, [FromQuery] DateTime? startdate, [FromQuery] DateTime enddate)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.NumberofAppointmentByStatus(id, startdate, enddate);
+                var formattedResponse = appointmentsResponse.Select(a => new
+                {
+                    Date = a.Item1,
+                    Successed = a.Item2,
+                    Failed = a.Item3,
+                    CancelByCustomer = a.Item4
+                });
+                return Ok(formattedResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

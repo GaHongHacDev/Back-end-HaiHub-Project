@@ -1437,6 +1437,103 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse;
         }
+
+        public async Task<(decimal, int)> RevenueandNumberofAppointment(Guid id, DateTime? startdate, DateTime enddate)
+        {
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (employee == null) {
+                throw new Exception("Nhân viên này không tồn tại");     
+            }
+            DateTime startDateFilter = startdate ?? DateTime.MinValue;
+            var revenue =  await  _unitOfWork.GetRepository<Appointment>().GetListAsync(
+                          predicate: p => p.AppointmentDetails.Any(detail => detail.SalonEmployeeId == employee.Id) &&
+                                          p.StartDate >= startDateFilter &&
+                                          p.StartDate <= enddate && p.Status == AppointmentStatus.Fail,
+                          include: x => x.Include(x => x.AppointmentDetails));
+            decimal totalRevenue = revenue.Sum(a => a.TotalPrice);
+            int totalAppointment = revenue.Count();
+
+            return (totalRevenue, totalAppointment);
+
+        }
+
+        public async Task<(decimal, decimal, decimal)> RateofAppointmentByStatus(Guid id, DateTime? startdate, DateTime enddate)
+        {
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (employee == null)
+            {
+                throw new Exception("Nhân viên này không tồn tại");
+            }
+            DateTime startDateFilter = startdate ?? DateTime.MinValue;
+            var revenue = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
+                          predicate: p => p.AppointmentDetails.Any(detail => detail.SalonEmployeeId == employee.Id) &&
+                                          p.StartDate >= startDateFilter &&
+                                          p.StartDate <= enddate,
+                          include: x => x.Include(x => x.AppointmentDetails));
+            int totalAppointment = revenue.Count();
+            if (totalAppointment == 0)
+            {
+                return (0m, 0m, 0m);
+            }
+            decimal rateAppointmentSuccessed = Math.Round((decimal)revenue.Count(a => a.Status.Equals(AppointmentStatus.Successed)) * 100 / totalAppointment);
+            decimal rateAppointmentFailed = Math.Round((decimal)revenue.Count(a => a.Status.Equals(AppointmentStatus.Fail)) * 100 / totalAppointment);
+            decimal rateAppointmentCancelByCus = Math.Round((decimal)revenue.Count(a => a.Status.Equals(AppointmentStatus.CancelByCustomer)) * 100 / totalAppointment);
+
+            // Tổng phần trăm
+            decimal totalPercentage = rateAppointmentSuccessed + rateAppointmentFailed + rateAppointmentCancelByCus;
+
+            // Điều chỉnh nếu tổng không bằng 100%
+            if (totalPercentage != 100)
+            {
+                // Tìm tỷ lệ lớn nhất và điều chỉnh để tổng là 100
+                if (rateAppointmentSuccessed >= rateAppointmentFailed && rateAppointmentSuccessed >= rateAppointmentCancelByCus)
+                {
+                    rateAppointmentSuccessed += 100 - totalPercentage;
+                }
+                else if (rateAppointmentFailed >= rateAppointmentSuccessed && rateAppointmentFailed >= rateAppointmentCancelByCus)
+                {
+                    rateAppointmentFailed += 100 - totalPercentage;
+                }
+                else
+                {
+                    rateAppointmentCancelByCus += 100 - totalPercentage;
+                }
+            }
+
+            return (rateAppointmentSuccessed, rateAppointmentFailed, rateAppointmentCancelByCus);
+        }
+
+        public async Task<List<(DateTime, int, int, int)>> NumberofAppointmentByStatus(Guid id, DateTime? startdate, DateTime? enddate)
+        {
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (employee == null)
+            {
+                throw new Exception("Nhân viên này không tồn tại");
+            }
+            DateTime startDateFilter = startdate ?? DateTime.MinValue;
+            DateTime endDateFilter = enddate ?? DateTime.MaxValue;
+
+            
+            var results = new List<(DateTime, int, int, int)>();
+
+            
+            for (DateTime date = startDateFilter.Date; date <= endDateFilter.Date; date = date.AddDays(1))
+            {
+                var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
+                    predicate: p => p.AppointmentDetails.Any(detail => detail.SalonEmployeeId == employee.Id) &&
+                                    p.StartDate.Date == date,
+                    include: x => x.Include(x => x.AppointmentDetails));
+
+                // Đếm số lượng lịch hẹn theo từng trạng thái
+                int numberAppointmentSuccessed = appointments.Count(a => a.Status.Equals(AppointmentStatus.Successed));
+                int numberAppointmentFailed = appointments.Count(a => a.Status.Equals(AppointmentStatus.Fail));
+                int numberAppointmentCancelByCus = appointments.Count(a => a.Status.Equals(AppointmentStatus.CancelByCustomer));
+
+                // Thêm kết quả của ngày vào danh sách kết quả
+                results.Add((date, numberAppointmentSuccessed, numberAppointmentFailed, numberAppointmentCancelByCus));
+            }
+            return results;
+        }
         #endregion
 
     }

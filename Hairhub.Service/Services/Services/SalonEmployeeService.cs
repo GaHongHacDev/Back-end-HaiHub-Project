@@ -151,6 +151,9 @@ namespace Hairhub.Service.Services.Services
                 var url = await _mediaService.UploadAnImage(item.ImgEmployee, MediaPath.EMPLOYEE, employee.Id.ToString());
                 employee.Img = url;
                 employee.SalonInformationId = request.SalonInformationId;
+                employee.Rating = 0;
+                employee.RatingSum = 0;
+                employee.RatingCount = 0;
                 await _unitOfWork.GetRepository<SalonEmployee>().InsertAsync(employee);
                 if (item.ScheduleEmployees == null || item.ScheduleEmployees.Count == 0)
                 {

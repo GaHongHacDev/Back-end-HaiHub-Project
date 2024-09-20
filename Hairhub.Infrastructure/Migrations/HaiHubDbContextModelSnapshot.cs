@@ -753,13 +753,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("phone");
 
                     b.Property<decimal?>("Rating")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("rating");
 
                     b.Property<int?>("RatingCount")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("rating_count");
 
                     b.Property<int?>("RatingSum")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("rating_sum");
 
                     b.Property<Guid>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
@@ -839,8 +842,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("status");
 
-                    b.Property<int>("TotalRating")
-                        .HasColumnType("int")
+                    b.Property<decimal>("TotalRating")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("total_rating");
 
                     b.Property<int>("TotalReviewer")
