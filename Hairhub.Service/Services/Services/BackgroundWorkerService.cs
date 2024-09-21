@@ -156,7 +156,6 @@ namespace Hairhub.Service.Services.Services
                                     await uow.CommitAsync();
                                 }
                             }
-                            
                         }
                     }
 
