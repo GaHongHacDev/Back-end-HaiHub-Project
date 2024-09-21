@@ -174,7 +174,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAccountEmployee([FromBody] CreateAccountEmployeeRequest createAccountEmployeeRequest)
         {
             try
