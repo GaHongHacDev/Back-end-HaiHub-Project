@@ -43,9 +43,9 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetSalonByStatus([FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetSalonByStatus([FromQuery] string? name, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(status, page, size);
+            var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(name, status, page, size);
             return Ok(salonInformationsResponse);
         }
 
@@ -218,6 +218,26 @@ namespace Hairhub.API.Controllers
                     return BadRequest("Cannot delete this SalonInformation!");
                 }
                 return Ok("SalonInformation account successfully!");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> ReviewRevenue([FromRoute] Guid id, [FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
+        {
+            try
+            {
+                var result = await _salonInformationService.ReviewRevenue(id, startTime, endTime);
+                return Ok(result);
             }
             catch (NotFoundException ex)
             {

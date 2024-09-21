@@ -21,11 +21,11 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAllSalonOwner([FromQuery] int page=1, [FromQuery] int size=10)
+        public async Task<IActionResult> GetAllSalonOwner([FromQuery] string? email, [FromQuery] bool? status, [FromQuery] int page=1, [FromQuery] int size=10)
         {
             try
             {
-                var salonOwnersResponse = await _salonOwnerService.GetAllSalonOwner(page, size);
+                var salonOwnersResponse = await _salonOwnerService.GetAllSalonOwner(email, status, page, size);
                 return Ok(salonOwnersResponse);
             }
             catch (Exception ex)

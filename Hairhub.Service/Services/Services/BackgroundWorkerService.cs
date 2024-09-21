@@ -40,30 +40,30 @@ namespace Hairhub.Service.Services.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //while (!stoppingToken.IsCancellationRequested)
-            //{
-
-            //    var now = DateTime.Now;
-            //    var nextMidnight = now.Date.AddDays(1);
-            //    var delayTime = nextMidnight - now;
-
-
-            //    await Task.Delay(delayTime, stoppingToken);
-
-            //    await ExecuteExpiredSalon(stoppingToken);
-
-
-            //    await ExecuteExpriredAppointment(stoppingToken);
-            //}
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Thực hiện công việc của bạn ở đây
-                await ExecuteExpiredSalon(stoppingToken);
-                await ExecuteExpriredAppointment(stoppingToken);
 
-                // Đợi 30 giây
-                await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+                var now = DateTime.Now;
+                var nextmidnight = now.Date.AddDays(1);
+                var delaytime = nextmidnight - now;
+
+
+                await Task.Delay(delaytime, stoppingToken);
+
+                await ExecuteExpiredSalon(stoppingToken);
+
+
+                await ExecuteExpriredAppointment(stoppingToken);
             }
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    // Thực hiện công việc của bạn ở đây
+            //    await ExecuteExpiredSalon(stoppingToken);
+            //    await ExecuteExpriredAppointment(stoppingToken);
+
+            //    // Đợi 30 giây
+            //    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+            //}
         }   
 
         private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
@@ -78,7 +78,7 @@ namespace Hairhub.Service.Services.Services
 
                     var appontments = await uow.GetRepository<Appointment>().GetListAsync(
                         predicate: x => x.Status.Equals(AppointmentStatus.Booking)
-                                && x.StartDate == DateTime.Now.AddDays(-1),
+                                && x.StartDate.Date < DateTime.Now.Date,
                         include: x => x.Include(s => s.AppointmentDetails)
                     );
 
@@ -95,7 +95,7 @@ namespace Hairhub.Service.Services.Services
                         appointment.QrCodeImg = "";
                         uow.GetRepository<Appointment>().UpdateAsync(appointment);
                     }
-                    uow.CommitAsync();
+                    await uow.CommitAsync();
                     _logger.LogInformation("Expired salappointment checked and updated at: {time}", DateTimeOffset.Now);
                 }
             }
@@ -128,22 +128,26 @@ namespace Hairhub.Service.Services.Services
                         
                         if (latestPayment != null)
                         {
-                            decimal amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate);
+                            decimal amount = await paymentService.AmountofCommissionRateInMonthBySalon(salon.SalonOwner.Id, (decimal)latestPayment.CommissionRate!);
+                            
                             if (amount == 0)
                             {
-                                var paymentInfor = new SavePaymentInfor
+                                if(latestPayment.EndDate < DateTime.Now)
                                 {
-                                    SalonOwnerId = salon.SalonOwner.Id,
-                                    ConfigId = (Guid)latestPayment.ConfigId
-                                };
-                                await paymentService.PaymentForCommissionRate(paymentInfor);
+                                    var paymentInfor = new SavePaymentInfor
+                                    {
+                                        SalonOwnerId = salon.SalonOwner.Id,
+                                        ConfigId = (Guid)latestPayment.ConfigId!
+                                    };
+                                    await paymentService.PaymentForCommissionRate(paymentInfor);
+                                }                               
                             }
                             if (amount > 0)
                             {
                                 var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
                                 if (daysToExpiry < 5 && daysToExpiry > 0)
                                 {
-                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]);
+                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email!, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]!);
                                 }
                                 if (latestPayment.EndDate < DateTime.Now)
                                 {

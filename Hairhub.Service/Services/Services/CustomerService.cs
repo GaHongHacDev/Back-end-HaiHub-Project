@@ -37,14 +37,18 @@ namespace Hairhub.Service.Services.Services
             _mapper = mapper;
             _mediaService = mediaService;
         }
-        public async Task<IPaginate<GetCustomerResponse>> GetCustomers(int page, int size)
+        public async Task<IPaginate<GetCustomerResponse>> GetCustomers(string? email, bool? status, int page, int size)
         {
+
             var customerEntities = await _unitOfWork.GetRepository<Customer>()
-           .GetPagingListAsync(
-               include: query => query.Include(s => s.Account),
-               page: page,
-               size: size
-           );
+        .GetPagingListAsync(
+            predicate: c =>
+                (string.IsNullOrEmpty(email) || c.Email.Contains(email)) &&
+                (!status.HasValue || c.Account.IsActive == status.Value),  // Nullable bool handling
+            include: query => query.Include(s => s.Account),
+            page: page,
+            size: size
+        );
 
             var paginateResponse = new Paginate<GetCustomerResponse>
             {

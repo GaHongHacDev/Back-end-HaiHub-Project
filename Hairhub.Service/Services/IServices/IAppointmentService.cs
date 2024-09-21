@@ -20,14 +20,14 @@ namespace Hairhub.Service.Services.IServices
         Task<List<GetAppointmentResponse>> GetAppointmentSalonBySalonIdNoPaging(Guid salonId);
         Task<GetAvailableTimeResponse> GetAvailableTime(GetAvailableTimeRequest getAvailableTimeRequest);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentByAccountId(Guid AccountId, int page, int size);
-        Task<IPaginate<GetAppointmentResponse>> GetAppointmentCustomerByStatus(Guid customerId, string? status, int page, int size);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentCustomerByStatus(Guid customerId, string? status, bool isAscending, DateTime? date, int page, int size);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentByCustomerIdStatus(int page, int size, Guid customerId, string status);
         Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId);
         Task<IPaginate<GetAppointmentResponse>> GetBookingAppointmentByCustomerId(int page, int size, Guid CustomerId);
-        Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid SalonId, string? Status);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid SalonId, string? Status, bool isAscending, DateTime? date, string? customerName);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status);
         Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate);
-        Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, int NumberOfDay);
+        Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate);
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
@@ -46,6 +46,10 @@ namespace Hairhub.Service.Services.IServices
 
         Task<List<MonthlyRatioData>> GetPercentageOfAppointmentByAdmin(int? year);
 
+
+        Task<(decimal, int)> RevenueandNumberofAppointment(Guid id, DateTime? startdate, DateTime enddate);
+        Task<(decimal, decimal, decimal)> RateofAppointmentByStatus(Guid id, DateTime? startdate, DateTime enddate);
+        Task<List<(DateTime, int, int, int)>> NumberofAppointmentByStatus(Guid id, DateTime? startdate, DateTime? enddate);
     }
 }
 

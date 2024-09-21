@@ -12,6 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
+using Hairhub.Domain.JsonConverter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,12 +96,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
         policy => {
-            policy.WithOrigins("http://localhost:5173", "https://www.hairhub.com.vn", "https://hairhub.id.vn")
+            policy.WithOrigins("http://localhost:5173", "https://www.hairhub.com.vn", "https://hairhub.id.vn", "http://localhost:3010")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();  // Allow credentials for CORS
         });
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+    });
 
 // Jwt configuration starts here
 var jwtIssuer = builder.Configuration.GetSection("JwtSettings:Issuer").Get<string>();
