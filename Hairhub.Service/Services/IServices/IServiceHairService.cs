@@ -15,7 +15,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetServiceHairResponse>> GetAllServiceHair(int page, int size);
         Task<GetServiceHairResponse>? GetServiceHairById(Guid id);
         Task<IEnumerable<GetServiceHairResponse>> GetServiceHairBySalonInformationId(Guid salonInformationId);
-        Task<IPaginate<GetServiceHairResponse>> GetServiceHairByEmployeeId(Guid employeeId, int page, int size);
+        Task<IPaginate<GetServiceHairResponse>> GetServiceHairByEmployeeId(Guid employeeId, int page, int size, string? orderby, bool? filter, string? search);
         Task<IPaginate<GetServiceHairResponse>> GetServiceHairBySalonIdPaging(Guid id, int page, int size, string? orderby, bool? filter, string? search);
         Task<bool> CreateServiceHair(CreateServiceHairRequest createServiceHairRequest);
         Task<bool> UpdateServiceHairById(Guid id, UpdateServiceHairRequest updateServiceHairRequest);
