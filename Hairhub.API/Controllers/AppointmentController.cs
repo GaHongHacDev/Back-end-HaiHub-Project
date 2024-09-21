@@ -499,7 +499,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
         public async Task<IActionResult> RevenueandNumberofAppointment([FromRoute] Guid id, [FromQuery]DateTime? startdate, [FromQuery] DateTime enddate)
         {
             try
@@ -525,7 +525,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
         public async Task<IActionResult> RateAppointmentByStatus([FromRoute] Guid id, [FromQuery] DateTime? startdate, [FromQuery] DateTime enddate)
         {
             try
@@ -551,7 +551,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
         public async Task<IActionResult> NumberAppointmentByStatus([FromRoute] Guid id, [FromQuery] DateTime? startdate, [FromQuery] DateTime enddate)
         {
             try
