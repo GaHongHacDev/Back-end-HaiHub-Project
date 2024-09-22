@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.ServiceHairs;
@@ -95,6 +97,65 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = serviceHairs.TotalPages,
                 Items = _mapper.Map<IList<GetServiceHairResponse>>(serviceHairs.Items),
             };
+            return serviceHairResponses;
+        }
+
+        public async Task<IPaginate<GetServiceHairResponse>> GetServiceHairByEmployeeId(Guid employeeId, int page, int size, string? orderby, bool? filter, string? search)
+        {
+            var predicate = PredicateBuilder.New<ServiceHair>(s => s.ServiceEmployees.Any(x => x.SalonEmployeeId == employeeId));
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                predicate = predicate.And(s => s.ServiceName.Contains(search));
+            }
+
+            if (filter.HasValue)
+            {
+                predicate = predicate.And(x => x.IsActive == filter.Value);
+            }
+
+
+            Func<IQueryable<ServiceHair>, IOrderedQueryable<ServiceHair>> orderBy = null;
+
+            if (!string.IsNullOrWhiteSpace(orderby))
+            {
+                if (orderby.Equals("giá tăng dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.Price);
+                }
+                else if (orderby.Equals("giá giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.Price);
+                }
+                else if (orderby.Equals("thời gian tăng dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderBy(s => s.Time);
+                }
+                else if (orderby.Equals("thời gian giảm dần", StringComparison.OrdinalIgnoreCase))
+                {
+                    orderBy = q => q.OrderByDescending(s => s.Time);
+                }
+            }
+
+
+            var serviceHairs = await _unitOfWork.GetRepository<ServiceHair>()
+                                                .GetPagingListAsync(
+                                                    predicate: predicate,
+                                                    orderBy: orderBy!,
+                                                    page: page,
+                                                    size: size
+                                                );
+
+
+            var serviceHairResponses = new Paginate<GetServiceHairResponse>()
+            {
+                Page = serviceHairs.Page,
+                Size = serviceHairs.Size,
+                Total = serviceHairs.Total,
+                TotalPages = serviceHairs.TotalPages,
+                Items = _mapper.Map<IList<GetServiceHairResponse>>(serviceHairs.Items),
+            };
+
             return serviceHairResponses;
         }
 

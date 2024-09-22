@@ -97,6 +97,17 @@ namespace Hairhub.Service.Services.Services
                 response = _mapper.Map<GetAccountResponse>(salonOwner);
                 response.Id = salonOwner.Id;
             }
+            else if (account.Role.RoleName.Equals(RoleEnum.SalonEmployee.ToString()))
+            {
+                SalonEmployee salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>()
+                                    .SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                if (salonEmployee == null)
+                {
+                    throw new NotFoundException("Tài khoản không tồn tại");
+                }
+                response = _mapper.Map<GetAccountResponse>(salonEmployee);
+                response.Id = salonEmployee.Id;
+            }
             else
             {
                 throw new NotFoundException("Role không tồn tại");

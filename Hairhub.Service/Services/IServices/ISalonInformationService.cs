@@ -17,6 +17,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetSalonInformationResponse>> GetAllSalonByAdmin(int page, int size);
         Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? name, string? status, int page, int size);
         Task<GetSalonInformationResponse>? GetSalonInformationById(Guid id);
+        Task<GetSalonInformationResponse>? GetSalonByEmployeeId(Guid id);
         Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest);
         Task<bool> UpdateSalonInformationById(Guid id, UpdateSalonInformationRequest updateSalonInformationRequest);
         Task<bool> DeleteSalonInformationById(Guid id);

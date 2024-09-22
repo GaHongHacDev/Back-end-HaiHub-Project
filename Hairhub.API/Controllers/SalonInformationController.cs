@@ -62,7 +62,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var salonInformationResponse = await _salonInformationService.GetSalonInformationById(id);
+                var salonInformationResponse = await _salonInformationService.GetSalonInformationById(id)!;
                 if (salonInformationResponse == null)
                 {
                     return NotFound("Cannot find this SalonInformation!");
@@ -71,7 +71,27 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
+        public async Task<IActionResult> GetSalonByEmployeeId([FromRoute] Guid id)
+        {
+            try
+            {
+                var salonInformationResponse = await _salonInformationService.GetSalonByEmployeeId(id)!;
+                if (salonInformationResponse == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy Salon, barber shop" });
+                }
+                return Ok(salonInformationResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -82,16 +102,16 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var salonInformationResponse = await _salonInformationService.GetSalonByOwnerId(ownerId);
+                var salonInformationResponse = await _salonInformationService.GetSalonByOwnerId(ownerId)!;
                 return Ok(salonInformationResponse);
             }
-            catch (NotFoundException ex)
+            catch (NotFoundException nf)
             {
-                return NotFound(new { message = "Cannot find this SalonInformation!" });
+                return NotFound(new { message = nf.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -117,11 +137,11 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(new { message = "Cannot find this SalonInformation!" });
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -135,7 +155,7 @@ namespace Hairhub.API.Controllers
                 var accoutResponse = await _salonInformationService.CreateSalonInformation(createSalonInformationRequest);
                 if (accoutResponse == null)
                 {
-                    return NotFound("Cannot create SalonInformation!");
+                    return NotFound("Không thể tạo Salon, barber shop");
                 }
                 return Ok(accoutResponse);
             }
@@ -146,7 +166,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -157,17 +177,12 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if (id == null)
-                {
-                    return BadRequest("SalonInformation Id is null or empty!");
-                }
-
                 bool isUpdate = await _salonInformationService.UpdateSalonInformationById(id, updateSalonInformationRequest);
                 if (!isUpdate)
                 {
-                    return BadRequest("Cannot update SalonInformation");
+                    return BadRequest("Không thể cập nhật thông tin Salon, Barber shop");
                 }
-                return Ok("Update SalonInformation successfully");
+                return Ok("Cập nhật thôn tin Salon, Barber shop thành công");
             }
             catch (NotFoundException ex)
             {
@@ -175,7 +190,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -200,7 +215,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return BadRequest(ex.Message);
+                    return BadRequest(new { message = ex.Message });
                 }
             }
         }
@@ -225,7 +240,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -245,7 +260,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
     }
