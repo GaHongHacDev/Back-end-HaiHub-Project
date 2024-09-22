@@ -55,6 +55,7 @@ namespace Hairhub.Service.Helpers
             .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<GetAccountResponse, Customer>().ReverseMap();
             CreateMap<GetAccountResponse, SalonOwner>().ReverseMap();
+            CreateMap<GetAccountResponse, SalonEmployee>().ReverseMap();
             CreateMap<FetchUserResponse, Customer>().ReverseMap();
             CreateMap<FetchUserResponse, SalonOwner>().ReverseMap();
             CreateMap<FetchUserResponse, Account>().ReverseMap(); 
