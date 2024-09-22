@@ -101,11 +101,6 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if (id == null)
-                {
-                    return BadRequest("SalonEmployee Id is null or empty!");
-                }
-
                 bool isUpdate = await _salonEmployeeService.UpdateSalonEmployeeById(id, updateSalonEmployeeRequest);
                 if (!isUpdate)
                 {
@@ -174,7 +169,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAccountEmployee([FromBody] CreateAccountEmployeeRequest createAccountEmployeeRequest)
         {
             try

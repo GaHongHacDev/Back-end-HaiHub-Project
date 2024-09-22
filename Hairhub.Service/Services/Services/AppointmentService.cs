@@ -363,6 +363,89 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse!;
         }
 
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(Guid employeeId, int page, int size, string? status, bool isAscending, DateTime? date, string? customerName)
+        {
+            ExpressionStarter<Appointment> predicate;
+            if (date.HasValue)
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployeeId == employeeId) && x.StartDate.Date == date.Value.Date);
+
+            }
+            else
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployeeId == employeeId));
+            }
+
+            if (customerName != null)
+            {
+                customerName = customerName.Trim();
+                predicate = predicate.And(x => x.Customer.FullName.ToUpper().Contains(customerName.ToUpper()));
+            }
+            if (status == null)
+            {
+                status = "";
+            }
+            predicate = predicate.And(x => x.Status.Contains(status));
+            IPaginate<Appointment> appointments;
+            if (isAscending)
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                    .GetPagingListAsync(
+                        predicate: predicate,
+                        include: query => query.Include(a => a.Customer)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee)
+                                                       .ThenInclude(se => se.SalonInformation),
+                        orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                            .OrderByDescending(ad => ad.StartTime)!
+                            .FirstOrDefault()!.StartTime),
+                        page: page,
+                        size: size
+                    );
+            }
+            else
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                    .GetPagingListAsync(
+                        predicate: predicate,
+                        include: query => query.Include(a => a.Customer)
+                                               .Include(a => a.AppointmentDetails)
+                                                   .ThenInclude(ad => ad.SalonEmployee)
+                                                       .ThenInclude(se => se.SalonInformation),
+                        orderBy: query => query.OrderByDescending(a => a.AppointmentDetails!
+                            .OrderByDescending(ad => ad.StartTime)!
+                            .FirstOrDefault()!.StartTime),
+                        page: page,
+                        size: size
+                    );
+            }
+
+            // Xắp sếp appointment detail tăng dần
+            foreach (var appointment in appointments.Items)
+            {
+                appointment.AppointmentDetails = appointment.AppointmentDetails
+                    .OrderBy(ad => ad.StartTime)
+                    .ToList();
+            }
+
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
+            if (appointmentResponse != null && appointmentResponse.Items.Count > 0)
+            {
+                foreach (var item in appointmentResponse.Items)
+                {
+                    item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
+                }
+            }
+            return appointmentResponse!;
+        }
+
         public async Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate)
         {
 
@@ -461,7 +544,7 @@ namespace Hairhub.Service.Services.Services
                     for (decimal i = start; i <= end; i += 0.25m)
                         if (timeOnlyNow.Hour + timeOnlyNow.Minute / 60m <= i)
                         {
-                            timeStartSchedule = i + 1;
+                            timeStartSchedule = i + 0.25m;
                             checkTime = false;
                             break;
                         }

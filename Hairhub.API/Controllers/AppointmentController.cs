@@ -49,7 +49,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -69,13 +69,13 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet]
         [Route("{SalonId:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
@@ -89,7 +89,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -109,18 +109,18 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet]
         [Route("{employeeId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetAppointmentEmployeeByStatus([FromRoute] Guid employeeId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
+        public async Task<IActionResult> GetAppointmentEmployeeByStatus([FromRoute] Guid employeeId, [FromQuery] string? status, [FromQuery] bool isAscending, [FromQuery] DateTime? date, [FromQuery] string? customerName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentEmployeeByStatus(page, size, employeeId, status);
+                var appointmentResponse = await _appointmentService.GetAppointmentEmployeeByStatus(employeeId, page, size, status, isAscending, date, customerName);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
@@ -132,6 +132,26 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        //[HttpGet]
+        //[Route("{employeeId:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        //public async Task<IActionResult> GetAppointmentEmployeeByStatus([FromRoute] Guid employeeId, [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        //{
+        //    try
+        //    {
+        //        var appointmentResponse = await _appointmentService.GetAppointmentEmployeeByStatus(page, size, employeeId, status);
+        //        if (appointmentResponse == null)
+        //        {
+        //            return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+        //        }
+        //        return Ok(appointmentResponse);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
 
         [HttpGet]
         [Route("{customerId:Guid}")]
@@ -207,31 +227,6 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        //[HttpPut]
-        //[Route("{id:Guid}")]
-        //public async Task<IActionResult> DeleteAppointment([FromRoute] Guid id)
-        //{
-        //    {
-        //        try
-        //        {
-        //            var isDelete = await _appointmentService.DeleteAppoinmentById(id);
-        //            if (!isDelete)
-        //            {
-        //                return BadRequest(new { message = "Cannot delete this appointment!" });
-        //            }
-        //            return Ok("Delete appointment successfully!");
-        //        }
-        //        catch (NotFoundException ex)
-        //        {
-        //            return NotFound(new { message = ex.Message });
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return BadRequest(new { message = ex.Message });
-        //        }
-        //    }
-        //}
-
         [HttpPut]
         [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Customer)]
@@ -257,29 +252,6 @@ namespace Hairhub.API.Controllers
                 }
             }
         }
-
-        //[HttpPut]
-        //[Route("{id:Guid}")]
-        //public async Task<IActionResult> ActiveAppointment([FromRoute] Guid id)
-        //{
-        //    try
-        //    {
-        //        var isActive = await _appointmentService.ActiveAppointment(id);
-        //        if (!isActive)
-        //        {
-        //            return BadRequest("Cannot delete this appointment!");
-        //        }
-        //        return Ok("Appointment account successfully!");
-        //    }
-        //    catch (NotFoundException ex)
-        //    {
-        //        return NotFound(new { message = ex.Message });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
 
         [HttpGet]
         [Route("{AccountId:Guid}")]
