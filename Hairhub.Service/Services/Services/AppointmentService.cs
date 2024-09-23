@@ -1531,7 +1531,7 @@ namespace Hairhub.Service.Services.Services
             var revenue =  await  _unitOfWork.GetRepository<Appointment>().GetListAsync(
                           predicate: p => p.AppointmentDetails.Any(detail => detail.SalonEmployeeId == employee.Id) &&
                                           p.StartDate >= startDateFilter &&
-                                          p.StartDate <= enddate && p.Status == AppointmentStatus.Fail,
+                                          p.StartDate <= enddate && p.Status == AppointmentStatus.Successed,
                           include: x => x.Include(x => x.AppointmentDetails));
             decimal totalRevenue = revenue.Sum(a => a.TotalPrice);
             int totalAppointment = revenue.Count();
@@ -1614,6 +1614,36 @@ namespace Hairhub.Service.Services.Services
 
                 // Thêm kết quả của ngày vào danh sách kết quả
                 results.Add((date, numberAppointmentSuccessed, numberAppointmentFailed, numberAppointmentCancelByCus));
+            }
+            return results;
+        }
+
+        public async Task<List<(DateTime, decimal)>> RevenueofAppointmentDaybyDay(Guid id, DateTime? startdate, DateTime? enddate)
+        {
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (employee == null)
+            {
+                throw new Exception("Nhân viên này không tồn tại");
+            }
+            DateTime startDateFilter = startdate ?? DateTime.MinValue;
+            DateTime endDateFilter = enddate ?? DateTime.MaxValue;
+
+
+            var results = new List<(DateTime, decimal)>();
+
+
+            for (DateTime date = startDateFilter.Date; date <= endDateFilter.Date; date = date.AddDays(1))
+            {
+                var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
+                    predicate: p => p.AppointmentDetails.Any(detail => detail.SalonEmployeeId == employee.Id) &&
+                                    p.StartDate.Date == date && p.Status == AppointmentStatus.Successed,
+                    include: x => x.Include(x => x.AppointmentDetails));
+
+                
+                decimal revenue = appointments.Sum(p => p.TotalPrice);
+
+                // Thêm kết quả của ngày vào danh sách kết quả
+                results.Add((date, revenue));
             }
             return results;
         }

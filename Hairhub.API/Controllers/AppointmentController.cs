@@ -548,5 +548,29 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
+        public async Task<IActionResult> RevenueofAppointmentDaybyDay([FromRoute] Guid id, [FromQuery] DateTime? startdate, [FromQuery] DateTime enddate)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.NumberofAppointmentByStatus(id, startdate, enddate);
+                var formattedResponse = appointmentsResponse.Select(a => new
+                {
+                    Date = a.Item1,
+                    Revenue = a.Item2,
+                });
+                return Ok(formattedResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
