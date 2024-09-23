@@ -24,7 +24,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetAllSalonEmployee([FromQuery] int page=1, [FromQuery] int size=10)
+        public async Task<IActionResult> GetAllSalonEmployee([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var salonEmployeesResponse = await _salonEmployeeService.GetAllSalonEmployee(page, size);
             return Ok(salonEmployeesResponse);
@@ -52,8 +52,8 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{SalonInformationId:Guid}")]
-        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid SalonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10, 
-                                                                              [FromQuery] bool? orderByName=null, [FromQuery] bool? isActive = null, [FromQuery] string? nameEmployee = null)
+        public async Task<IActionResult> GetSalonEmployeeBySalonInformationId([FromRoute] Guid SalonInformationId, [FromQuery] int page = 1, [FromQuery] int size = 10,
+                                                                              [FromQuery] bool? orderByName = null, [FromQuery] bool? isActive = null, [FromQuery] string? nameEmployee = null)
         {
             try
             {
@@ -101,11 +101,6 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if (id == null)
-                {
-                    return BadRequest("SalonEmployee Id is null or empty!");
-                }
-
                 bool isUpdate = await _salonEmployeeService.UpdateSalonEmployeeById(id, updateSalonEmployeeRequest);
                 if (!isUpdate)
                 {
@@ -173,26 +168,6 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("{email}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CheckEmailAccountEmployee([FromRoute] string email)
-        {
-            try
-            {
-                var response = await _salonEmployeeService.CheckEmailAccountEmployee(email);
-                if (response == false)
-                {
-                    throw new NotFoundException("Email đã tồn tại");
-                }
-                return Ok(email);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest( new { message = ex.Message });
-            }
-        }
-
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAccountEmployee([FromBody] CreateAccountEmployeeRequest createAccountEmployeeRequest)
@@ -202,9 +177,24 @@ namespace Hairhub.API.Controllers
                 var response = await _salonEmployeeService.CreateAccountEmployee(createAccountEmployeeRequest);
                 return Ok(createAccountEmployeeRequest);
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{numberOfDay}")]
+        public async Task<IActionResult> GetEmployeesHighRating([FromRoute] int? numberOfDay)
+        {
+            try
+            {
+                var result = await _salonEmployeeService.GetEmployeeHighRating(numberOfDay);
+                return Ok(result);
             }
             catch (Exception ex)
             {

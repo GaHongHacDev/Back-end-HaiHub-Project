@@ -27,7 +27,23 @@ namespace Hairhub.API.Controllers
                 return Ok(schedules);
             } catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
+        public async Task<IActionResult> GetScheduleByEmployeeId([FromRoute] Guid id)
+        {
+            try
+            {
+                var schedules = await _scheduleService.GetScheduleByEmployeeId(id);
+                return Ok(schedules);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -45,7 +61,7 @@ namespace Hairhub.API.Controllers
                 return Ok(schedule);
             } catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -59,7 +75,7 @@ namespace Hairhub.API.Controllers
                 return Ok(isSuccessFull);
             } catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -73,7 +89,7 @@ namespace Hairhub.API.Controllers
                 return Ok(isSuccessfull);
             } catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -89,7 +105,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -106,7 +122,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -122,7 +138,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 

@@ -452,5 +452,17 @@ namespace Hairhub.Service.Services.Services
             }
             return result;
         }
+
+        public async Task<GetSalonInformationResponse>? GetSalonByEmployeeId(Guid id)
+        {
+            SalonInformation salonInformationResponse = await _unitOfWork.GetRepository<SalonInformation>()
+                                                            .SingleOrDefaultAsync(
+                                                                predicate: x => x.SalonEmployees.Any(x=>x.Id == id),
+                                                                include: source => source.Include(s => s.SalonOwner).Include(x => x.Schedules)
+                                                            );
+            if (salonInformationResponse == null)
+                return null;
+            return _mapper.Map<GetSalonInformationResponse>(salonInformationResponse);
+        }
     }
 }

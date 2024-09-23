@@ -276,7 +276,7 @@ namespace Hairhub.Service.Services.Services
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception("Lỗi tải ảnh lên");
+                            throw new Exception("Lỗi tải ảnh lên, message: " + ex.Message);
                         }
                     }
                     //if (item.VideoReport != null)

@@ -28,6 +28,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(int page, int size, Guid EmployeeId, string? Status);
         Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate);
         Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(Guid employeeId, int page, int size, string? status, bool isAscending, DateTime? date, string? customerName);
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);

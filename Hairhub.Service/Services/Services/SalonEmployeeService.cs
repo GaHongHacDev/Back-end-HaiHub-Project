@@ -59,6 +59,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Email đã tồn tại");
             }
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == request.EmployeeId);
+            if (employee.AccountId != null) 
+            {
+                throw new NotFoundException("Nhân viên đã có tài khoản");
+            }
             Account accountEmployee = new Account();
             accountEmployee.UserName = request.Email;
             accountEmployee.Password = AesEncoding.GenerateRandomPassword();
@@ -67,8 +72,7 @@ namespace Hairhub.Service.Services.Services
             accountEmployee.IsActive = true;
             accountEmployee.CreatedDate = DateTime.Now;
             accountEmployee.Id = Guid.NewGuid();
-
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x=>x.Id == request.EmployeeId);
+            
             employee.Email = request.Email;
             employee.AccountId = accountEmployee.Id;
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(employee);
@@ -79,37 +83,6 @@ namespace Hairhub.Service.Services.Services
                 await _emailService.SendEmailRegisterAccountAsync(request.Email, "Tạo tài khoản thành công trên Hairhub", employee.FullName, accountEmployee.UserName, accountEmployee.Password);
             }
             return isSuccess;
-        }
-
-        public async Task<bool> CheckEmailAccountEmployee(string email)
-        {
-            email = email.Trim();
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(email) && x.IsActive);
-            if (account == null)
-            {
-                return true;
-            }
-            else
-            {
-                //if (account.Role.RoleName.Equals(RoleEnum.Customer.ToString()))
-                //{
-                //    throw new NotFoundException("Email đã được tạo với 1 tài khoản khách hàng đặt lịch");
-                //}
-                //else if (account.Role.RoleName.Equals(RoleEnum.SalonOwner.ToString()))
-                //{
-                //    throw new NotFoundException("Email đã được tạo với 1 tài khoản chủ tiệm tóc");
-                //}
-                //else if (account.Role.RoleName.Equals(RoleEnum.SalonEmployee.ToString()))
-                //{
-                //    throw new NotFoundException("Email đã tồn tại với 1 tài khoản nhân viên");
-                //}
-                //else if (account.Role.RoleName.Equals(RoleEnum.Admin.ToString()))
-                //{
-                //    throw new NotFoundException("Email admin không được tạo tài khoản khác");
-                //}
-                //throw new NotFoundException("Email đã tồn tại");
-                return false;
-            }
         }
 
         public async Task<bool> CreateSalonEmployee(CreateSalonEmployeeRequest request)
@@ -143,6 +116,7 @@ namespace Hairhub.Service.Services.Services
                 }
 
             }
+
             //create employee
             foreach (var item in request.SalonEmployees)
             {
@@ -344,6 +318,22 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(salonEmployee);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             return isUpdate;
+        }
+
+        public async Task<IList<GetEmployeeHighRatingResponse>> GetEmployeeHighRating(int? numberOfDay)
+        {
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>()
+                                            .GetListAsync(
+                                                          predicate: x => x.IsActive && x.SalonInformation.Status.Equals(SalonStatus.Approved) && x.Rating!=0,
+                                                            orderBy: q => q.OrderByDescending(s => s.Rating)
+                                                                            .ThenByDescending(s => s.RatingCount),
+                                                            take: 10
+                                                         );
+            if (employees==null)
+            {
+                employees = new List<SalonEmployee>();
+            }
+            return _mapper.Map<IList<GetEmployeeHighRatingResponse>>(employees);
         }
     }
 }

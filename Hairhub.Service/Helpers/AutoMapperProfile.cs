@@ -55,6 +55,7 @@ namespace Hairhub.Service.Helpers
             .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<GetAccountResponse, Customer>().ReverseMap();
             CreateMap<GetAccountResponse, SalonOwner>().ReverseMap();
+            CreateMap<GetAccountResponse, SalonEmployee>().ReverseMap();
             CreateMap<FetchUserResponse, Customer>().ReverseMap();
             CreateMap<FetchUserResponse, SalonOwner>().ReverseMap();
             CreateMap<FetchUserResponse, Account>().ReverseMap(); 
@@ -70,15 +71,13 @@ namespace Hairhub.Service.Helpers
 
             //Schedule
             CreateMap<Schedule, GetScheduleResponse>().ReverseMap(); 
-            CreateMap<SalonEmployee, SalonEmployeeResponseS>().ReverseMap();
-            CreateMap<SalonInformationSchedule, SalonInformation>().ReverseMap();
 
             //Appointment
             CreateMap<CreateAppointmentRequest, Appointment>().ReverseMap();
             CreateMap<CreateAppointmentResponse, Appointment>().ReverseMap();
             CreateMap<UpdateAppointmentRequest, Appointment>().ReverseMap();
             CreateMap<Appointment, GetAppointmentResponse>()
-                .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation));
+                .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.AppointmentDetails.FirstOrDefault()!.SalonEmployee.SalonInformation));
             CreateMap<AppointmentTransaction, Appointment>().ReverseMap();
 
             //SalonOwner
@@ -96,6 +95,7 @@ namespace Hairhub.Service.Helpers
             CreateMap<EmployeeRequest, SalonEmployee>().ReverseMap();
             CreateMap<ScheduleEmployee, Schedule>().ReverseMap();
             CreateMap<ScheduleEmployeeResponse, Schedule>().ReverseMap();
+            CreateMap<SalonEmployee, GetEmployeeHighRatingResponse>().ReverseMap();
 
 
             //SalonInformation
@@ -105,8 +105,7 @@ namespace Hairhub.Service.Helpers
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<SalonOwnerSalonInformationResponse, SalonOwner>().ReverseMap();
-            CreateMap<CreateScheduleRequest, Schedule>().ReverseMap(); 
-            CreateMap<SalonInformationSchedule, SalonInformation>().ReverseMap();
+            CreateMap<CreateScheduleRequest, Schedule>().ReverseMap();
             CreateMap<SalonInformation, SearchSalonByNameAddressServiceResponse>()
                        .ForMember(dest => dest.Services, opt => opt.Ignore())
                        .ForMember(dest => dest.Vouchers, opt => opt.Ignore());
