@@ -117,13 +117,15 @@
         public static class Report
         {
             public const string ReportsEndpoint = ApiEndpoint + "/reports";
-
+        }
+        public static class BusyScheduleEmployee
+        {
+            public const string BusyScheduleEmployeeEndpoint = ApiEndpoint + "/busy_schedule_employee";
         }
 
         public static class SignalR
         {
             public const string SignalRsEndpoint = ApiEndpoint + "/signalRs";
-            
         }
     }
 }
