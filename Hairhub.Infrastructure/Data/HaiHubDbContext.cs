@@ -50,6 +50,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<ServiceEmployee> ServiceEmployees { get; set; }
         public virtual DbSet<StyleHairCustomer> StyleHairCustomers { get; set; }
         public virtual DbSet<ImageStyle> ImageStyles { get; set; }
+        public virtual DbSet<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -611,6 +612,25 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.StyleHairCustomerId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_image_style_style_hair_customer");
+            });
+
+            modelBuilder.Entity<BusyScheduleEmployee>(entity =>
+            {
+                entity.ToTable("busy_schedule_employee");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.StartTime).HasColumnName("start_time");
+                entity.Property(e => e.EndTime).HasColumnName("end_time");
+                entity.Property(e => e.Note).HasColumnName("note").IsRequired(false);
+                entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
+
+                entity.HasOne(d => d.SalonEmployee)
+                      .WithMany(p => p.BusyScheduleEmployees)
+                      .HasForeignKey(d => d.EmployeeId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_busy_schedule_employee_salon_employee");
             });
         }
     }
