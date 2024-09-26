@@ -51,6 +51,8 @@ namespace Hairhub.Service.Services.IServices
         Task<(decimal, int)> RevenueandNumberofAppointment(Guid id, DateTime? startdate, DateTime enddate);
         Task<(decimal, decimal, decimal)> RateofAppointmentByStatus(Guid id, DateTime? startdate, DateTime enddate);
         Task<List<(DateTime, int, int, int)>> NumberofAppointmentByStatus(Guid id, DateTime? startdate, DateTime? enddate);
+
+        Task<List<(DateTime, decimal)>> RevenueofAppointmentDaybyDay(Guid id, DateTime? startdate, DateTime? enddate);
     }
 }
 
