@@ -302,6 +302,42 @@ namespace Hairhub.Infrastructure.Migrations
                     b.ToTable("approval", (string)null);
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.BusyScheduleEmployee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("employee_id");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_time");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("note");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("busy_schedule_employee", (string)null);
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Config", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1256,6 +1292,17 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("SalonInformation");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.BusyScheduleEmployee", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.SalonEmployee", "SalonEmployee")
+                        .WithMany("BusyScheduleEmployees")
+                        .HasForeignKey("EmployeeId")
+                        .IsRequired()
+                        .HasConstraintName("FK_busy_schedule_employee_salon_employee");
+
+                    b.Navigation("SalonEmployee");
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Customer", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
@@ -1537,6 +1584,8 @@ namespace Hairhub.Infrastructure.Migrations
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonEmployee", b =>
                 {
                     b.Navigation("AppointmentDetails");
+
+                    b.Navigation("BusyScheduleEmployees");
 
                     b.Navigation("Schedules");
 
