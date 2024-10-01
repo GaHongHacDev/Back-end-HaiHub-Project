@@ -129,6 +129,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
      };
  });
+ //.AddGoogle(googleOption =>
+ //{
+ //    googleOption.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+ //    googleOption.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+ //});
 
 builder.Services.AddAuthorization();
 
@@ -154,3 +159,5 @@ app.MapControllers();
 app.MapHub<BookAppointmentHub>("book-appointment-hub");
 
 app.Run();
+
+

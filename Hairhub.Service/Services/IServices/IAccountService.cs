@@ -19,15 +19,11 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> ActiveAccount(Guid id);
         Task<bool> ChangePassword(Guid id, ChangePasswordRequest changePasswordRequest);
         Task<GetAccountResponse> GetAccountById(Guid id);
-
         Task<DataOfMonths> GetNumberOfCustomerOnMonth(int? year);
-
         Task<DataOfMonths> GetNumberOfSalonOwnerOnMonth(int? year);
-
-
         Task<int> GetCustomersActive();
-
         Task<int> GetSalonsActive();
         Task<bool> ForgotPassword(ForgotPasswordRequest request);
+        Task<bool> CheckLoginGoogle(CheckLoginGoogle checkLoginGoogle);
     }
 }

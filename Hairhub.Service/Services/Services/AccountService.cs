@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Google.Apis.Auth;
+using Hairhub.Domain.Specifications;
 
 
 namespace Hairhub.Service.Services.Services
@@ -279,6 +281,45 @@ namespace Hairhub.Service.Services.Services
             account.Password = request.NewPassword;
             _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
             return await _unitOfWork.CommitAsync() > 0;
+        }
+
+        public async Task<bool> CheckLoginGoogle(CheckLoginGoogle checkLoginGoogle)
+        {
+            try
+            {
+                // Xác thực token với Google
+                var clientId = "160573115812-l88je63eolr52ichb690e7i8g3f59r9t.apps.googleusercontent.com";
+
+                var payload = await GoogleJsonWebSignature.ValidateAsync(checkLoginGoogle.IdToken, new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] { clientId }
+                });
+
+                if (payload == null)
+                {
+                    throw new Exception("Không có dữ liệu từ Google API");
+                }
+                // Lấy thông tin người dùng từ payload
+                var email = payload.Email;
+                if(email == null)
+                {
+                    throw new Exception("Không có dữ liệu email từ Google API");
+                }
+                var existEmail = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.UserName.Equals(email));
+                if (existEmail != null)
+                {
+                    throw new NotFoundException("Email đã tồn tại trên hệ thống");
+                }
+                return true;
+            }
+            catch (InvalidJwtException ex)
+            {
+                throw new Exception("Id Token hoặc JWT không hợp lệ");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

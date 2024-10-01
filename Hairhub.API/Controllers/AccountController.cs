@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
@@ -18,6 +19,24 @@ namespace Hairhub.API.Controllers
         public AccountController(IMapper mapper, IAccountService accountService) : base(mapper)
         {
             _accountService = accountService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GoogleLogin(CheckLoginGoogle checkLoginGoogle)
+        {
+            try
+            {
+                var payload = await _accountService.CheckLoginGoogle(checkLoginGoogle);
+                return Ok(payload);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPost]
