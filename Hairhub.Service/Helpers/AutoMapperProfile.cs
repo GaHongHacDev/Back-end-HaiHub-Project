@@ -100,7 +100,8 @@ namespace Hairhub.Service.Helpers
 
             //SalonInformation
             CreateMap<SalonInformation, GetSalonInformationResponse>()
-                .ForMember(dest => dest.schedules, opt => opt.MapFrom(src => src.Schedules));
+            .ForMember(dest => dest.schedules, opt => opt.MapFrom(src => src.Schedules))
+            .ForMember(dest => dest.FileSalonInformations, opt => opt.MapFrom(src => src.StaticFiles));
             CreateMap<CreateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
@@ -111,10 +112,11 @@ namespace Hairhub.Service.Helpers
                        .ForMember(dest => dest.Vouchers, opt => opt.Ignore());
             CreateMap<SearchSalonServiceResponse, ServiceHair>().ReverseMap();
             CreateMap<SearchSalonVoucherRespnse, Voucher>().ReverseMap();
-            CreateMap<AppointmentSalon, SalonInformation>().ReverseMap(); 
+            CreateMap<AppointmentSalon, SalonInformation>().ReverseMap();
             CreateMap<SalonInformation, GetSalonInformationResponse>().ReverseMap();
             CreateMap<SalonInformation, SalonSuggesstionResponse>().ReverseMap();
             CreateMap<SalonEmployee, ReviewRevenueEmployee>();
+            CreateMap<SalonInformation, GetSalonInformationResponse>().ReverseMap();
 
             //ServiceHair
             CreateMap<GetServiceHairResponse, ServiceHair>().ReverseMap();
@@ -186,6 +188,7 @@ namespace Hairhub.Service.Helpers
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();
             CreateMap<StaticFile, FileFeedbackResponse>().ReverseMap();
+            CreateMap<StaticFile, FileSalonResponse>(); // Mapping for individual files
 
 
             //Customer Image History

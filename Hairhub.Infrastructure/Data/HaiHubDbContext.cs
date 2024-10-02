@@ -24,7 +24,7 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
            // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
@@ -435,6 +435,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
                 entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
 
@@ -449,6 +450,12 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.ReportId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_report_static_file");
+                
+                entity.HasOne(d => d.SalonInformation)
+                                      .WithMany(p => p.StaticFiles)
+                                      .HasForeignKey(d => d.SalonInformationId)
+                                      .OnDelete(DeleteBehavior.ClientSetNull)
+                                      .HasConstraintName("FK_saloninformation_static_file");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
