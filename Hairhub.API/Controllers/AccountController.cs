@@ -25,7 +25,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var payload = await _accountService.CheckLoginGoogle(checkLoginGoogle);
+                var payload = await _accountService.LoginGoogle(checkLoginGoogle);
                 return Ok(payload);
             }
             catch (NotFoundException ex)

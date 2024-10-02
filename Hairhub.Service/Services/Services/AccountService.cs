@@ -18,6 +18,12 @@ using Hairhub.Domain.Dtos.Responses.Authentication;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Service.Helpers;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using System.Security.Principal;
+using Role = Hairhub.Domain.Entitities.Role;
+using Account = Hairhub.Domain.Entitities.Account;
+using System.Data;
 
 
 namespace Hairhub.Service.Services.Services
@@ -294,10 +300,11 @@ namespace Hairhub.Service.Services.Services
             return await _unitOfWork.CommitAsync() > 0;
         }
 
-        public async Task<string> CheckLoginGoogle(CheckLoginGoogleRequest checkLoginGoogle)
+        public async Task<LoginResponse> LoginGoogle(CheckLoginGoogleRequest checkLoginGoogle)
         {
             try
             {
+
                 // Xác thực token với Google
                 var payload = await GoogleJsonWebSignature.ValidateAsync(checkLoginGoogle.IdToken, new GoogleJsonWebSignature.ValidationSettings()
                 {
@@ -315,12 +322,41 @@ namespace Hairhub.Service.Services.Services
                     throw new Exception("Không có dữ liệu email từ Google API");
                 }
                 var email = payload.Email;
-                var existEmail = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.UserName.Equals(email));
-                if (existEmail != null)
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(email), include: x=>x.Include(s => s.Role));
+                if (account == null)
                 {
-                    throw new NotFoundException("Email đã tồn tại trên hệ thống");
+                    throw new NotFoundException("Email không tồn tại trên hệ thống");
                 }
-                return email;
+                SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                SalonEmployee salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+                if (salonOwner == null && customer == null && salonEmployee == null)
+                {
+                    throw new Exception("Không tìm thấy tài khoản");
+                }
+                var accessToken = JWTHelper.GenerateToken(account.UserName, account.Role.RoleName!, _configuaration["JWTSettings:Key"]!, _configuaration["JWTSettings:Issuer"]!, _configuaration["JWTSettings:Audience"]!);
+                var refreshToken = JWTHelper.GenerateRefreshToken();
+                var newRefrehToken = new RefreshTokenAccount()
+                {
+                    Id = Guid.NewGuid(),
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    AccountId = account.Id,
+                    Expires = DateTime.UtcNow.AddDays(30),
+                };
+                await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken);
+
+                bool isInsert = await _unitOfWork.CommitAsync() > 0;
+                return new LoginResponse()
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    AccountId = account.Id,
+                    RoleName = account.Role?.RoleName,
+                    CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
+                    SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null,
+                    SalonEmployeeResponse = salonEmployee != null ? _mapper.Map<SalonEmployeeResponse>(salonEmployee) : null,
+                };
             }
             catch (InvalidJwtException ex)
             {

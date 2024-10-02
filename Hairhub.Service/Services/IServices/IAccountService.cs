@@ -25,7 +25,7 @@ namespace Hairhub.Service.Services.IServices
         Task<int> GetCustomersActive();
         Task<int> GetSalonsActive();
         Task<bool> ForgotPassword(ForgotPasswordRequest request);
-        Task<string> CheckLoginGoogle(CheckLoginGoogleRequest checkLoginGoogle);
+        Task<LoginResponse> LoginGoogle(CheckLoginGoogleRequest checkLoginGoogle);
         Task<LoginResponse> RegisterAccountLoginGoogle(CreateAccountLoginGoogleRequest createAccountLoginGoogleRequest);
     }
 }
