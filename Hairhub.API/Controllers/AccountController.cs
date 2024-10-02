@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Accounts;
-using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
@@ -22,7 +21,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GoogleLogin(CheckLoginGoogle checkLoginGoogle)
+        public async Task<IActionResult> GoogleLogin(CheckLoginGoogleRequest checkLoginGoogle)
         {
             try
             {
@@ -50,6 +49,28 @@ namespace Hairhub.API.Controllers
                     return BadRequest(new { message = "Không thể đăng ký tài khoản" });
                 }
                 return Ok(accoutResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterAccountLoginGoogle([FromBody] CreateAccountLoginGoogleRequest createAccountRequest)
+        {
+            try
+            {
+                var accoutResponse = await _accountService.RegisterAccountLoginGoogle(createAccountRequest);
+                if (accoutResponse == null)
+                {
+                    return BadRequest(new { message = "Không thể đăng ký tài khoản" });
+                }
+                return Ok(accoutResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

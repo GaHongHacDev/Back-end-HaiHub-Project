@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hairhub.Domain.Dtos.Responses.Accounts
+namespace Hairhub.Domain.Dtos.Requests.Accounts
 {
-    public class CheckLoginGoogle
+    public class CheckLoginGoogleRequest
     {
-        public string IdToken {  get; set; }
+        public string IdToken { get; set; }
     }
 }

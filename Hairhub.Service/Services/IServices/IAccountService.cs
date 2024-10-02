@@ -1,6 +1,7 @@
 ﻿using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
+using Hairhub.Domain.Dtos.Responses.Authentication;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Domain.Entitities;
 using System;
@@ -24,6 +25,7 @@ namespace Hairhub.Service.Services.IServices
         Task<int> GetCustomersActive();
         Task<int> GetSalonsActive();
         Task<bool> ForgotPassword(ForgotPasswordRequest request);
-        Task<bool> CheckLoginGoogle(CheckLoginGoogle checkLoginGoogle);
+        Task<string> CheckLoginGoogle(CheckLoginGoogleRequest checkLoginGoogle);
+        Task<LoginResponse> RegisterAccountLoginGoogle(CreateAccountLoginGoogleRequest createAccountLoginGoogleRequest);
     }
 }
