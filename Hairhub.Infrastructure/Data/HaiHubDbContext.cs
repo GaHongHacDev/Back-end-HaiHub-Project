@@ -51,6 +51,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<StyleHairCustomer> StyleHairCustomers { get; set; }
         public virtual DbSet<ImageStyle> ImageStyles { get; set; }
         public virtual DbSet<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
+        public virtual DbSet<FeedbackDetail> FeedbackDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -475,6 +476,28 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.AppointmentId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_appointment_feedback");
+            });
+
+            modelBuilder.Entity<FeedbackDetail>(entity =>
+            {
+                entity.ToTable("feedback_detail");
+
+                entity.HasKey(e => e.AppointmentDetailId);  // Khóa chính
+
+                entity.Property(e => e.FeedbackId).IsRequired();  // Đảm bảo FeedbackId là bắt buộc
+                entity.Property(e => e.Rating).HasColumnName("rating");
+
+                entity.HasOne(d => d.Feedback)
+                      .WithMany(p => p.FeedbackDetails)
+                      .HasForeignKey(d => d.FeedbackId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_feedback_feedback_detail");
+
+                entity.HasOne(d => d.AppointmentDetail)
+                      .WithOne(p => p.FeedbackDetail)  // Nếu AppointmentDetail có FeedbackDetail
+                      .HasForeignKey<FeedbackDetail>(d => d.AppointmentDetailId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_feedback_detail");
             });
 
             modelBuilder.Entity<Report>(entity =>

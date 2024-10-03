@@ -92,7 +92,7 @@ namespace Hairhub.Service.Services.Services
                     Id = Guid.NewGuid(),
                     CustomerId = request.CustomerId,
                     AppointmentId = request.AppointmentId,
-                    Rating = ratingSum / request.FeedbackDetailRequests.Count,
+                    Rating = (decimal)ratingSum / request.FeedbackDetailRequests.Count,
                     Comment = request.Comment,
                     IsActive = true,
                     CreateDate = DateTime.Now,
@@ -100,6 +100,7 @@ namespace Hairhub.Service.Services.Services
 
                 await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
 
+                List<SalonEmployee> listEmployee = new List<SalonEmployee>();
                 foreach (var item in request.FeedbackDetailRequests)
                 {
                     var appointmentDetail = await _unitOfWork.GetRepository<AppointmentDetail>()
@@ -116,11 +117,30 @@ namespace Hairhub.Service.Services.Services
                     {
                         throw new NotFoundException($"Không tìm thấy nhân viên với id {employee!.Id}");
                     }
-                    employee.RatingCount++;
-                    employee.RatingSum += item.Rating;
-                    employee.Rating = employee.RatingSum/employee.RatingCount;
-                    _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(employee);
+                    var existingEmployee = listEmployee.FirstOrDefault(e => e.Id == employee.Id);
+
+                    if (existingEmployee == null)
+                    {
+                        listEmployee.Add(employee);
+                        employee.RatingCount++;
+                        employee.RatingSum += item.Rating;
+                        employee.Rating = employee.RatingSum / employee.RatingCount;
+                    }
+                    else
+                    {
+                        existingEmployee.RatingCount++;
+                        existingEmployee.RatingSum += item.Rating;
+                        existingEmployee.Rating = existingEmployee.RatingSum / existingEmployee.RatingCount;
+                    }
+                    FeedbackDetail feedbackDetail = new FeedbackDetail()
+                    {
+                        AppointmentDetailId = appointmentDetail.Id,
+                        FeedbackId = newFeedback.Id,
+                        Rating = item.Rating,
+                    };
+                    await _unitOfWork.GetRepository<FeedbackDetail>().InsertAsync(feedbackDetail);
                 }
+                _unitOfWork.GetRepository<SalonEmployee>().UpdateRange(listEmployee);
 
                 for (int i = 0; i < request.ImgFeedbacks.Count; i++)
                 {
@@ -137,7 +157,7 @@ namespace Hairhub.Service.Services.Services
 
                 decimal totalRating = existingSalon.TotalRating;
                 int totalReview = existingSalon.TotalReviewer + 1;
-                existingSalon.Rate = (totalRating + (decimal)(ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
+                existingSalon.Rate = (totalRating + ((decimal)ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
                 existingSalon.TotalReviewer = totalReview;
                 existingSalon.TotalRating = totalRating + (decimal)ratingSum/request.FeedbackDetailRequests.Count;
 
