@@ -1104,6 +1104,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("report_id");
 
+                    b.Property<Guid?>("SalonInformationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("salon_information_id");
+
                     b.Property<string>("Video")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("video");
@@ -1113,6 +1117,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.HasIndex("ReportId");
+
+                    b.HasIndex("SalonInformationId");
 
                     b.ToTable("static_file", (string)null);
                 });
@@ -1534,9 +1540,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasForeignKey("ReportId")
                         .HasConstraintName("FK_report_static_file");
 
+                    b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
+                        .WithMany("StaticFiles")
+                        .HasForeignKey("SalonInformationId")
+                        .HasConstraintName("FK_saloninformation_static_file");
+
                     b.Navigation("Feedback");
 
                     b.Navigation("Report");
+
+                    b.Navigation("SalonInformation");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.StyleHairCustomer", b =>
@@ -1649,6 +1662,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Schedules");
 
                     b.Navigation("ServiceHairs");
+
+                    b.Navigation("StaticFiles");
 
                     b.Navigation("Vouchers");
                 });

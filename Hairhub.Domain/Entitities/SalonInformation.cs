@@ -33,5 +33,7 @@ namespace Hairhub.Domain.Entitities
         public virtual ICollection<ServiceHair> ServiceHairs { get; set; }
         public virtual ICollection<Approval> Approvals { get; set; }
         public virtual ICollection<Report> Report { get; set; }
+
+        public virtual ICollection<StaticFile> StaticFiles { get; set; }
     }
 }
