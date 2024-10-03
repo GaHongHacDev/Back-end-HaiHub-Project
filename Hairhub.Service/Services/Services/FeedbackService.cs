@@ -215,7 +215,7 @@ namespace Hairhub.Service.Services.Services
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
                        predicate: x => x.IsActive == true && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
-                        include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
+                        include: x => x.Include(s=>s.FeedbackDetails).Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
                        page: page,
                        size: size);
                 }
@@ -224,7 +224,7 @@ namespace Hairhub.Service.Services.Services
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
                        predicate: x => x.IsActive == true && x.Rating == rating && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
-                       include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
+                       include: x => x.Include(s => s.FeedbackDetails).Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
                        page: page,
                        size: size);
                 }

@@ -184,6 +184,9 @@ namespace Hairhub.Service.Helpers
             //Feedback
             CreateMap<Feedback, GetFeedbackResponse>()
                 .ForMember(dest => dest.FileFeedbacks, opt => opt.MapFrom(src => src.StaticFiles.ToList()));
+            CreateMap<FeedbackDetail, FeedbackDetailResponse>().ReverseMap();
+            CreateMap<AppointmentFeedback, Appointment>().ReverseMap();
+            CreateMap<AppointmentDetailFeedback, AppointmentDetail>().ReverseMap();
 
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();

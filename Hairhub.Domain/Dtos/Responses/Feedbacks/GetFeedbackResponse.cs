@@ -2,6 +2,7 @@
 using Hairhub.Domain.Dtos.Responses.Reports;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Dtos.Responses.StaticFile;
+using Hairhub.Domain.Entitities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,8 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public string? Comment { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? CreateDate { get; set; }
-        public GetAppointmentResponse Appointment { get; set; }
+        public AppointmentFeedback Appointment { get; set; }
+        public List<FeedbackDetailResponse> feedbackDetails { get; set; }
         public List<FileFeedbackResponse> FileFeedbacks { get; set; }
         public CustomerAppointment Customer { get; set; }
     }

@@ -371,6 +371,10 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Id Token hoặc JWT không hợp lệ");
             }
+            catch(NotFoundException ex)
+            {
+                throw new NotFoundException(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
