@@ -9,5 +9,6 @@ namespace Hairhub.Domain.Dtos.Requests.Accounts
     public class CheckLoginGoogleRequest
     {
         public string IdToken { get; set; }
+        public string? type { get; set; }
     }
 }

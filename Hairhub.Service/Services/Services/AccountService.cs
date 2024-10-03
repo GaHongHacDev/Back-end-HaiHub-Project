@@ -35,7 +35,8 @@ namespace Hairhub.Service.Services.Services
         private readonly IMediaService _mediaService;
         private readonly IConfiguration _configuaration;
         private readonly IEmailService _emailService;
-        string clientId = "160573115812-l88je63eolr52ichb690e7i8g3f59r9t.apps.googleusercontent.com";
+        private string clientIdWeb = "160573115812-l88je63eolr52ichb690e7i8g3f59r9t.apps.googleusercontent.com";
+        private string clientIdAndroid = "435735956374-biv1qavtd6b0b79a1372s99v10qfsnpj.apps.googleusercontent.com";
         public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IConfiguration configuaration, IEmailService email)
         {
             _unitOfWork = unitOfWork;
@@ -304,7 +305,15 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-
+                string clientId = "";
+                if(checkLoginGoogle.type == null || checkLoginGoogle.type.Equals("Web"))
+                {
+                    clientId = clientIdWeb;
+                }
+                else if (checkLoginGoogle.type.Equals("Android"))
+                {
+                    clientId = clientIdAndroid;
+                }
                 // Xác thực token với Google
                 var payload = await GoogleJsonWebSignature.ValidateAsync(checkLoginGoogle.IdToken, new GoogleJsonWebSignature.ValidationSettings()
                 {

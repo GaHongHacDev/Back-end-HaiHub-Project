@@ -14,5 +14,6 @@ namespace Hairhub.Domain.Dtos.Requests.Accounts
         public string RoleName { get; set; }
         [Required]
         public string Phone { get; set; }
+        public string? type { get; set; }
     }
 }
