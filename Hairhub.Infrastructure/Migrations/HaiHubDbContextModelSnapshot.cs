@@ -302,6 +302,42 @@ namespace Hairhub.Infrastructure.Migrations
                     b.ToTable("approval", (string)null);
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.BusyScheduleEmployee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("employee_id");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_time");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("note");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("busy_schedule_employee", (string)null);
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Config", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1049,6 +1085,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("report_id");
 
+                    b.Property<Guid?>("SalonInformationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("salon_information_id");
+
                     b.Property<string>("Video")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("video");
@@ -1058,6 +1098,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.HasIndex("ReportId");
+
+                    b.HasIndex("SalonInformationId");
 
                     b.ToTable("static_file", (string)null);
                 });
@@ -1256,6 +1298,17 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("SalonInformation");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.BusyScheduleEmployee", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.SalonEmployee", "SalonEmployee")
+                        .WithMany("BusyScheduleEmployees")
+                        .HasForeignKey("EmployeeId")
+                        .IsRequired()
+                        .HasConstraintName("FK_busy_schedule_employee_salon_employee");
+
+                    b.Navigation("SalonEmployee");
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Customer", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
@@ -1449,9 +1502,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasForeignKey("ReportId")
                         .HasConstraintName("FK_report_static_file");
 
+                    b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
+                        .WithMany("StaticFiles")
+                        .HasForeignKey("SalonInformationId")
+                        .HasConstraintName("FK_saloninformation_static_file");
+
                     b.Navigation("Feedback");
 
                     b.Navigation("Report");
+
+                    b.Navigation("SalonInformation");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.StyleHairCustomer", b =>
@@ -1538,6 +1598,8 @@ namespace Hairhub.Infrastructure.Migrations
                 {
                     b.Navigation("AppointmentDetails");
 
+                    b.Navigation("BusyScheduleEmployees");
+
                     b.Navigation("Schedules");
 
                     b.Navigation("ServiceEmployees");
@@ -1554,6 +1616,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Schedules");
 
                     b.Navigation("ServiceHairs");
+
+                    b.Navigation("StaticFiles");
 
                     b.Navigation("Vouchers");
                 });

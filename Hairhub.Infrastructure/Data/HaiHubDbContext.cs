@@ -24,9 +24,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
-
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+
+           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
         }
 
@@ -50,6 +50,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<ServiceEmployee> ServiceEmployees { get; set; }
         public virtual DbSet<StyleHairCustomer> StyleHairCustomers { get; set; }
         public virtual DbSet<ImageStyle> ImageStyles { get; set; }
+        public virtual DbSet<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -434,6 +435,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
                 entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
 
@@ -448,6 +450,12 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.ReportId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_report_static_file");
+                
+                entity.HasOne(d => d.SalonInformation)
+                                      .WithMany(p => p.StaticFiles)
+                                      .HasForeignKey(d => d.SalonInformationId)
+                                      .OnDelete(DeleteBehavior.ClientSetNull)
+                                      .HasConstraintName("FK_saloninformation_static_file");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -611,6 +619,25 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.StyleHairCustomerId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_image_style_style_hair_customer");
+            });
+
+            modelBuilder.Entity<BusyScheduleEmployee>(entity =>
+            {
+                entity.ToTable("busy_schedule_employee");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.StartTime).HasColumnName("start_time");
+                entity.Property(e => e.EndTime).HasColumnName("end_time");
+                entity.Property(e => e.Note).HasColumnName("note").IsRequired(false);
+                entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
+
+                entity.HasOne(d => d.SalonEmployee)
+                      .WithMany(p => p.BusyScheduleEmployees)
+                      .HasForeignKey(d => d.EmployeeId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_busy_schedule_employee_salon_employee");
             });
         }
     }

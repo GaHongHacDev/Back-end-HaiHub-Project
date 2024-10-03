@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hairhub.Domain.Dtos.Requests.BusySchedule
+{
+    public class RequestCreationOfBusySchedule
+    {
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public string? Note {  get; set; }
+    }
+
+}

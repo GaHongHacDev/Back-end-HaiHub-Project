@@ -29,6 +29,7 @@ namespace Hairhub.Domain.Entitities
         public virtual ICollection<Schedule> Schedules { get; set; }
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; }
         public virtual ICollection<ServiceEmployee> ServiceEmployees { get; set; }
+        public virtual ICollection<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
 
     }
 }

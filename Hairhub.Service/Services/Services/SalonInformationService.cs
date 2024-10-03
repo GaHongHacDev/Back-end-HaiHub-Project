@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hairhub.Common.ThirdParties.Contract;
+using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Dtos.Requests.Schedule;
@@ -413,17 +414,17 @@ namespace Hairhub.Service.Services.Services
         public async Task<ReviewRevenueReponse> ReviewRevenue(Guid SalonId, DateTime startDate, DateTime endDate)
         {
             ReviewRevenueReponse result = new ReviewRevenueReponse();
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == SalonId);
-            if (salon == null) 
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == SalonId);
+            if (salon == null)
             {
                 throw new NotFoundException($"Không tìm thấy salon/barber shop với id {SalonId}");
             }
-            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync( predicate: x=>x.SalonInformationId == SalonId);
-            foreach (var employee in employees) 
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == SalonId);
+            foreach (var employee in employees)
             {
                 var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                     .GetListAsync(
-                                                                    x=>x.AppointmentDetails.Any(x=>x.SalonEmployeeId == employee.Id) 
+                                                                    x => x.AppointmentDetails.Any(x => x.SalonEmployeeId == employee.Id)
                                                                     && !x.Status.Equals(AppointmentStatus.Booking)
                                                                     && x.StartDate.Date >= startDate.Date
                                                                     && x.StartDate <= endDate.Date
@@ -431,8 +432,8 @@ namespace Hairhub.Service.Services.Services
                 ReviewRevenueEmployee reviewRevenueEmployee = new ReviewRevenueEmployee();
                 reviewRevenueEmployee = _mapper.Map<ReviewRevenueEmployee>(employee);
 
-                foreach (var appointment in appointments) 
-                {                    
+                foreach (var appointment in appointments)
+                {
                     switch (appointment.Status)
                     {
                         case AppointmentStatus.Successed:
@@ -457,12 +458,66 @@ namespace Hairhub.Service.Services.Services
         {
             SalonInformation salonInformationResponse = await _unitOfWork.GetRepository<SalonInformation>()
                                                             .SingleOrDefaultAsync(
-                                                                predicate: x => x.SalonEmployees.Any(x=>x.Id == id),
+                                                                predicate: x => x.SalonEmployees.Any(x => x.Id == id),
                                                                 include: source => source.Include(s => s.SalonOwner).Include(x => x.Schedules)
                                                             );
             if (salonInformationResponse == null)
                 return null;
             return _mapper.Map<GetSalonInformationResponse>(salonInformationResponse);
+        }
+
+        public async Task<bool> AddSalonInformationImages(Guid Salonid, AddSalonImagesRequest request)
+        {
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == Salonid);
+            if (salon == null) throw new Exception("Salon không tồn tại") ;
+            
+                foreach (var image in request.SalonImages)
+                {
+                var urlImg = await _mediaService.UploadAnImage(image, MediaPath.FEEDBACK_IMG, salon.Id.ToString() + "/" + salon.Id.ToString());
+                //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
+                StaticFile staticFile = new StaticFile()
+                {
+                    Id = Guid.NewGuid(),
+                    SalonInformationId = salon.Id,
+                    Img = urlImg,
+                };
+                await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                }
+           bool isSuccessed = await _unitOfWork.CommitAsync() > 0;
+           return isSuccessed;
+        }
+
+        public async Task<SalonInformationImagesResponse> GetSalonInformationImages(Guid salonid)
+        {
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == salonid);
+            if (salon == null) throw new Exception("Salon không tồn tại");
+
+            var salonImages = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: p => p.SalonInformationId == salonid);
+
+            if (salonImages == null || !salonImages.Any()) throw new Exception("Salon không có hình");
+
+            var response = new SalonInformationImagesResponse
+            {
+                SalonInformationId = salonid,
+                SalonImages = _mapper.Map<List<FileSalonResponse>>(salonImages)
+            };
+
+            return response;
+        }
+
+        public async Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request)
+        {
+            bool isDeleted = false;
+            if (request != null) {
+                foreach(var imageid in request.ImagesId)
+                {
+                    var image = await _unitOfWork.GetRepository<StaticFile>().SingleOrDefaultAsync(predicate: p => p.Id == imageid);
+                    _unitOfWork.GetRepository<StaticFile>().DeleteAsync(image);
+                }
+                 isDeleted = await _unitOfWork.CommitAsync() > 0;
+            
+            }
+            return isDeleted;   
         }
     }
 }

@@ -26,5 +26,13 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "",
                                         string? salonAddress = "", string? salonName = "", decimal? latitude = 0, decimal? longtitude = 0, decimal? distance = 0);
         Task<ReviewRevenueReponse> ReviewRevenue(Guid SalonId, DateTime startDate, DateTime endDate);
+
+        Task<bool> AddSalonInformationImages(Guid Salonid, AddSalonImagesRequest request);
+
+        Task<SalonInformationImagesResponse> GetSalonInformationImages(Guid salonid);
+
+        Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request);
+
+        
     }
 }
