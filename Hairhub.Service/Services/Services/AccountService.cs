@@ -379,6 +379,15 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<LoginResponse> RegisterAccountLoginGoogle(CreateAccountLoginGoogleRequest createAccountLoginGoogleRequest)
         {
+            string clientId = "";
+            if (createAccountLoginGoogleRequest.type == null || createAccountLoginGoogleRequest.type.Equals("Web"))
+            {
+                clientId = clientIdWeb;
+            }
+            else if (createAccountLoginGoogleRequest.type.Equals("Android"))
+            {
+                clientId = clientIdAndroid;
+            }
             // Xác thực token với Google
             var payload = await GoogleJsonWebSignature.ValidateAsync(createAccountLoginGoogleRequest.IdToken, new GoogleJsonWebSignature.ValidationSettings()
             {
