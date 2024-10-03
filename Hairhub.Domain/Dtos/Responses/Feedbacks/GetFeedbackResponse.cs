@@ -16,7 +16,7 @@ namespace Hairhub.Domain.Dtos.Responses.Feedbacks
         public Guid Id { get; set; }
         public Guid? CustomerId { get; set; }
         public Guid? AppointmentDetailId { get; set; }
-        public int? Rating { get; set; }
+        public decimal? Rating { get; set; }
         public string? Comment { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? CreateDate { get; set; }

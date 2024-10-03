@@ -204,7 +204,7 @@ namespace Hairhub.Service.Services.Services
             return isSuccessful;
         }
 
-        public async Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, int? rating, int page, int size)
+        public async Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, decimal? rating, int page, int size)
         {
             try
             {
@@ -221,9 +221,10 @@ namespace Hairhub.Service.Services.Services
                 }
                 else
                 {
+                    rating-=0.5m;
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
-                       predicate: x => x.IsActive == true && x.Rating == rating && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
+                       predicate: x => x.IsActive == true && x.Rating>=rating && x.Rating<rating+1 && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
                        include: x => x.Include(s => s.FeedbackDetails).Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
                        page: page,
                        size: size);
