@@ -57,7 +57,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CreateFeedback([FromForm]CreateFeedbackRequest request)
         {
             try
