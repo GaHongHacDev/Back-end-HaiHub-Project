@@ -19,7 +19,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> UpdateFeedback(Guid id, UpdateFeedbackRequest request);
         Task<bool> DeleteFeedback(Guid id);
 
-        Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, int? rating, int page, int size);
+        Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, decimal? rating, int page, int size);
 
         Task<GetFeedbackResponse> GetFeedBackByAppointmentId(Guid id);
 

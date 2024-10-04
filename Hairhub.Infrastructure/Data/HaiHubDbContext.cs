@@ -24,9 +24,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
-           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
 
         }
 
@@ -51,6 +51,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<StyleHairCustomer> StyleHairCustomers { get; set; }
         public virtual DbSet<ImageStyle> ImageStyles { get; set; }
         public virtual DbSet<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
+        public virtual DbSet<FeedbackDetail> FeedbackDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -435,6 +436,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
                 entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
 
@@ -449,6 +451,12 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.ReportId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_report_static_file");
+                
+                entity.HasOne(d => d.SalonInformation)
+                                      .WithMany(p => p.StaticFiles)
+                                      .HasForeignKey(d => d.SalonInformationId)
+                                      .OnDelete(DeleteBehavior.ClientSetNull)
+                                      .HasConstraintName("FK_saloninformation_static_file");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -475,6 +483,28 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.AppointmentId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_appointment_feedback");
+            });
+
+            modelBuilder.Entity<FeedbackDetail>(entity =>
+            {
+                entity.ToTable("feedback_detail");
+
+                entity.HasKey(e => e.AppointmentDetailId);  // Khóa chính
+
+                entity.Property(e => e.FeedbackId).IsRequired();  // Đảm bảo FeedbackId là bắt buộc
+                entity.Property(e => e.Rating).HasColumnName("rating");
+
+                entity.HasOne(d => d.Feedback)
+                      .WithMany(p => p.FeedbackDetails)
+                      .HasForeignKey(d => d.FeedbackId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_feedback_feedback_detail");
+
+                entity.HasOne(d => d.AppointmentDetail)
+                      .WithOne(p => p.FeedbackDetail)  // Nếu AppointmentDetail có FeedbackDetail
+                      .HasForeignKey<FeedbackDetail>(d => d.AppointmentDetailId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_feedback_detail");
             });
 
             modelBuilder.Entity<Report>(entity =>

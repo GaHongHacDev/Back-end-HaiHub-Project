@@ -263,5 +263,81 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> AddSalonInformationImages([FromRoute]Guid id, [FromForm] AddSalonImagesRequest request)
+        {
+            try
+            {
+                bool isSuccessed = await _salonInformationService.AddSalonInformationImages(id, request);
+                if (isSuccessed == false)
+                {
+                    return NotFound("Không thể thêm hình Salon, barber shop");
+                }
+                return Ok(isSuccessed);
+            }
+            catch (NotFoundException ex)
+            {
+
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetSalonInformationImages([FromRoute] Guid id)
+        {
+            try
+            {
+                var SalonImages = await _salonInformationService.GetSalonInformationImages(id);
+                if (SalonImages == null)
+                {
+                    return BadRequest("Không thể lấy hình của salon");
+                }
+                return Ok(SalonImages);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpDelete]
+        
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> DeleteSalonInformationImages([FromBody] DeleteImagesRequest request)
+        {
+            try
+            {
+                bool isSuccessed = await _salonInformationService.DeleteSalonInformationImages(request);
+                if (isSuccessed == false)
+                {
+                    return NotFound("Không thể xóa hình Salon, barber shop");
+                }
+                return Ok(isSuccessed);
+            }
+            catch (NotFoundException ex)
+            {
+
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }
