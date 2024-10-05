@@ -141,18 +141,20 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<FeedbackDetail>().InsertAsync(feedbackDetail);
                 }
                 _unitOfWork.GetRepository<SalonEmployee>().UpdateRange(listEmployee);
-
-                for (int i = 0; i < request.ImgFeedbacks.Count; i++)
+                if (request.ImgFeedbacks != null)
                 {
-                    var urlImg = await _mediaservice.UploadAnImage(request.ImgFeedbacks[i], MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString() + "/" + i.ToString());
-                    //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
-                    StaticFile staticFile = new StaticFile()
+                    for (int i = 0; i < request.ImgFeedbacks.Count; i++)
                     {
-                        Id = Guid.NewGuid(),
-                        FeedbackId = newFeedback.Id,
-                        Img = urlImg,
-                    };
-                    await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                        var urlImg = await _mediaservice.UploadAnImage(request.ImgFeedbacks[i], MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString() + "/" + i.ToString());
+                        //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
+                        StaticFile staticFile = new StaticFile()
+                        {
+                            Id = Guid.NewGuid(),
+                            FeedbackId = newFeedback.Id,
+                            Img = urlImg,
+                        };
+                        await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                    }
                 }
 
                 decimal totalRating = existingSalon.TotalRating;
