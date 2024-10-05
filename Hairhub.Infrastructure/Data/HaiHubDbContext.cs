@@ -26,7 +26,7 @@ namespace Hairhub.Infrastructure
                 .Build();
             //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
 
         }
 
