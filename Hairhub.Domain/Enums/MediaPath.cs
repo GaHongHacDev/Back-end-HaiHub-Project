@@ -17,5 +17,6 @@ namespace Hairhub.Domain.Enums
         public static string FEEDBACK_VIDEO = "FEEDBACK/VIDEO";
         public static string QR_APPOINTMENT = "APPOINTMENT/QR_CODE";
         public static string REPORT = "REPORT";
+        public static string SALONINFORMATION_IMG = "SALONINFORMATION/IMG";
     }
 }

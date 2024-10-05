@@ -470,10 +470,10 @@ namespace Hairhub.Service.Services.Services
         {
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == Salonid);
             if (salon == null) throw new Exception("Salon không tồn tại") ;
-            
-                foreach (var image in request.SalonImages)
+
+                for (int i = 0; i < request.SalonImages.Count; i++)
                 {
-                var urlImg = await _mediaService.UploadAnImage(image, MediaPath.FEEDBACK_IMG, salon.Id.ToString() + "/" + salon.Id.ToString());
+                var urlImg = await _mediaService.UploadAnImage(request.SalonImages[i], MediaPath.SALONINFORMATION_IMG, salon.Id.ToString() + "/" + i.ToString());
                 //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
                 StaticFile staticFile = new StaticFile()
                 {
