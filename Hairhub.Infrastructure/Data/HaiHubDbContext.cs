@@ -24,9 +24,9 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
         }
 
@@ -547,10 +547,14 @@ namespace Hairhub.Infrastructure
 
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(250).IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
-                entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.MaximumOrderAmount).HasColumnName("maximum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.MaximumDiscount).HasColumnName("maximum_discount").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
+                entity.Property(e => e.StartDate).HasColumnName("start_date");
                 entity.Property(e => e.DiscountPercentage).HasColumnName("discount_percentage").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");
