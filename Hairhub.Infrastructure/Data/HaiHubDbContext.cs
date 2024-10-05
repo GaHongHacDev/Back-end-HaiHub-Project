@@ -545,7 +545,6 @@ namespace Hairhub.Infrastructure
                 entity.ToTable("voucher");
                 entity.HasKey(e => e.Id);
 
-
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(250).IsRequired(false);

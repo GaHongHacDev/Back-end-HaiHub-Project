@@ -490,7 +490,7 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<int>("Rating")
                         .HasColumnType("int")
-                        .HasColumnName("rating");
+                        .HasColumnName("rating_detail");
 
                     b.HasKey("AppointmentDetailId");
 
@@ -1200,7 +1200,15 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_system_created");
 
-                    b.Property<decimal>("MinimumOrderAmount")
+                    b.Property<decimal>("MaximumDiscount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_discount");
+
+                    b.Property<decimal?>("MaximumOrderAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_order_amount");
+
+                    b.Property<decimal?>("MinimumOrderAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("minimum_order_amount");
 
@@ -1208,9 +1216,17 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("modified_date");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasColumnName("quantity");
+
                     b.Property<Guid?>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
 
                     b.HasKey("Id");
 
