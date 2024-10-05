@@ -314,7 +314,7 @@ namespace Hairhub.API.Controllers
         }
 
 
-        [HttpDelete]
+        [HttpPost]
         
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> DeleteSalonInformationImages([FromBody] DeleteImagesRequest request)
