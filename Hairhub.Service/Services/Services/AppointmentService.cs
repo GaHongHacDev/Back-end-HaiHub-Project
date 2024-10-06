@@ -393,7 +393,7 @@ namespace Hairhub.Service.Services.Services
                     .GetPagingListAsync(
                         predicate: predicate,
                         include: query => query.Include(a => a.Customer)
-                                               .Include(a => a.AppointmentDetails)
+                                               .Include(a => a.AppointmentDetails.Where(s=>s.SalonEmployeeId == employeeId))
                                                    .ThenInclude(ad => ad.SalonEmployee)
                                                        .ThenInclude(se => se.SalonInformation),
                         orderBy: query => query.OrderBy(a => a.AppointmentDetails!
@@ -409,7 +409,7 @@ namespace Hairhub.Service.Services.Services
                     .GetPagingListAsync(
                         predicate: predicate,
                         include: query => query.Include(a => a.Customer)
-                                               .Include(a => a.AppointmentDetails)
+                                               .Include(a => a.AppointmentDetails.Where(s => s.SalonEmployeeId == employeeId))
                                                    .ThenInclude(ad => ad.SalonEmployee)
                                                        .ThenInclude(se => se.SalonInformation),
                         orderBy: query => query.OrderByDescending(a => a.AppointmentDetails!
