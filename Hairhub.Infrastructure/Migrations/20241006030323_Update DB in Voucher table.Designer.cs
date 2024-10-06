@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairhub.Infrastructure.Migrations
 {
     [DbContext(typeof(HaiHubDbContext))]
-    [Migration("20241003023825_UpdateDatabase in FeedbackDetail table")]
-    partial class UpdateDatabaseinFeedbackDetailtable
+    [Migration("20241006030323_Update DB in Voucher table")]
+    partial class UpdateDBinVouchertable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -470,8 +470,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<int?>("Rating")
-                        .HasColumnType("int")
+                    b.Property<decimal?>("Rating")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("rating");
 
                     b.HasKey("Id");
@@ -1107,6 +1107,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("report_id");
 
+                    b.Property<Guid?>("SalonInformationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("salon_information_id");
+
                     b.Property<string>("Video")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("video");
@@ -1116,6 +1120,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.HasIndex("ReportId");
+
+                    b.HasIndex("SalonInformationId");
 
                     b.ToTable("static_file", (string)null);
                 });
@@ -1197,7 +1203,15 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_system_created");
 
-                    b.Property<decimal>("MinimumOrderAmount")
+                    b.Property<decimal>("MaximumDiscount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_discount");
+
+                    b.Property<decimal?>("MaximumOrderAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_order_amount");
+
+                    b.Property<decimal?>("MinimumOrderAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("minimum_order_amount");
 
@@ -1205,9 +1219,17 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("modified_date");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasColumnName("quantity");
+
                     b.Property<Guid?>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
 
                     b.HasKey("Id");
 
@@ -1537,9 +1559,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasForeignKey("ReportId")
                         .HasConstraintName("FK_report_static_file");
 
+                    b.HasOne("Hairhub.Domain.Entitities.SalonInformation", "SalonInformation")
+                        .WithMany("StaticFiles")
+                        .HasForeignKey("SalonInformationId")
+                        .HasConstraintName("FK_saloninformation_static_file");
+
                     b.Navigation("Feedback");
 
                     b.Navigation("Report");
+
+                    b.Navigation("SalonInformation");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.StyleHairCustomer", b =>
@@ -1652,6 +1681,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Schedules");
 
                     b.Navigation("ServiceHairs");
+
+                    b.Navigation("StaticFiles");
 
                     b.Navigation("Vouchers");
                 });
