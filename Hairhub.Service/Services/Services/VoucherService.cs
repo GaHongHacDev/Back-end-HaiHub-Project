@@ -40,19 +40,35 @@ namespace Hairhub.Service.Services.Services
             {
                 var voucherbyAdmin = _mapper.Map<Voucher>(request);
                 voucherbyAdmin.Id = Guid.NewGuid();
-                voucherbyAdmin.SalonInformationId = null;
+                //voucherbyAdmin.SalonInformationId = null;                
                 voucherbyAdmin.Code = GenerateRandomCode(10);
+                voucherbyAdmin.StartDate = request.StartDate;
+                voucherbyAdmin.Quantity = request.Quantity;
+                voucherbyAdmin.MaximumDiscount = request.MaximumDiscount;
+                voucherbyAdmin.MaximumOrderAmount = request.MaximumOrderAmount;
+                voucherbyAdmin.MinimumOrderAmount = request.MinimumOrderAmount;
+                voucherbyAdmin.ExpiryDate = (DateTime)request.ExpiryDate;
+                voucherbyAdmin.CreatedDate = DateTime.Now;
+                voucherbyAdmin.ModifiedDate = DateTime.Now;
                 voucherbyAdmin.IsSystemCreated = true;
+                voucherbyAdmin.IsActive = true;
                 await _unitofwork.GetRepository<Voucher>().InsertAsync(voucherbyAdmin);
                 bool isSystemCreated = await _unitofwork.CommitAsync() > 0;
                 return isSystemCreated;
             }
-
-
-
             var voucher = _mapper.Map<Voucher>(request);    
             voucher.Id = Guid.NewGuid();
+            voucher.SalonInformationId = request.SalonInformationId;
             voucher.Code = GenerateRandomCode(10);
+            voucher.StartDate = request.StartDate;
+            voucher.Quantity = request.Quantity;
+            voucher.MaximumDiscount = request.MaximumDiscount;
+            voucher.MaximumOrderAmount = request.MaximumOrderAmount;
+            voucher.MinimumOrderAmount = request.MinimumOrderAmount;
+            voucher.ExpiryDate = (DateTime)request.ExpiryDate;
+            voucher.CreatedDate = DateTime.Now;
+            voucher.ModifiedDate = DateTime.Now;
+            voucher.IsActive = true;
             voucher.IsSystemCreated = false;
             await _unitofwork.GetRepository<Voucher>().InsertAsync(voucher);
             bool isCreated = await _unitofwork.CommitAsync() > 0;
@@ -252,15 +268,6 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Cannot Find Voucher");
             }
-            // Chỉ cập nhật các trường được cung cấp
-            if (request.SalonInformationId.HasValue)
-            {
-                existVoucher.SalonInformationId = request.SalonInformationId.Value;
-            }
-            if (!string.IsNullOrEmpty(request.Code))
-            {
-                existVoucher.Code = request.Code;
-            }
             if (!string.IsNullOrEmpty(request.Description))
             {
                 existVoucher.Description = request.Description;
@@ -269,25 +276,31 @@ namespace Hairhub.Service.Services.Services
             {
                 existVoucher.MinimumOrderAmount = request.MinimumOrderAmount;
             }
+            if (request.MaximumDiscount != default(decimal))
+            {
+                existVoucher.MaximumDiscount = request.MaximumDiscount;
+            }
+            if (request.MaximumOrderAmount != default(decimal))
+            {
+                existVoucher.MaximumOrderAmount = request.MaximumOrderAmount;
+            }
             if (request.DiscountPercentage != default(decimal))
             {
                 existVoucher.DiscountPercentage = request.DiscountPercentage;
+            }
+            if (request.Quantity != default(int))
+            {
+                existVoucher.Quantity = request.Quantity;
             }
             if (request.ExpiryDate != default(DateTime))
             {
                 existVoucher.ExpiryDate = request.ExpiryDate;
             }
-            if (request.CreatedDate != default(DateTime))
+            if (request.StartDate != default(DateTime))
             {
-                existVoucher.CreatedDate = request.CreatedDate;
+                existVoucher.StartDate = request.StartDate;
             }
-            if (request.ModifiedDate != default(DateTime)) 
-            {
-                existVoucher.ModifiedDate = request.ModifiedDate.Value;
-            }
-            // Vì các giá trị boolean không nullable, chúng ta sẽ kiểm tra xem chúng có khác giá trị mặc định không
-            existVoucher.IsSystemCreated = request.IsSystemCreated;
-            existVoucher.IsActive = request.IsActive;
+            existVoucher.ModifiedDate = DateTime.Now;
             existVoucher.Id = id;
             _unitofwork.GetRepository<Voucher>().UpdateAsync(existVoucher);
             bool isUpdate = await _unitofwork.CommitAsync()>0;
