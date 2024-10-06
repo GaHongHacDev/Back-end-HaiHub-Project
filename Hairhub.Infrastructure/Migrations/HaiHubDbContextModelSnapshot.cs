@@ -490,7 +490,7 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Property<int>("Rating")
                         .HasColumnType("int")
-                        .HasColumnName("rating_detail");
+                        .HasColumnName("rating");
 
                     b.HasKey("AppointmentDetailId");
 
