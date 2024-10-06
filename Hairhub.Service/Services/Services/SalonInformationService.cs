@@ -487,22 +487,25 @@ namespace Hairhub.Service.Services.Services
            return isSuccessed;
         }
 
-        public async Task<SalonInformationImagesResponse> GetSalonInformationImages(Guid salonid)
+        public async Task<IPaginate<SalonInformationImagesResponse>> GetSalonInformationImages(Guid salonid, int page, int size)
         {
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == salonid);
             if (salon == null) throw new Exception("Salon không tồn tại");
 
-            var salonImages = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: p => p.SalonInformationId == salonid);
+            var salonImages = await _unitOfWork.GetRepository<StaticFile>().GetPagingListAsync(predicate: p => p.SalonInformationId == salonid, page: page, size: size);
 
-            if (salonImages == null || !salonImages.Any()) throw new Exception("Salon không có hình");
+            if (salonImages == null) throw new Exception("Salon không có hình");
 
-            var response = new SalonInformationImagesResponse
+            
+            var salonInformationResponses = new Paginate<SalonInformationImagesResponse>()
             {
-                SalonInformationId = salonid,
-                SalonImages = _mapper.Map<List<FileSalonResponse>>(salonImages)
+                Page = salonImages.Page,
+                Size = salonImages.Size,
+                Total = salonImages.Total,
+                TotalPages = salonImages.TotalPages,
+                Items = _mapper.Map<IList<SalonInformationImagesResponse>>(salonImages.Items),
             };
-
-            return response;
+            return salonInformationResponses;
         }
 
         public async Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request)
