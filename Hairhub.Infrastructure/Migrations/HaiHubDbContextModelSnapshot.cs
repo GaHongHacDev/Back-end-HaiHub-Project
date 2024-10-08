@@ -1204,10 +1204,6 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("maximum_discount");
 
-                    b.Property<decimal?>("MaximumOrderAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("maximum_order_amount");
-
                     b.Property<decimal?>("MinimumOrderAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("minimum_order_amount");

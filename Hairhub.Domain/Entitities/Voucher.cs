@@ -14,7 +14,6 @@ namespace Hairhub.Domain.Entitities
         public string? Code { get; set; }
         public string? Description { get; set; }
         public decimal? MinimumOrderAmount { get; set; }
-        public decimal? MaximumOrderAmount { get; set; }
         public decimal DiscountPercentage { get; set; }
         public decimal MaximumDiscount {  get; set; }
         public int Quantity { get; set; }
