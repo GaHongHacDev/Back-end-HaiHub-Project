@@ -100,8 +100,7 @@ namespace Hairhub.Service.Helpers
 
             //SalonInformation
             CreateMap<SalonInformation, GetSalonInformationResponse>()
-            .ForMember(dest => dest.schedules, opt => opt.MapFrom(src => src.Schedules))
-            .ForMember(dest => dest.FileSalonInformations, opt => opt.MapFrom(src => src.StaticFiles));
+            .ForMember(dest => dest.schedules, opt => opt.MapFrom(src => src.Schedules));
             CreateMap<CreateSalonInformationRequest, SalonInformation>().ReverseMap();
             CreateMap<CreateSalonInformationResponse, SalonInformation>().ReverseMap();
             CreateMap<UpdateSalonInformationRequest, SalonInformation>().ReverseMap();
@@ -184,12 +183,29 @@ namespace Hairhub.Service.Helpers
             //Feedback
             CreateMap<Feedback, GetFeedbackResponse>()
                 .ForMember(dest => dest.FileFeedbacks, opt => opt.MapFrom(src => src.StaticFiles.ToList()));
+            CreateMap<FeedbackDetail, FeedbackDetailResponse>().ReverseMap();
+            CreateMap<AppointmentFeedback, Appointment>().ReverseMap();
+            CreateMap<AppointmentDetailFeedback, AppointmentDetail>().ReverseMap();
 
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();
             CreateMap<StaticFile, FileFeedbackResponse>().ReverseMap();
-            CreateMap<StaticFile, FileSalonResponse>(); // Mapping for individual files
+            CreateMap<StaticFile, FileSalonResponse>()
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.Video, opt => opt.MapFrom(src => src.Video));
 
+            // Mapping from StaticFile to SalonInformationImagesResponse
+            CreateMap<StaticFile, SalonInformationImagesResponse>()
+                .ForMember(dest => dest.SalonInformationId, opt => opt.MapFrom(src => src.SalonInformationId))
+                .ForMember(dest => dest.SalonImages, opt => opt.MapFrom(src => new List<FileSalonResponse>
+                {
+                    new FileSalonResponse
+                    {
+                        Id = src.Id,
+                        Img = src.Img,
+                        Video = src.Video
+                    }
+                }));
 
             //Customer Image History
             CreateMap<StyleHairCustomer, CustomerImageHistoryResponse>()

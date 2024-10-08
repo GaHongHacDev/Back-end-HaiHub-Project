@@ -17,6 +17,7 @@ using Hairhub.Domain.Enums;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using CloudinaryDotNet.Core;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
+using Hairhub.Service.Helpers;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -64,46 +65,6 @@ namespace Hairhub.Service.Services.Services
             };
         }
 
-        private string GenerateToken(string username, string roleName)
-        {
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var key = Encoding.UTF8.GetBytes(_configuaration["JWTSettings:Key"]);
-
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new Claim[]
-            //    {
-            //        new Claim(ClaimTypes.Name, username),
-            //        new Claim(ClaimTypes.Email, username),
-            //        new Claim(ClaimTypes.Role, roleName)
-            //    }),
-            //    // Time Access Totken
-            //    Expires = DateTime.UtcNow.AddMinutes(10),
-            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            //};
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-            //return tokenHandler.WriteToken(token);
-
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuaration["JWTSettings:Key"]);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, roleName)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                Issuer = _configuaration["JWTSettings:Issuer"], 
-                Audience = _configuaration["JWTSettings:Audience"], 
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
         public async Task<LoginResponse> Login(string userName, string password)
         {
 
@@ -124,8 +85,8 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy tài khoản");
             }
             // authentication successful so generate jwt token and refresh token
-            var accessToken = GenerateToken(account.UserName, account.Role.RoleName!);
-            var refreshToken = GenerateRefreshToken();
+            var accessToken = JWTHelper.GenerateToken(account.UserName, account.Role.RoleName!, _configuaration["JWTSettings:Key"]!, _configuaration["JWTSettings:Issuer"]!, _configuaration["JWTSettings:Audience"]!);
+            var refreshToken = JWTHelper.GenerateRefreshToken();
             var newRefrehToken = new RefreshTokenAccount()
             {
                 Id = Guid.NewGuid(),
@@ -170,7 +131,7 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Account not found or expired");
             }
 
-            var accessToken = GenerateToken(account.UserName, account.Role.RoleName!);
+            var accessToken = JWTHelper.GenerateToken(account.UserName, account.Role.RoleName!, _configuaration["JWTSettings:Key"]!, _configuaration["JWTSettings:Issuer"]!, _configuaration["JWTSettings:Audience"]!);
             refreshTokenEntity.AccessToken = accessToken;
             _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
@@ -181,15 +142,7 @@ namespace Hairhub.Service.Services.Services
             return new RefreshTokenResponse() { AccessToken = refreshTokenEntity.AccessToken, RefreshToken = refreshTokenEntity.RefreshToken };
         }
 
-        private string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
-            }
-        }
+
 
         public async Task<bool> Logout(LogoutRequest logoutRequest)
         {

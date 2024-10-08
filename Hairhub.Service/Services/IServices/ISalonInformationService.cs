@@ -29,7 +29,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> AddSalonInformationImages(Guid Salonid, AddSalonImagesRequest request);
 
-        Task<SalonInformationImagesResponse> GetSalonInformationImages(Guid salonid);
+        Task<IPaginate<SalonInformationImagesResponse>> GetSalonInformationImages(Guid salonid, int page, int size);
 
         Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request);
 

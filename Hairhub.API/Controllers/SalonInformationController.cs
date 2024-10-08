@@ -291,12 +291,12 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetSalonInformationImages([FromRoute] Guid id)
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetSalonInformationImages([FromRoute] Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var SalonImages = await _salonInformationService.GetSalonInformationImages(id);
+                var SalonImages = await _salonInformationService.GetSalonInformationImages(id,page, size);
                 if (SalonImages == null)
                 {
                     return BadRequest("Không thể lấy hình của salon");
@@ -314,7 +314,7 @@ namespace Hairhub.API.Controllers
         }
 
 
-        [HttpDelete]
+        [HttpPost]
         
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> DeleteSalonInformationImages([FromBody] DeleteImagesRequest request)

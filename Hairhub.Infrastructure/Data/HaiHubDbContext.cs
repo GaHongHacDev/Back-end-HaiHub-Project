@@ -24,10 +24,16 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
+<<<<<<< HEAD
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("HienConnectionString"));
 
            // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
 
+=======
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+>>>>>>> deploy-backup
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
@@ -51,6 +57,7 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<StyleHairCustomer> StyleHairCustomers { get; set; }
         public virtual DbSet<ImageStyle> ImageStyles { get; set; }
         public virtual DbSet<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
+        public virtual DbSet<FeedbackDetail> FeedbackDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -484,6 +491,28 @@ namespace Hairhub.Infrastructure
                       .HasConstraintName("FK_appointment_feedback");
             });
 
+            modelBuilder.Entity<FeedbackDetail>(entity =>
+            {
+                entity.ToTable("feedback_detail");
+
+                entity.HasKey(e => e.AppointmentDetailId);  // Khóa chính
+
+                entity.Property(e => e.FeedbackId).IsRequired();  // Đảm bảo FeedbackId là bắt buộc
+                entity.Property(e => e.Rating).HasColumnName("rating");
+
+                entity.HasOne(d => d.Feedback)
+                      .WithMany(p => p.FeedbackDetails)
+                      .HasForeignKey(d => d.FeedbackId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_feedback_feedback_detail");
+
+                entity.HasOne(d => d.AppointmentDetail)
+                      .WithOne(p => p.FeedbackDetail)  // Nếu AppointmentDetail có FeedbackDetail
+                      .HasForeignKey<FeedbackDetail>(d => d.AppointmentDetailId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_feedback_detail");
+            });
+
             modelBuilder.Entity<Report>(entity =>
             {
                 entity.ToTable("report");
@@ -522,12 +551,15 @@ namespace Hairhub.Infrastructure
                 entity.ToTable("voucher");
                 entity.HasKey(e => e.Id);
 
-
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
+                entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id");
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(250).IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
-                entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.MaximumOrderAmount).HasColumnName("maximum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
+                entity.Property(e => e.MaximumDiscount).HasColumnName("maximum_discount").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
+                entity.Property(e => e.StartDate).HasColumnName("start_date");
                 entity.Property(e => e.DiscountPercentage).HasColumnName("discount_percentage").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");

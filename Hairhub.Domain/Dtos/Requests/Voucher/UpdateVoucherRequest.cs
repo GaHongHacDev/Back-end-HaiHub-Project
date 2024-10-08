@@ -8,15 +8,13 @@ namespace Hairhub.Domain.Dtos.Requests.Voucher
 {
     public class UpdateVoucherRequest
     {
-        public Guid? SalonInformationId { get; set; }
-        public string? Code { get; set; }
         public string? Description { get; set; }
-        public decimal MinimumOrderAmount { get; set; }
+        public decimal? MinimumOrderAmount { get; set; }
+        public decimal? MaximumOrderAmount { get; set; }
         public decimal DiscountPercentage { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public bool IsSystemCreated { get; set; }
-        public bool IsActive { get; set; }
+        public decimal MaximumDiscount { get; set; }
+        public int Quantity { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime ExpiryDate { get; set; } 
     }
 }
