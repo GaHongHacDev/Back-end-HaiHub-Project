@@ -26,6 +26,7 @@ namespace Hairhub.Domain.Entitities
         public string Status { get; set; }
 
 
+        public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
         public virtual Customer Customer { get; set; }
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; }
         public virtual ICollection<AppointmentDetailVoucher> AppointmentDetailVouchers { get; set; }
