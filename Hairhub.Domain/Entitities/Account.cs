@@ -21,6 +21,8 @@ namespace Hairhub.Domain.Entitities
 
         public bool IsActive {  get; set; }
 
+
+        public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
         public virtual Role Role { get; set; }
         public virtual ICollection<SalonOwner> SalonOwners { get; set; }
         public virtual ICollection<Customer> Customers { get; set; }

@@ -24,9 +24,19 @@ namespace Hairhub.Infrastructure
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
+<<<<<<< HEAD
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
             //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+=======
+
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+
+           // optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
+
+
+
+>>>>>>> 00830acc1b2b5b43769824e7d1943145d3e61825
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
@@ -51,6 +61,9 @@ namespace Hairhub.Infrastructure
         public virtual DbSet<ImageStyle> ImageStyles { get; set; }
         public virtual DbSet<BusyScheduleEmployee> BusyScheduleEmployees { get; set; }
         public virtual DbSet<FeedbackDetail> FeedbackDetails { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
+
+        public virtual DbSet<NotificationDetail> NotificationDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -549,7 +562,6 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(250).IsRequired(false);
                 entity.Property(e => e.Description).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.MinimumOrderAmount).HasColumnName("minimum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
-                entity.Property(e => e.MaximumOrderAmount).HasColumnName("maximum_order_amount").HasColumnType("decimal(18,2)").IsRequired(false);
                 entity.Property(e => e.MaximumDiscount).HasColumnName("maximum_discount").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.Quantity).HasColumnName("quantity");
                 entity.Property(e => e.StartDate).HasColumnName("start_date");
@@ -663,6 +675,49 @@ namespace Hairhub.Infrastructure
                       .HasForeignKey(d => d.EmployeeId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_busy_schedule_employee_salon_employee");
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.ToTable("notification");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Title).HasColumnName("title");
+                entity.Property(e => e.Message).HasColumnName("message");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+                entity.Property(e => e.Type).HasColumnName("type");
+            });
+
+            modelBuilder.Entity<NotificationDetail>(entity =>
+            {
+                entity.ToTable("notification_detail");
+
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.NotificationId).IsRequired();
+                entity.Property(e => e.AccountId).IsRequired();
+                entity.Property(e => e.AppointmentId).IsRequired();
+                entity.Property(e => e.IsRead).HasColumnName("is_read");
+                entity.Property(e => e.ReadDate).HasColumnName("read_date");
+
+                entity.HasOne(d => d.Notification)
+                      .WithMany(p => p.NotificationDetails)
+                      .HasForeignKey(nd => nd.NotificationId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_notification_notification_detail");
+                
+                entity.HasOne(d => d.Account)
+                      .WithMany(p => p.NotificationDetails)
+                      .HasForeignKey(d => d.AccountId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_Account_notification_detail");
+
+                entity.HasOne(d => d.Appointment)
+                      .WithMany(p => p.NotificationDetails)
+                      .HasForeignKey(d => d.AppointmentId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_Appointment_notification_detail");
             });
         }
     }

@@ -526,6 +526,71 @@ namespace Hairhub.Infrastructure.Migrations
                     b.ToTable("image_style", (string)null);
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("message");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("notification", (string)null);
+                });
+
+            modelBuilder.Entity("Hairhub.Domain.Entitities.NotificationDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AppointmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_read");
+
+                    b.Property<Guid>("NotificationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReadDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("read_date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("NotificationId");
+
+                    b.ToTable("notification_detail", (string)null);
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.OTP", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1204,10 +1269,6 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("maximum_discount");
 
-                    b.Property<decimal?>("MaximumOrderAmount")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("maximum_order_amount");
-
                     b.Property<decimal?>("MinimumOrderAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("minimum_order_amount");
@@ -1404,6 +1465,33 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("StyleHairCustomer");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.NotificationDetail", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
+                        .WithMany("NotificationDetails")
+                        .HasForeignKey("AccountId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Account_notification_detail");
+
+                    b.HasOne("Hairhub.Domain.Entitities.Appointment", "Appointment")
+                        .WithMany("NotificationDetails")
+                        .HasForeignKey("AppointmentId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Appointment_notification_detail");
+
+                    b.HasOne("Hairhub.Domain.Entitities.Notification", "Notification")
+                        .WithMany("NotificationDetails")
+                        .HasForeignKey("NotificationId")
+                        .IsRequired()
+                        .HasConstraintName("FK_notification_notification_detail");
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("Notification");
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Payment", b =>
                 {
                     b.HasOne("Hairhub.Domain.Entitities.Config", "Config")
@@ -1594,6 +1682,8 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Navigation("Customers");
 
+                    b.Navigation("NotificationDetails");
+
                     b.Navigation("RefreshTokenAccounts");
 
                     b.Navigation("SalonEmployees");
@@ -1613,6 +1703,8 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("AppointmentDetails");
 
                     b.Navigation("Feedbacks");
+
+                    b.Navigation("NotificationDetails");
 
                     b.Navigation("Report");
                 });
@@ -1644,6 +1736,11 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("FeedbackDetails");
 
                     b.Navigation("StaticFiles");
+                });
+
+            modelBuilder.Entity("Hairhub.Domain.Entitities.Notification", b =>
+                {
+                    b.Navigation("NotificationDetails");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Report", b =>
