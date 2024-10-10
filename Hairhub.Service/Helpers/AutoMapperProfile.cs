@@ -186,6 +186,8 @@ namespace Hairhub.Service.Helpers
             CreateMap<FeedbackDetail, FeedbackDetailResponse>().ReverseMap();
             CreateMap<AppointmentFeedback, Appointment>().ReverseMap();
             CreateMap<AppointmentDetailFeedback, AppointmentDetail>().ReverseMap();
+            //CreateMap<FeedbackDetail, AppointmentDetailFeedback>()
+            //        .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating)); // Map trường Rating
 
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();
