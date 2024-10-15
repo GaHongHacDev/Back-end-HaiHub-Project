@@ -11,6 +11,8 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetails
             public Guid Id { get; set; }
             public DateTime EndTime { get; set; }
             public DateTime StartTime { get; set; }
+            public int Feedback {  get; set; }
+            //public int Rating {  get; set; } 
 
             //Service Hair
             public string? ServiceName { get; set; }
