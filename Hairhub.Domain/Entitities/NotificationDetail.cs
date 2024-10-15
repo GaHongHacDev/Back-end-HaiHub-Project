@@ -10,7 +10,7 @@ namespace Hairhub.Domain.Entitities
     {
         public Guid Id { get; set; }
         public Guid NotificationId { get; set; }
-        public Guid AccountId { get; set; }
+        public Guid? AccountId { get; set; }
         public Guid AppointmentId { get; set; }
         public bool IsRead { get; set; }
         public DateTime ReadDate { get; set; }

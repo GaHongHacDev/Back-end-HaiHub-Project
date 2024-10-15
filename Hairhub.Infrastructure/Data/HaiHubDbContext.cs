@@ -690,7 +690,7 @@ namespace Hairhub.Infrastructure
 
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.NotificationId).IsRequired();
-                entity.Property(e => e.AccountId).IsRequired();
+                entity.Property(e => e.AccountId).IsRequired(false);
                 entity.Property(e => e.AppointmentId).IsRequired();
                 entity.Property(e => e.IsRead).HasColumnName("is_read");
                 entity.Property(e => e.ReadDate).HasColumnName("read_date");

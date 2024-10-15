@@ -127,5 +127,11 @@
         {
             public const string SignalRsEndpoint = ApiEndpoint + "/signalRs";
         }
+
+        public static class Notification
+        {
+            public const string NotificationEndpoint = ApiEndpoint + "/notifications";
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using BirthdayParty.WebApi.Constants;
+﻿
+using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Hubs;
 using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Infrastructure;
@@ -129,11 +130,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
      };
  });
- //.AddGoogle(googleOption =>
- //{
- //    googleOption.ClientId = builder.Configuration["Authentication:Google:ClientId"];
- //    googleOption.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
- //});
+//.AddGoogle(googleOption =>
+//{
+//    googleOption.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+//    googleOption.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+//});
 
 builder.Services.AddAuthorization();
 
