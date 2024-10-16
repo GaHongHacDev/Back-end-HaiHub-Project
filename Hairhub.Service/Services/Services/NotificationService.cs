@@ -33,7 +33,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> CreatedNotification(Guid salonid, NotificationRequest request)
         {
             var salon = await _unitofwork.GetRepository<SalonInformation>()
-                                .SingleOrDefaultAsync(predicate: p => p.Id == salonid);
+                                .SingleOrDefaultAsync(predicate: p => p.Id == salonid, include: query => query.Include(s => s.SalonOwner));
             if (salon == null) { throw new Exception("Salon không tồn tại"); }
             List<SalonEmployee> accounts = new List<SalonEmployee>();
 

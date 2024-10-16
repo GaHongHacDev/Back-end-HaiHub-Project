@@ -288,7 +288,6 @@ namespace Hairhub.Service.Services.Services
             await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
             bool isCreated = await _unitOfWork.CommitAsync() > 0;
             return isCreated;
-
         }
 
         public async Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
