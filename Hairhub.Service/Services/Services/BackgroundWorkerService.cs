@@ -151,7 +151,9 @@ namespace Hairhub.Service.Services.Services
                                 }
                                 if (latestPayment.EndDate < DateTime.Now)
                                 {
+                                    latestPayment.Status = SalonStatus.OverDue;
                                     salon.Status = SalonStatus.OverDue;
+                                    uow.GetRepository<Payment>().UpdateAsync(latestPayment);
                                     uow.GetRepository<SalonInformation>().UpdateAsync(salon);
                                     await uow.CommitAsync();
                                 }

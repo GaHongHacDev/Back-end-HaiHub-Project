@@ -69,7 +69,7 @@ namespace Hairhub.Service.Services.Services
                 {
                     Id = Guid.NewGuid(),
                     NotificationId = notification.Id,
-                    AccountId = employee.SalonEmployee.AccountId, // Kiểm tra null an toàn
+                    AccountId = employee.SalonEmployee.AccountId, 
                     AppointmentId = appointment.Id,
                     IsRead = false,
                     ReadDate = DateTime.Now,
@@ -77,6 +77,26 @@ namespace Hairhub.Service.Services.Services
 
                 list.Add(notidetail);
             }
+            var notiSalon = new NotificationDetail
+            {
+                Id = Guid.NewGuid(),
+                NotificationId = notification.Id,
+                AccountId = salon.SalonOwner.AccountId, 
+                AppointmentId = appointment.Id,
+                IsRead = false,
+                ReadDate = DateTime.Now,
+            };
+            list.Add(notiSalon);
+            var notiCustomer = new NotificationDetail
+            {
+                Id = Guid.NewGuid(),
+                NotificationId = notification.Id,
+                AccountId = customerName.AccountId, 
+                AppointmentId = appointment.Id,
+                IsRead = false,
+                ReadDate = DateTime.Now,
+            };
+            list.Add(notiCustomer);
             await _hubContext.Clients.All
                 .SendAsync("ReceiveNotification", new
                 {
