@@ -100,7 +100,7 @@ namespace Hairhub.Service.Services.Services
             List<Guid> AccountIds = new List<Guid>();
             foreach (var account in list)
             {
-                if (account?.Account != null)
+                if(account.AccountId != null)
                 {
                     AccountIds.Add((Guid)account.AccountId!);
                 }
@@ -108,15 +108,15 @@ namespace Hairhub.Service.Services.Services
 
 
             await _hubContext.Clients.All
-                .SendAsync("ReceiveNotification", new
-                {
-                    Title = request.Title,
-                    Message = request.Message,
+                .SendAsync("ReceiveNotification",
+                
+                    request.Title,
+                    request.Message,
                     AccountIds,
-                    apps = appointment.Id,
-                    customer = customerName.FullName,
-                    CreatedDate = DateTime.Now
-                });
+                    appointment.Id,
+                    customerName.FullName,
+                    DateTime.Now
+                );
             await _unitofwork.GetRepository<NotificationDetail>().InsertRangeAsync(list);
             bool isSuccessed = await _unitofwork.CommitAsync() > 0;
             return isSuccessed;
