@@ -33,7 +33,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> CreatedNotification(Guid salonid, NotificationRequest request)
         {
             var salon = await _unitofwork.GetRepository<SalonInformation>()
-                                .SingleOrDefaultAsync(predicate: p => p.Id == salonid, include: query => query.Include(s => s.SalonOwner));
+                                .SingleOrDefaultAsync(predicate: p => p.Id == salonid, include: query => query.Include(s => s.SalonOwner).ThenInclude(s => s.Account));
             if (salon == null) { throw new Exception("Salon không tồn tại"); }
             List<SalonEmployee> accounts = new List<SalonEmployee>();
 
@@ -50,7 +50,7 @@ namespace Hairhub.Service.Services.Services
                                                    predicate: p => p.Id == request.AppointmentId
                                                );
 
-            var customerName = await _unitofwork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: p => p.Id == appointment.CustomerId);
+            var customerName = await _unitofwork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: p => p.Id == appointment.CustomerId, include: query => query.Include(s => s.Account));
 
             var notification = new Notification
             {
@@ -97,12 +97,22 @@ namespace Hairhub.Service.Services.Services
                 ReadDate = DateTime.Now,
             };
             list.Add(notiCustomer);
+            List<Guid> AccountIds = new List<Guid>();
+            foreach (var account in list)
+            {
+                if (account?.Account != null)
+                {
+                    AccountIds.Add((Guid)account.AccountId!);
+                }
+            }
+
+
             await _hubContext.Clients.All
                 .SendAsync("ReceiveNotification", new
                 {
                     Title = request.Title,
                     Message = request.Message,
-                    list,
+                    AccountIds,
                     apps = appointment.Id,
                     customer = customerName.FullName,
                     CreatedDate = DateTime.Now
