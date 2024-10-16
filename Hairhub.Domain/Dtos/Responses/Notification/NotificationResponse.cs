@@ -8,6 +8,7 @@ namespace Hairhub.Domain.Dtos.Responses.Notification
 {
     public class NotificationResponse
     {
+        public Guid Id { get; set; }
         public NotificationContent Notification {  get; set; }
         public AppointmentContent Appointment { get; set; }
     }

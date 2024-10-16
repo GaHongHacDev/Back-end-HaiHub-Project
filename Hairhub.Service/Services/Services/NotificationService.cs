@@ -126,8 +126,9 @@ namespace Hairhub.Service.Services.Services
         {
             var account = await _unitofwork.GetRepository<NotificationDetail>()
                                 .GetPagingListAsync(predicate: p => p.AccountId == accountid,
-                                                    page: page, size: size,
-                                                    include: i => i.Include(p => p.Account).Include(p => p.Appointment).ThenInclude(p => p.Customer).Include(p => p.Notification)
+                                                    page: page, size: size, 
+                                                    include: i => i.Include(p => p.Account).Include(p => p.Appointment).ThenInclude(p => p.Customer).Include(p => p.Notification),
+                                                    orderBy: o => o.OrderByDescending(s => s.Notification.CreatedDate)
 
                                 );
             if (account == null) { throw new Exception("Salon không tồn tại"); }

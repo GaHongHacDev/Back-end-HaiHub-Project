@@ -221,6 +221,7 @@ namespace Hairhub.Service.Helpers
 
             // Notificaation
             CreateMap<NotificationDetail, NotificationResponse>()
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                     .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => new NotificationContent
                     {
                         Id = src.Notification.Id,
