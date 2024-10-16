@@ -180,7 +180,7 @@ namespace Hairhub.API.Controllers
             try
             {               
                 var accountResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
-                if (accountResponse == false)
+                if (accountResponse.Item1 == false)
                 {
                     return NotFound(new { message = "Không thể tạo lịch hẹn" });
                 }
