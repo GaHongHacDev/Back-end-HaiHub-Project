@@ -191,7 +191,13 @@ namespace Hairhub.API.Controllers
                 //    AppointmentDetails = createAppointmentRequest
                 //});
 
-                return Ok("Tạo lịch hẹn thành công");
+                var response = new
+                {
+                    message = "Tạo lịch hẹn thành công",
+                    appointmentDetails = accountResponse.Item2
+                };
+
+                return Ok(response);
             }
             catch (NotFoundException ex)
             {           
