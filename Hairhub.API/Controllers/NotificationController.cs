@@ -65,6 +65,20 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> CountNumberUnreadNotification([FromRoute] Guid id)
+        {
+            try
+            {
+                var noti = await _notificationservice.CountNumberUnreadNotification(id);
+                return Ok(noti);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

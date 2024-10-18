@@ -132,6 +132,10 @@
         {
             public const string NotificationEndpoint = ApiEndpoint + "/notifications";
         }
+        public static class VnPay
+        {
+            public const string VnPayEndpoint = ApiEndpoint + "/VnPays";
+        }
 
     }
 }

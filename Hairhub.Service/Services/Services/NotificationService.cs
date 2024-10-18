@@ -30,6 +30,14 @@ namespace Hairhub.Service.Services.Services
             _hubContext = hubContext;
         }
 
+        public async Task<int> CountNumberUnreadNotification(Guid accountid)
+        {
+            var account = await _unitofwork.GetRepository<NotificationDetail>().GetListAsync(predicate: p => p.AccountId == accountid && p.IsRead == false);
+            if(account == null) { return 0; }
+            int result = account.Count();
+            return result;
+        }
+
         public async Task<bool> CreatedNotification(Guid salonid, NotificationRequest request)
         {
             var salon = await _unitofwork.GetRepository<SalonInformation>()
