@@ -34,6 +34,7 @@ using Hairhub.Domain.Dtos.Requests.Approval;
 using Hairhub.Domain.Dtos.Responses.Approval;
 using Hairhub.Domain.Dtos.Responses.Reports;
 using Hairhub.Domain.Dtos.Requests.Reports;
+using Hairhub.Domain.Dtos.Responses.Notification;
 
 namespace Hairhub.Service.Helpers
 {
@@ -216,6 +217,26 @@ namespace Hairhub.Service.Helpers
 
             CreateMap<Customer, Customers>(); // Assuming Customer -> Customers mapping
             CreateMap<ImageStyle, ImageStyles>();
+
+
+            // Notificaation
+            CreateMap<NotificationDetail, NotificationResponse>()
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => new NotificationContent
+                    {
+                        Id = src.Notification.Id,
+                        Title = src.Notification.Title,
+                        Message = src.Notification.Message,
+                        IsRead = src.IsRead,
+                        Type = src.Notification.Type
+                    }))
+                    .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment != null ? new AppointmentContent
+                    {
+                        Id = src.Appointment.Id,
+                        ServiceTime = src.Appointment.StartDate,
+                        CustomerName = src.Appointment.Customer.FullName,
+                        CreatedDate = src.Appointment.CreatedDate
+                    } : null));
         }
     }
 }

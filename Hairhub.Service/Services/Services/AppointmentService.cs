@@ -991,7 +991,7 @@ namespace Hairhub.Service.Services.Services
         #endregion
 
         #region Create Update Delete Active
-        public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
+        public async Task<(bool, Guid)> CreateAppointment(CreateAppointmentRequest request)
         {
             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x => x.CommissionRate != null && x.IsActive);
             if (config == null)
@@ -1068,7 +1068,7 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
-            return isInsert;
+            return (isInsert, id);
         }
 
         public async Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest)

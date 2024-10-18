@@ -563,7 +563,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AccountId")
+                    b.Property<Guid?>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AppointmentId")
@@ -1470,7 +1470,6 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
                         .WithMany("NotificationDetails")
                         .HasForeignKey("AccountId")
-                        .IsRequired()
                         .HasConstraintName("FK_Account_notification_detail");
 
                     b.HasOne("Hairhub.Domain.Entitities.Appointment", "Appointment")

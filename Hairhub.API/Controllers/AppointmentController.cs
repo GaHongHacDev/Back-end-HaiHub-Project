@@ -180,7 +180,7 @@ namespace Hairhub.API.Controllers
             try
             {               
                 var accountResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
-                if (accountResponse == false)
+                if (accountResponse.Item1 == false)
                 {
                     return NotFound(new { message = "Không thể tạo lịch hẹn" });
                 }
@@ -191,7 +191,13 @@ namespace Hairhub.API.Controllers
                 //    AppointmentDetails = createAppointmentRequest
                 //});
 
-                return Ok("Tạo lịch hẹn thành công");
+                var response = new
+                {
+                    message = "Tạo lịch hẹn thành công",
+                    appointmentDetails = accountResponse.Item2
+                };
+
+                return Ok(response);
             }
             catch (NotFoundException ex)
             {           

@@ -32,7 +32,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
-        Task<bool> CreateAppointment(CreateAppointmentRequest request);
+        Task<(bool, Guid)> CreateAppointment(CreateAppointmentRequest request);
         Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest);
         Task<bool> CancelAppointmentByCustomer(Guid id, CancelApointmentRequest cancelApointmentRequest);
         Task<bool> DeleteAppoinmentById(Guid id);
