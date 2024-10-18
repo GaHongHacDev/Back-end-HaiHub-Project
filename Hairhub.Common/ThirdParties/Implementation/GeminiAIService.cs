@@ -34,7 +34,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
                         role = "user",
                         parts = new[]
                         {
-                            new { text = request.AskMessage }
+                            new { text = "Đây là câu hỏi cho hệ thống Hairhub, tôi cần hỏi về "+request.AskMessage }
                         }
                     }
                 }
