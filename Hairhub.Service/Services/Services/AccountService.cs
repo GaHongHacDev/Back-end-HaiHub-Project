@@ -24,6 +24,7 @@ using System.Security.Principal;
 using Role = Hairhub.Domain.Entitities.Role;
 using Account = Hairhub.Domain.Entitities.Account;
 using System.Data;
+using Hairhub.Common.ThirdParties.Implementation;
 
 
 namespace Hairhub.Service.Services.Services
@@ -74,7 +75,38 @@ namespace Hairhub.Service.Services.Services
         {
             var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.Id == id);
             account.IsActive = false;
-            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
+            account.UserName = "*#*#*#*#*#*#*#*#";
+            account.Password = "*#*#*#*#*#*#*#*#";
+
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+            customer.Phone = "";
+            customer.FullName = "Người Dùng Hairhub";
+            customer.DayOfBirth = null;
+            customer.Gender = "";
+            customer.Email = "";
+            customer.Address = "";
+            customer.Img = _configuaration["Default:Avatar_Default"];
+
+            var styleHairCustomers = await _unitOfWork.GetRepository<StyleHairCustomer>().GetListAsync(predicate: x=>x.CustomerId == customer.Id);
+            foreach(var item in styleHairCustomers)
+            {
+                var entityImgs = await _unitOfWork.GetRepository<ImageStyle>().GetListAsync(predicate: x=>x.StyleHairCustomerId == item.Id);
+                foreach (var itemImg in entityImgs)
+                {
+                    try
+                    {
+                        await _mediaService.DeleteImageAsync(itemImg.UrlImage, MediaPath.STYLE_HAIR_CUSTOMER);
+                    }
+                    catch (Exception ex) 
+                    {
+                    }
+                }
+                _unitOfWork.GetRepository<ImageStyle>().DeleteRangeAsync(entityImgs);
+            }
+            _unitOfWork.GetRepository<StyleHairCustomer>().DeleteRangeAsync(styleHairCustomers);
+
+            _unitOfWork.GetRepository<Customer>().UpdateAsync(customer);
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             return await _unitOfWork.CommitAsync() > 0;
         }
 
@@ -331,7 +363,7 @@ namespace Hairhub.Service.Services.Services
                     throw new Exception("Không có dữ liệu email từ Google API");
                 }
                 var email = payload.Email;
-                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(email), include: x=>x.Include(s => s.Role));
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.UserName.Equals(email) && x.IsActive, include: x=>x.Include(s => s.Role));
                 if (account == null)
                 {
                     throw new NotFoundException("Email không tồn tại trên hệ thống");
