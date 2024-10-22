@@ -136,7 +136,7 @@ namespace Hairhub.Service.Services.Services
             {
                 var urlImg = await _mediaService.UploadAnImage(
                     request.ImageStyles[i],
-                    MediaPath.FEEDBACK_IMG,
+                    MediaPath.STYLE_HAIR_CUSTOMER,
                     newImageCustomer.Id.ToString() + "/" + i.ToString());
 
                 var imageStyle = new ImageStyle

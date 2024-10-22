@@ -15,6 +15,7 @@ namespace Hairhub.Domain.Enums
         public static string EMPLOYEE = "EMPLOYEE";
         public static string FEEDBACK_IMG = "FEEDBACK/IMG";
         public static string FEEDBACK_VIDEO = "FEEDBACK/VIDEO";
+        public static string STYLE_HAIR_CUSTOMER = "STYLE_HAIR_CUSTOMER";
         public static string QR_APPOINTMENT = "APPOINTMENT/QR_CODE";
         public static string REPORT = "REPORT";
         public static string SALONINFORMATION_IMG = "SALONINFORMATION/IMG";
