@@ -39,18 +39,18 @@ namespace Hairhub.API.Controllers
         
         [HttpPost]
         //[Route("/VNPayAPI/{amount}&{infor}&{orderinfor}")]
-        public ActionResult Payment(double amount, string infor, string orderinfor)
+        public async Task<ActionResult> Payment(VnPayRequest request)
         {
             string hostName = System.Net.Dns.GetHostName();
             string clientIPAddress = System.Net.Dns.GetHostAddresses(hostName).GetValue(0).ToString();
             string returnUrl = $"https://localhost:7257/api/v1/VnPays/PaymentConfirm";
 
-            string paymentUrl = _vnpayservice.CreatePaymentUrl(amount, infor, orderinfor, returnUrl, clientIPAddress);
+            string paymentUrl = await _vnpayservice.CreatePaymentUrl(request, returnUrl, clientIPAddress);
             return Ok(paymentUrl);
         }
         [HttpGet]
         
-        public IActionResult PaymentConfirm()
+        public async Task<IActionResult> PaymentConfirm()
         {
             // Kiểm tra xem có query string không
             if (Request.Query.Count > 0)
@@ -66,7 +66,7 @@ namespace Hairhub.API.Controllers
                 }
 
                 // Xác nhận thanh toán với dịch vụ VNPAY
-                bool isValid = _vnpayservice.ConfirmPayment(Request.QueryString.Value, out orderInfor, out responseCode);
+                bool isValid = await _vnpayservice.ConfirmPayment(Request.QueryString.Value,  orderInfor,  responseCode);
 
                 if (isValid && responseCode == "00")
                 {
