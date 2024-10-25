@@ -31,9 +31,9 @@ namespace Hairhub.Service.Services.Services
         private readonly IAppointmentService _appointmentservice;
         private readonly IPaymentService _paymentService;
 
-        public VNPayService(IUnitOfWork unitOfWork, 
-                            IMapper mapper, 
-                            IConfiguration config, 
+        public VNPayService(IUnitOfWork unitOfWork,
+                            IMapper mapper,
+                            IConfiguration config,
                             IAppointmentService appointmentService,
                             IPaymentService paymentService)
         {
@@ -42,7 +42,7 @@ namespace Hairhub.Service.Services.Services
             _config = config;
             _appointmentservice = appointmentService;
             _paymentService = paymentService;
-        }        
+        }
         //public string CreatePaymentUrl(PaymentInformationModel model, HttpContext context)
         //{
         //    var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_config["TimeZoneId"]);
@@ -93,7 +93,7 @@ namespace Hairhub.Service.Services.Services
 
         //    VnPayLibrary vnpay = new VnPayLibrary();
 
-            
+
 
 
         //    throw new NotImplementedException();
@@ -148,33 +148,35 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commissionRate)
         {
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
-            if (salon == null)
-            {
-                return 0;
-            }
+            throw new NotImplementedException();
+            /* var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
+             if (salon == null)
+             {
+                 return 0;
+             }
 
-            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
-            if (payment == null)
-            {
-                return 0;
-            }
+             var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
+             if (payment == null)
+             {
+                 return 0;
+             }
 
-            var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
+             var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
 
-            decimal totalCommission = 0;
-            foreach (var appointment in appointments)
-            {
-                decimal commissionAmount = appointment.TotalPrice * (commissionRate / 100);
-                totalCommission += commissionAmount;
-            }
+             decimal totalCommission = 0;
+             foreach (var appointment in appointments)
+             {
+                 decimal commissionAmount = appointment.TotalPrice * (commissionRate / 100);
+                 totalCommission += commissionAmount;
+             }
 
-            return totalCommission;
+             return totalCommission;*/
         }
 
-        public async Task<bool> ConfirmPayment(string queryString,  string orderInfor,  string responseCode)
+        public async Task<bool> ConfirmPayment(string queryString, string orderInfor, string responseCode)
         {
-            var json = HttpUtility.ParseQueryString(queryString);   
+            throw new NotImplementedException();
+            /*var json = HttpUtility.ParseQueryString(queryString);   
             // Extracting values from query string
             long orderId = Convert.ToInt64(json["vnp_TxnRef"]); // Mã hóa đơn
             decimal amout = decimal.Parse(json["vnp_Amount"])/100;
@@ -211,6 +213,7 @@ namespace Hairhub.Service.Services.Services
                 
             }
             return checkSignature && _config["Vnpay:vnp_TmnCode"] == json["vnp_TmnCode"];
+            */
         }
 
         private bool ValidateSignature(string rspraw, string inputHash)
@@ -218,7 +221,5 @@ namespace Hairhub.Service.Services.Services
             string myChecksum = VnPayLibrary.HmacSHA512(_config["Vnpay:vnp_HashSecret"], rspraw);
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
-
-        
     }
 }

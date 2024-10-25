@@ -24,7 +24,7 @@ namespace Hairhub.Domain.Entitities
         public string? QrCodeImg { get; set; }
         public decimal? CommissionRate { get; set; }
         public string Status { get; set; }
-
+        public string? PaymentMethod { get; set; }
 
         public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
         public virtual Customer Customer { get; set; }
