@@ -29,6 +29,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("balance");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_date");
@@ -137,6 +141,11 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("original_price");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("payment_method");
 
                     b.Property<string>("QrCodeImg")
                         .HasMaxLength(255)
@@ -642,6 +651,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("account_id");
+
                     b.Property<decimal?>("CommissionRate")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("commission_rate");
@@ -658,11 +671,6 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("end_date");
-
-                    b.Property<string>("MethodBanking")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("method_banking");
 
                     b.Property<decimal?>("PakageFee")
                         .HasColumnType("decimal(18, 2)")
@@ -682,9 +690,16 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("payment_date");
 
-                    b.Property<Guid>("SalonOWnerID")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("salon_owner_id");
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("payment_type");
+
+                    b.Property<string>("ReasonCancle")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
+                        .HasColumnName("reason_cancle");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2")
@@ -702,9 +717,9 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConfigId");
+                    b.HasIndex("AccountId");
 
-                    b.HasIndex("SalonOWnerID");
+                    b.HasIndex("ConfigId");
 
                     b.ToTable("payment", (string)null);
                 });
@@ -1493,20 +1508,19 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Payment", b =>
                 {
+                    b.HasOne("Hairhub.Domain.Entitities.Account", "Account")
+                        .WithMany("Payments")
+                        .HasForeignKey("AccountId")
+                        .HasConstraintName("FK_salon_owner_payment");
+
                     b.HasOne("Hairhub.Domain.Entitities.Config", "Config")
                         .WithMany("Payments")
                         .HasForeignKey("ConfigId")
                         .HasConstraintName("FK_config_payment");
 
-                    b.HasOne("Hairhub.Domain.Entitities.SalonOwner", "SalonOwner")
-                        .WithMany("Payments")
-                        .HasForeignKey("SalonOWnerID")
-                        .IsRequired()
-                        .HasConstraintName("FK_salon_owner_payment");
+                    b.Navigation("Account");
 
                     b.Navigation("Config");
-
-                    b.Navigation("SalonOwner");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.RefreshTokenAccount", b =>
@@ -1683,6 +1697,8 @@ namespace Hairhub.Infrastructure.Migrations
 
                     b.Navigation("NotificationDetails");
 
+                    b.Navigation("Payments");
+
                     b.Navigation("RefreshTokenAccounts");
 
                     b.Navigation("SalonEmployees");
@@ -1782,8 +1798,6 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.SalonOwner", b =>
                 {
-                    b.Navigation("Payments");
-
                     b.Navigation("SalonInformations");
                 });
 
