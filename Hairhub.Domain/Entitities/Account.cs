@@ -18,6 +18,7 @@ namespace Hairhub.Domain.Entitities
         public DateTime CreatedDate { get; set; }
 
         public Guid RoleId { get; set; }
+        public decimal Balance { get; set; }
 
         public bool IsActive {  get; set; }
 
@@ -29,5 +30,6 @@ namespace Hairhub.Domain.Entitities
         public virtual ICollection<Admin> Admins { get; set; }
         public virtual ICollection<SalonEmployee> SalonEmployees { get; set; }
         public virtual ICollection<RefreshTokenAccount> RefreshTokenAccounts { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

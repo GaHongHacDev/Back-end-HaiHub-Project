@@ -27,7 +27,7 @@ namespace Hairhub.Service.Services.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<BackgroundWorkerService> _logger;
         private readonly IConfiguration _configuration;
-        
+
 
 
         public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IConfiguration configuration)
@@ -64,7 +64,7 @@ namespace Hairhub.Service.Services.Services
             //    // Đợi 30 giây
             //    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
             //}
-        }   
+        }
 
         private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
         {
@@ -84,7 +84,7 @@ namespace Hairhub.Service.Services.Services
 
                     foreach (var appointment in appontments)
                     {
-                        foreach(var appointmentDetail in appointment.AppointmentDetails)
+                        foreach (var appointmentDetail in appointment.AppointmentDetails)
                         {
                             appointmentDetail.Status = AppointmentStatus.Fail;
                             uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
@@ -107,6 +107,8 @@ namespace Hairhub.Service.Services.Services
         }
         private async Task ExecuteExpiredSalon(CancellationToken stoppingToken)
         {
+            throw new NotImplementedException();
+            /*
             try
             {
                 using (var scope = _scopeFactory.CreateScope())
@@ -168,8 +170,9 @@ namespace Hairhub.Service.Services.Services
             {
                 _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
             }
+            
+            */
         }
-
 
     }
 }
