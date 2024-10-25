@@ -13,8 +13,8 @@ namespace Hairhub.Service.Services.IServices
     {
         //string CreatePaymentUrl(PaymentInformationModel model, HttpContext context);
         //PaymentResponseModel PaymentExecute(IQueryCollection collections);
-        string CreatePaymentUrl(double amount, string infor, string orderinfor, string returnUrl, string clientIPAddress);
+        Task<string> CreatePaymentUrl(VnPayRequest request, string returnUrl, string clientIPAddress);
 
-        bool ConfirmPayment(string queryString, out string orderInfor, out string responseCode);
+        Task<bool> ConfirmPayment(string queryString,  string orderInfor,  string responseCode);
     }
 }
