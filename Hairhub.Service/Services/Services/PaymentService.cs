@@ -38,6 +38,7 @@ using System.Linq.Expressions;
 using LinqKit;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http;
+using Hairhub.Common.ThirdParties.Contract;
 
 
 namespace Hairhub.Service.Services.Services
@@ -51,11 +52,16 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAppointmentService _appointmentservice;
+        private readonly IMediaService _mediaService;
+        private readonly IEmailService _emailService;
 
-        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper, IAppointmentService appointmentService)
+        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, 
+                                IMapper mapper, IAppointmentService appointmentService, IMediaService mediaService, IEmailService emailService)
         {
             _payOSSettings = settings.Value;
             _appointmentservice = appointmentService;
+            _mediaService = mediaService;
+            _emailService = emailService;
             _client = client;
             _unitOfWork = unitOfWork;
             _config = config;
@@ -344,20 +350,46 @@ namespace Hairhub.Service.Services.Services
             account.Balance-= request.Balance;
             _unitOfWork.GetRepository<Account>().UpdateAsync(account);
 
-            //Payment payment = new Payment()
-            //{
-            //    Id = Guid.NewGuid(),
-            //    AccountId = account.Id,
-            //    CreateDate = DateTime.UtcNow,
-            //    TotalAmount = request.Balance,
-            //    PaymentType = PaymentType.Withdraw,
-            //    Description = "",
-            //    Status = PaymentStatus.Pending
-            //};
-            //await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+            Payment payment = new Payment()
+            {
+                Id = Guid.NewGuid(),
+                AccountId = account.Id,
+                TotalAmount = request.Balance,
+                PaymentType = PaymentType.Withdraw,
+                Description = request.Description,
+                Status = PaymentStatus.Pending
+            };
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+
+            PaymentReport paymentReport = new PaymentReport()
+            {
+                PaymentId = payment.Id,
+                CreateDate = DateTime.UtcNow,
+                FullName = request.FullName,
+                NumberAccount = request.NumberAccount,
+                BankName = request.BankName,
+                Balance = request.Balance,
+                Status = PaymentStatus.Pending
+            };
+            await _unitOfWork.GetRepository<PaymentReport>().InsertAsync(paymentReport);
 
 
-            return true;
+            List<StaticFile> staticFile = new List<StaticFile>();
+
+            for (int i=1; i<=request.IdentityCard.Count; i++) 
+            {
+                var url = await _mediaService.UploadAnImage(request.IdentityCard.ElementAt(i-1), MediaPath.PAYMENT_REPORT_IMG, 
+                                                            paymentReport.PaymentId.ToString() + i.ToString());
+                staticFile.Add(new StaticFile()
+                {
+                    Id = Guid.NewGuid(),
+                    PaymentReportId = paymentReport.PaymentId,
+                    Img = url,
+                });
+            }
+            await _unitOfWork.GetRepository<StaticFile>().InsertRangeAsync(staticFile);
+            bool isCommit = await _unitOfWork.CommitAsync()>0;
+            return isCommit;
         }
 
         public async Task<bool> ConfirmWithdrawPayment(WithdrawConfirmRequest request)
@@ -369,18 +401,71 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Không tìm thấy lý do từ chối");
                 }
                 var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == request.Id);
-
-                //payment.ReasonCancle = request.ReasonCancel;
+                if (payment == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment với id {request.Id}");
+                }
                 payment.Status = PaymentStatus.Cancel;
-                return true;
+                _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
+
+                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x=>x.PaymentId == request.Id);
+                if (paymentReport == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment report với id {request.Id}");
+                }
+                paymentReport.ReasonCancle = request.ReasonCancel;
+                paymentReport.ConfirmDate = DateTime.UtcNow;
+                paymentReport.Status = PaymentStatus.Cancel;
+                _unitOfWork.GetRepository<PaymentReport>().UpdateAsync(paymentReport);
+
+                bool isUpdate = await _unitOfWork.CommitAsync()>0;
+                return isUpdate;
             }
             else if(request.StatusConfirm.Equals(PaymentStatus.Paid))
             {
-                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == request.Id);
-                payment.Status = PaymentStatus.Cancel;
-                payment.PaymentDate = DateTime.Now;
-                //Luu hinh
-                return true;
+                var payment = await _unitOfWork.GetRepository<Payment>()
+                                                .SingleOrDefaultAsync(
+                                                    predicate: x => x.Id == request.Id, 
+                                                    include: x=>x.Include(s=>s.Account).ThenInclude(s=>s.Role)
+                                                );
+                if (payment == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment với id {request.Id}");
+                }
+                payment.Status = PaymentStatus.Paid;
+                payment.PaymentDate = DateTime.UtcNow;
+
+                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x => x.PaymentId == request.Id);
+                if (paymentReport == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment report với id {request.Id}");
+                }
+                paymentReport.ConfirmDate = DateTime.UtcNow;
+                paymentReport.Status = PaymentStatus.Paid;
+                _unitOfWork.GetRepository<PaymentReport>().UpdateAsync(paymentReport);
+                
+                string urlImg = await _mediaService.UploadAnImage(request.BankingImgs, MediaPath.PAYMENT_BANKED_IMG, paymentReport.PaymentId.ToString());
+
+                string fullName = "";
+                if(payment.Account.Role.RoleName!.Equals(RoleEnum.Customer.ToString()))
+                {
+                    var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == payment.AccountId);
+                    fullName = customer.FullName;
+                }
+                else if (payment.Account.Role.RoleName!.Equals(RoleEnum.SalonOwner.ToString()))
+                {
+                    var salon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == payment.AccountId);
+                    fullName = salon.FullName;
+                }
+                bool isSendMail = await _emailService.SendConfirmWithdraw(payment.Account.UserName, "Hairhub thông báo rút tiền thành công", fullName, 
+                                                        DateTime.Now.Date.ToString(), paymentReport.FullName, paymentReport.NumberAccount, paymentReport.BankName,
+                                                        paymentReport.Balance.ToString(), urlImg);
+                if (!isSendMail)
+                {
+                    throw new NotFoundException("Gửi mail thất bại. Vui lòng thử lại sau!");
+                }
+                bool isCommit = await _unitOfWork.CommitAsync()>0;
+                return isCommit;
             }
             else
             {

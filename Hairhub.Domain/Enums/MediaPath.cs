@@ -19,5 +19,7 @@ namespace Hairhub.Domain.Enums
         public static string QR_APPOINTMENT = "APPOINTMENT/QR_CODE";
         public static string REPORT = "REPORT";
         public static string SALONINFORMATION_IMG = "SALONINFORMATION/IMG";
+        public static string PAYMENT_REPORT_IMG = "PAYMENT_REPORT";
+        public static string PAYMENT_BANKED_IMG = "PAYMENT_BANKED_IMG";
     }
 }

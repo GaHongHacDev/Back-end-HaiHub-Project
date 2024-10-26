@@ -14,6 +14,7 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
         public string NumberAccount { get; set; }
         public string BankName { get; set; }
         public decimal Balance { get; set; }
+        public string Description { get; set; }
         public List<IFormFile> IdentityCard {get; set;}
     }
 }
