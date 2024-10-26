@@ -508,7 +508,7 @@ namespace Hairhub.Service.Services.Services
             }
 
             if (staticfile == null) { throw new NotFoundException("Không tìm thấy thông tin của staticfile  "); }
-            string email = "", phone="", Name="", url ="";
+            string email = "", phone="", Name="", url ="", roleName ="";
             Guid? userid = null;
             if (salonOwner != null)
             {
@@ -517,13 +517,16 @@ namespace Hairhub.Service.Services.Services
                 phone = salonOwner.Phone;
                 Name = salonOwner.FullName;
                 url = salonOwner.Img!;
+                roleName = RoleEnum.SalonOwner.ToString();
             } else if (CustomerInformation != null){
                 userid = CustomerInformation.Id;
                 email = CustomerInformation.Email!;
                 phone = CustomerInformation.Phone;
                 Name = CustomerInformation.FullName;
                 url = CustomerInformation.Img!;
-            } else
+                roleName = RoleEnum.Customer.ToString();
+            }
+            else
             {
                 if (paymentReport != null) { throw new NotFoundException("Không tìm thấy thông tin của salon và customer"); }
             }
@@ -537,10 +540,11 @@ namespace Hairhub.Service.Services.Services
                     Email = email,
                     Phone = phone,
                     FullName = Name,
-                    urlImage = url
+                    urlImage = url,
+                    RoleName = roleName,
                 },
                 Id = paymentReport!.PaymentId,
-                beneficiary = paymentReport.FullName,
+                Beneficiary = paymentReport.FullName,
                 Balance = paymentReport.Balance,
                 ConfirmDate = paymentReport.ConfirmDate,
                 CreateDate = paymentReport.CreateDate,
@@ -550,8 +554,8 @@ namespace Hairhub.Service.Services.Services
                 Status = paymentReport.Status,
                 Description = paymentReport.Payment.Description,
                 PaymentDate = paymentReport.Payment.PaymentDate,
-                statusofpayment = paymentReport.Payment.Status,
-                typeofpayment = paymentReport.Payment.PaymentType,
+                Statusofpayment = paymentReport.Payment.Status,
+                Typeofpayment = paymentReport.Payment.PaymentType,
                 urlPaymentImage = Images,
             };
 
