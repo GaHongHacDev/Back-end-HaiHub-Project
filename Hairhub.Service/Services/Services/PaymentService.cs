@@ -32,6 +32,11 @@ using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Enums;
 using System.Net;
 using Hairhub.Domain.Exceptions;
+using Microsoft.IdentityModel.Tokens;
+using System.Linq.Expressions;
+using LinqKit;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.AspNetCore.Http;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -403,6 +408,105 @@ namespace Hairhub.Service.Services.Services
             return responsePayment;*/
 
 
+        }
+
+        public async Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email, string? paymentType, string? status, int page = 1, int size = 10)
+        {
+            email = (email == null || email.Trim() == "") ? "" : email;
+            paymentType = (paymentType == null || paymentType.Trim() == "") ? "" : paymentType;
+            status = (status == null || status.Trim() == "") ? "" : status;
+
+            var predicate = PredicateBuilder.New<Payment>(x => x.Status.Equals(status) && x.PaymentType.Equals(paymentType) && x.Account.UserName.Contains(email));
+            if(accountId != null)
+            {
+                predicate = predicate.And(x => x.AccountId == accountId);
+            }
+            if (payDate.HasValue)
+            {
+                predicate = predicate.And(x => x.PaymentDate!.Value.Date == payDate.Value.Date);
+            }
+
+            var payments = await _unitOfWork.GetRepository<Payment>()
+                                            .GetPagingListAsync(
+                                                predicate: predicate,
+                                                include: x=>x.Include(s=>s.Account).Include(s=>s.Account.Role).Include(s=>s.Account.SalonOwners)
+                                                             .Include(s => s.Account.Customers),
+                                                page: page, 
+                                                size: size
+                                            );
+            var paginateResponse = new Paginate<PaymentHistory>
+            {
+                Page = payments.Page,
+                Size = payments.Size,
+                Total = payments.Total,
+                TotalPages = payments.TotalPages,
+                Items = _mapper.Map<IList<PaymentHistory>>(payments.Items)
+            };
+
+            return paginateResponse; 
+        }
+
+        public async Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request)
+        {
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == request.AccountId && x.IsActive);
+            if (account == null)
+            {
+                throw new NotFoundException($"Không tìm thấy account với id {request.AccountId}");
+            }
+            if (account.Balance<request.Balance)
+            {
+                throw new Exception("Số dư trong ví không đủ");
+            }
+            else if (request.Balance < 10000)
+            {
+                throw new Exception("Không đủ số tiền để rút từ ví");
+            }
+
+            account.Balance-= request.Balance;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+
+            //Payment payment = new Payment()
+            //{
+            //    Id = Guid.NewGuid(),
+            //    AccountId = account.Id,
+            //    CreateDate = DateTime.UtcNow,
+            //    TotalAmount = request.Balance,
+            //    PaymentType = PaymentType.Withdraw,
+            //    Description = "",
+            //    Status = PaymentStatus.Pending
+            //};
+            //await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+
+
+            return true;
+        }
+
+        public async Task<bool> ConfirmWithdrawPayment(WithdrawConfirmRequest request)
+        {
+            if (request.StatusConfirm.Equals(PaymentStatus.Cancel))
+            {
+                if (string.IsNullOrEmpty(request.ReasonCancel!.Trim()))
+                {
+                    throw new NotFoundException("Không tìm thấy lý do từ chối");
+                }
+                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == request.Id);
+
+                //payment.ReasonCancle = request.ReasonCancel;
+                payment.Status = PaymentStatus.Cancel;
+                return true;
+            }
+            else if(request.StatusConfirm.Equals(PaymentStatus.Paid))
+            {
+                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == request.Id);
+                payment.Status = PaymentStatus.Cancel;
+                payment.PaymentDate = DateTime.Now;
+                //Luu hinh
+                return true;
+            }
+            else
+            {
+                throw new NotFoundException("Trạng thái duyệt đơn không đúng");
+            }
         }
     }
 }

@@ -31,5 +31,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id);
 
+        Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email,
+                                                             string? paymentType, string? status, int page = 1, int size = 10);
+
     }
 }

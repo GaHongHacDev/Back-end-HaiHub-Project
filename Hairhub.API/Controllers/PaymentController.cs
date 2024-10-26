@@ -83,6 +83,27 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> GetPaymentHistory([FromQuery] DateTime? payDate, [FromQuery] Guid? accountId, [FromQuery] string? email, 
+                                                            [FromQuery] string? paymentType, [FromQuery] string? status, 
+                                                            [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var result = await _paymentservice.GetPaymentHistory(payDate, accountId, email, paymentType, status, page, size);
+                return Ok(result);
+            }
+            catch (NotFoundException ex) 
+            {
+                return NotFound(new {message = ex.Message});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("{ownerId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetPaymentByOwnerId([FromRoute] Guid ownerId, int page=1, int size=10)

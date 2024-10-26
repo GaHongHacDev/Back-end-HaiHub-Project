@@ -440,6 +440,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.FeedbackId).HasColumnName("feed_back_id").IsRequired(false);
                 entity.Property(e => e.ReportId).HasColumnName("report_id").IsRequired(false);
                 entity.Property(e => e.SalonInformationId).HasColumnName("salon_information_id").IsRequired(false);
+                entity.Property(e => e.PaymentReportId).HasColumnName("payment_report_id").IsRequired(false);
                 entity.Property(e => e.Img).HasColumnName("img").IsRequired(false);
                 entity.Property(e => e.Video).HasColumnName("video").IsRequired(false);
 
@@ -460,6 +461,11 @@ namespace Hairhub.Infrastructure
                                       .HasForeignKey(d => d.SalonInformationId)
                                       .OnDelete(DeleteBehavior.ClientSetNull)
                                       .HasConstraintName("FK_saloninformation_static_file");
+                entity.HasOne(p => p.PaymentReport)
+                      .WithMany(e => e.StaticFiles)
+                      .HasForeignKey(d => d.PaymentReportId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_paymentReport_staticFile");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -571,14 +577,14 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.ConfigId).HasColumnName("config_id").IsRequired(false);
+                entity.Property(e => e.AppointmentId).HasColumnName("appointment_id").IsRequired(false);
                 entity.Property(e => e.AccountId).HasColumnName("account_id").IsRequired(false);
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)").HasColumnName("total_amount");
-                entity.Property(e => e.PaymentDate).HasColumnName("payment_date");
+                entity.Property(e => e.PaymentDate).HasColumnName("payment_date").IsRequired(false);
                 entity.Property(e => e.PaymentType).HasMaxLength(30).HasColumnName("payment_type");
                 entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description").IsRequired(false);
                 entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
-                entity.Property(e => e.ReasonCancle).HasMaxLength(250).HasColumnName("reason_cancle").IsRequired(false);
-                entity.Property(e => e.PaymentCode).HasColumnName("payment_code");
+                entity.Property(e => e.PaymentCode).HasColumnName("payment_code").IsRequired(false);
                 entity.Property(e => e.StartDate).HasColumnName("start_date");
                 entity.Property(e => e.EndDate).HasColumnName("end_date");
                 entity.Property(e => e.PakageName).HasMaxLength(100).HasColumnName("pakage_name");
@@ -589,14 +595,41 @@ namespace Hairhub.Infrastructure
                       .WithMany(p => p.Payments)
                       .HasForeignKey(d => d.AccountId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
-                      .HasConstraintName("FK_salon_owner_payment");
+                      .HasConstraintName("FK_account_payment");
 
                 entity.HasOne(d => d.Config)
                       .WithMany(p => p.Payments)
                       .HasForeignKey(d => d.ConfigId)
                       .OnDelete(DeleteBehavior.ClientSetNull)
                       .HasConstraintName("FK_config_payment");
+
+                entity.HasOne(d => d.Appointment)
+                      .WithMany(p => p.Payments)
+                      .HasForeignKey(d => d.AppointmentId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_appointment_payment");
             });
+
+            modelBuilder.Entity<PaymentReport>(entity =>
+            {
+                entity.ToTable("payment_report");
+                entity.HasKey(e => e.PaymentId);
+                entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+                entity.Property(e => e.ReasonCancle).HasMaxLength(250).HasColumnName("reason_cancle").IsRequired(false);
+                entity.Property(e => e.CreateDate).HasColumnName("create_date");
+                entity.Property(e => e.ConfirmDate).HasColumnName("confirm_date");
+                entity.Property(e => e.FullName).HasMaxLength(100).HasColumnName("full_name");
+                entity.Property(e => e.NumberAccount).HasMaxLength(50).HasColumnName("number_account");
+                entity.Property(e => e.BankName).HasMaxLength(100).HasColumnName("bank_name");
+                entity.Property(e => e.Balance).HasColumnType("decimal(18, 2)").HasColumnName("balance");
+
+                entity.HasOne(e => e.Payment)
+                      .WithOne(p => p.PaymentReport)
+                      .HasForeignKey<PaymentReport>(e => e.PaymentId)
+                      .OnDelete(DeleteBehavior.ClientSetNull)
+                      .HasConstraintName("FK_payment_paymentReport");
+            });
+
 
             modelBuilder.Entity<Config>(entity =>
             {

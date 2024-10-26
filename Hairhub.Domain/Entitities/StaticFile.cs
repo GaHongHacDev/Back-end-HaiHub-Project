@@ -14,12 +14,13 @@ namespace Hairhub.Domain.Entitities
         public Guid? FeedbackId { get; set; }
         public Guid? ReportId {  get; set; }
         public Guid? SalonInformationId { get; set; }
+        public Guid? PaymentReportId { get; set; }
         public string? Img { get; set; }
         public string? Video { get; set; }
 
         public virtual Feedback Feedback { get; set; }
         public virtual Report Report { get; set; }
-
+        public virtual PaymentReport PaymentReport { get; set; }
         public virtual SalonInformation SalonInformation { get; set; }
     }
 }
