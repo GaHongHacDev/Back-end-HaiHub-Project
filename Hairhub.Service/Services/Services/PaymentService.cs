@@ -494,13 +494,15 @@ namespace Hairhub.Service.Services.Services
                                 );
             var paymentWithdraw = new PaymentReportResponse
             {
+                Email =  CustomerInformation.Email ?? salonInformation.Email!,
+                Phone = CustomerInformation.Phone ?? salonInformation.Phone!,
                 FullName = paymentReport.FullName,
                 Balance = paymentReport.Balance,
                 ConfirmDate = paymentReport.ConfirmDate,
                 CreateDate = paymentReport.CreateDate,
                 NumberAccount = paymentReport.NumberAccount,
                 BankName = paymentReport.BankName,
-                ReasonCancle = paymentReport.ReasonCancle,
+                ReasonCancle = paymentReport.ReasonCancle!,
                 Status = paymentReport.Status,
                 Payment = new PaymentInformation
                 {
@@ -511,21 +513,7 @@ namespace Hairhub.Service.Services.Services
                     PaymentDate = paymentReport.Payment.PaymentDate,
                     PaymentType = paymentReport.Payment.PaymentType,
                     TotalAmount = paymentReport.Payment.TotalAmount,
-                    Customer = account.Customers != null ? new CustomerInformation
-                    {
-                        FullName = CustomerInformation.FullName,
-                        Email = CustomerInformation.Email,
-                        Phone = CustomerInformation.Phone
-                        
-                    } : null!,
-                    salon = account.SalonOwners != null ? new SalonOwnerInformation
-                    {
-                        FullName = salonInformation.FullName,
-                        Email = salonInformation.Email,
-                        Phone = salonInformation.Phone
-                    } : null!
-
-                }
+                },
             };
 
             return paymentWithdraw;
