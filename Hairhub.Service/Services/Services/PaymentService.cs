@@ -161,9 +161,7 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                string hostName = System.Net.Dns.GetHostName();
-                string clientIPAddress = System.Net.Dns.GetHostAddresses(hostName).GetValue(0).ToString();
-                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
+                string returnUrl = $"https://localhost:7257/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
                 var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
