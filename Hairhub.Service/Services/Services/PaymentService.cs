@@ -434,6 +434,7 @@ namespace Hairhub.Service.Services.Services
                 }
                 payment.Status = PaymentStatus.Paid;
                 payment.PaymentDate = DateTime.UtcNow;
+                _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
 
                 var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x => x.PaymentId == Id);
                 if (paymentReport == null)
