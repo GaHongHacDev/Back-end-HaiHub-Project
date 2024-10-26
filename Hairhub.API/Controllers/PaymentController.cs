@@ -25,7 +25,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         [Route("{accountid:Guid}")]
         public async Task<IActionResult> SendPaymentLink(Guid accountid, CreatePaymentRequest request)
         {
@@ -80,6 +80,17 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
         {
             var result = await _paymentservice.FakePaymentForCommissionRate(createFirstTimePaymentRequest);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CreatePromotionPaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
+        {
+            var result = await _paymentservice.PromotionPaymentForCommissionRate(createFirstTimePaymentRequest);
             if (result == null)
             {
                 return BadRequest();
