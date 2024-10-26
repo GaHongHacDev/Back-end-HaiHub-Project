@@ -32,6 +32,15 @@ using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Enums;
 using System.Net;
 using Hairhub.Domain.Exceptions;
+using Org.BouncyCastle.Asn1.Ocsp;
+using Microsoft.IdentityModel.Tokens;
+using System.Linq.Expressions;
+using LinqKit;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.AspNetCore.Http;
+using Hairhub.Common.ThirdParties.Contract;
+using System.Drawing;
+
 
 namespace Hairhub.Service.Services.Services
 {
@@ -44,11 +53,16 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAppointmentService _appointmentservice;
+        private readonly IMediaService _mediaService;
+        private readonly IEmailService _emailService;
 
-        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, IMapper mapper, IAppointmentService appointmentService)
+        public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, 
+                                IMapper mapper, IAppointmentService appointmentService, IMediaService mediaService, IEmailService emailService)
         {
             _payOSSettings = settings.Value;
             _appointmentservice = appointmentService;
+            _mediaService = mediaService;
+            _emailService = emailService;
             _client = client;
             _unitOfWork = unitOfWork;
             _config = config;
@@ -63,58 +77,118 @@ namespace Hairhub.Service.Services.Services
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
+        public async Task<bool> FakePaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
+        {
+           
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+            Guid account = createPaymentRequest.AccountId;
+            var firstPayment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                Description = "Tiền hoa hồng dựa trên lịch hẹn tháng đầu tiên",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(30),
+                PaymentDate = DateTime.Now,
+                AccountId = account,
+                PaymentCode = "",
+                Status = PaymentStatus.Fake,
+                TotalAmount = 0,
+                ConfigId = config.Id,
+                PakageFee = config.PakageFee,
+                PakageName = config.PakageName,
+                CommissionRate = config.CommissionRate,                
+            };
 
-        public async Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request)
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
+        }
+
+        public async Task<bool> PromotionPaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
+        {
+
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+            Guid account = createPaymentRequest.AccountId;
+            var firstPayment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                Description = "Tiền hoa hồng dựa trên lịch hẹn tháng đầu tiên",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(30),
+                PaymentDate = DateTime.Now,
+                AccountId = account,
+                PaymentCode = "",
+                Status = PaymentStatus.Promotion,
+                TotalAmount = 0,
+                ConfigId = config.Id,
+                PakageFee = config.PakageFee,
+                PakageName = config.PakageName,
+                CommissionRate = config.CommissionRate,
+            };
+
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
+        }
+
+        public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commissionRate)
+        {
+            
+             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
+             if (salon == null)
+             {
+                 return 0;
+             }
+
+             var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.AccountId == salon.SalonOwner.AccountId && p.Status == PaymentStatus.Fake);
+             if (payment == null)
+             {
+                 return 0;
+             }
+
+             var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
+
+             decimal totalCommission = 0;
+             foreach (var appointment in appointments)
+             {
+                 decimal commissionAmount = appointment.TotalPrice * (commissionRate / 100);
+                 totalCommission += commissionAmount;
+             }
+
+             return totalCommission;
+        }
+        public async Task<CreatePaymentResult> SendPaymentLink(Guid accountId, CreatePaymentRequest request)
         {
             try
             {
-                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);               
-                var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
-                if (SalonOwner == null)
-                {
-                    throw new Exception("SalonOwner is null.");
-                }
-                
+                string returnUrl = $"https://localhost:7257/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
-                var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == request.SalonOWnerID);
-                if (Salon == null)
-                {
-                    throw new Exception("Salon is null.");
-                }
-                int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
+                if (account == null) throw new Exception("account not null!!");
+
+
+                int amount = (int)request.Price;
                 string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
                 long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
                 var description = request.Description;
                 string? clientId = _config["PayOS:ClientId"];
                 var apikey = _config["PayOS:APIKey"];
                 var checksumkey = _config["PayOS:ChecksumKey"];
-                var returnurl = _config["PayOS:ReturnUrl"];
                 var returnurlfail = _config["PayOS:ReturnUrlFail"];
 
-                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
-                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
-
                 PayOS pos = new PayOS(clientId, apikey, checksumkey);
-                // Prepare data for signature
+                
                 var signatureData = new Dictionary<string, object>
                  {
                      { "amount", amount },
-                     { "cancelUrl", updatedReturnUrlFail},
+                     { "cancelUrl", returnurlfail},
                      { "description", description },
                      { "expiredAt", DateTimeOffset.Now.ToUnixTimeSeconds() },
                      { "orderCode", orderCode },
-                     { "returnUrl", updatedReturnUrl}
+                     { "returnUrl", returnUrl}
                  };
-
-
-
-                // Sort data alphabetically by key
                 var sortedSignatureData = new SortedDictionary<string, object>(signatureData);
-
-                // Create data string for signature
                 var dataForSignature = string.Join("&", sortedSignatureData.Select(p => $"{p.Key}={p.Value}"));
-
-                // Compute the HMAC_SHA256 signature
                 var signature = ComputeHmacSha256(dataForSignature, checksumkey);
                 DateTimeOffset expiredAt = DateTimeOffset.Now.AddMinutes(10);
 
@@ -123,21 +197,17 @@ namespace Hairhub.Service.Services.Services
                     amount: amount,
                     description: description,
                     items: new List<ItemData>(), // Provide a list of items if needed
-                    cancelUrl: updatedReturnUrlFail,
-                    returnUrl: updatedReturnUrl,
+                    cancelUrl: returnurlfail,
+                    returnUrl: returnUrl,
                     signature: signature,
-                    buyerName: SalonOwner.FullName,
-                    buyerPhone: SalonOwner.Phone, // Provide a valid currency
-                    buyerEmail: SalonOwner.Email,
-                    buyerAddress: SalonOwner.Address,
+                    buyerName: account.UserName,
                     expiredAt: (int)DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds()
                 );
 
-                paymentData.items.Add(new ItemData(SalonOwner.FullName, 1, amount));
+                paymentData.items.Add(new ItemData(account.UserName, 1, amount));
                 var createPaymentResult = await pos.createPaymentLink(paymentData);
-
-                return createPaymentResult; // Chú ý sử dụng PaymentLink thay vì paymentLink
-
+                string url = createPaymentResult.checkoutUrl;
+                return createPaymentResult; 
             }
             catch (Exception ex)
             {
@@ -147,16 +217,16 @@ namespace Hairhub.Service.Services.Services
         }
 
 
-        public async Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest)
-        {
-            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentLinkId}";
 
+        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
+        {
+            
+            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
-                request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);
-                var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == createPaymentRequest.SalonOwnerId);
+                request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              
                 var response = await _client.SendAsync(request);
                 bool isStatus = false;
                 if (response.IsSuccessStatusCode)
@@ -165,37 +235,47 @@ namespace Hairhub.Service.Services.Services
                     var responseObject = JObject.Parse(responseContent);
                     var status = responseObject["data"]?["status"]?.ToString();
                     var paymentInfo = responseObject["data"];
-
                     if (status != null)
                     {
                         if (status == "PAID")
                         {
-                            if (salon.Status == SalonStatus.Approved)
+                            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+                            var balance = account.Balance;
+                            account.Balance = balance + price;
+                            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                            if (config != null)
                             {
-                                var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-                                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == createPaymentRequest.SalonOwnerId && p.Status == PaymentStatus.Fake);
-                                payment.Status = PaymentStatus.Paid;
-                                // Save the transaction
-                                _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
-                                await PaymentForCommissionRate(createPaymentRequest);
-                                await _unitOfWork.CommitAsync();
-                                return isStatus = true;
-                                
-                            } else if( salon.Status == SalonStatus.OverDue) {
-                                var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-                                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == createPaymentRequest.SalonOwnerId && p.Status == PaymentStatus.Fake);
-                                payment.Status = PaymentStatus.Paid;
-                                salon.Status = SalonStatus.Approved;
-
-                                // Save the transaction
-                                _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
-                                _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
-                                await PaymentForCommissionRate(createPaymentRequest);
-                                await _unitOfWork.CommitAsync();
-                                return isStatus = true;
+                                var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
+                                fakepayment.Status = PaymentStatus.Paid;
+                                fakepayment.TotalAmount = price;
+                                fakepayment.PaymentDate = DateTime.UtcNow;
+                                fakepayment.Description = $"Thanh toán thành công tiền hoa hồng tháng {fakepayment.PaymentDate.Value.Month - 1}";
+                                _unitOfWork.GetRepository<Payment>().UpdateAsync(fakepayment);
+                                var nextpayment = new SavePaymentInfor
+                                {
+                                    AccountId = accountid,
+                                    ConfigId = config.Id,
+                                };
+                                await FakePaymentForCommissionRate(nextpayment);
                             }
-                            
-
+                            else {
+                                var payment = new Payment
+                                {
+                                    Id = Guid.NewGuid(),    
+                                    AccountId = accountid,
+                                    AppointmentId = null,
+                                    ConfigId = config == null ? null : config.Id,
+                                    Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
+                                    PaymentDate = DateTime.Now,
+                                    TotalAmount = price,
+                                    Status = PaymentStatus.Paid,
+                                    PaymentCode = paymentlinkId,
+                                    PaymentType = PaymentType.Deposit,      
+                                };
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                            }
+                            isStatus = await _unitOfWork.CommitAsync() > 0;
                         }
                         return isStatus;
                     }
@@ -214,186 +294,277 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception(ex.Message);
             }
         }
-
-        public async Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size)
+        
+        public async Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email, string? paymentType, string? status, int page = 1, int size = 10)
         {
-            var existingsalonowner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: e => e.Id == ownerid);
-            if (existingsalonowner == null)
+            email = (email == null || email.Trim() == "") ? "" : email;
+            paymentType = (paymentType == null || paymentType.Trim() == "") ? "" : paymentType;
+            status = (status == null || status.Trim() == "") ? "" : status;
+
+            var predicate = PredicateBuilder.New<Payment>(x => x.Status.Contains(status) && x.PaymentType.Contains(paymentType) && x.Account.UserName.Contains(email) 
+                                                            && !x.Status.Equals(PaymentStatus.Fake));
+            if(accountId != null)
             {
-                throw new Exception("Not found");
+                predicate = predicate.And(x => x.AccountId == accountId);
             }
-            var payments = await _unitOfWork.GetRepository<Payment>()
-             .GetPagingListAsync(
-                 include: query => query.Include(x => x.SalonOwner)
-                         .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
-                         .Include(x => x.Config),
-                 predicate: x => x.SalonOWnerID == ownerid && x.Status == PaymentStatus.Paid,
-                 page: page,
-                 size: size);
+            if (payDate.HasValue)
+            {
+                predicate = predicate.And(x => x.PaymentDate!.Value.Date == payDate.Value.Date);
+            }
 
-            var paginateResponse = new Paginate<ResponsePayment>
+            var payments = await _unitOfWork.GetRepository<Payment>()
+                                            .GetPagingListAsync(
+                                                predicate: predicate,
+                                                include: x=>x.Include(s=>s.Account).Include(s=>s.Account.Role),
+                                                page: page, 
+                                                size: size
+                                            );
+            var paginateResponse = new Paginate<PaymentHistory>
             {
                 Page = payments.Page,
                 Size = payments.Size,
                 Total = payments.Total,
                 TotalPages = payments.TotalPages,
-                Items = _mapper.Map<IList<ResponsePayment>>(payments.Items)
+                Items = _mapper.Map<IList<PaymentHistory>>(payments.Items)
             };
 
-            return paginateResponse;
+            return paginateResponse; 
         }
 
-        public async Task<IPaginate<ResponsePayment>> GetPayments(string? valueSearch, int page, int size)
+        public async Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request)
         {
-
-            var payments = await _unitOfWork.GetRepository<Payment>()
-                .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid 
-                                                    && (string.IsNullOrEmpty(valueSearch) 
-                                                    || x.SalonOwner.Email!.ToLower().Contains(valueSearch.Trim().ToLower()) 
-                                                    || x.SalonOwner.SalonInformations.Any(x=>x.Name.ToLower().Contains(valueSearch.Trim().ToLower()))),
-                include: query => query.Include(x => x.SalonOwner)
-                                        .ThenInclude(x => x.SalonInformations)
-                                        .Include(x => x.Config),
-                page: page,
-                size: size);
-
-            var paginateResponse = new Paginate<ResponsePayment>
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == request.AccountId && x.IsActive);
+            if (account == null)
             {
-                Page = payments.Page,
-                Size = payments.Size,
-                Total = payments.Total,
-                TotalPages = payments.TotalPages,
-                Items = _mapper.Map<IList<ResponsePayment>>(payments.Items)
-            };
+                throw new NotFoundException($"Không tìm thấy account với id {request.AccountId}");
+            }
+            if (account.Balance<request.Balance)
+            {
+                throw new Exception("Số dư trong ví không đủ");
+            }
+            else if (request.Balance < 10000)
+            {
+                throw new Exception("Không đủ số tiền để rút từ ví");
+            }
 
-            return paginateResponse;
-        }
+            account.Balance-= request.Balance;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
 
-        public async Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
-        {
-           Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
-           var firstPayment = new Payment { 
-               Id = Guid.NewGuid(),
-               Description = "Miễn phí 1 tháng đầu tiên",
-               StartDate = DateTime.Now,
-               EndDate = DateTime.Now.AddDays(30),
-               PaymentDate = DateTime.Now,
-               SalonOWnerID = salonownerid,
-               MethodBanking = "None",
-               PaymentCode = new Random().Next(1, 1000000),
-               Status = "PAID",
-               TotalAmount = 0,
-            };
-            
-            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
-            bool isCreated = await _unitOfWork.CommitAsync() > 0;
-            return isCreated;
-
-        }
-
-        public async Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
-        {
-            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-            Guid salonownerid = createPaymentRequest.SalonOwnerId;
-            var firstPayment = new Payment
+            Payment payment = new Payment()
             {
                 Id = Guid.NewGuid(),
-                Description = "Tiền hoa hồng dựa trên lịch hẹn tháng đầu tiên",
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddDays(30),
-                PaymentDate = DateTime.Now,
-                SalonOWnerID = salonownerid,
-                MethodBanking = "None",
-                PaymentCode = new Random().Next(1, 1000000),
-                Status = PaymentStatus.Fake,
-                TotalAmount = 0,
-                ConfigId = config.Id,
-                PakageFee = config.PakageFee,
-                PakageName = config.PakageName,
-                CommissionRate = config.CommissionRate,                
+                AccountId = account.Id,
+                TotalAmount = request.Balance,
+                PaymentType = PaymentType.Withdraw,
+                Description = request.Description,
+                Status = PaymentStatus.Pending
             };
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
 
-            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
-            bool isCreated = await _unitOfWork.CommitAsync() > 0;
-            return isCreated;
+            PaymentReport paymentReport = new PaymentReport()
+            {
+                PaymentId = payment.Id,
+                CreateDate = DateTime.UtcNow,
+                FullName = request.FullName,
+                NumberAccount = request.NumberAccount,
+                BankName = request.BankName,
+                Balance = request.Balance,
+                Status = PaymentStatus.Pending
+            };
+            await _unitOfWork.GetRepository<PaymentReport>().InsertAsync(paymentReport);
+
+
+            List<StaticFile> staticFile = new List<StaticFile>();
+
+            for (int i=1; i<=request.IdentityCard.Count; i++) 
+            {
+                var url = await _mediaService.UploadAnImage(request.IdentityCard.ElementAt(i-1), MediaPath.PAYMENT_REPORT_IMG, 
+                                                            paymentReport.PaymentId.ToString() + i.ToString());
+                staticFile.Add(new StaticFile()
+                {
+                    Id = Guid.NewGuid(),
+                    PaymentReportId = paymentReport.PaymentId,
+                    Img = url,
+                });
+            }
+            await _unitOfWork.GetRepository<StaticFile>().InsertRangeAsync(staticFile);
+            bool isCommit = await _unitOfWork.CommitAsync()>0;
+            return isCommit;
+        }
+
+        public async Task<bool> ConfirmWithdrawPayment(Guid Id, WithdrawConfirmRequest request)
+        {
+            if (request.StatusConfirm.Equals(PaymentStatus.Cancel))
+            {
+                if (string.IsNullOrEmpty(request.ReasonCancel!.Trim()))
+                {
+                    throw new NotFoundException("Không tìm thấy lý do từ chối");
+                }
+                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == Id);
+                if (payment == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment với id {Id}");
+                }
+                payment.Status = PaymentStatus.Cancel;
+                _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
+
+                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x=>x.PaymentId == Id);
+                if (paymentReport == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
+                }
+                paymentReport.ReasonCancle = request.ReasonCancel;
+                paymentReport.ConfirmDate = DateTime.UtcNow;
+                paymentReport.Status = PaymentStatus.Cancel;
+                _unitOfWork.GetRepository<PaymentReport>().UpdateAsync(paymentReport);
+
+                bool isUpdate = await _unitOfWork.CommitAsync()>0;
+                return isUpdate;
+            }
+            else if(request.StatusConfirm.Equals(PaymentStatus.Paid))
+            {
+                var payment = await _unitOfWork.GetRepository<Payment>()
+                                                .SingleOrDefaultAsync(
+                                                    predicate: x => x.Id == Id, 
+                                                    include: x=>x.Include(s=>s.Account).ThenInclude(s=>s.Role)
+                                                );
+                if (payment == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment với id {Id}");
+                }
+                payment.Status = PaymentStatus.Paid;
+                payment.PaymentDate = DateTime.UtcNow;
+
+                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x => x.PaymentId == Id);
+                if (paymentReport == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
+                }
+                paymentReport.ConfirmDate = DateTime.UtcNow;
+                paymentReport.Status = PaymentStatus.Paid;
+                _unitOfWork.GetRepository<PaymentReport>().UpdateAsync(paymentReport);
+                
+                string urlImg = await _mediaService.UploadAnImage(request.BankingImgs, MediaPath.PAYMENT_BANKED_IMG, paymentReport.PaymentId.ToString());
+
+                string fullName = "";
+                if(payment.Account.Role.RoleName!.Equals(RoleEnum.Customer.ToString()))
+                {
+                    var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == payment.AccountId);
+                    fullName = customer.FullName;
+                }
+                else if (payment.Account.Role.RoleName!.Equals(RoleEnum.SalonOwner.ToString()))
+                {
+                    var salon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == payment.AccountId);
+                    fullName = salon.FullName;
+                }
+                bool isSendMail = await _emailService.SendConfirmWithdraw(payment.Account.UserName, "Hairhub thông báo rút tiền thành công", fullName, 
+                                                        DateTime.Now.Date.ToString(), paymentReport.FullName, paymentReport.NumberAccount, paymentReport.BankName,
+                                                        paymentReport.Balance.ToString(), urlImg);
+                if (!isSendMail)
+                {
+                    throw new NotFoundException("Gửi mail thất bại. Vui lòng thử lại sau!");
+                }
+                bool isCommit = await _unitOfWork.CommitAsync()>0;
+                return isCommit;
+            }
+            else
+            {
+                throw new NotFoundException("Trạng thái duyệt đơn không đúng");
+
+            }
         }
 
 
-
-        public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commissionRate)
+        public async Task<PaymentReportResponse> GetPaymentReportById(Guid id)
         {
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
-            if (salon == null)
+            var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().
+                                      SingleOrDefaultAsync(predicate: p => p.PaymentId == id,
+                                                           include: i => i.Include(p => p.Payment)
+                                                           .ThenInclude(p => p.Account)
+                                                           .ThenInclude(p => p.Customers));
+            var account = await _unitOfWork.GetRepository<Account>()
+                                .SingleOrDefaultAsync(predicate: p => p.Id == paymentReport.Payment.AccountId,
+                                include: i => i.Include(p => p.Customers).Include(p => p.SalonOwners)
+                                );
+            var salonInformation = await _unitOfWork.GetRepository<SalonOwner>()
+                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
+                                );
+            var CustomerInformation = await _unitOfWork.GetRepository<Customer>()
+                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
+                                );
+            var paymentWithdraw = new PaymentReportResponse
             {
-                return 0;
-            }
-
-            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
-            if (payment == null)
-            {
-                return 0;
-            }
-
-            var appointments = await _appointmentservice.GetAppointmentSalonByStatusNoPaing(salon.Id, AppointmentStatus.Successed, payment.StartDate, payment.EndDate);
-
-            decimal totalCommission = 0;
-            foreach (var appointment in appointments)
-            {
-                decimal commissionAmount = appointment.TotalPrice * (commissionRate / 100);
-                totalCommission += commissionAmount;
-            }
-
-            return totalCommission;
-        }
-
-        public async Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id)
-        {
-            var payment = await _unitOfWork.GetRepository<Payment>()
-                        .SingleOrDefaultAsync(
-                            predicate: p => p.SalonOWnerID == id && p.Status == PaymentStatus.Fake,
-                            include: i => i.Include(m => m.SalonOwner).Include(n => n.Config)
-                        );
-            if (payment == null)
-            {
-                throw new NotFoundException("Payment not found");
-            }
-            if (payment.EndDate.Date > DateTime.Now.Date)
-            {
-                throw new NotFoundException($"Chưa tới ngày thanh toán, ngày thanh toán của bạn là {payment.EndDate}");
-            }
-            var responsePayment = new ResponsePayment
-            {
-                Id = payment.Id,
-                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)payment.CommissionRate!),
-                PaymentDate = payment.PaymentDate,
-                MethodBanking = payment.MethodBanking,
-                Description = payment.Description,
-                Status = payment.Status,
-                PaymentCode = payment.PaymentCode,
-                StartDate = payment.StartDate,
-                EndDate = payment.EndDate,
-                SalonOwners = new SalonOwnerPaymentResponse
+                FullName = paymentReport.FullName,
+                Balance = paymentReport.Balance,
+                ConfirmDate = paymentReport.ConfirmDate,
+                CreateDate = paymentReport.CreateDate,
+                NumberAccount = paymentReport.NumberAccount,
+                BankName = paymentReport.BankName,
+                ReasonCancle = paymentReport.ReasonCancle,
+                Status = paymentReport.Status,
+                Payment = new PaymentInformation
                 {
-                    Id = payment.SalonOwner.Id,
-                    FullName = payment.SalonOwner.FullName,
-                    Email = payment.SalonOwner.Email,
-                    Phone = payment.SalonOwner.Phone,
-                    Address = payment.SalonOwner.Address,
-                    Img = payment.SalonOwner.Img
-                },      
-                Config = new ConfigPaymentResponse
-                {
-                    PakageName = payment.PakageName,
-                    Id = payment.Id,
+                    Id = paymentReport.PaymentId,
+                    Description = paymentReport.Payment.Description,
+                    Status = paymentReport.Payment.Status,
+                    PaymentCode = paymentReport.Payment.PaymentCode,
+                    PaymentDate = paymentReport.Payment.PaymentDate,
+                    PaymentType = paymentReport.Payment.PaymentType,
+                    TotalAmount = paymentReport.Payment.TotalAmount,
+                    Customer = account.Customers != null ? new CustomerInformation
+                    {
+                        FullName = CustomerInformation.FullName,
+                        Email = CustomerInformation.Email,
+                        Phone = CustomerInformation.Phone
+                        
+                    } : null!,
+                    salon = account.SalonOwners != null ? new SalonOwnerInformation
+                    {
+                        FullName = salonInformation.FullName,
+                        Email = salonInformation.Email,
+                        Phone = salonInformation.Phone
+                    } : null!
+
                 }
             };
-            payment.TotalAmount = responsePayment.TotalAmount;
-            payment.Id = responsePayment.Id;
-            _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
-            await _unitOfWork.CommitAsync();
-            return responsePayment;
 
-
+            return paymentWithdraw;
         }
+
+
+        public async Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size)
+        {
+            email = (email == null || email.Trim() == "") ? "" : email;
+            status = (status == null || status.Trim() == "") ? "" : status;
+
+            var predicate = PredicateBuilder.New<PaymentReport>(x => x.Status.Contains(status) && x.Payment.Account.UserName.Contains(email));
+            if (accountId != null)
+            {
+                predicate = predicate.And(x => x.Payment.AccountId == accountId);
+            }
+            if (createDate.HasValue)
+            {
+                predicate = predicate.And(x => x.CreateDate.Date == createDate.Value.Date);
+            }
+
+            var payments = await _unitOfWork.GetRepository<PaymentReport>()
+                                            .GetPagingListAsync(
+                                                predicate: predicate,
+                                                include: x => x.Include(s => s.Payment.Account).Include(s => s.Payment.Account.Role),
+                                                page: page,
+                                                size: size
+                                            );
+            var paginateResponse = new Paginate<GetPaymentReportReponse>
+            {
+                Page = payments.Page,
+                Size = payments.Size,
+                Total = payments.Total,
+                TotalPages = payments.TotalPages,
+                Items = _mapper.Map<IList<GetPaymentReportReponse>>(payments.Items)
+            };
+
+            return paginateResponse;
+        }
+
     }
 }

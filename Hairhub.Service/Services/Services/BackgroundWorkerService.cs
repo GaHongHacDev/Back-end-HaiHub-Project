@@ -27,7 +27,7 @@ namespace Hairhub.Service.Services.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<BackgroundWorkerService> _logger;
         private readonly IConfiguration _configuration;
-        
+
 
 
         public BackgroundWorkerService(IServiceScopeFactory scopeFactory, ILogger<BackgroundWorkerService> logger, IConfiguration configuration)
@@ -64,7 +64,7 @@ namespace Hairhub.Service.Services.Services
             //    // Đợi 30 giây
             //    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
             //}
-        }   
+        }
 
         private async Task ExecuteExpriredAppointment(CancellationToken stoppingToken)
         {
@@ -84,7 +84,7 @@ namespace Hairhub.Service.Services.Services
 
                     foreach (var appointment in appontments)
                     {
-                        foreach(var appointmentDetail in appointment.AppointmentDetails)
+                        foreach (var appointmentDetail in appointment.AppointmentDetails)
                         {
                             appointmentDetail.Status = AppointmentStatus.Fail;
                             uow.GetRepository<AppointmentDetail>().UpdateAsync(appointmentDetail);
@@ -105,6 +105,56 @@ namespace Hairhub.Service.Services.Services
                 // Thực hiện xử lý lỗi tại đây nếu cần thiết
             }
         }
+        private async Task ExecutePromotionExpiredSalon(CancellationToken stoppingToken)
+        {
+            try
+            {
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                    var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
+                    var salons = await uow.GetRepository<SalonInformation>().GetListAsync(
+                        include: x => x.Include(s => s.SalonOwner),
+                        predicate: p => p.Status == SalonStatus.Approved
+                    );
+
+                    foreach (var salon in salons)
+                    {
+                        var latestPayment = await uow.GetRepository<Payment>().SingleOrDefaultAsync(
+                            predicate: p => p.AccountId == salon.SalonOwner.AccountId && p.Status == PaymentStatus.Promotion,
+                            orderBy: o => o.OrderByDescending(p => p.EndDate)
+                        );
+
+                        if (latestPayment != null)
+                        {
+                           if (latestPayment.EndDate < DateTime.Now)
+                            {
+                                latestPayment.Status = PaymentStatus.Paid;
+                                    var paymentInfor = new SavePaymentInfor
+                                    {
+                                        AccountId = salon.SalonOwner.AccountId,
+                                        ConfigId = (Guid)latestPayment.ConfigId!
+                                    };
+                                    uow.GetRepository<Payment>().UpdateAsync(latestPayment);
+                                    await paymentService.FakePaymentForCommissionRate(paymentInfor);
+                            }
+                            await uow.CommitAsync();
+                        }
+                    }
+
+                    _logger.LogInformation("Expired salons checked and updated at: {time}", DateTimeOffset.Now);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
+            }
+
+
+        }
+
+
         private async Task ExecuteExpiredSalon(CancellationToken stoppingToken)
         {
             try
@@ -122,7 +172,7 @@ namespace Hairhub.Service.Services.Services
                     foreach (var salon in salons)
                     {
                         var latestPayment = await uow.GetRepository<Payment>().SingleOrDefaultAsync(
-                            predicate: p => p.SalonOwner.Id == salon.SalonOwner.Id,
+                            predicate: p => p.AccountId == salon.SalonOwner.AccountId && p.Status == PaymentStatus.Fake,
                             orderBy: o => o.OrderByDescending(p => p.EndDate)
                         );
                         
@@ -134,28 +184,31 @@ namespace Hairhub.Service.Services.Services
                             {
                                 if(latestPayment.EndDate < DateTime.Now)
                                 {
+                                    latestPayment.Status = PaymentStatus.Paid;
                                     var paymentInfor = new SavePaymentInfor
                                     {
-                                        SalonOwnerId = salon.SalonOwner.Id,
+                                        AccountId = salon.SalonOwner.AccountId,
                                         ConfigId = (Guid)latestPayment.ConfigId!
                                     };
-                                    await paymentService.PaymentForCommissionRate(paymentInfor);
+                                    uow.GetRepository<Payment>().UpdateAsync(latestPayment);
+                                    await paymentService.FakePaymentForCommissionRate(paymentInfor);
                                 }                               
                             }
                             if (amount > 0)
                             {
-                                var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now).TotalDays;
+                                var daysToExpiry = (int)(latestPayment.EndDate - DateTime.Now)!.Value.TotalDays;
                                 if (daysToExpiry < 5 && daysToExpiry > 0)
                                 {
-                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email!, salon.SalonOwner.FullName, daysToExpiry, latestPayment.EndDate, _configuration["EmailPayment:LinkPayment"]!);
+                                    await emailService.SendEmailAsyncNotifyOfExpired(salon.SalonOwner.Email!, salon.SalonOwner.FullName, daysToExpiry, (DateTime)latestPayment.EndDate!, _configuration["EmailPayment:LinkPayment"]!);
                                 }
                                 if (latestPayment.EndDate < DateTime.Now)
-                                {
+                                {                                    
                                     salon.Status = SalonStatus.OverDue;
                                     uow.GetRepository<SalonInformation>().UpdateAsync(salon);
-                                    await uow.CommitAsync();
+                                    
                                 }
                             }
+                            await uow.CommitAsync();
                         }
                     }
 
@@ -166,8 +219,9 @@ namespace Hairhub.Service.Services.Services
             {
                 _logger.LogError(ex, "Error occurred in CheckAndExpireAccounts");
             }
+            
+            
         }
-
 
     }
 }

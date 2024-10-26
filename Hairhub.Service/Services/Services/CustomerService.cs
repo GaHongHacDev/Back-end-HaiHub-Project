@@ -87,7 +87,7 @@ namespace Hairhub.Service.Services.Services
             var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync
                                                                                                 (
                                                                                                     predicate: x => x.Id == appointmentId,
-                                                                                                    include: x => x.Include(s => s.AppointmentDetails)
+                                                                                                    include: x => x.Include(s => s.AppointmentDetails).Include(s=>s.AppointmentDetailVouchers)
                                                                                                 );
             if (appointment == null)
             {
@@ -105,6 +105,52 @@ namespace Hairhub.Service.Services.Services
             }
             appointment.Status = AppointmentStatus.Successed;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
+
+            var employeeId = appointment.AppointmentDetails.ElementAt(0).SalonEmployeeId;
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>()
+                                            .SingleOrDefaultAsync(
+                                                predicate: x=>x.Id == employeeId, 
+                                                include: x=>x.Include(s=>s.SalonInformation.SalonOwner)
+                                            );
+            var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformation.SalonOwner.Id);
+            if(appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByWallet) || appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
+            {
+                decimal payMoney = appointment.TotalPrice;
+                if (appointment.AppointmentDetailVouchers != null)
+                {
+                    foreach(var item in appointment.AppointmentDetailVouchers)
+                    {
+                        var voucher = await _unitOfWork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: x=>x.Id == item.VoucherId);
+                        if (voucher.IsSystemCreated)
+                        {
+                            payMoney = appointment.OriginalPrice;
+                        }
+                    }
+                }
+                else
+                {
+                    payMoney = appointment.OriginalPrice;
+                }
+                accountSalon.Balance += payMoney;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(accountSalon);
+
+                var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == customerId);
+                string fullName = customer != null ? customer.FullName : "";
+                //Tao payment
+                Payment payment = new Payment()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = accountSalon.Id,
+                    AppointmentId = appointment.Id,
+                    Description = $"Nhận tiền từ cuộc hẹn với khách hàng {customer!.FullName}",
+                    PaymentDate = DateTime.UtcNow,
+                    TotalAmount = payMoney,
+                    PaymentType = PaymentType.Deposit,
+                    Status = PaymentStatus.Paid,
+                };
+                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+            }
+
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
@@ -136,7 +182,7 @@ namespace Hairhub.Service.Services.Services
             {
                 var urlImg = await _mediaService.UploadAnImage(
                     request.ImageStyles[i],
-                    MediaPath.FEEDBACK_IMG,
+                    MediaPath.STYLE_HAIR_CUSTOMER,
                     newImageCustomer.Id.ToString() + "/" + i.ToString());
 
                 var imageStyle = new ImageStyle

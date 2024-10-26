@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Otps;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +26,24 @@ namespace Hairhub.API.Controllers
             try
             {
                 bool isSendOtp = await _emailService.SendEmailAsync(sendOtpEmailRequest);
+                if (!isSendOtp)
+                {
+                    return BadRequest("Cannot send mail!");
+                }
+                return Ok("Send Otp successfully!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendOTPTRequestWithdraw([FromBody] SendOTPRequestWithdraw sendOtpRequest)
+        {
+            try
+            {
+                bool isSendOtp = await _emailService.SendRequestWithdraw(sendOtpRequest);
                 if (!isSendOtp)
                 {
                     return BadRequest("Cannot send mail!");
@@ -81,6 +100,7 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> CheckNonExistEmail([FromBody]CheckExistEmailResrequest request)
         {
             try

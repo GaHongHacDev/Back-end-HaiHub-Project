@@ -34,6 +34,7 @@ using Hairhub.Domain.Dtos.Requests.Approval;
 using Hairhub.Domain.Dtos.Responses.Approval;
 using Hairhub.Domain.Dtos.Responses.Reports;
 using Hairhub.Domain.Dtos.Requests.Reports;
+using Hairhub.Domain.Dtos.Responses.Notification;
 
 namespace Hairhub.Service.Helpers
 {
@@ -152,11 +153,35 @@ namespace Hairhub.Service.Helpers
 
             //Payment
             CreateMap<Payment, CreatePaymentRequest>().ReverseMap();
-            CreateMap<Payment, ResponsePayment>()
+            /*CreateMap<Payment, ResponsePayment>()
                 .ForMember(dest => dest.SalonOwners, opt => opt.MapFrom(src => src.SalonOwner)) // Ánh xạ cho SalonOwner
                 .ForMember(dest => dest.Config, opt => opt.MapFrom(src => src.Config)) // Ánh xạ cho Config
                 .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.SalonOwner.SalonInformations.FirstOrDefault())) // Ánh xạ cho SalonInformation
                 .ReverseMap();
+            */
+            CreateMap<Payment, PaymentHistory>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ConfigId, opt => opt.MapFrom(src => src.ConfigId))
+                .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.AccountId))
+                .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount))
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate))
+                .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Account.Role.RoleName))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Account.UserName));
+
+            CreateMap<PaymentReport, GetPaymentReportReponse>()
+           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PaymentId))
+           .ForMember(dest => dest.Balance, opt => opt.MapFrom(src => src.Balance))
+           .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate))
+           .ForMember(dest => dest.ConfirmDate, opt => opt.MapFrom(src => src.ConfirmDate))
+           .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+           .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Payment.Account.Id))
+           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Payment.Account.UserName))
+           .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Payment.Account.Role.RoleName));
+
             CreateMap<Payment, SavePaymentInfor>().ReverseMap();
             CreateMap<SavePaymentInfor, Payment>().ReverseMap();
             CreateMap<SalonOwnerPaymentResponse, SalonOwner>().ReverseMap();
@@ -186,6 +211,8 @@ namespace Hairhub.Service.Helpers
             CreateMap<FeedbackDetail, FeedbackDetailResponse>().ReverseMap();
             CreateMap<AppointmentFeedback, Appointment>().ReverseMap();
             CreateMap<AppointmentDetailFeedback, AppointmentDetail>().ReverseMap();
+            //CreateMap<FeedbackDetail, AppointmentDetailFeedback>()
+            //        .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating)); // Map trường Rating
 
             //Static File
             CreateMap<StaticFile, FileReportResponse>().ReverseMap();
@@ -214,6 +241,26 @@ namespace Hairhub.Service.Helpers
 
             CreateMap<Customer, Customers>(); // Assuming Customer -> Customers mapping
             CreateMap<ImageStyle, ImageStyles>();
+
+
+            // Notificaation
+            CreateMap<NotificationDetail, NotificationResponse>()
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => new NotificationContent
+                    {
+                        Id = src.Notification.Id,
+                        Title = src.Notification.Title,
+                        Message = src.Notification.Message,
+                        IsRead = src.IsRead,
+                        Type = src.Notification.Type
+                    }))
+                    .ForMember(dest => dest.Appointment, opt => opt.MapFrom(src => src.Appointment != null ? new AppointmentContent
+                    {
+                        Id = src.Appointment.Id,
+                        ServiceTime = src.Appointment.StartDate,
+                        CustomerName = src.Appointment.Customer.FullName,
+                        CreatedDate = src.Appointment.CreatedDate
+                    } : null));
         }
     }
 }

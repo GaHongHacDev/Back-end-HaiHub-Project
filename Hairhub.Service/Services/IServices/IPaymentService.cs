@@ -15,21 +15,19 @@ namespace Hairhub.Service.Services.IServices
 {
     public interface IPaymentService
     {
-        Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request);
-        Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest);
-        Task<IPaginate<ResponsePayment>> GetPayments(string? email, int page, int size);
-
-
-        Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest);
-
-        Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest);
-
-
-        Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size);
-
+        Task<bool> FakePaymentForCommissionRate(SavePaymentInfor createPaymentRequest);
+        Task<bool> PromotionPaymentForCommissionRate(SavePaymentInfor createPaymentRequest);
         Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commisionrate);
+        Task<CreatePaymentResult> SendPaymentLink(Guid accountId, CreatePaymentRequest request);
+        Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid);
+        Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email,
+                                                             string? paymentType, string? status, int page = 1, int size = 10);
+        Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request);
+        Task<bool> ConfirmWithdrawPayment(Guid id, WithdrawConfirmRequest request);
 
-        Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id);
+        Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size);
+        Task<PaymentReportResponse> GetPaymentReportById(Guid id);
+
 
     }
 }

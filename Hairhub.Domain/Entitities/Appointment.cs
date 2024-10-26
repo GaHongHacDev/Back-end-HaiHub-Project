@@ -24,12 +24,14 @@ namespace Hairhub.Domain.Entitities
         public string? QrCodeImg { get; set; }
         public decimal? CommissionRate { get; set; }
         public string Status { get; set; }
+        public string? PaymentMethod { get; set; }
 
-
+        public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
         public virtual Customer Customer { get; set; }
         public virtual ICollection<AppointmentDetail> AppointmentDetails { get; set; }
         public virtual ICollection<AppointmentDetailVoucher> AppointmentDetailVouchers { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<Report> Report { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }
