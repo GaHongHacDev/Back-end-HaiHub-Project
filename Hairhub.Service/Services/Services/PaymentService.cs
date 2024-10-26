@@ -482,27 +482,50 @@ namespace Hairhub.Service.Services.Services
                                                            include: i => i.Include(p => p.Payment)
                                                            .ThenInclude(p => p.Account)
                                                            .ThenInclude(p => p.Customers));
+            if (paymentReport == null)
+            {
+                throw new NotFoundException("Không tìm thấy thông tin payment report");
+            }
             var account = await _unitOfWork.GetRepository<Account>()
                                 .SingleOrDefaultAsync(predicate: p => p.Id == paymentReport.Payment.AccountId,
                                 include: i => i.Include(p => p.Customers).Include(p => p.SalonOwners)
                                 );
+            if (account == null)
+            {
+                throw new NotFoundException("Không tìm thấy thông tin account");
+            }
             var salonInformation = await _unitOfWork.GetRepository<SalonOwner>()
                                 .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
                                 );
             var CustomerInformation = await _unitOfWork.GetRepository<Customer>()
                                 .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
                                 );
+            string email="", phone="";
+            if (CustomerInformation != null)
+            {
+                email = CustomerInformation.Email;
+                phone = CustomerInformation.Phone;
+            }
+            else if (salonInformation != null)
+            {
+                email=salonInformation.Email;
+                phone = salonInformation.Phone;
+            }
+            else
+            {
+                throw new NotFoundException("Không tìm thấy thông tin customer hoặc salon");
+            }
             var paymentWithdraw = new PaymentReportResponse
             {
-                Email =  CustomerInformation.Email ?? salonInformation.Email!,
-                Phone = CustomerInformation.Phone ?? salonInformation.Phone!,
+                Email =  email,
+                Phone = phone,
                 FullName = paymentReport.FullName,
                 Balance = paymentReport.Balance,
                 ConfirmDate = paymentReport.ConfirmDate,
                 CreateDate = paymentReport.CreateDate,
                 NumberAccount = paymentReport.NumberAccount,
                 BankName = paymentReport.BankName,
-                ReasonCancle = paymentReport.ReasonCancle!,
+                ReasonCancle = paymentReport.ReasonCancle??null,
                 Status = paymentReport.Status,
                 Payment = new PaymentInformation
                 {
