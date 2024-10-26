@@ -16,6 +16,8 @@ namespace Hairhub.Domain.Dtos.Responses.Accounts
         public string? Gender { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }
-        public string? Img { get; set; }
+        public string? Img { get; set; } 
+
+        public decimal? Balance { get; set; }
     }
 }

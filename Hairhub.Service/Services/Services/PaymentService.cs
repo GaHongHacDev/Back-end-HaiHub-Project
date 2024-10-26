@@ -482,19 +482,64 @@ namespace Hairhub.Service.Services.Services
                                                            include: i => i.Include(p => p.Payment)
                                                            .ThenInclude(p => p.Account)
                                                            .ThenInclude(p => p.Customers));
+            if (paymentReport == null) { throw new NotFoundException("Không tìm thấy thông tin của payment"); }
             var account = await _unitOfWork.GetRepository<Account>()
                                 .SingleOrDefaultAsync(predicate: p => p.Id == paymentReport.Payment.AccountId,
                                 include: i => i.Include(p => p.Customers).Include(p => p.SalonOwners)
                                 );
-            var salonInformation = await _unitOfWork.GetRepository<SalonOwner>()
-                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
+            if (account == null) { throw new NotFoundException("Không tìm thấy thông tin của account"); }
+            var salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
+                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId,
+                                include: i => i.Include(p => p.SalonInformations)
                                 );
             var CustomerInformation = await _unitOfWork.GetRepository<Customer>()
                                 .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
                                 );
+            var staticfile = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: p => p.PaymentReportId == paymentReport.PaymentId);
+
+            List<string> Images = new List<string>();
+            if (staticfile != null)
+            {
+                foreach (var image in staticfile)
+                {
+                    Images.Add(image.Img);
+                }
+            }
+
+            if (staticfile == null) { throw new NotFoundException("Không tìm thấy thông tin của staticfile  "); }
+            string email = "", phone="", Name="", url ="";
+            Guid? userid = null;
+            if (salonOwner != null)
+            {
+                userid = salonOwner.Id;
+                email = salonOwner.Email!;
+                phone = salonOwner.Phone;
+                Name = salonOwner.FullName;
+                url = salonOwner.Img!;
+            } else if (CustomerInformation != null){
+                userid = CustomerInformation.Id;
+                email = CustomerInformation.Email!;
+                phone = CustomerInformation.Phone;
+                Name = CustomerInformation.FullName;
+                url = CustomerInformation.Img!;
+            } else
+            {
+                if (paymentReport != null) { throw new NotFoundException("Không tìm thấy thông tin của salon và customer"); }
+            }
+            
             var paymentWithdraw = new PaymentReportResponse
             {
-                FullName = paymentReport.FullName,
+                AccountInformation = new AccountInformation
+                {
+                    Id = account.Id,
+                    UserId = userid ?? Guid.Empty,
+                    Email = email,
+                    Phone = phone,
+                    FullName = Name,
+                    urlImage = url
+                },
+                Id = paymentReport!.PaymentId,
+                beneficiary = paymentReport.FullName,
                 Balance = paymentReport.Balance,
                 ConfirmDate = paymentReport.ConfirmDate,
                 CreateDate = paymentReport.CreateDate,
@@ -502,30 +547,11 @@ namespace Hairhub.Service.Services.Services
                 BankName = paymentReport.BankName,
                 ReasonCancle = paymentReport.ReasonCancle,
                 Status = paymentReport.Status,
-                Payment = new PaymentInformation
-                {
-                    Id = paymentReport.PaymentId,
-                    Description = paymentReport.Payment.Description,
-                    Status = paymentReport.Payment.Status,
-                    PaymentCode = paymentReport.Payment.PaymentCode,
-                    PaymentDate = paymentReport.Payment.PaymentDate,
-                    PaymentType = paymentReport.Payment.PaymentType,
-                    TotalAmount = paymentReport.Payment.TotalAmount,
-                    Customer = account.Customers != null ? new CustomerInformation
-                    {
-                        FullName = CustomerInformation.FullName,
-                        Email = CustomerInformation.Email,
-                        Phone = CustomerInformation.Phone
-                        
-                    } : null!,
-                    salon = account.SalonOwners != null ? new SalonOwnerInformation
-                    {
-                        FullName = salonInformation.FullName,
-                        Email = salonInformation.Email,
-                        Phone = salonInformation.Phone
-                    } : null!
-
-                }
+                Description = paymentReport.Payment.Description,
+                PaymentDate = paymentReport.Payment.PaymentDate,
+                statusofpayment = paymentReport.Payment.Status,
+                typeofpayment = paymentReport.Payment.PaymentType,
+                urlPaymentImage = Images,
             };
 
             return paymentWithdraw;
