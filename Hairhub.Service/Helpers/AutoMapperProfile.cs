@@ -159,6 +159,10 @@ namespace Hairhub.Service.Helpers
                 .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.SalonOwner.SalonInformations.FirstOrDefault())) // Ánh xạ cho SalonInformation
                 .ReverseMap();
             */
+            CreateMap<Payment, PaymentHistory>();
+            CreateMap<Account, PaymentHistory>();
+            CreateMap<Role, PaymentHistory>();
+
             CreateMap<Payment, SavePaymentInfor>().ReverseMap();
             CreateMap<SavePaymentInfor, Payment>().ReverseMap();
             CreateMap<SalonOwnerPaymentResponse, SalonOwner>().ReverseMap();

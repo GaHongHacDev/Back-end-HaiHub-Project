@@ -32,5 +32,6 @@ namespace Hairhub.Domain.Entitities
         public virtual ICollection<AppointmentDetailVoucher> AppointmentDetailVouchers { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<Report> Report { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

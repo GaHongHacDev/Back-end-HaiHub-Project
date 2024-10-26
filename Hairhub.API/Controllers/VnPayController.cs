@@ -48,8 +48,7 @@ namespace Hairhub.API.Controllers
             string paymentUrl = await _vnpayservice.CreatePaymentUrl(request, returnUrl, clientIPAddress);
             return Ok(paymentUrl);
         }
-        [HttpGet]
-        
+        [HttpGet]        
         public async Task<IActionResult> PaymentConfirm()
         {
             // Kiểm tra xem có query string không

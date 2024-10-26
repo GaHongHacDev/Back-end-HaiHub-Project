@@ -13,20 +13,24 @@ namespace Hairhub.Domain.Entitities
         public Guid Id { get; set; }
         public Guid? ConfigId { get; set; }
         public Guid? AccountId { get; set; }
+        public Guid? AppointmentId { get; set; }
         public decimal TotalAmount { get; set; }
-        public DateTime PaymentDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
         public string PaymentType { get; set; }
         public string? Description { get; set; }
         public string Status { get; set; }
-        public string? ReasonCancle { get; set; }
-        public int PaymentCode { get; set; }
+        //public string? ReasonCancle { get; set; }
+        public string? PaymentCode { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        //public DateTime CreateDate { get; set; }
         public string PakageName { get; set; }
         public decimal? PakageFee { get; set; }
         public decimal? CommissionRate { get; set; }
         // Navigation properties
         public virtual Account Account { get; set; }
         public virtual Config Config { get; set; }
+        public virtual Appointment Appointment { get; set; }
+        public virtual PaymentReport PaymentReport { get; set; }
     }
 }

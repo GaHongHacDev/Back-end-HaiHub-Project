@@ -29,7 +29,6 @@ namespace Hairhub.Service.Services.Services
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
-
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
                                     IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
         {
@@ -1022,6 +1021,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
+            if (!AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) && !AppointmentPaymentMethod.PayInSalon.Equals(request.PaymentMethod) 
+                && !AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+            {
+                throw new NotFoundException("Sai tên phương thức thanh toán");
+            }
             var appointment = new Appointment()
             {
                 Id = id,
@@ -1034,6 +1038,7 @@ namespace Hairhub.Service.Services.Services
                 Status = AppointmentStatus.Booking,
                 CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
+                PaymentMethod = request.PaymentMethod
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
@@ -1065,9 +1070,11 @@ namespace Hairhub.Service.Services.Services
                         AppointmentId = appointment.Id,
                         VoucherId = item
                     };
+                    
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
                 }
             }
+             
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return (isInsert, id);
         }
@@ -1280,21 +1287,21 @@ namespace Hairhub.Service.Services.Services
             {
                 year = DateTime.Now.Year;
             }
-            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate.Year == year && p.Status == PaymentStatus.Paid);
+            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate!.Value.Year == year && p.Status == PaymentStatus.Paid);
             var dataOfMonths = new DataOfMonths
             {
-                Jan = (int?)payments.Where(a => a.PaymentDate.Month == 1).Sum(a => a.TotalAmount),
-                Feb = (int?)payments.Where(a => a.PaymentDate.Month == 2).Sum(a => a.TotalAmount),
-                March = (int?)payments.Where(a => a.PaymentDate.Month == 3).Sum(a => a.TotalAmount),
-                April = (int?)payments.Where(a => a.PaymentDate.Month == 4).Sum(a => a.TotalAmount),
-                May = (int?)payments.Where(a => a.PaymentDate.Month == 5).Sum(a => a.TotalAmount),
-                June = (int?)payments.Where(a => a.PaymentDate.Month == 6).Sum(a => a.TotalAmount),
-                July = (int?)payments.Where(a => a.PaymentDate.Month == 7).Sum(a => a.TotalAmount),
-                August = (int?)payments.Where(a => a.PaymentDate.Month == 8).Sum(a => a.TotalAmount),
-                September = (int?)payments.Where(a => a.PaymentDate.Month == 9).Sum(a => a.TotalAmount),
-                October = (int?)payments.Where(a => a.PaymentDate.Month == 10).Sum(a => a.TotalAmount),
-                November = (int?)payments.Where(a => a.PaymentDate.Month == 11).Sum(a => a.TotalAmount),
-                December = (int?)payments.Where(a => a.PaymentDate.Month == 12).Sum(a => a.TotalAmount)
+                Jan = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 1).Sum(a => a.TotalAmount),
+                Feb = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 2).Sum(a => a.TotalAmount),
+                March = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 3).Sum(a => a.TotalAmount),
+                April = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 4).Sum(a => a.TotalAmount),
+                May = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 5).Sum(a => a.TotalAmount),
+                June = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 6).Sum(a => a.TotalAmount),
+                July = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 7).Sum(a => a.TotalAmount),
+                August = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 8).Sum(a => a.TotalAmount),
+                September = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 9).Sum(a => a.TotalAmount),
+                October = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 10).Sum(a => a.TotalAmount),
+                November = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 11).Sum(a => a.TotalAmount),
+                December = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 12).Sum(a => a.TotalAmount)
             };
             return dataOfMonths;
         }
