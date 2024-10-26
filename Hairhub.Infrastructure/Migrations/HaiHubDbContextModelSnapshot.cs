@@ -672,7 +672,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("description");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("end_date");
 
@@ -681,13 +681,12 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnName("pakage_fee");
 
                     b.Property<string>("PakageName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("pakage_name");
 
-                    b.Property<int?>("PaymentCode")
-                        .HasColumnType("int")
+                    b.Property<string>("PaymentCode")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("payment_code");
 
                     b.Property<DateTime?>("PaymentDate")
@@ -700,7 +699,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(30)")
                         .HasColumnName("payment_type");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("start_date");
 
