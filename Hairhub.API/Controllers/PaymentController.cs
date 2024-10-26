@@ -36,7 +36,7 @@ namespace Hairhub.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> PaymentConfirm()
         {
             // Kiểm tra xem có query string không
@@ -60,7 +60,7 @@ namespace Hairhub.API.Controllers
                 bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
 
 
-                if (isValid == true)
+                if (isValid != true)
                 {
                     // Thanh toán thành công
                     return Ok(isValid);
@@ -70,10 +70,9 @@ namespace Hairhub.API.Controllers
                     // Thanh toán không thành công
                     return Ok(isValid);
                 }
-            }
 
-            // Phản hồi không hợp lệ
-            return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
+            }
+            return Ok(false);
         }
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
