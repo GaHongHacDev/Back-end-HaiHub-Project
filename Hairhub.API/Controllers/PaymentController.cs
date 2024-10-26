@@ -57,13 +57,10 @@ namespace Hairhub.API.Controllers
                     return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
                 }
 
-<<<<<<< HEAD
+
                 
                 bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
-=======
 
-                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, appointmentid, configid);
->>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
 
                 if (isValid == true)
                 {
@@ -124,16 +121,6 @@ namespace Hairhub.API.Controllers
             }
         }
 
-<<<<<<< HEAD
-        [HttpGet]
-        [Route("{id:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetPaymentReportById([FromRoute] Guid id)
-        {
-            try
-            {
-                var result = await _paymentservice.GetPaymentReportById(id);
-=======
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateWithdrawPayment(CreateWithdrawPaymentRequest request)
@@ -149,7 +136,7 @@ namespace Hairhub.API.Controllers
         [HttpPost]
         [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> ConfirmWithdrawPayment([FromRoute]Guid id, [FromForm] WithdrawConfirmRequest request)
+        public async Task<IActionResult> ConfirmWithdrawPayment([FromRoute] Guid id, [FromForm] WithdrawConfirmRequest request)
         {
             try
             {
@@ -158,7 +145,6 @@ namespace Hairhub.API.Controllers
                 {
                     return BadRequest(new { message = "Lỗi không thể confirm đơn rút tiền" });
                 }
->>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
                 return Ok(result);
             }
             catch (NotFoundException ex)
@@ -167,16 +153,11 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-<<<<<<< HEAD
                 return BadRequest(new { message = ex.Message });
             }
         }
-=======
-                return BadRequest(new {message = ex.Message});
-            }
-        }
 
 
->>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
+
     }
 }

@@ -218,12 +218,9 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-<<<<<<< HEAD
+
 
         public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
-=======
-        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? appointmentid, Guid? configid)
->>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
         {
             
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
@@ -479,7 +476,7 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-<<<<<<< HEAD
+
         public async Task<PaymentReportResponse> GetPaymentReportById(Guid id)
         {
             var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().
@@ -537,7 +534,6 @@ namespace Hairhub.Service.Services.Services
         }
 
 
-=======
         public async Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size)
         {
             email = (email == null || email.Trim() == "") ? "" : email;
@@ -571,6 +567,6 @@ namespace Hairhub.Service.Services.Services
 
             return paginateResponse;
         }
->>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
+
     }
 }
