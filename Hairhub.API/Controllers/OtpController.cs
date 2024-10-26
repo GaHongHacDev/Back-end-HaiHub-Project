@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Otps;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -99,6 +100,7 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> CheckNonExistEmail([FromBody]CheckExistEmailResrequest request)
         {
             try

@@ -161,7 +161,7 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Chỉ customer hoặc salon owner mới có thể gửi OTP yêu cầu rút tiền");
                 }
 
-                var emailBody = _configuration["EmailSetting:EmailConfirmWithdraw"];
+                var emailBody = _configuration["EmailSetting:EmailRequestWithdraw"];
                 emailBody = emailBody.Replace("{FULL_NAME}", fullName);
                 emailBody = emailBody.Replace("{OTP_CODE}", otp);
                 emailBody = emailBody.Replace("{PHONE_NUMBER}", _configuration["Project_HairHub:PHONE_NUMBER"]);

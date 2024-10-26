@@ -37,7 +37,8 @@ namespace Hairhub.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> PaymentConfirm()
         {
             // Kiểm tra xem có query string không
