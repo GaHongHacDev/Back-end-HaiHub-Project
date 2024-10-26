@@ -162,6 +162,15 @@ namespace Hairhub.Service.Helpers
             CreateMap<Payment, PaymentHistory>();
             CreateMap<Account, PaymentHistory>();
             CreateMap<Role, PaymentHistory>();
+            CreateMap<PaymentReport, GetPaymentReportReponse>()
+           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PaymentId))
+           .ForMember(dest => dest.Balance, opt => opt.MapFrom(src => src.Balance))
+           .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate))
+           .ForMember(dest => dest.ConfirmDate, opt => opt.MapFrom(src => src.ConfirmDate))
+           .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+           .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Payment.Account.Id))
+           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Payment.Account.UserName))
+           .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Payment.Account.Role.RoleName));
 
             CreateMap<Payment, SavePaymentInfor>().ReverseMap();
             CreateMap<SavePaymentInfor, Payment>().ReverseMap();

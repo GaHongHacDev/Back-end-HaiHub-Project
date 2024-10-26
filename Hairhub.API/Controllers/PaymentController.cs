@@ -156,6 +156,24 @@ namespace Hairhub.API.Controllers
             }
         }
 
-
+        [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> GetPaymentReport([FromQuery] Guid? accountId, [FromQuery] string? email, [FromQuery] DateTime? createDate,
+                                                    [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var result = await _paymentservice.GetPaymentReport(accountId, email, createDate, status, page, size);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
