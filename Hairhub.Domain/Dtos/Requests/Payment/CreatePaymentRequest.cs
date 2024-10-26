@@ -10,7 +10,6 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
     public class CreatePaymentRequest
     {
         public Guid? ConfigId { get; set; }
-        public Guid? AppointmentId { get; set; }
 
         public decimal Price { get; set; }
         public string? Description { get; set; }

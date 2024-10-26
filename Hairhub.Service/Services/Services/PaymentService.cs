@@ -162,7 +162,7 @@ namespace Hairhub.Service.Services.Services
             {
                 string hostName = System.Net.Dns.GetHostName();
                 string clientIPAddress = System.Net.Dns.GetHostAddresses(hostName).GetValue(0).ToString();
-                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&appointment={request.AppointmentId}&config={request.ConfigId}";
+                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
                 var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
@@ -218,7 +218,7 @@ namespace Hairhub.Service.Services.Services
         }
 
 
-        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? appointmentid, Guid? configid)
+        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
         {
             
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
@@ -243,7 +243,6 @@ namespace Hairhub.Service.Services.Services
                             var balance = account.Balance;
                             account.Balance = balance + price;
                             _unitOfWork.GetRepository<Account>().UpdateAsync(account);
-                            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentid);
                             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
                             if (config != null)
                             {
@@ -263,16 +262,16 @@ namespace Hairhub.Service.Services.Services
                             else {
                                 var payment = new Payment
                                 {
-                                    Id = Guid.NewGuid(),
+                                    Id = Guid.NewGuid(),    
                                     AccountId = accountid,
-                                    AppointmentId = appointment == null ? null : appointment.Id,
+                                    AppointmentId = null,
                                     ConfigId = config == null ? null : config.Id,
-                                    Description = "Nạp tiền thành công vào ví",
+                                    Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
                                     PaymentDate = DateTime.Now,
                                     TotalAmount = price,
                                     Status = PaymentStatus.Paid,
                                     PaymentCode = paymentlinkId,
-                                    PaymentType = PaymentType.Deposit,
+                                    PaymentType = PaymentType.Deposit,      
                                 };
                                 await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
                             }
@@ -473,5 +472,63 @@ namespace Hairhub.Service.Services.Services
 
             }
         }
+
+        public async Task<PaymentReportResponse> GetPaymentReportById(Guid id)
+        {
+            var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().
+                                      SingleOrDefaultAsync(predicate: p => p.PaymentId == id,
+                                                           include: i => i.Include(p => p.Payment)
+                                                           .ThenInclude(p => p.Account)
+                                                           .ThenInclude(p => p.Customers));
+            var account = await _unitOfWork.GetRepository<Account>()
+                                .SingleOrDefaultAsync(predicate: p => p.Id == paymentReport.Payment.AccountId,
+                                include: i => i.Include(p => p.Customers).Include(p => p.SalonOwners)
+                                );
+            var salonInformation = await _unitOfWork.GetRepository<SalonOwner>()
+                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
+                                );
+            var CustomerInformation = await _unitOfWork.GetRepository<Customer>()
+                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
+                                );
+            var paymentWithdraw = new PaymentReportResponse
+            {
+                FullName = paymentReport.FullName,
+                Balance = paymentReport.Balance,
+                ConfirmDate = paymentReport.ConfirmDate,
+                CreateDate = paymentReport.CreateDate,
+                NumberAccount = paymentReport.NumberAccount,
+                BankName = paymentReport.BankName,
+                ReasonCancle = paymentReport.ReasonCancle,
+                Status = paymentReport.Status,
+                Payment = new PaymentInformation
+                {
+                    Id = paymentReport.PaymentId,
+                    Description = paymentReport.Payment.Description,
+                    Status = paymentReport.Payment.Status,
+                    PaymentCode = paymentReport.Payment.PaymentCode,
+                    PaymentDate = paymentReport.Payment.PaymentDate,
+                    PaymentType = paymentReport.Payment.PaymentType,
+                    TotalAmount = paymentReport.Payment.TotalAmount,
+                    Customer = account.Customers != null ? new CustomerInformation
+                    {
+                        FullName = CustomerInformation.FullName,
+                        Email = CustomerInformation.Email,
+                        Phone = CustomerInformation.Phone
+                        
+                    } : null!,
+                    salon = account.SalonOwners != null ? new SalonOwnerInformation
+                    {
+                        FullName = salonInformation.FullName,
+                        Email = salonInformation.Email,
+                        Phone = salonInformation.Phone
+                    } : null!
+
+                }
+            };
+
+            return paymentWithdraw;
+        }
+
+
     }
 }

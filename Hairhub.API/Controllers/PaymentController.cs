@@ -47,7 +47,6 @@ namespace Hairhub.API.Controllers
                 string paymentlink = Request.Query["id"]!;
                 string status = Request.Query["status"]!;
                 var accountid = Guid.Parse(Request.Query["accountId"]!);
-                var appointmentid = Guid.Parse(Request.Query["appointment"]!);
                 var configid = Guid.Parse(Request.Query["config"]!);
                 var price = Decimal.Parse(Request.Query["amount"]!)!;
                 int orderCode = int.Parse(Request.Query["ordercode"]!);
@@ -59,7 +58,7 @@ namespace Hairhub.API.Controllers
                 }
 
                 
-                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, appointmentid, configid);
+                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
 
                 if (isValid == true)
                 {
@@ -112,6 +111,26 @@ namespace Hairhub.API.Controllers
             catch (NotFoundException ex) 
             {
                 return NotFound(new {message = ex.Message});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> GetPaymentReportById([FromRoute] Guid id)
+        {
+            try
+            {
+                var result = await _paymentservice.GetPaymentReportById(id);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
