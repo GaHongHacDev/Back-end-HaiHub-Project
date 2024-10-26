@@ -39,6 +39,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http;
 using Hairhub.Common.ThirdParties.Contract;
+using System.Drawing;
 
 
 namespace Hairhub.Service.Services.Services
@@ -217,8 +218,12 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
+<<<<<<< HEAD
 
         public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
+=======
+        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? appointmentid, Guid? configid)
+>>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
         {
             
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
@@ -294,13 +299,15 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception(ex.Message);
             }
         }
+        
         public async Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email, string? paymentType, string? status, int page = 1, int size = 10)
         {
             email = (email == null || email.Trim() == "") ? "" : email;
             paymentType = (paymentType == null || paymentType.Trim() == "") ? "" : paymentType;
             status = (status == null || status.Trim() == "") ? "" : status;
 
-            var predicate = PredicateBuilder.New<Payment>(x => x.Status.Equals(status) && x.PaymentType.Equals(paymentType) && x.Account.UserName.Contains(email));
+            var predicate = PredicateBuilder.New<Payment>(x => x.Status.Contains(status) && x.PaymentType.Contains(paymentType) && x.Account.UserName.Contains(email) 
+                                                            && !x.PaymentType.Equals(PaymentStatus.Fake));
             if(accountId != null)
             {
                 predicate = predicate.And(x => x.AccountId == accountId);
@@ -313,8 +320,7 @@ namespace Hairhub.Service.Services.Services
             var payments = await _unitOfWork.GetRepository<Payment>()
                                             .GetPagingListAsync(
                                                 predicate: predicate,
-                                                include: x=>x.Include(s=>s.Account).Include(s=>s.Account.Role).Include(s=>s.Account.SalonOwners)
-                                                             .Include(s => s.Account.Customers),
+                                                include: x=>x.Include(s=>s.Account).Include(s=>s.Account.Role),
                                                 page: page, 
                                                 size: size
                                             );
@@ -391,7 +397,7 @@ namespace Hairhub.Service.Services.Services
             return isCommit;
         }
 
-        public async Task<bool> ConfirmWithdrawPayment(WithdrawConfirmRequest request)
+        public async Task<bool> ConfirmWithdrawPayment(Guid Id, WithdrawConfirmRequest request)
         {
             if (request.StatusConfirm.Equals(PaymentStatus.Cancel))
             {
@@ -399,18 +405,18 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Không tìm thấy lý do từ chối");
                 }
-                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == request.Id);
+                var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: x => x.Id == Id);
                 if (payment == null)
                 {
-                    throw new NotFoundException($"Không tìm thấy payment với id {request.Id}");
+                    throw new NotFoundException($"Không tìm thấy payment với id {Id}");
                 }
                 payment.Status = PaymentStatus.Cancel;
                 _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
 
-                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x=>x.PaymentId == request.Id);
+                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x=>x.PaymentId == Id);
                 if (paymentReport == null)
                 {
-                    throw new NotFoundException($"Không tìm thấy payment report với id {request.Id}");
+                    throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
                 }
                 paymentReport.ReasonCancle = request.ReasonCancel;
                 paymentReport.ConfirmDate = DateTime.UtcNow;
@@ -424,20 +430,20 @@ namespace Hairhub.Service.Services.Services
             {
                 var payment = await _unitOfWork.GetRepository<Payment>()
                                                 .SingleOrDefaultAsync(
-                                                    predicate: x => x.Id == request.Id, 
+                                                    predicate: x => x.Id == Id, 
                                                     include: x=>x.Include(s=>s.Account).ThenInclude(s=>s.Role)
                                                 );
                 if (payment == null)
                 {
-                    throw new NotFoundException($"Không tìm thấy payment với id {request.Id}");
+                    throw new NotFoundException($"Không tìm thấy payment với id {Id}");
                 }
                 payment.Status = PaymentStatus.Paid;
                 payment.PaymentDate = DateTime.UtcNow;
 
-                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x => x.PaymentId == request.Id);
+                var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x => x.PaymentId == Id);
                 if (paymentReport == null)
                 {
-                    throw new NotFoundException($"Không tìm thấy payment report với id {request.Id}");
+                    throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
                 }
                 paymentReport.ConfirmDate = DateTime.UtcNow;
                 paymentReport.Status = PaymentStatus.Paid;
@@ -473,6 +479,7 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
+<<<<<<< HEAD
         public async Task<PaymentReportResponse> GetPaymentReportById(Guid id)
         {
             var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().
@@ -530,5 +537,40 @@ namespace Hairhub.Service.Services.Services
         }
 
 
+=======
+        public async Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size)
+        {
+            email = (email == null || email.Trim() == "") ? "" : email;
+            status = (status == null || status.Trim() == "") ? "" : status;
+
+            var predicate = PredicateBuilder.New<PaymentReport>(x => x.Status.Contains(status) && x.Payment.Account.UserName.Contains(email));
+            if (accountId != null)
+            {
+                predicate = predicate.And(x => x.Payment.AccountId == accountId);
+            }
+            if (createDate.HasValue)
+            {
+                predicate = predicate.And(x => x.CreateDate.Date == createDate.Value.Date);
+            }
+
+            var payments = await _unitOfWork.GetRepository<PaymentReport>()
+                                            .GetPagingListAsync(
+                                                predicate: predicate,
+                                                include: x => x.Include(s => s.Payment.Account).Include(s => s.Payment.Account.Role),
+                                                page: page,
+                                                size: size
+                                            );
+            var paginateResponse = new Paginate<GetPaymentReportReponse>
+            {
+                Page = payments.Page,
+                Size = payments.Size,
+                Total = payments.Total,
+                TotalPages = payments.TotalPages,
+                Items = _mapper.Map<IList<GetPaymentReportReponse>>(payments.Items)
+            };
+
+            return paginateResponse;
+        }
+>>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
     }
 }

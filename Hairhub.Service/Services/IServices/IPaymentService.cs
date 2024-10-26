@@ -22,10 +22,16 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid);
         Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email,
                                                              string? paymentType, string? status, int page = 1, int size = 10);
+<<<<<<< HEAD
 
 
         Task<PaymentReportResponse> GetPaymentReportById(Guid id);
 
 
+=======
+        Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request);
+        Task<bool> ConfirmWithdrawPayment(Guid id, WithdrawConfirmRequest request);
+        Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size);
+>>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
     }
 }

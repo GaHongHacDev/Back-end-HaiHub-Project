@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
 {
-    [Route(ApiEndPointConstant.Payment.PaymentEndpoint+ "/[action]")]
+    [Route(ApiEndPointConstant.Payment.PaymentEndpoint + "/[action]")]
     [ApiController]
     public class PaymentController : BaseController
     {
@@ -54,11 +54,16 @@ namespace Hairhub.API.Controllers
 
                 if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))
                 {
-                    return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE"); 
+                    return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
                 }
 
+<<<<<<< HEAD
                 
                 bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
+=======
+
+                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, appointmentid, configid);
+>>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
 
                 if (isValid == true)
                 {
@@ -97,35 +102,16 @@ namespace Hairhub.API.Controllers
             }
             return Ok(result);
         }
+
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetPaymentHistory([FromQuery] DateTime? payDate, [FromQuery] Guid? accountId, [FromQuery] string? email, 
-                                                            [FromQuery] string? paymentType, [FromQuery] string? status, 
+        public async Task<IActionResult> GetPaymentHistory([FromQuery] DateTime? payDate, [FromQuery] Guid? accountId, [FromQuery] string? email,
+                                                            [FromQuery] string? paymentType, [FromQuery] string? status,
                                                             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
                 var result = await _paymentservice.GetPaymentHistory(payDate, accountId, email, paymentType, status, page, size);
-                return Ok(result);
-            }
-            catch (NotFoundException ex) 
-            {
-                return NotFound(new {message = ex.Message});
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("{id:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetPaymentReportById([FromRoute] Guid id)
-        {
-            try
-            {
-                var result = await _paymentservice.GetPaymentReportById(id);
                 return Ok(result);
             }
             catch (NotFoundException ex)
@@ -137,5 +123,60 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+<<<<<<< HEAD
+        [HttpGet]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> GetPaymentReportById([FromRoute] Guid id)
+        {
+            try
+            {
+                var result = await _paymentservice.GetPaymentReportById(id);
+=======
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CreateWithdrawPayment(CreateWithdrawPaymentRequest request)
+        {
+            var result = await _paymentservice.CreateWithdrawPayment(request);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> ConfirmWithdrawPayment([FromRoute]Guid id, [FromForm] WithdrawConfirmRequest request)
+        {
+            try
+            {
+                var result = await _paymentservice.ConfirmWithdrawPayment(id, request);
+                if (result == null || !result)
+                {
+                    return BadRequest(new { message = "Lỗi không thể confirm đơn rút tiền" });
+                }
+>>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+<<<<<<< HEAD
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+=======
+                return BadRequest(new {message = ex.Message});
+            }
+        }
+
+
+>>>>>>> 4c548418f68388c791207d23ad9a8cc32da40fe2
     }
 }
