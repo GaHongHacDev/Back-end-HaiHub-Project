@@ -47,7 +47,6 @@ namespace Hairhub.API.Controllers
                 string paymentlink = Request.Query["id"]!;
                 string status = Request.Query["status"]!;
                 var accountid = Guid.Parse(Request.Query["accountId"]!);
-                var appointmentid = Guid.Parse(Request.Query["appointment"]!);
                 var configid = Guid.Parse(Request.Query["config"]!);
                 var price = Decimal.Parse(Request.Query["amount"]!)!;
                 int orderCode = int.Parse(Request.Query["ordercode"]!);
@@ -59,7 +58,9 @@ namespace Hairhub.API.Controllers
                 }
 
 
-                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, appointmentid, configid);
+                
+                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
+
 
                 if (isValid == true)
                 {
@@ -135,7 +136,7 @@ namespace Hairhub.API.Controllers
         [HttpPost]
         [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> ConfirmWithdrawPayment([FromRoute]Guid id, [FromForm] WithdrawConfirmRequest request)
+        public async Task<IActionResult> ConfirmWithdrawPayment([FromRoute] Guid id, [FromForm] WithdrawConfirmRequest request)
         {
             try
             {
@@ -152,7 +153,7 @@ namespace Hairhub.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new {message = ex.Message});
+                return BadRequest(new { message = ex.Message });
             }
         }
 
