@@ -18,6 +18,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Data.Entity;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -80,14 +81,127 @@ namespace Hairhub.Service.Services.Services
                 ExpireTime = 2,
                 TypeOtp = OtpTypeEnum.OtpMail.ToString(),
             };
-            otp.EndTime = otp.CreatedTime.GetValueOrDefault().AddMinutes(otp.ExpireTime??=2);
+            otp.EndTime = otp.CreatedTime.GetValueOrDefault().AddMinutes(otp.ExpireTime ??= 2);
             await _unitOfWork.GetRepository<OTP>().InsertAsync(otp);
-            bool isInsertAsync = await _unitOfWork.CommitAsync()>0;
+            bool isInsertAsync = await _unitOfWork.CommitAsync() > 0;
             if (!isInsertAsync)
             {
                 throw new Exception("Cannot insert otp to database");
             }
             return true;
+        }
+
+        public async Task<bool> SendConfirmWithdraw(string emailRequest, string subjectEmail, string fullName, string paymentDate,
+                                                    string accountHolderName, string accountNumber, string bankName, string Balance, string bankImg)
+        {
+            try
+            {
+                var emailBody = _configuration["EmailSetting:EmailConfirmWithdraw"];
+                emailBody = emailBody.Replace("{FULL_NAME}", fullName);
+                emailBody = emailBody.Replace("{PAYMENT_DATE}", paymentDate);
+                emailBody = emailBody.Replace("{ACCOUNT_HOLDER_NAME}", accountHolderName);
+                emailBody = emailBody.Replace("{ACCOUNT_NUMBER}", accountNumber);
+                emailBody = emailBody.Replace("{BANK_NAME}", bankName);
+                emailBody = emailBody.Replace("{BALANCE}", Balance);
+                emailBody = emailBody.Replace("{BANKING_IMG}", bankImg);
+                emailBody = emailBody.Replace("{PHONE_NUMBER}", _configuration["Project_HairHub:PHONE_NUMBER"]);
+                emailBody = emailBody.Replace("{EMAIL_ADDRESS}", _configuration["Project_HairHub:EMAIL_ADDRESS"]);
+
+                var emailHost = _configuration["EmailSetting:EmailHost"];
+                var userName = _configuration["EmailSetting:EmailUsername"];
+                var password = _configuration["EmailSetting:EmailPassword"];
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse(emailHost));
+                email.To.Add(MailboxAddress.Parse(emailRequest));
+                email.Subject = subjectEmail;
+                email.Body = new TextPart(TextFormat.Html)
+                {
+                    Text = emailBody
+                };
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync(emailHost, 587, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(userName, password);
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SendRequestWithdraw(SendOTPRequestWithdraw request)
+        {
+            try
+            {
+                string emailRequest = "";
+                string subjectEmail = "OTP Rút Tiền Từ Ví Hairhub Pay";
+                string fullName = "";
+                string otp = GenerateOTP(6);
+
+                var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == request.AccountId);
+                var salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == request.AccountId);
+                if (customer == null && salonOwner == null)
+                {
+                    throw new NotFoundException("Không tìm thấy tài khoản");
+                }
+                if (customer != null)
+                {
+                    emailRequest = customer.Email;
+                    fullName = customer.FullName;
+                }
+                else if (salonOwner != null)
+                {
+                    emailRequest = customer.Email;
+                    fullName = customer.FullName;
+                }
+                else
+                {
+                    throw new NotFoundException("Chỉ customer hoặc salon owner mới có thể gửi OTP yêu cầu rút tiền");
+                }
+
+                var emailBody = _configuration["EmailSetting:EmailConfirmWithdraw"];
+                emailBody = emailBody.Replace("{FULL_NAME}", fullName);
+                emailBody = emailBody.Replace("{OTP_CODE}", otp);
+                emailBody = emailBody.Replace("{PHONE_NUMBER}", _configuration["Project_HairHub:PHONE_NUMBER"]);
+                emailBody = emailBody.Replace("{EMAIL_ADDRESS}", _configuration["Project_HairHub:EMAIL_ADDRESS"]);
+
+                var emailHost = _configuration["EmailSetting:EmailHost"];
+                var userName = _configuration["EmailSetting:EmailUsername"];
+                var password = _configuration["EmailSetting:EmailPassword"];
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse(emailHost));
+                email.To.Add(MailboxAddress.Parse(emailRequest));
+                email.Subject = subjectEmail;
+                email.Body = new TextPart(TextFormat.Html)
+                {
+                    Text = emailBody
+                };
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync(emailHost, 587, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(userName, password);
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+
+                OTP otpEntity = new OTP()
+                {
+                    Id = Guid.NewGuid(),
+                    Email = emailRequest,
+                    OtpKey = otp,
+                    CreatedTime = DateTime.Now,
+                    ExpireTime = 2,
+                    TypeOtp = OtpTypeEnum.OtpMail.ToString(),
+                };
+                otpEntity.EndTime = otpEntity.CreatedTime.GetValueOrDefault().AddMinutes(otpEntity.ExpireTime ??= 2);
+                await _unitOfWork.GetRepository<OTP>().InsertAsync(otpEntity);
+                bool isInsertAsync = await _unitOfWork.CommitAsync() > 0;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> SendEmailWithBodyAsync(string emailRequest, string subjectEmail, string fullName, string bodyEmail)
@@ -160,8 +274,8 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<bool> SendEmailAsyncNotifyOfExpired(string emailIndividual, string  fullname, int REMAINING_DAY, DateTime EXPIRATION_DATE, string LINK_PAYMENT)
-        {  
+        public async Task<bool> SendEmailAsyncNotifyOfExpired(string emailIndividual, string fullname, int REMAINING_DAY, DateTime EXPIRATION_DATE, string LINK_PAYMENT)
+        {
             var emailBody = _configuration["EmailPayment:EmailBody"];
             emailBody = emailBody.Replace("{FULL_NAME_OWNER}", fullname);
             emailBody = emailBody.Replace("{REMAINING_DAY}", REMAINING_DAY.ToString());
@@ -219,7 +333,7 @@ namespace Hairhub.Service.Services.Services
             }
             return true;
         }
-       
+
 
     }
 }

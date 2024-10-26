@@ -617,7 +617,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.PaymentId).HasColumnName("payment_id");
                 entity.Property(e => e.ReasonCancle).HasMaxLength(250).HasColumnName("reason_cancle").IsRequired(false);
                 entity.Property(e => e.CreateDate).HasColumnName("create_date");
-                entity.Property(e => e.ConfirmDate).HasColumnName("confirm_date");
+                entity.Property(e => e.ConfirmDate).HasColumnName("confirm_date").IsRequired(false);
                 entity.Property(e => e.FullName).HasMaxLength(100).HasColumnName("full_name");
                 entity.Property(e => e.NumberAccount).HasMaxLength(50).HasColumnName("number_account");
                 entity.Property(e => e.BankName).HasMaxLength(100).HasColumnName("bank_name");

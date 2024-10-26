@@ -38,6 +38,24 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> SendOTPTRequestWithdraw([FromBody] SendOTPRequestWithdraw sendOtpRequest)
+        {
+            try
+            {
+                bool isSendOtp = await _emailService.SendRequestWithdraw(sendOtpRequest);
+                if (!isSendOtp)
+                {
+                    return BadRequest("Cannot send mail!");
+                }
+                return Ok("Send Otp successfully!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> checkOtp([FromBody] CheckOtpRequest CheckOtpRequest)
         {
             try
