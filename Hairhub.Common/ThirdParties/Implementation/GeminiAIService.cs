@@ -81,14 +81,14 @@ namespace Hairhub.Common.ThirdParties.Implementation
                             [Thời gian] phải được viết dưới dạng dd/mm/yyyy hh:mm. Phân biệt rõ ràng về ý định của câu hỏi về [Loại hướng dẫn sử dụng] hay những ý định khác.
                             Nếu không có thông tin thì trả lời ""null"". 
                             Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
-                            Kết quả trả lời ứng với cột dữ liệu sau, và chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
+                            Kết quả trả lời ứng với cột dữ liệu sau, chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
 
-                            [Intent]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null]
-                            [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn] 
-                            [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại]
-                            [Vị trí]: [Gần tôi, Địa điểm, null]
-                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null]
-                            [Thời gian]: [dd/mm/yyyy hh:mm, tuần này, hiện tại, hôm nay, null]";
+                            [Loại câu hỏi]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null];
+                            [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn]; 
+                            [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại];
+                            [Vị trí]: [Gần tôi, Địa điểm, null];
+                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
+                            [Thời gian]: [dd/mm/yyyy hh:mm, tuần này, hiện tại, hôm nay, null];";
             var requestBody = new
             {
                 contents = new[]
@@ -133,7 +133,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
                     var trimmedLine = line.Trim();
                     switch (trimmedLine)
                     {
-                        case string s when s.StartsWith("[Intent]:"):
+                        case string s when s.StartsWith("[Loại câu hỏi]:"):
                             clasifyAskCustomer.Intent = ExtractValue(s);
                             break;
                         case string s when s.StartsWith("[Loại hướng dẫn sử dụng]:"):
