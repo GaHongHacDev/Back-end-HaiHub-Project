@@ -45,7 +45,6 @@ namespace Hairhub.Service.Services.Services
                 voucherbyAdmin.StartDate = request.StartDate;
                 voucherbyAdmin.Quantity = request.Quantity;
                 voucherbyAdmin.MaximumDiscount = request.MaximumDiscount;
-                voucherbyAdmin.MaximumOrderAmount = request.MaximumOrderAmount;
                 voucherbyAdmin.MinimumOrderAmount = request.MinimumOrderAmount;
                 voucherbyAdmin.StartDate = (DateTime)request.StartDate;
                 voucherbyAdmin.ExpiryDate = (DateTime)request.ExpiryDate;
@@ -64,7 +63,6 @@ namespace Hairhub.Service.Services.Services
             voucher.StartDate = request.StartDate;
             voucher.Quantity = request.Quantity;
             voucher.MaximumDiscount = request.MaximumDiscount;
-            voucher.MaximumOrderAmount = request.MaximumOrderAmount;
             voucher.MinimumOrderAmount = request.MinimumOrderAmount;
             voucher.StartDate = (DateTime)request.StartDate;
             voucher.ExpiryDate = (DateTime)request.ExpiryDate;
@@ -281,10 +279,6 @@ namespace Hairhub.Service.Services.Services
             if (request.MaximumDiscount != default(decimal))
             {
                 existVoucher.MaximumDiscount = request.MaximumDiscount;
-            }
-            if (request.MaximumOrderAmount != default(decimal))
-            {
-                existVoucher.MaximumOrderAmount = request.MaximumOrderAmount;
             }
             if (request.DiscountPercentage != default(decimal))
             {

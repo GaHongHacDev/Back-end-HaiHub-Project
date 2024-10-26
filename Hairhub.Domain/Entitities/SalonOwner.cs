@@ -21,6 +21,5 @@ namespace Hairhub.Domain.Entitities
 
         public Account Account { get; set; }
         public virtual ICollection<SalonInformation> SalonInformations { get; set; }
-        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

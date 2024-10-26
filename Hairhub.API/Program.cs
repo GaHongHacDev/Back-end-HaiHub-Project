@@ -1,4 +1,5 @@
-﻿using BirthdayParty.WebApi.Constants;
+﻿
+using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Hubs;
 using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Infrastructure;
@@ -96,7 +97,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
         policy => {
-            policy.WithOrigins("http://localhost:5173", "https://www.hairhub.com.vn", "https://hairhub.id.vn", "http://localhost:3010")
+            policy.WithOrigins("http://localhost:5173", 
+                               "https://www.hairhub.com.vn", 
+                               "https://hairhub.id.vn", 
+                               "http://localhost:3010", 
+                               "https://h5.zdn.vn/",
+                               "zbrowser://h5.zdn.vn/")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();  // Allow credentials for CORS
@@ -129,11 +135,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
      };
  });
- //.AddGoogle(googleOption =>
- //{
- //    googleOption.ClientId = builder.Configuration["Authentication:Google:ClientId"];
- //    googleOption.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
- //});
+//.AddGoogle(googleOption =>
+//{
+//    googleOption.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+//    googleOption.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+//});
 
 builder.Services.AddAuthorization();
 

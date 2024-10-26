@@ -25,6 +25,22 @@ namespace Hairhub.Common.ThirdParties.Implementation
 
         public async Task<AIChatMessageResponse> ChatMessage(AIChatMessageRequest request)
         {
+            var promptStr = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
+
+                            Lưu ý: Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về 
+                            lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
+                            Bỏ qua các thông khác trong câu hỏi không liên quan đến lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
+                            [Thời gian] phải được viết dưới dạng dd/mm/yyyy hh:mm. Phân biệt rõ ràng về ý định của câu hỏi về [Loại hướng dẫn sử dụng] hay những ý định khác.
+                            Nếu không có thông tin thì trả lời ""null"". 
+                            Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
+                            Kết quả trả lời ứng với cột dữ liệu sau, và chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
+
+                            [Intents]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null]
+                            [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn] 
+                            [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại]
+                            [Vị trí]: [Gần tôi, Địa điểm, null]
+                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null]
+                            [Thời gian]: [dd/mm/yyyy hh:mm, tuần này, hiện tại, hôm nay, null]";
             var requestBody = new
             {
                 contents = new[]
@@ -34,7 +50,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
                         role = "user",
                         parts = new[]
                         {
-                            new { text = request.AskMessage }
+                            new { text = promptStr}
                         }
                     }
                 }
@@ -59,9 +75,118 @@ namespace Hairhub.Common.ThirdParties.Implementation
             }
 
             var apiResponse = JsonConvert.DeserializeObject<AIChatMessageResponse>(responseJson);
-            //var firstCandidate = apiResponse?.Candidates?.FirstOrDefault();
-            //var firstPart = firstCandidate?.Content?.Parts?.FirstOrDefault();
+            var classificationText = apiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text;
+            if (classificationText != null)
+            {
+                var lines = classificationText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                var clasifyAskCustomer = new ClassificationResult();
+                foreach (var line in lines)
+                {
+                    var trimmedLine = line.Trim();
+                    switch (trimmedLine)
+                    {
+                        case string s when s.StartsWith("[Intent]:"):
+                            clasifyAskCustomer.Intent = ExtractValue(s);
+                            break;
+                        case string s when s.StartsWith("[Loại hướng dẫn sử dụng]:"):
+                            clasifyAskCustomer.TyleGuid = ExtractValue(s);
+                            break;
+                        case string s when s.StartsWith("[Trạng thái lịch hẹn]:"):
+                            clasifyAskCustomer.StatusAppointment = ExtractValue(s);
+                            break;
+                        case string s when s.StartsWith("[Vị trí]:"):
+                            clasifyAskCustomer.Position = ExtractValue(s);
+                            break;
+                        case string s when s.StartsWith("[Tên Salon hoặc tên Barber shop]:"):
+                            clasifyAskCustomer.SalonName = ExtractValue(s);
+                            break;
+                        case string s when s.StartsWith("[Thời gian]:"):
+                            clasifyAskCustomer.Time = ExtractValue(s);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                switch (clasifyAskCustomer.Intent)
+                {
+                    case "Kiểm tra lịch hẹn":
+                        switch (clasifyAskCustomer.StatusAppointment)
+                        {
+                            case "Hủy":
+                                break;
+                            case "Đang đặt" or "Đang":
+                                break;
+                            case "Thành công" or "Hoàn thành":
+                                break;
+                            case "Thất bại":
+                                break;
+                            case null:
+                                //thua, không có trạng thái sao mà kiểm tra???
+                                break;
+                            default:
+                                //thua, không có trạng thái sao mà kiểm tra???
+                                break;
+                        }
+                        break;
+                    //Chưa nghĩ ra
+                    case "Tìm khuyến mãi":
+                        break;
+                    case "Hướng dẫn sử dụng Hairhub":
+                        switch (clasifyAskCustomer.TyleGuid)
+                        {
+                            case "Đặt lịch hẹn":
+                                break;
+                            case "Hủy lịch hẹn":
+                                break;
+                            case "Quy trình check in":
+                                break;
+                            case "Xem lịch sử lịch hẹn":
+                                break;
+                            case "Xem trạng thái lịch hẹn":
+                                break;
+                            case null:
+                                //Cần cung cấp thêm thông tin là hướng dẫn sử dụng về gì?
+                                break;
+                            default:
+                                //Chưa có thông tin cho hướng dẫn Hairhub này
+                                break;
+                        }
+                        break;
+                    case "Tìm thời gian đặt lịch":
+                        break;
+                    case "Tìm salon hoặc barber shop":
+                        break;
+                    case null:
+                        //Tôi không biết bạn đang hỏi qq dì cả???
+                        break;
+                    default:
+                        //Tôi không biết bạn đang hỏi qq dì cả???
+                        break;
+                }
+
+                Console.WriteLine("*************************" + clasifyAskCustomer);
+
+            }
             return apiResponse!;
+        }
+
+        private string ExtractValue(string line)
+        {
+            var parts = line.Split(new[] { ':' }, 2);
+            if (parts.Length < 2)
+                return "null";
+
+            var valuePart = parts[1].Trim();
+            // Remove square brackets if present
+            if (valuePart.StartsWith("[") && valuePart.EndsWith("]"))
+                valuePart = valuePart.Substring(1, valuePart.Length - 2).Trim();
+
+            // Handle "null" case
+            if (string.Equals(valuePart, "null", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return valuePart;
         }
     }
 }

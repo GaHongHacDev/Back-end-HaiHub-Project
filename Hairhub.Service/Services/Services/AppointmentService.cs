@@ -29,7 +29,6 @@ namespace Hairhub.Service.Services.Services
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
-
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
                                     IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
         {
@@ -76,66 +75,67 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate)
         {
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
-            if (salon == null)
-            {
-                throw new NotFoundException("Không tìm thấy salon, barber shop");
-            }
-            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
-            predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
+            throw new NotImplementedException();
+            /* var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
+             if (salon == null)
+             {
+                 throw new NotFoundException("Không tìm thấy salon, barber shop");
+             }
+             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+             predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
 
-            var appointments = await _unitOfWork.GetRepository<Appointment>()
-                                                .GetListAsync
-                                                (
-                                                    predicate: predicate,
-                                                    orderBy: x => x.OrderByDescending(x => x.StartDate)
-                                                );
-            GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
-            var payment = await _unitOfWork.GetRepository<Payment>()
-                                            .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
-            if (payment == null)
-            {
-                throw new NotFoundException("Không tìm thấy thông tin thanh toán");
-            }
-            if (appointments != null)
-            {
-                int canceledAppointmentCount = 0;
-                int successedAppointmentCount = 0;
-                int failedAppointmentCount = 0;
-                List<Appointment> appointmentsResponse = new List<Appointment>();
+             var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                 .GetListAsync
+                                                 (
+                                                     predicate: predicate,
+                                                     orderBy: x => x.OrderByDescending(x => x.StartDate)
+                                                 );
+             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
+             var payment = await _unitOfWork.GetRepository<Payment>()
+                                             .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
+             if (payment == null)
+             {
+                 throw new NotFoundException("Không tìm thấy thông tin thanh toán");
+             }
+             if (appointments != null)
+             {
+                 int canceledAppointmentCount = 0;
+                 int successedAppointmentCount = 0;
+                 int failedAppointmentCount = 0;
+                 List<Appointment> appointmentsResponse = new List<Appointment>();
 
-                foreach (var appointment in appointments)
-                {
-                    switch (appointment.Status)
-                    {
-                        case AppointmentStatus.Successed:
-                            appointmentsResponse.Add(appointment);
-                            //Tính tiền HH mà salon chưa trả cho system
-                            if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
-                            {
-                                response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                            }
-                            //Tính tổng tiền HH của salon từ start_date đến end_date
-                            response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                            //Tổng appointment thành công
-                            successedAppointmentCount++;
-                            break;
-                        case AppointmentStatus.Fail:
-                            //Tổng appointment thất bại
-                            failedAppointmentCount++;
-                            break;
-                        case AppointmentStatus.CancelByCustomer:
-                            //Tổng appointment bị khách hàng hủy
-                            canceledAppointmentCount++;
-                            break;
-                    }
-                }
-                response.CanceledAppointmentCount = canceledAppointmentCount;
-                response.SuccessedAppointmentCount = successedAppointmentCount;
-                response.FailedAppointmentCount = failedAppointmentCount;
-                response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
-            }
-            return response;
+                 foreach (var appointment in appointments)
+                 {
+                     switch (appointment.Status)
+                     {
+                         case AppointmentStatus.Successed:
+                             appointmentsResponse.Add(appointment);
+                             //Tính tiền HH mà salon chưa trả cho system
+                             if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
+                             {
+                                 response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                             }
+                             //Tính tổng tiền HH của salon từ start_date đến end_date
+                             response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                             //Tổng appointment thành công
+                             successedAppointmentCount++;
+                             break;
+                         case AppointmentStatus.Fail:
+                             //Tổng appointment thất bại
+                             failedAppointmentCount++;
+                             break;
+                         case AppointmentStatus.CancelByCustomer:
+                             //Tổng appointment bị khách hàng hủy
+                             canceledAppointmentCount++;
+                             break;
+                     }
+                 }
+                 response.CanceledAppointmentCount = canceledAppointmentCount;
+                 response.SuccessedAppointmentCount = successedAppointmentCount;
+                 response.FailedAppointmentCount = failedAppointmentCount;
+                 response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
+             }
+             return response;*/
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
@@ -991,7 +991,7 @@ namespace Hairhub.Service.Services.Services
         #endregion
 
         #region Create Update Delete Active
-        public async Task<bool> CreateAppointment(CreateAppointmentRequest request)
+        public async Task<(bool, Guid)> CreateAppointment(CreateAppointmentRequest request)
         {
             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x => x.CommissionRate != null && x.IsActive);
             if (config == null)
@@ -1021,6 +1021,18 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
+            if (!AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) && !AppointmentPaymentMethod.PayInSalon.Equals(request.PaymentMethod) 
+                && !AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+            {
+                throw new NotFoundException("Sai tên phương thức thanh toán");
+            }
+
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == request.CustomerId, include: x=>x.Include(s=>s.Account));
+            if (customer == null)
+            {
+                throw new NotFoundException($"Không tìm thấy khách hàng với id {request.CustomerId}");
+            }
+
             var appointment = new Appointment()
             {
                 Id = id,
@@ -1033,6 +1045,7 @@ namespace Hairhub.Service.Services.Services
                 Status = AppointmentStatus.Booking,
                 CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
+                PaymentMethod = request.PaymentMethod
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
@@ -1064,11 +1077,43 @@ namespace Hairhub.Service.Services.Services
                         AppointmentId = appointment.Id,
                         VoucherId = item
                     };
+                    
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
                 }
             }
+
+            var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x=>x.Id == employeeId);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
+            }
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformationId);
+            //Tạo payment withdraw
+            if (AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) || AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+            {
+                Payment payment = new Payment()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = customer.AccountId,
+                    AppointmentId = appointment.Id,
+                    TotalAmount = appointment.TotalPrice,
+                    PaymentDate = DateTime.UtcNow,
+                    PaymentType = PaymentType.Withdraw,
+                    Description = $"Thanh toán đơn đặt lịch với {salon.Name} ngày {appointment.StartDate.Date.ToString()}",
+                    Status = PaymentStatus.Paid
+                };
+                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                customer.Account.Balance -= appointment.TotalPrice;
+                if (customer.Account.Balance < 0)
+                {
+                    throw new NotFoundException("Số tiền không đủ để đặt lịch hẹn.");
+                }
+                _unitOfWork.GetRepository<Account>().UpdateAsync(customer.Account);
+            }
+            
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
-            return isInsert;
+            return (isInsert, id);
         }
 
         public async Task<bool> UpdateAppointmentById(Guid id, UpdateAppointmentRequest updateAppointmentRequest)
@@ -1279,21 +1324,21 @@ namespace Hairhub.Service.Services.Services
             {
                 year = DateTime.Now.Year;
             }
-            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate.Year == year && p.Status == PaymentStatus.Paid);
+            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate!.Value.Year == year && p.Status == PaymentStatus.Paid);
             var dataOfMonths = new DataOfMonths
             {
-                Jan = (int?)payments.Where(a => a.PaymentDate.Month == 1).Sum(a => a.TotalAmount),
-                Feb = (int?)payments.Where(a => a.PaymentDate.Month == 2).Sum(a => a.TotalAmount),
-                March = (int?)payments.Where(a => a.PaymentDate.Month == 3).Sum(a => a.TotalAmount),
-                April = (int?)payments.Where(a => a.PaymentDate.Month == 4).Sum(a => a.TotalAmount),
-                May = (int?)payments.Where(a => a.PaymentDate.Month == 5).Sum(a => a.TotalAmount),
-                June = (int?)payments.Where(a => a.PaymentDate.Month == 6).Sum(a => a.TotalAmount),
-                July = (int?)payments.Where(a => a.PaymentDate.Month == 7).Sum(a => a.TotalAmount),
-                August = (int?)payments.Where(a => a.PaymentDate.Month == 8).Sum(a => a.TotalAmount),
-                September = (int?)payments.Where(a => a.PaymentDate.Month == 9).Sum(a => a.TotalAmount),
-                October = (int?)payments.Where(a => a.PaymentDate.Month == 10).Sum(a => a.TotalAmount),
-                November = (int?)payments.Where(a => a.PaymentDate.Month == 11).Sum(a => a.TotalAmount),
-                December = (int?)payments.Where(a => a.PaymentDate.Month == 12).Sum(a => a.TotalAmount)
+                Jan = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 1).Sum(a => a.TotalAmount),
+                Feb = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 2).Sum(a => a.TotalAmount),
+                March = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 3).Sum(a => a.TotalAmount),
+                April = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 4).Sum(a => a.TotalAmount),
+                May = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 5).Sum(a => a.TotalAmount),
+                June = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 6).Sum(a => a.TotalAmount),
+                July = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 7).Sum(a => a.TotalAmount),
+                August = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 8).Sum(a => a.TotalAmount),
+                September = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 9).Sum(a => a.TotalAmount),
+                October = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 10).Sum(a => a.TotalAmount),
+                November = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 11).Sum(a => a.TotalAmount),
+                December = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 12).Sum(a => a.TotalAmount)
             };
             return dataOfMonths;
         }
