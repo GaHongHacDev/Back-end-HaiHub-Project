@@ -1026,6 +1026,13 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Sai tên phương thức thanh toán");
             }
+
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == request.CustomerId, include: x=>x.Include(s=>s.Account));
+            if (customer == null)
+            {
+                throw new NotFoundException($"Không tìm thấy khách hàng với id {request.CustomerId}");
+            }
+
             var appointment = new Appointment()
             {
                 Id = id,
@@ -1074,7 +1081,37 @@ namespace Hairhub.Service.Services.Services
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
                 }
             }
-             
+
+            var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x=>x.Id == employeeId);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
+            }
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformationId);
+            //Tạo payment withdraw
+            if (AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) || AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+            {
+                Payment payment = new Payment()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = customer.AccountId,
+                    AppointmentId = appointment.Id,
+                    TotalAmount = appointment.TotalPrice,
+                    PaymentDate = DateTime.UtcNow,
+                    PaymentType = PaymentType.Withdraw,
+                    Description = $"Thanh toán đơn đặt lịch với {salon.Name} ngày {appointment.StartDate.Date.ToString()}",
+                    Status = PaymentStatus.Paid
+                };
+                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                customer.Account.Balance -= appointment.TotalPrice;
+                if (customer.Account.Balance < 0)
+                {
+                    throw new NotFoundException("Số tiền không đủ để đặt lịch hẹn.");
+                }
+                _unitOfWork.GetRepository<Account>().UpdateAsync(customer.Account);
+            }
+            
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return (isInsert, id);
         }
