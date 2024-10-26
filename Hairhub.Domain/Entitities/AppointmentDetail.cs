@@ -29,5 +29,6 @@ namespace Hairhub.Domain.Entitities
         public virtual SalonEmployee SalonEmployee { get; set; }
         public virtual ServiceHair ServiceHair { get; set; }
         public virtual Appointment Appointment { get; set; }
+        public virtual FeedbackDetail FeedbackDetail { get; set; }
     }
 }

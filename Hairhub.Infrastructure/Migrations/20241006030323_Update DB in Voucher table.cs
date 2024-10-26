@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hairhub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddapprovedAtfieldtosalontable : Migration
+    public partial class UpdateDBinVouchertable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -268,7 +268,7 @@ namespace Hairhub.Infrastructure.Migrations
                     rate = table.Column<decimal>(type: "decimal(18,1)", nullable: true),
                     longitude = table.Column<decimal>(type: "decimal(18,10)", maxLength: 150, nullable: false),
                     latitude = table.Column<decimal>(type: "decimal(18,10)", maxLength: 150, nullable: false),
-                    total_rating = table.Column<int>(type: "int", nullable: false),
+                    total_rating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     total_reviewer = table.Column<int>(type: "int", nullable: false),
                     number_of_reported = table.Column<int>(type: "int", nullable: true),
                     update_at = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -293,7 +293,7 @@ namespace Hairhub.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     appointment_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    rating = table.Column<int>(type: "int", nullable: true),
+                    rating = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     comment = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: false),
                     create_date = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -401,13 +401,25 @@ namespace Hairhub.Infrastructure.Migrations
                     salon_information_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     full_name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    phone = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                     img = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    is_active = table.Column<bool>(type: "bit", nullable: false)
+                    email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    is_active = table.Column<bool>(type: "bit", nullable: false),
+                    account_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    rating_count = table.Column<int>(type: "int", nullable: true),
+                    rating_sum = table.Column<int>(type: "int", nullable: true),
+                    rating = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_salon_employee", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_account_salon_employee",
+                        column: x => x.account_id,
+                        principalTable: "account",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_salon_information_salon_employee",
                         column: x => x.salon_information_id,
@@ -446,8 +458,12 @@ namespace Hairhub.Infrastructure.Migrations
                     salon_information_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     code = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    minimum_order_amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    minimum_order_amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    maximum_order_amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     discount_percentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    maximum_discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    start_date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     expiry_date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     created_date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     modified_date = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -471,6 +487,7 @@ namespace Hairhub.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     feed_back_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     report_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    salon_information_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     img = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     video = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -486,6 +503,32 @@ namespace Hairhub.Infrastructure.Migrations
                         name: "FK_report_static_file",
                         column: x => x.report_id,
                         principalTable: "report",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_saloninformation_static_file",
+                        column: x => x.salon_information_id,
+                        principalTable: "salon_information",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "busy_schedule_employee",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    employee_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    start_time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    end_time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_busy_schedule_employee", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_busy_schedule_employee_salon_employee",
+                        column: x => x.employee_id,
+                        principalTable: "salon_employee",
                         principalColumn: "id");
                 });
 
@@ -600,6 +643,29 @@ namespace Hairhub.Infrastructure.Migrations
                         principalColumn: "id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "feedback_detail",
+                columns: table => new
+                {
+                    AppointmentDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FeedbackId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    rating = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_feedback_detail", x => x.AppointmentDetailId);
+                    table.ForeignKey(
+                        name: "FK_appointment_feedback_detail",
+                        column: x => x.AppointmentDetailId,
+                        principalTable: "appointment_detail",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_feedback_feedback_detail",
+                        column: x => x.FeedbackId,
+                        principalTable: "feedback",
+                        principalColumn: "id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_account_role_id",
                 table: "account",
@@ -651,6 +717,11 @@ namespace Hairhub.Infrastructure.Migrations
                 column: "salon_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_busy_schedule_employee_employee_id",
+                table: "busy_schedule_employee",
+                column: "employee_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_customer_account_id",
                 table: "customer",
                 column: "account_id");
@@ -664,6 +735,11 @@ namespace Hairhub.Infrastructure.Migrations
                 name: "IX_feedback_customer_id",
                 table: "feedback",
                 column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_feedback_detail_FeedbackId",
+                table: "feedback_detail",
+                column: "FeedbackId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_image_style_style_hair_customer_id",
@@ -699,6 +775,11 @@ namespace Hairhub.Infrastructure.Migrations
                 name: "IX_report_salon_id",
                 table: "report",
                 column: "salon_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_salon_employee_account_id",
+                table: "salon_employee",
+                column: "account_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_salon_employee_salon_information_id",
@@ -751,6 +832,11 @@ namespace Hairhub.Infrastructure.Migrations
                 column: "report_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_static_file_salon_information_id",
+                table: "static_file",
+                column: "salon_information_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_style_hair_customer_customer_id",
                 table: "style_hair_customer",
                 column: "customer_id");
@@ -765,13 +851,16 @@ namespace Hairhub.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "appointment_detail");
-
-            migrationBuilder.DropTable(
                 name: "appointment_detail_voucher");
 
             migrationBuilder.DropTable(
                 name: "approval");
+
+            migrationBuilder.DropTable(
+                name: "busy_schedule_employee");
+
+            migrationBuilder.DropTable(
+                name: "feedback_detail");
 
             migrationBuilder.DropTable(
                 name: "image_style");
@@ -801,22 +890,25 @@ namespace Hairhub.Infrastructure.Migrations
                 name: "admin");
 
             migrationBuilder.DropTable(
+                name: "appointment_detail");
+
+            migrationBuilder.DropTable(
                 name: "style_hair_customer");
 
             migrationBuilder.DropTable(
                 name: "config");
 
             migrationBuilder.DropTable(
-                name: "salon_employee");
-
-            migrationBuilder.DropTable(
-                name: "service_hair");
-
-            migrationBuilder.DropTable(
                 name: "feedback");
 
             migrationBuilder.DropTable(
                 name: "report");
+
+            migrationBuilder.DropTable(
+                name: "salon_employee");
+
+            migrationBuilder.DropTable(
+                name: "service_hair");
 
             migrationBuilder.DropTable(
                 name: "appointment");

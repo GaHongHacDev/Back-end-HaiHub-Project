@@ -17,7 +17,7 @@ namespace Hairhub.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -467,8 +467,8 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
-                    b.Property<int?>("Rating")
-                        .HasColumnType("int")
+                    b.Property<decimal?>("Rating")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("rating");
 
                     b.HasKey("Id");
@@ -478,6 +478,25 @@ namespace Hairhub.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("feedback", (string)null);
+                });
+
+            modelBuilder.Entity("Hairhub.Domain.Entitities.FeedbackDetail", b =>
+                {
+                    b.Property<Guid>("AppointmentDetailId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FeedbackId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int")
+                        .HasColumnName("rating");
+
+                    b.HasKey("AppointmentDetailId");
+
+                    b.HasIndex("FeedbackId");
+
+                    b.ToTable("feedback_detail", (string)null);
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.ImageStyle", b =>
@@ -1181,7 +1200,15 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_system_created");
 
-                    b.Property<decimal>("MinimumOrderAmount")
+                    b.Property<decimal>("MaximumDiscount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_discount");
+
+                    b.Property<decimal?>("MaximumOrderAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_order_amount");
+
+                    b.Property<decimal?>("MinimumOrderAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("minimum_order_amount");
 
@@ -1189,9 +1216,17 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("modified_date");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasColumnName("quantity");
+
                     b.Property<Guid?>("SalonInformationId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("salon_information_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
 
                     b.HasKey("Id");
 
@@ -1337,6 +1372,25 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Appointment");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Hairhub.Domain.Entitities.FeedbackDetail", b =>
+                {
+                    b.HasOne("Hairhub.Domain.Entitities.AppointmentDetail", "AppointmentDetail")
+                        .WithOne("FeedbackDetail")
+                        .HasForeignKey("Hairhub.Domain.Entitities.FeedbackDetail", "AppointmentDetailId")
+                        .IsRequired()
+                        .HasConstraintName("FK_appointment_feedback_detail");
+
+                    b.HasOne("Hairhub.Domain.Entitities.Feedback", "Feedback")
+                        .WithMany("FeedbackDetails")
+                        .HasForeignKey("FeedbackId")
+                        .IsRequired()
+                        .HasConstraintName("FK_feedback_feedback_detail");
+
+                    b.Navigation("AppointmentDetail");
+
+                    b.Navigation("Feedback");
                 });
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.ImageStyle", b =>
@@ -1563,6 +1617,12 @@ namespace Hairhub.Infrastructure.Migrations
                     b.Navigation("Report");
                 });
 
+            modelBuilder.Entity("Hairhub.Domain.Entitities.AppointmentDetail", b =>
+                {
+                    b.Navigation("FeedbackDetail")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Hairhub.Domain.Entitities.Config", b =>
                 {
                     b.Navigation("Payments");
@@ -1581,6 +1641,8 @@ namespace Hairhub.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairhub.Domain.Entitities.Feedback", b =>
                 {
+                    b.Navigation("FeedbackDetails");
+
                     b.Navigation("StaticFiles");
                 });
 

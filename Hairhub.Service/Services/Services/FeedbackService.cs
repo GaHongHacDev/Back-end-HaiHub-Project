@@ -92,7 +92,7 @@ namespace Hairhub.Service.Services.Services
                     Id = Guid.NewGuid(),
                     CustomerId = request.CustomerId,
                     AppointmentId = request.AppointmentId,
-                    Rating = ratingSum / request.FeedbackDetailRequests.Count,
+                    Rating = (decimal)ratingSum / request.FeedbackDetailRequests.Count,
                     Comment = request.Comment,
                     IsActive = true,
                     CreateDate = DateTime.Now,
@@ -100,6 +100,7 @@ namespace Hairhub.Service.Services.Services
 
                 await _unitOfWork.GetRepository<Feedback>().InsertAsync(newFeedback);
 
+                List<SalonEmployee> listEmployee = new List<SalonEmployee>();
                 foreach (var item in request.FeedbackDetailRequests)
                 {
                     var appointmentDetail = await _unitOfWork.GetRepository<AppointmentDetail>()
@@ -116,28 +117,49 @@ namespace Hairhub.Service.Services.Services
                     {
                         throw new NotFoundException($"Không tìm thấy nhân viên với id {employee!.Id}");
                     }
-                    employee.RatingCount++;
-                    employee.RatingSum += item.Rating;
-                    employee.Rating = employee.RatingSum/employee.RatingCount;
-                    _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(employee);
-                }
+                    var existingEmployee = listEmployee.FirstOrDefault(e => e.Id == employee.Id);
 
-                for (int i = 0; i < request.ImgFeedbacks.Count; i++)
-                {
-                    var urlImg = await _mediaservice.UploadAnImage(request.ImgFeedbacks[i], MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString() + "/" + i.ToString());
-                    //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
-                    StaticFile staticFile = new StaticFile()
+                    if (existingEmployee == null)
                     {
-                        Id = Guid.NewGuid(),
+                        listEmployee.Add(employee);
+                        employee.RatingCount++;
+                        employee.RatingSum += item.Rating;
+                        employee.Rating = employee.RatingSum / employee.RatingCount;
+                    }
+                    else
+                    {
+                        existingEmployee.RatingCount++;
+                        existingEmployee.RatingSum += item.Rating;
+                        existingEmployee.Rating = existingEmployee.RatingSum / existingEmployee.RatingCount;
+                    }
+                    FeedbackDetail feedbackDetail = new FeedbackDetail()
+                    {
+                        AppointmentDetailId = appointmentDetail.Id,
                         FeedbackId = newFeedback.Id,
-                        Img = urlImg,
+                        Rating = item.Rating,
                     };
-                    await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                    await _unitOfWork.GetRepository<FeedbackDetail>().InsertAsync(feedbackDetail);
+                }
+                _unitOfWork.GetRepository<SalonEmployee>().UpdateRange(listEmployee);
+                if (request.ImgFeedbacks != null)
+                {
+                    for (int i = 0; i < request.ImgFeedbacks.Count; i++)
+                    {
+                        var urlImg = await _mediaservice.UploadAnImage(request.ImgFeedbacks[i], MediaPath.FEEDBACK_IMG, newFeedback.Id.ToString() + "/" + i.ToString());
+                        //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
+                        StaticFile staticFile = new StaticFile()
+                        {
+                            Id = Guid.NewGuid(),
+                            FeedbackId = newFeedback.Id,
+                            Img = urlImg,
+                        };
+                        await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
+                    }
                 }
 
                 decimal totalRating = existingSalon.TotalRating;
                 int totalReview = existingSalon.TotalReviewer + 1;
-                existingSalon.Rate = (totalRating + (decimal)(ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
+                existingSalon.Rate = (totalRating + ((decimal)ratingSum / request.FeedbackDetailRequests.Count)) / totalReview;
                 existingSalon.TotalReviewer = totalReview;
                 existingSalon.TotalRating = totalRating + (decimal)ratingSum/request.FeedbackDetailRequests.Count;
 
@@ -184,7 +206,7 @@ namespace Hairhub.Service.Services.Services
             return isSuccessful;
         }
 
-        public async Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, int? rating, int page, int size)
+        public async Task<IPaginate<GetFeedbackResponse>> GetFeedBackBySalonId(Guid id, decimal? rating, int page, int size)
         {
             try
             {
@@ -195,16 +217,17 @@ namespace Hairhub.Service.Services.Services
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
                        predicate: x => x.IsActive == true && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
-                        include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
+                        include: x => x.Include(s=>s.FeedbackDetails).Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
                        page: page,
                        size: size);
                 }
                 else
                 {
+                    rating-=0.5m;
                     feedbacks = await _unitOfWork.GetRepository<Feedback>()
                        .GetPagingListAsync(
-                       predicate: x => x.IsActive == true && x.Rating == rating && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
-                       include: x => x.Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
+                       predicate: x => x.IsActive == true && x.Rating>=rating && x.Rating<rating+1 && x.Appointment.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id),
+                       include: x => x.Include(s => s.FeedbackDetails).Include(s => s.StaticFiles).Include(s => s.Appointment).ThenInclude(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee.SalonInformation).Include(s => s.Customer),
                        page: page,
                        size: size);
                 }
