@@ -20,11 +20,11 @@ namespace Hairhub.Domain.Entitities
         public string? Description { get; set; }
         public string Status { get; set; }
         //public string? ReasonCancle { get; set; }
-        public int? PaymentCode { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public string? PaymentCode { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         //public DateTime CreateDate { get; set; }
-        public string PakageName { get; set; }
+        public string? PakageName { get; set; }
         public decimal? PakageFee { get; set; }
         public decimal? CommissionRate { get; set; }
         // Navigation properties

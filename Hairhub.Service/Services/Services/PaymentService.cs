@@ -32,12 +32,14 @@ using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Enums;
 using System.Net;
 using Hairhub.Domain.Exceptions;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 using LinqKit;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http;
 using Hairhub.Common.ThirdParties.Contract;
+
 
 namespace Hairhub.Service.Services.Services
 {
@@ -74,245 +76,11 @@ namespace Hairhub.Service.Services.Services
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
-
-        public async Task<CreatePaymentResult> CreatePaymentUrlRegisterCreator(CreatePaymentRequest request)
+        public async Task<bool> FakePaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
         {
-            try
-            {
-                var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);               
-                var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
-                if (SalonOwner == null)
-                {
-                    throw new Exception("SalonOwner is null.");
-                }
-                
-
-                var Salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: s => s.SalonOwner.Id == request.SalonOWnerID);
-                if (Salon == null)
-                {
-                    throw new Exception("Salon is null.");
-                }
-                int amount = (int)await AmountofCommissionRateInMonthBySalon(SalonOwner.Id, (decimal)Configs.CommissionRate);
-                string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-                long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
-                var description = request.Description;
-                string? clientId = _config["PayOS:ClientId"];
-                var apikey = _config["PayOS:APIKey"];
-                var checksumkey = _config["PayOS:ChecksumKey"];
-                var returnurl = _config["PayOS:ReturnUrl"];
-                var returnurlfail = _config["PayOS:ReturnUrlFail"];
-
-                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
-                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
-
-                PayOS pos = new PayOS(clientId, apikey, checksumkey);
-                // Prepare data for signature
-                var signatureData = new Dictionary<string, object>
-                 {
-                     { "amount", amount },
-                     { "cancelUrl", updatedReturnUrlFail},
-                     { "description", description },
-                     { "expiredAt", DateTimeOffset.Now.ToUnixTimeSeconds() },
-                     { "orderCode", orderCode },
-                     { "returnUrl", updatedReturnUrl}
-                 };
-
-
-
-                // Sort data alphabetically by key
-                var sortedSignatureData = new SortedDictionary<string, object>(signatureData);
-
-                // Create data string for signature
-                var dataForSignature = string.Join("&", sortedSignatureData.Select(p => $"{p.Key}={p.Value}"));
-
-                // Compute the HMAC_SHA256 signature
-                var signature = ComputeHmacSha256(dataForSignature, checksumkey);
-                DateTimeOffset expiredAt = DateTimeOffset.Now.AddMinutes(10);
-
-                var paymentData = new PaymentData(
-                    orderCode: orderCode,
-                    amount: amount,
-                    description: description,
-                    items: new List<ItemData>(), // Provide a list of items if needed
-                    cancelUrl: updatedReturnUrlFail,
-                    returnUrl: updatedReturnUrl,
-                    signature: signature,
-                    buyerName: SalonOwner.FullName,
-                    buyerPhone: SalonOwner.Phone, // Provide a valid currency
-                    buyerEmail: SalonOwner.Email,
-                    buyerAddress: SalonOwner.Address,
-                    expiredAt: (int)DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds()
-                );
-
-                paymentData.items.Add(new ItemData(SalonOwner.FullName, 1, amount));
-                var createPaymentResult = await pos.createPaymentLink(paymentData);
-
-                return createPaymentResult; // Chú ý sử dụng PaymentLink thay vì paymentLink
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw;
-            }
-        }
-
-
-        public async Task<bool> GetPaymentInfo(string paymentLinkId, SavePaymentInfor createPaymentRequest)
-        {
-            throw new NotImplementedException();
-            /* var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentLinkId}";
-
-             try
-             {
-                 var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
-                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
-                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);
-                 var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == createPaymentRequest.SalonOwnerId);
-                 var response = await _client.SendAsync(request);
-                 bool isStatus = false;
-                 if (response.IsSuccessStatusCode)
-                 {
-                     var responseContent = await response.Content.ReadAsStringAsync();
-                     var responseObject = JObject.Parse(responseContent);
-                     var status = responseObject["data"]?["status"]?.ToString();
-                     var paymentInfo = responseObject["data"];
-
-                     if (status != null)
-                     {
-                         if (status == "PAID")
-                         {
-                             if (salon.Status == SalonStatus.Approved)
-                             {
-                                 var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-                                 var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == createPaymentRequest.SalonOwnerId && p.Status == PaymentStatus.Fake);
-                                 payment.Status = PaymentStatus.Paid;
-                                 // Save the transaction
-                                 _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
-                                 await PaymentForCommissionRate(createPaymentRequest);
-                                 await _unitOfWork.CommitAsync();
-                                 return isStatus = true;
-
-                             } else if( salon.Status == SalonStatus.OverDue) {
-                                 var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-                                 var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == createPaymentRequest.SalonOwnerId && p.Status == PaymentStatus.Fake);
-                                 payment.Status = PaymentStatus.Paid;
-                                 salon.Status = SalonStatus.Approved;
-
-                                 // Save the transaction
-                                 _unitOfWork.GetRepository<SalonInformation>().UpdateAsync(salon);
-                                 _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
-                                 await PaymentForCommissionRate(createPaymentRequest);
-                                 await _unitOfWork.CommitAsync();
-                                 return isStatus = true;
-                             }
-
-
-                         }
-                         return isStatus;
-                     }
-                     else
-                     {
-                         throw new Exception("Failed to retrieve payment status.");
-                     }
-                 }
-                 else
-                 {
-                     throw new Exception("Failed to send request.");
-                 }
-             }
-             catch (Exception ex)
-             {
-                 throw new Exception(ex.Message);
-             }
-            */
-        }
-
-        public async Task<IPaginate<ResponsePayment>> GetPaymentBySalonOwnerID(Guid ownerid, int page, int size)
-        {
-            throw new NotImplementedException();
-            /*
-            var existingsalonowner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: e => e.Id == ownerid);
-            if (existingsalonowner == null)
-            {
-                throw new Exception("Not found");
-            }
-            var payments = await _unitOfWork.GetRepository<Payment>()
-             .GetPagingListAsync(
-                 include: query => query.Include(x => x.SalonOwner)
-                         .Include(x => x.SalonOwner).ThenInclude(x => x.SalonInformations)
-                         .Include(x => x.Config),
-                 predicate: x => x.SalonOWnerID == ownerid && x.Status == PaymentStatus.Paid,
-                 page: page,
-                 size: size);
-
-            var paginateResponse = new Paginate<ResponsePayment>
-            {
-                Page = payments.Page,
-                Size = payments.Size,
-                Total = payments.Total,
-                TotalPages = payments.TotalPages,
-                Items = _mapper.Map<IList<ResponsePayment>>(payments.Items)
-            };
-
-            return paginateResponse;*/
-        }
-
-        public async Task<IPaginate<ResponsePayment>> GetPayments(string? valueSearch, int page, int size)
-        {
-            throw new NotImplementedException();
-            /*
-            var payments = await _unitOfWork.GetRepository<Payment>()
-                .GetPagingListAsync(predicate: x => x.Status == PaymentStatus.Paid 
-                                                    && (string.IsNullOrEmpty(valueSearch) 
-                                                    || x.SalonOwner.Email!.ToLower().Contains(valueSearch.Trim().ToLower()) 
-                                                    || x.SalonOwner.SalonInformations.Any(x=>x.Name.ToLower().Contains(valueSearch.Trim().ToLower()))),
-                include: query => query.Include(x => x.SalonOwner)
-                                        .ThenInclude(x => x.SalonInformations)
-                                        .Include(x => x.Config),
-                page: page,
-                size: size);
-
-            var paginateResponse = new Paginate<ResponsePayment>
-            {
-                Page = payments.Page,
-                Size = payments.Size,
-                Total = payments.Total,
-                TotalPages = payments.TotalPages,
-                Items = _mapper.Map<IList<ResponsePayment>>(payments.Items)
-            };
-
-            return paginateResponse;*/
-        }
-
-        public async Task<bool> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
-        {
-            throw new NotImplementedException();
-            /*
-           Guid salonownerid  = createFirstTimePaymentRequest.SalonOwnerId;
-           var firstPayment = new Payment { 
-               Id = Guid.NewGuid(),
-               Description = "Miễn phí 1 tháng đầu tiên",
-               StartDate = DateTime.Now,
-               EndDate = DateTime.Now.AddDays(30),
-               PaymentDate = DateTime.Now,
-               SalonOWnerID = salonownerid,
-               MethodBanking = "None",
-               PaymentCode = new Random().Next(1, 1000000),
-               Status = "PAID",
-               TotalAmount = 0,
-            };
-            
-            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
-            bool isCreated = await _unitOfWork.CommitAsync() > 0;
-            return isCreated;*/
-        }
-
-        public async Task<bool> PaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
-        {
-            throw new NotImplementedException();
-            /*var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
-            Guid salonownerid = createPaymentRequest.SalonOwnerId;
+           
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+            Guid account = createPaymentRequest.AccountId;
             var firstPayment = new Payment
             {
                 Id = Guid.NewGuid(),
@@ -320,9 +88,8 @@ namespace Hairhub.Service.Services.Services
                 StartDate = DateTime.Now,
                 EndDate = DateTime.Now.AddDays(30),
                 PaymentDate = DateTime.Now,
-                SalonOWnerID = salonownerid,
-                MethodBanking = "None",
-                PaymentCode = new Random().Next(1, 1000000),
+                AccountId = account,
+                PaymentCode = "",
                 Status = PaymentStatus.Fake,
                 TotalAmount = 0,
                 ConfigId = config.Id,
@@ -333,21 +100,46 @@ namespace Hairhub.Service.Services.Services
 
             await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
             bool isCreated = await _unitOfWork.CommitAsync() > 0;
-            return isCreated;*/
+            return isCreated;
         }
 
+        public async Task<bool> PromotionPaymentForCommissionRate(SavePaymentInfor createPaymentRequest)
+        {
 
+            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == createPaymentRequest.ConfigId);
+            Guid account = createPaymentRequest.AccountId;
+            var firstPayment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                Description = "Tiền hoa hồng dựa trên lịch hẹn tháng đầu tiên",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(30),
+                PaymentDate = DateTime.Now,
+                AccountId = account,
+                PaymentCode = "",
+                Status = PaymentStatus.Promotion,
+                TotalAmount = 0,
+                ConfigId = config.Id,
+                PakageFee = config.PakageFee,
+                PakageName = config.PakageName,
+                CommissionRate = config.CommissionRate,
+            };
+
+            await _unitOfWork.GetRepository<Payment>().InsertAsync(firstPayment);
+            bool isCreated = await _unitOfWork.CommitAsync() > 0;
+            return isCreated;
+        }
 
         public async Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commissionRate)
         {
-            throw new NotImplementedException();
-            /* var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
+            
+             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.SalonOwner.Id == id);
              if (salon == null)
              {
                  return 0;
              }
 
-             var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake);
+             var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.AccountId == salon.SalonOwner.AccountId && p.Status == PaymentStatus.Fake);
              if (payment == null)
              {
                  return 0;
@@ -362,60 +154,147 @@ namespace Hairhub.Service.Services.Services
                  totalCommission += commissionAmount;
              }
 
-             return totalCommission;*/
+             return totalCommission;
         }
-
-        public async Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id)
+        public async Task<CreatePaymentResult> SendPaymentLink(Guid accountId, CreatePaymentRequest request)
         {
-            throw new NotImplementedException();
-            /*var payment = await _unitOfWork.GetRepository<Payment>()
-                        .SingleOrDefaultAsync(
-                            predicate: p => p.SalonOWnerID == id && p.Status == PaymentStatus.Fake,
-                            include: i => i.Include(m => m.SalonOwner).Include(n => n.Config)
-                        );
-            if (payment == null)
+            try
             {
-                throw new NotFoundException("Payment not found");
-            }
-            if (payment.EndDate.Date > DateTime.Now.Date)
-            {
-                throw new NotFoundException($"Chưa tới ngày thanh toán, ngày thanh toán của bạn là {payment.EndDate}");
-            }
-            var responsePayment = new ResponsePayment
-            {
-                Id = payment.Id,
-                TotalAmount = (int)await AmountofCommissionRateInMonthBySalon(id, (decimal)payment.CommissionRate!),
-                PaymentDate = payment.PaymentDate,
-                MethodBanking = payment.MethodBanking,
-                Description = payment.Description,
-                Status = payment.Status,
-                PaymentCode = payment.PaymentCode,
-                StartDate = payment.StartDate,
-                EndDate = payment.EndDate,
-                SalonOwners = new SalonOwnerPaymentResponse
-                {
-                    Id = payment.SalonOwner.Id,
-                    FullName = payment.SalonOwner.FullName,
-                    Email = payment.SalonOwner.Email,
-                    Phone = payment.SalonOwner.Phone,
-                    Address = payment.SalonOwner.Address,
-                    Img = payment.SalonOwner.Img
-                },      
-                Config = new ConfigPaymentResponse
-                {
-                    PakageName = payment.PakageName,
-                    Id = payment.Id,
-                }
-            };
-            payment.TotalAmount = responsePayment.TotalAmount;
-            payment.Id = responsePayment.Id;
-            _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
-            await _unitOfWork.CommitAsync();
-            return responsePayment;*/
+                string hostName = System.Net.Dns.GetHostName();
+                string clientIPAddress = System.Net.Dns.GetHostAddresses(hostName).GetValue(0).ToString();
+                string returnUrl = $"https://localhost:7257/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&appointment={request.AppointmentId}&config={request.ConfigId}";
+
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
+                if (account == null) throw new Exception("account not null!!");
 
 
+                int amount = (int)request.Price;
+                string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+                long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
+                var description = request.Description;
+                string? clientId = _config["PayOS:ClientId"];
+                var apikey = _config["PayOS:APIKey"];
+                var checksumkey = _config["PayOS:ChecksumKey"];
+                var returnurlfail = _config["PayOS:ReturnUrlFail"];
+
+                PayOS pos = new PayOS(clientId, apikey, checksumkey);
+                
+                var signatureData = new Dictionary<string, object>
+                 {
+                     { "amount", amount },
+                     { "cancelUrl", returnurlfail},
+                     { "description", description },
+                     { "expiredAt", DateTimeOffset.Now.ToUnixTimeSeconds() },
+                     { "orderCode", orderCode },
+                     { "returnUrl", returnUrl}
+                 };
+                var sortedSignatureData = new SortedDictionary<string, object>(signatureData);
+                var dataForSignature = string.Join("&", sortedSignatureData.Select(p => $"{p.Key}={p.Value}"));
+                var signature = ComputeHmacSha256(dataForSignature, checksumkey);
+                DateTimeOffset expiredAt = DateTimeOffset.Now.AddMinutes(10);
+
+                var paymentData = new PaymentData(
+                    orderCode: orderCode,
+                    amount: amount,
+                    description: description,
+                    items: new List<ItemData>(), // Provide a list of items if needed
+                    cancelUrl: returnurlfail,
+                    returnUrl: returnUrl,
+                    signature: signature,
+                    buyerName: account.UserName,
+                    expiredAt: (int)DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds()
+                );
+
+                paymentData.items.Add(new ItemData(account.UserName, 1, amount));
+                var createPaymentResult = await pos.createPaymentLink(paymentData);
+                string url = createPaymentResult.checkoutUrl;
+                return createPaymentResult; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+            }
         }
 
+
+        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? appointmentid, Guid? configid)
+        {
+            
+            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
+                request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
+                request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              
+                var response = await _client.SendAsync(request);
+                bool isStatus = false;
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var responseObject = JObject.Parse(responseContent);
+                    var status = responseObject["data"]?["status"]?.ToString();
+                    var paymentInfo = responseObject["data"];
+                    if (status != null)
+                    {
+                        if (status == "PAID")
+                        {
+                            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+                            var balance = account.Balance;
+                            account.Balance = balance + price;
+                            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+                            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentid);
+                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                            if (config != null)
+                            {
+                                var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
+                                fakepayment.Status = PaymentStatus.Paid;
+                                fakepayment.TotalAmount = price;
+                                fakepayment.PaymentDate = DateTime.UtcNow;
+                                fakepayment.Description = $"Thanh toán thành công tiền hoa hồng tháng {fakepayment.PaymentDate.Value.Month - 1}";
+                                _unitOfWork.GetRepository<Payment>().UpdateAsync(fakepayment);
+                                var nextpayment = new SavePaymentInfor
+                                {
+                                    AccountId = accountid,
+                                    ConfigId = config.Id,
+                                };
+                                await FakePaymentForCommissionRate(nextpayment);
+                            }
+                            else {
+                                var payment = new Payment
+                                {
+                                    Id = Guid.NewGuid(),
+                                    AccountId = accountid,
+                                    AppointmentId = appointment == null ? null : appointment.Id,
+                                    ConfigId = config == null ? null : config.Id,
+                                    Description = "Nạp tiền thành công vào ví",
+                                    PaymentDate = DateTime.Now,
+                                    TotalAmount = price,
+                                    Status = PaymentStatus.Paid,
+                                    PaymentCode = paymentlinkId,
+                                    PaymentType = PaymentType.Deposit,
+                                };
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                            }
+                            isStatus = await _unitOfWork.CommitAsync() > 0;
+                        }
+                        return isStatus;
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to retrieve payment status.");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to send request.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email, string? paymentType, string? status, int page = 1, int size = 10)
         {
             email = (email == null || email.Trim() == "") ? "" : email;
@@ -591,6 +470,7 @@ namespace Hairhub.Service.Services.Services
             else
             {
                 throw new NotFoundException("Trạng thái duyệt đơn không đúng");
+
             }
         }
     }

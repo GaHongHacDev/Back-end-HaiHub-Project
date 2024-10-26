@@ -4,8 +4,10 @@ using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Requests.Payment;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hairhub.API.Controllers
@@ -24,45 +26,10 @@ namespace Hairhub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> SendPaymentLink(CreatePaymentRequest request)
+        [Route("{accountid:Guid}")]
+        public async Task<IActionResult> SendPaymentLink(Guid accountid, CreatePaymentRequest request)
         {
-            var result = await _paymentservice.CreatePaymentUrlRegisterCreator(request);
-            if (result == null)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
-        {
-            var result = await _paymentservice.CreateFirstTimePayment(createFirstTimePaymentRequest);
-            if (result == null)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
-        {
-            var result = await _paymentservice.PaymentForCommissionRate(createFirstTimePaymentRequest);
-            if (result == null)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetStatusPayment(string ordercode, [FromBody] SavePaymentInfor paymentrequest)
-        {
-            var result = await _paymentservice.GetPaymentInfo(ordercode, paymentrequest);
+            var result = await _paymentservice.SendPaymentLink(accountid, request);
             if (result == null)
             {
                 return BadRequest();
@@ -71,17 +38,65 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetPayments([FromQuery]string? email, int page=1, int size = 10)
+        public async Task<IActionResult> PaymentConfirm()
         {
-            var result = await _paymentservice.GetPayments(email, page, size);
+            // Kiểm tra xem có query string không
+            if (Request.Query.Count > 0)
+            {
+                string paymentlink = Request.Query["id"]!;
+                string status = Request.Query["status"]!;
+                var accountid = Guid.Parse(Request.Query["accountId"]!);
+                var appointmentid = Guid.Parse(Request.Query["appointment"]!);
+                var configid = Guid.Parse(Request.Query["config"]!);
+                var price = Decimal.Parse(Request.Query["amount"]!)!;
+                int orderCode = int.Parse(Request.Query["ordercode"]!);
+
+
+                if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))
+                {
+                    return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE"); 
+                }
+
+                
+                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, appointmentid, configid);
+
+                if (isValid == true)
+                {
+                    // Thanh toán thành công
+                    return Ok(isValid);
+                }
+                else
+                {
+                    // Thanh toán không thành công
+                    return Ok(isValid);
+                }
+            }
+
+            // Phản hồi không hợp lệ
+            return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
+        }
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
+        {
+            var result = await _paymentservice.FakePaymentForCommissionRate(createFirstTimePaymentRequest);
             if (result == null)
             {
                 return BadRequest();
             }
             return Ok(result);
         }
-
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CreatePromotionPaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
+        {
+            var result = await _paymentservice.PromotionPaymentForCommissionRate(createFirstTimePaymentRequest);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
+        }
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetPaymentHistory([FromQuery] DateTime? payDate, [FromQuery] Guid? accountId, [FromQuery] string? email, 
@@ -96,42 +111,6 @@ namespace Hairhub.API.Controllers
             catch (NotFoundException ex) 
             {
                 return NotFound(new {message = ex.Message});
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("{ownerId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetPaymentByOwnerId([FromRoute] Guid ownerId, int page=1, int size=10)
-        {
-            var result = await _paymentservice.GetPaymentBySalonOwnerID(ownerId, page, size);
-            if (result == null)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
-        [HttpGet]
-        [Route("{ownerId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetInformationPaymentOfSalonOwner([FromRoute] Guid ownerId)
-        {
-            try
-            {
-                var result = await _paymentservice.GetInformationPaymentOfSalon(ownerId);
-                if (result == null)
-                {
-                    return BadRequest(new { message = "Thất bại trong việc thanh toán" });
-                }
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

@@ -29,7 +29,6 @@ namespace Hairhub.Service.Services.Services
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
-
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
                                     IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
         {
@@ -1071,9 +1070,11 @@ namespace Hairhub.Service.Services.Services
                         AppointmentId = appointment.Id,
                         VoucherId = item
                     };
+                    
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
                 }
             }
+             
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return (isInsert, id);
         }
