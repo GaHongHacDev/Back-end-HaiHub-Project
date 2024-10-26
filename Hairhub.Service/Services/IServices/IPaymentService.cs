@@ -31,5 +31,9 @@ namespace Hairhub.Service.Services.IServices
 
         Task<ResponsePayment> GetInformationPaymentOfSalon(Guid id);
 
+        Task<string> SalonPayment();
+
+
+
     }
 }

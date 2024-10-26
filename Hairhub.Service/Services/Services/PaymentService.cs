@@ -32,6 +32,7 @@ using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Enums;
 using System.Net;
 using Hairhub.Domain.Exceptions;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -69,8 +70,8 @@ namespace Hairhub.Service.Services.Services
             try
             {
                 var Configs = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: c => c.Id == request.ConfigId);               
-                var SalonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: s => s.Id == request.SalonOWnerID);
-                if (SalonOwner == null)
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: s => s.Id == request.AccountId);
+                if (account == null)
                 {
                     throw new Exception("SalonOwner is null.");
                 }
@@ -403,6 +404,77 @@ namespace Hairhub.Service.Services.Services
             return responsePayment;*/
 
 
+        }
+
+        public async Task<string> SalonPayment(Guid accountId, decimal price, string Description)
+        {
+            try
+            {
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
+                if (account == null) throw new Exception("account not null!!");
+
+
+                int amount = (int)price;
+                string currentTimeString = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+                long orderCode = long.Parse(currentTimeString.Substring(currentTimeString.Length - 6));
+                var description = Description;
+                string? clientId = _config["PayOS:ClientId"];
+                var apikey = _config["PayOS:APIKey"];
+                var checksumkey = _config["PayOS:ChecksumKey"];
+                var returnurl = _config["PayOS:ReturnUrl"];
+                var returnurlfail = _config["PayOS:ReturnUrlFail"];
+
+                var updatedReturnUrl = $"{returnurl}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
+                var updatedReturnUrlFail = $"{returnurlfail}?orderCode={Uri.EscapeDataString(orderCode.ToString())}&configId={Uri.EscapeDataString(Configs.Id.ToString())}&amount={amount}";
+
+                PayOS pos = new PayOS(clientId, apikey, checksumkey);
+                // Prepare data for signature
+                var signatureData = new Dictionary<string, object>
+                 {
+                     { "amount", amount },
+                     { "cancelUrl", updatedReturnUrlFail},
+                     { "description", description },
+                     { "expiredAt", DateTimeOffset.Now.ToUnixTimeSeconds() },
+                     { "orderCode", orderCode },
+                     { "returnUrl", updatedReturnUrl}
+                 };
+
+
+
+                // Sort data alphabetically by key
+                var sortedSignatureData = new SortedDictionary<string, object>(signatureData);
+
+                // Create data string for signature
+                var dataForSignature = string.Join("&", sortedSignatureData.Select(p => $"{p.Key}={p.Value}"));
+
+                // Compute the HMAC_SHA256 signature
+                var signature = ComputeHmacSha256(dataForSignature, checksumkey);
+                DateTimeOffset expiredAt = DateTimeOffset.Now.AddMinutes(10);
+
+                var paymentData = new PaymentData(
+                    orderCode: orderCode,
+                    amount: amount,
+                    description: description,
+                    items: new List<ItemData>(), // Provide a list of items if needed
+                    cancelUrl: updatedReturnUrlFail,
+                    returnUrl: updatedReturnUrl,
+                    signature: signature,
+                    buyerName: account.UserName,
+                    expiredAt: (int)DateTimeOffset.Now.AddMinutes(10).ToUnixTimeSeconds()
+                );
+
+                paymentData.items.Add(new ItemData(account.UserName, 1, amount));
+                var createPaymentResult = await pos.createPaymentLink(paymentData);
+                string url = createPaymentResult.paymentLinkId.ToString();
+
+                return url; // Chú ý sử dụng PaymentLink thay vì paymentLink
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+            }
         }
     }
 }
