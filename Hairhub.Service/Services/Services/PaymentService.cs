@@ -479,64 +479,79 @@ namespace Hairhub.Service.Services.Services
         {
             var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().
                                       SingleOrDefaultAsync(predicate: p => p.PaymentId == id,
-                                                           include: i => i.Include(p => p.Payment)  
+                                                           include: i => i.Include(p => p.Payment)
                                                            .ThenInclude(p => p.Account)
                                                            .ThenInclude(p => p.Customers));
-            if (paymentReport == null)
-            {
-                throw new NotFoundException("Không tìm thấy thông tin payment report");
-            }
+            if (paymentReport == null) { throw new NotFoundException("Không tìm thấy thông tin của payment"); }
             var account = await _unitOfWork.GetRepository<Account>()
                                 .SingleOrDefaultAsync(predicate: p => p.Id == paymentReport.Payment.AccountId,
                                 include: i => i.Include(p => p.Customers).Include(p => p.SalonOwners)
                                 );
-            if (account == null)
-            {
-                throw new NotFoundException("Không tìm thấy thông tin account");
-            }
-            var salonInformation = await _unitOfWork.GetRepository<SalonOwner>()
-                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
+            if (account == null) { throw new NotFoundException("Không tìm thấy thông tin của account"); }
+            var salonOwner = await _unitOfWork.GetRepository<SalonOwner>()
+                                .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId,
+                                include: i => i.Include(p => p.SalonInformations)
                                 );
             var CustomerInformation = await _unitOfWork.GetRepository<Customer>()
                                 .SingleOrDefaultAsync(predicate: p => p.AccountId == paymentReport.Payment.AccountId
                                 );
-            string email="", phone="";
-            if (CustomerInformation != null)
+            var staticfile = await _unitOfWork.GetRepository<StaticFile>().GetListAsync(predicate: p => p.PaymentReportId == paymentReport.PaymentId);
+
+            List<string> Images = new List<string>();
+            if (staticfile != null)
             {
-                email = CustomerInformation.Email;
+                foreach (var image in staticfile)
+                {
+                    Images.Add(image.Img);
+                }
+            }
+
+            if (staticfile == null) { throw new NotFoundException("Không tìm thấy thông tin của staticfile  "); }
+            string email = "", phone="", Name="", url ="";
+            Guid? userid = null;
+            if (salonOwner != null)
+            {
+                userid = salonOwner.Id;
+                email = salonOwner.Email!;
+                phone = salonOwner.Phone;
+                Name = salonOwner.FullName;
+                url = salonOwner.Img!;
+            } else if (CustomerInformation != null){
+                userid = CustomerInformation.Id;
+                email = CustomerInformation.Email!;
                 phone = CustomerInformation.Phone;
-            }
-            else if (salonInformation != null)
+                Name = CustomerInformation.FullName;
+                url = CustomerInformation.Img!;
+            } else
             {
-                email=salonInformation.Email;
-                phone = salonInformation.Phone;
+                if (paymentReport != null) { throw new NotFoundException("Không tìm thấy thông tin của salon và customer"); }
             }
-            else
-            {
-                throw new NotFoundException("Không tìm thấy thông tin customer hoặc salon");
-            }
+            
             var paymentWithdraw = new PaymentReportResponse
             {
-                Email =  email,
-                Phone = phone,
-                FullName = paymentReport.FullName,
+                AccountInformation = new AccountInformation
+                {
+                    Id = account.Id,
+                    UserId = userid ?? Guid.Empty,
+                    Email = email,
+                    Phone = phone,
+                    FullName = Name,
+                    urlImage = url
+                },
+                Id = paymentReport!.PaymentId,
+                beneficiary = paymentReport.FullName,
                 Balance = paymentReport.Balance,
                 ConfirmDate = paymentReport.ConfirmDate,
                 CreateDate = paymentReport.CreateDate,
                 NumberAccount = paymentReport.NumberAccount,
                 BankName = paymentReport.BankName,
-                ReasonCancle = paymentReport.ReasonCancle??null,
+                ReasonCancle = paymentReport.ReasonCancle,
                 Status = paymentReport.Status,
-                Payment = new PaymentInformation
-                {
-                    Id = paymentReport.PaymentId,
-                    Description = paymentReport.Payment.Description,
-                    Status = paymentReport.Payment.Status,
-                    PaymentCode = paymentReport.Payment.PaymentCode,
-                    PaymentDate = paymentReport.Payment.PaymentDate,
-                    PaymentType = paymentReport.Payment.PaymentType,
-                    TotalAmount = paymentReport.Payment.TotalAmount,
-                },
+                Description = paymentReport.Payment.Description,
+                PaymentDate = paymentReport.Payment.PaymentDate,
+                statusofpayment = paymentReport.Payment.Status,
+                typeofpayment = paymentReport.Payment.PaymentType,
+                urlPaymentImage = Images,
             };
 
             return paymentWithdraw;

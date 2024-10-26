@@ -14,7 +14,15 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hairhub.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< HEAD
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f41f55027fa6368bcb72f4d17ed9501ac301169b")]
+=======
+<<<<<<< HEAD
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dcc162a254f119e8664ac34f25e15bcab6ee3c1a")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b9e683d16ff5d864aba520c15e38100fa5f3d7c4")]
+>>>>>>> 5bf15356cae0aa441ac24e7011e3e5d20e03a804
+>>>>>>> ChauHien
 [assembly: System.Reflection.AssemblyProductAttribute("Hairhub.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hairhub.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
