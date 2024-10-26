@@ -159,9 +159,19 @@ namespace Hairhub.Service.Helpers
                 .ForMember(dest => dest.SalonInformation, opt => opt.MapFrom(src => src.SalonOwner.SalonInformations.FirstOrDefault())) // Ánh xạ cho SalonInformation
                 .ReverseMap();
             */
-            CreateMap<Payment, PaymentHistory>();
-            CreateMap<Account, PaymentHistory>();
-            CreateMap<Role, PaymentHistory>();
+            CreateMap<Payment, PaymentHistory>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ConfigId, opt => opt.MapFrom(src => src.ConfigId))
+                .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.AccountId))
+                .ForMember(dest => dest.AppointmentId, opt => opt.MapFrom(src => src.AppointmentId))
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount))
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate))
+                .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Account.Role.RoleName))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Account.UserName));
+
             CreateMap<PaymentReport, GetPaymentReportReponse>()
            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PaymentId))
            .ForMember(dest => dest.Balance, opt => opt.MapFrom(src => src.Balance))

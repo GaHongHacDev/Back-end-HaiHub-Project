@@ -99,7 +99,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetPaymentHistory([FromQuery] DateTime? payDate, [FromQuery] Guid? accountId, [FromQuery] string? email,
                                                             [FromQuery] string? paymentType, [FromQuery] string? status,
                                                             [FromQuery] int page = 1, [FromQuery] int size = 10)
@@ -156,7 +156,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetPaymentReport([FromQuery] Guid? accountId, [FromQuery] string? email, [FromQuery] DateTime? createDate,
                                                     [FromQuery] string? status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {

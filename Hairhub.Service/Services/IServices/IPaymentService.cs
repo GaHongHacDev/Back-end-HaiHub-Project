@@ -25,7 +25,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request);
         Task<bool> ConfirmWithdrawPayment(Guid id, WithdrawConfirmRequest request);
 
-
+        Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size);
         Task<PaymentReportResponse> GetPaymentReportById(Guid id);
 
 

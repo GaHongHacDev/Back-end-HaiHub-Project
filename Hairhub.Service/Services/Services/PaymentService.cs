@@ -304,7 +304,7 @@ namespace Hairhub.Service.Services.Services
             status = (status == null || status.Trim() == "") ? "" : status;
 
             var predicate = PredicateBuilder.New<Payment>(x => x.Status.Contains(status) && x.PaymentType.Contains(paymentType) && x.Account.UserName.Contains(email) 
-                                                            && !x.PaymentType.Equals(PaymentStatus.Fake));
+                                                            && !x.Status.Equals(PaymentStatus.Fake));
             if(accountId != null)
             {
                 predicate = predicate.And(x => x.AccountId == accountId);
