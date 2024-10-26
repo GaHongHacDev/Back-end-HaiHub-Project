@@ -10,6 +10,6 @@ namespace Hairhub.Common.ThirdParties.Contract
 {
     public interface IGeminiAIService
     {
-        public Task<AIChatMessageResponse> ChatMessage(AIChatMessageRequest request);
+        public Task<string> ChatMessage(AIChatMessageRequest request);
     }
 }

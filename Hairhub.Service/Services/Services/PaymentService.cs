@@ -479,7 +479,7 @@ namespace Hairhub.Service.Services.Services
         {
             var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().
                                       SingleOrDefaultAsync(predicate: p => p.PaymentId == id,
-                                                           include: i => i.Include(p => p.Payment)
+                                                           include: i => i.Include(p => p.Payment)  
                                                            .ThenInclude(p => p.Account)
                                                            .ThenInclude(p => p.Customers));
             if (paymentReport == null)
