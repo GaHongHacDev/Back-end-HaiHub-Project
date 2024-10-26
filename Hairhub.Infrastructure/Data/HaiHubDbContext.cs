@@ -624,6 +624,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.NumberAccount).HasMaxLength(50).HasColumnName("number_account");
                 entity.Property(e => e.BankName).HasMaxLength(100).HasColumnName("bank_name");
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 2)").HasColumnName("balance");
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(e => e.Payment)
                       .WithOne(p => p.PaymentReport)
