@@ -740,7 +740,7 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("bank_name");
 
-                    b.Property<DateTime>("ConfirmDate")
+                    b.Property<DateTime?>("ConfirmDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("confirm_date");
 
@@ -764,6 +764,11 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("reason_cancle");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("status");
 
                     b.HasKey("PaymentId");
 
