@@ -60,52 +60,32 @@ namespace Hairhub.API.Controllers
                 
                 bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, appointmentid, configid);
 
-                if (isValid && status == "Paid")
+                if (isValid == true)
                 {
                     // Thanh toán thành công
-                    return Redirect("LINK_THANH_CONG");
+                    return Ok(isValid);
                 }
                 else
                 {
                     // Thanh toán không thành công
-                    return Redirect("LINK_KHONG_THANH_CONG");
+                    return Ok(isValid);
                 }
             }
 
             // Phản hồi không hợp lệ
             return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
         }
-
-
-
-        [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CreateFirstTimePayment(CreateFirstTimePaymentRequest createFirstTimePaymentRequest)
-        {
-            var result = await _paymentservice.CreateFirstTimePayment(createFirstTimePaymentRequest);
-            if (result == null)
-            {
-                return BadRequest();
-            }
-            return Ok(result);
-        }
-
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateFirstTimePaymentCommissionRate(SavePaymentInfor createFirstTimePaymentRequest)
         {
-            var result = await _paymentservice.PaymentForCommissionRate(createFirstTimePaymentRequest);
+            var result = await _paymentservice.FakePaymentForCommissionRate(createFirstTimePaymentRequest);
             if (result == null)
             {
                 return BadRequest();
             }
             return Ok(result);
         }
-
-
-
-
-
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetPaymentHistory([FromQuery] DateTime? payDate, [FromQuery] Guid? accountId, [FromQuery] string? email, 
@@ -126,7 +106,5 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-        
     }
 }
