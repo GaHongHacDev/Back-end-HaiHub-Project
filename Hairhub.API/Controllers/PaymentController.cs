@@ -2,6 +2,7 @@
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Requests.Payment;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
@@ -9,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
+using static QRCoder.PayloadGenerator;
 
 namespace Hairhub.API.Controllers
 {
@@ -24,7 +27,7 @@ namespace Hairhub.API.Controllers
         }
 
 
-        [HttpPost]       
+        [HttpPost]
         [Route("{accountid:Guid}")]
         public async Task<IActionResult> SendPaymentLink(Guid accountid, CreatePaymentRequest request)
         {
@@ -56,7 +59,7 @@ namespace Hairhub.API.Controllers
                 }
 
 
-                
+
                 bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
 
 
@@ -120,14 +123,26 @@ namespace Hairhub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CreateWithdrawPayment([FromForm]CreateWithdrawPaymentRequest request)
+        public async Task<IActionResult> CreateWithdrawPayment([FromForm] CreateWithdrawPaymentRequest request)
         {
-            var result = await _paymentservice.CreateWithdrawPayment(request);
-            if (result == null)
+            try
             {
-                return BadRequest();
+                var result = await _paymentservice.CreateWithdrawPayment(request);
+
+                if (result == null)
+                {
+                    return BadRequest("Lỗi không thể tạo đơn rút tiền");
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPost]
