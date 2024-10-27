@@ -23,24 +23,17 @@ namespace Hairhub.Common.ThirdParties.Implementation
             _configuration = configuration;
         }
 
-        public async Task<AIChatMessageResponse> ChatMessage(AIChatMessageRequest request)
+        private async Task<string> SendMessageDefault(string askCustomer)
         {
-            var promptStr = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
-
-                            Lưu ý: Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về 
-                            lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
-                            Bỏ qua các thông khác trong câu hỏi không liên quan đến lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
-                            [Thời gian] phải được viết dưới dạng dd/mm/yyyy hh:mm. Phân biệt rõ ràng về ý định của câu hỏi về [Loại hướng dẫn sử dụng] hay những ý định khác.
-                            Nếu không có thông tin thì trả lời ""null"". 
-                            Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
-                            Kết quả trả lời ứng với cột dữ liệu sau, và chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
-
-                            [Intents]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null]
-                            [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn] 
-                            [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại]
-                            [Vị trí]: [Gần tôi, Địa điểm, null]
-                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null]
-                            [Thời gian]: [dd/mm/yyyy hh:mm, tuần này, hiện tại, hôm nay, null]";
+            var promptStr = $@"Câu hỏi của người dùng trên hệ thống Hairhub như sau: ""{askCustomer}"". Hãy giúp Hairhub soạn 1 nội dung trả lời lại 
+                                khách hàng với nội dung chính như sau: ""Chào mừng bạn đến với Hairhub – Hệ thống kết nối giữa Salon/Barber Shop và khách hàng! 
+                                Tôi là Hairhub chatbot. Để chúng tôi có thể hỗ trợ tốt hơn, vui lòng cung cấp câu hỏi liên quan đến một trong các chủ đề sau:
+                                1️. Kiểm tra lịch hẹn.
+                                2️. Tìm khuyến mãi hiện có.
+                                3️. Hướng dẫn sử dụng Hairhub.
+                                4️. Tìm thời gian đặt lịch phù hợp.
+                                5️. Tìm salon hoặc barber shop gần bạn.
+                                Chúng tôi rất hân hạnh được hỗ trợ bạn"" ";
             var requestBody = new
             {
                 contents = new[]
@@ -69,7 +62,62 @@ namespace Hairhub.Common.ThirdParties.Implementation
             }
 
             string responseJson = await response.Content.ReadAsStringAsync();
-            if(responseJson == null)
+            if (responseJson == null)
+            {
+                throw new Exception("Lỗi không tìm thấy nội dung trả lời của AI");
+            }
+
+            var apiResponse = JsonConvert.DeserializeObject<AIChatMessageResponse>(responseJson);
+            var classificationText = apiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text ?? "";
+            return classificationText;
+        }
+        public async Task<string> ChatMessage(AIChatMessageRequest request)
+        {
+            var promptStr = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
+
+                            Lưu ý: Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về 
+                            lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
+                            Bỏ qua các thông khác trong câu hỏi không liên quan đến lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
+                            [Thời gian] phải được viết dưới dạng dd/mm/yyyy hh:mm. Phân biệt rõ ràng về ý định của câu hỏi về [Loại hướng dẫn sử dụng] hay những ý định khác.
+                            Nếu không có thông tin thì trả lời ""null"". 
+                            Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
+                            Kết quả trả lời ứng với cột dữ liệu sau, chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
+
+                            [Loại câu hỏi]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null];
+                            [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn]; 
+                            [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại];
+                            [Vị trí]: [Gần tôi, Địa điểm, null];
+                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
+                            [Thời gian]: [dd/mm/yyyy hh:mm, tuần này, hiện tại, hôm nay, null];";
+            var requestBody = new
+            {
+                contents = new[]
+                {
+                    new
+                    {
+                        role = "user",
+                        parts = new[]
+                        {
+                            new { text = promptStr}
+                        }
+                    }
+                }
+            };
+
+            var json = JsonConvert.SerializeObject(requestBody);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var apiKey = _configuration["AIGemini:Key"];
+            var urlRequest = _configuration["AIGemini:Url"];
+            var response = await _httpClient.PostAsync($"{urlRequest}{apiKey}", httpContent);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Request failed with status code {response.StatusCode}: {errorContent}");
+            }
+
+            string responseJson = await response.Content.ReadAsStringAsync();
+            if (responseJson == null)
             {
                 throw new Exception("Lỗi không tìm thấy nội dung trả lời của AI");
             }
@@ -85,7 +133,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
                     var trimmedLine = line.Trim();
                     switch (trimmedLine)
                     {
-                        case string s when s.StartsWith("[Intent]:"):
+                        case string s when s.StartsWith("[Loại câu hỏi]:"):
                             clasifyAskCustomer.Intent = ExtractValue(s);
                             break;
                         case string s when s.StartsWith("[Loại hướng dẫn sử dụng]:"):
@@ -158,8 +206,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
                     case "Tìm salon hoặc barber shop":
                         break;
                     case null:
-                        //Tôi không biết bạn đang hỏi qq dì cả???
-                        break;
+                        return await SendMessageDefault(request.AskMessage);
                     default:
                         //Tôi không biết bạn đang hỏi qq dì cả???
                         break;
@@ -168,7 +215,8 @@ namespace Hairhub.Common.ThirdParties.Implementation
                 Console.WriteLine("*************************" + clasifyAskCustomer);
 
             }
-            return apiResponse!;
+            //return apiResponse!;
+            return "";
         }
 
         private string ExtractValue(string line)

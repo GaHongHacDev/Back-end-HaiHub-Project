@@ -1022,11 +1022,19 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
             if (!AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) && !AppointmentPaymentMethod.PayInSalon.Equals(request.PaymentMethod) 
-                && !AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+                && !AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod) && request.PaymentMethod!=null)
             {
                 throw new NotFoundException("Sai tên phương thức thanh toán");
             }
-
+            string paymentMethod = "";
+            if(request.PaymentMethod == null)
+            {
+                paymentMethod = AppointmentPaymentMethod.PayInSalon;
+            }
+            else
+            {
+                paymentMethod = request.PaymentMethod;
+            }
             var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == request.CustomerId, include: x=>x.Include(s=>s.Account));
             if (customer == null)
             {

@@ -9,7 +9,7 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
 {
     public class WithdrawConfirmRequest
     {
-        public IFormFile BankingImgs { get; set; }
+        public IFormFile? BankingImgs { get; set; }
         public string? ReasonCancel { get; set; }
         public string StatusConfirm { get; set; }
     }
