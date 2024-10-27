@@ -120,7 +120,7 @@ namespace Hairhub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CreateWithdrawPayment(CreateWithdrawPaymentRequest request)
+        public async Task<IActionResult> CreateWithdrawPayment([FromForm]CreateWithdrawPaymentRequest request)
         {
             var result = await _paymentservice.CreateWithdrawPayment(request);
             if (result == null)

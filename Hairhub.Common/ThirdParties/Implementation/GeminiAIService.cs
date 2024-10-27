@@ -27,13 +27,13 @@ namespace Hairhub.Common.ThirdParties.Implementation
         {
             var promptStr = $@"Câu hỏi của người dùng trên hệ thống Hairhub như sau: ""{askCustomer}"". Hãy giúp Hairhub soạn 1 nội dung trả lời lại 
                                 khách hàng với nội dung chính như sau: ""Chào mừng bạn đến với Hairhub – Hệ thống kết nối giữa Salon/Barber Shop và khách hàng! 
-                                Tôi là Hairhub chatbot. Để chúng tôi có thể hỗ trợ tốt hơn, vui lòng cung cấp câu hỏi liên quan đến một trong các chủ đề sau:
+                                Tôi là Hairhub chatbot. Để tôi có thể hỗ trợ tốt hơn, vui lòng cung cấp câu hỏi liên quan đến một trong các chủ đề sau:
                                 1️. Kiểm tra lịch hẹn.
                                 2️. Tìm khuyến mãi hiện có.
                                 3️. Hướng dẫn sử dụng Hairhub.
                                 4️. Tìm thời gian đặt lịch phù hợp.
                                 5️. Tìm salon hoặc barber shop gần bạn.
-                                Chúng tôi rất hân hạnh được hỗ trợ bạn"" ";
+                                Hairhub Chatbot rất hân hạnh được hỗ trợ bạn"" ";
             var requestBody = new
             {
                 contents = new[]
@@ -75,10 +75,29 @@ namespace Hairhub.Common.ThirdParties.Implementation
         {
             var promptStr = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
 
+                                Lưu ý: 
+                                1. Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
+                                2. Bỏ qua các thông khác trong câu hỏi không liên quan đến lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
+                                3. [Thời gian] phải được viết dưới dạng ""MM/dd/yyyy HH:mm:ss"", thời gian hiện tại đang là: ""{DateTime.Now}"". 
+                                4. Các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" cần được chuyển thành thời gian cụ thể dựa trên ngày hiện tại.
+
+                                Nếu không có thông tin thì trả lời ""null"". 
+                                Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
+                                Kết quả trả lời ứng với cột dữ liệu sau, chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
+
+                                [Loại câu hỏi]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null];
+                                [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn]; 
+                                [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại];
+                                [Vị trí]: [Gần tôi, Địa điểm, null];
+                                [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
+                                [Thời gian]: [Thời gian trong câu hỏi lời của khách hàng theo định dạng ""MM/dd/yyyy HH:mm:ss"", null];";
+
+            var promptStr1 = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
+
                             Lưu ý: Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về 
                             lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
                             Bỏ qua các thông khác trong câu hỏi không liên quan đến lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
-                            [Thời gian] phải được viết dưới dạng dd/mm/yyyy hh:mm. Phân biệt rõ ràng về ý định của câu hỏi về [Loại hướng dẫn sử dụng] hay những ý định khác.
+                            [Thời gian] phải được viết dưới dạng ""MM/dd/yyyy HH:mm:ss"", thời gian hiện tại đang là: ""{DateTime.Now}"". Phân biệt rõ ràng về ý định của câu hỏi về [Loại hướng dẫn sử dụng] hay những ý định khác.
                             Nếu không có thông tin thì trả lời ""null"". 
                             Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
                             Kết quả trả lời ứng với cột dữ liệu sau, chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
@@ -88,7 +107,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
                             [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại];
                             [Vị trí]: [Gần tôi, Địa điểm, null];
                             [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
-                            [Thời gian]: [dd/mm/yyyy hh:mm, tuần này, hiện tại, hôm nay, null];";
+                            [Thời gian]: [Thời gian trong câu hỏi lời của khách hàng theo định dạng ""MM/dd/yyyy HH:mm:ss"", null];";
             var requestBody = new
             {
                 contents = new[]
@@ -126,7 +145,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
             var classificationText = apiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text;
             if (classificationText != null)
             {
-                var lines = classificationText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                var lines = classificationText.Split(new[] { '\n', '\r', ';'}, StringSplitOptions.RemoveEmptyEntries);
                 var clasifyAskCustomer = new ClassificationResult();
                 foreach (var line in lines)
                 {

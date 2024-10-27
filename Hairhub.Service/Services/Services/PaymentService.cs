@@ -409,7 +409,7 @@ namespace Hairhub.Service.Services.Services
                 _unitOfWork.GetRepository<Payment>().UpdateAsync(payment);
 
                 var paymentReport = await _unitOfWork.GetRepository<PaymentReport>().SingleOrDefaultAsync(predicate: x=>x.PaymentId == Id);
-                if (paymentReport == null)
+                if (paymentReport == null) 
                 {
                     throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
                 }
