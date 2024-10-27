@@ -424,8 +424,7 @@ namespace Hairhub.Service.Services.Services
             {
                 var payment = await _unitOfWork.GetRepository<Payment>()
                                                 .SingleOrDefaultAsync(
-                                                    predicate: x => x.Id == Id, 
-                                                    include: x=>x.Include(s=>s.Account).ThenInclude(s=>s.Role)
+                                                    predicate: x => x.Id == Id
                                                 );
                 if (payment == null)
                 {
@@ -441,7 +440,11 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
                 }
 
-                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.Id == payment.AccountId);
+                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>()
+                                                .SingleOrDefaultAsync(
+                                                    predicate: x => x.Id == payment.AccountId, 
+                                                    include: x=>x.Include(s=>s.Role)
+                                                );
                 if (account == null)
                 {
                     throw new NotFoundException($"Không tìm thấy tài khoản với id {payment.AccountId}");
@@ -463,17 +466,17 @@ namespace Hairhub.Service.Services.Services
                 string urlImg = await _mediaService.UploadAnImage(request.BankingImgs, MediaPath.PAYMENT_BANKED_IMG, paymentReport.PaymentId.ToString());
 
                 string fullName = "";
-                if(payment.Account.Role.RoleName!.Equals(RoleEnum.Customer.ToString()))
+                if(account.Role.RoleName!.Equals(RoleEnum.Customer.ToString()))
                 {
-                    var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == payment.AccountId);
+                    var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
                     fullName = customer.FullName;
                 }
-                else if (payment.Account.Role.RoleName!.Equals(RoleEnum.SalonOwner.ToString()))
+                else if (account.Role.RoleName!.Equals(RoleEnum.SalonOwner.ToString()))
                 {
-                    var salon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == payment.AccountId);
+                    var salon = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
                     fullName = salon.FullName;
                 }
-                bool isSendMail = await _emailService.SendConfirmWithdraw(payment.Account.UserName, "Hairhub thông báo rút tiền thành công", fullName, 
+                bool isSendMail = await _emailService.SendConfirmWithdraw(account.UserName, "Hairhub thông báo rút tiền thành công", fullName, 
                                                         DateTime.Now.Date.ToString(), paymentReport.FullName, paymentReport.NumberAccount, paymentReport.BankName,
                                                         paymentReport.Balance.ToString(), urlImg);
                 if (!isSendMail)
