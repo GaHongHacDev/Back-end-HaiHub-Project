@@ -40,6 +40,8 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http;
 using Hairhub.Common.ThirdParties.Contract;
 using System.Drawing;
+using CloudinaryDotNet;
+using System.Security.Principal;
 
 
 namespace Hairhub.Service.Services.Services
@@ -163,7 +165,7 @@ namespace Hairhub.Service.Services.Services
             {
                 string returnUrl = $"https://localhost:7257/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
-                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
+                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
 
 
@@ -224,7 +226,7 @@ namespace Hairhub.Service.Services.Services
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, getUrl);
+                var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              
                 var response = await _client.SendAsync(request);
@@ -239,10 +241,10 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
                             var balance = account.Balance;
                             account.Balance = balance + price;
-                            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+                            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
                             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
                             if (config != null)
                             {
@@ -333,7 +335,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request)
         {
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == request.AccountId && x.IsActive);
+            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x=>x.Id == request.AccountId && x.IsActive);
             if (account == null)
             {
                 throw new NotFoundException($"Không tìm thấy account với id {request.AccountId}");
@@ -342,13 +344,10 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Số dư trong ví không đủ");
             }
-            else if (request.Balance < 10000)
+            else if (request.Balance < 50000)
             {
                 throw new Exception("Không đủ số tiền để rút từ ví");
             }
-
-            account.Balance-= request.Balance;
-            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
 
             Payment payment = new Payment()
             {
@@ -441,6 +440,22 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException($"Không tìm thấy payment report với id {Id}");
                 }
+
+                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: x => x.Id == payment.AccountId);
+                if (account == null)
+                {
+                    throw new NotFoundException($"Không tìm thấy tài khoản với id {payment.AccountId}");
+                }
+                if (paymentReport.Balance <= account.Balance)
+                {
+                    account.Balance -= paymentReport.Balance;
+                    _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
+                }
+                else
+                {
+                    throw new NotFoundException("Số dư tài khoản không đủ để rút tiền");
+                }
+
                 paymentReport.ConfirmDate = DateTime.UtcNow;
                 paymentReport.Status = PaymentStatus.Paid;
                 _unitOfWork.GetRepository<PaymentReport>().UpdateAsync(paymentReport);
@@ -484,7 +499,7 @@ namespace Hairhub.Service.Services.Services
                                                            .ThenInclude(p => p.Account)
                                                            .ThenInclude(p => p.Customers));
             if (paymentReport == null) { throw new NotFoundException("Không tìm thấy thông tin của payment"); }
-            var account = await _unitOfWork.GetRepository<Account>()
+            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>()
                                 .SingleOrDefaultAsync(predicate: p => p.Id == paymentReport.Payment.AccountId,
                                 include: i => i.Include(p => p.Customers).Include(p => p.SalonOwners)
                                 );
@@ -530,7 +545,7 @@ namespace Hairhub.Service.Services.Services
             {
                 if (paymentReport != null) { throw new NotFoundException("Không tìm thấy thông tin của salon và customer"); }
             }
-            
+
             var paymentWithdraw = new PaymentReportResponse
             {
                 AccountInformation = new AccountInformation
@@ -542,6 +557,7 @@ namespace Hairhub.Service.Services.Services
                     FullName = Name,
                     urlImage = url,
                     RoleName = roleName,
+                    Balance = account.Balance,
                 },
                 Id = paymentReport!.PaymentId,
                 Beneficiary = paymentReport.FullName,
