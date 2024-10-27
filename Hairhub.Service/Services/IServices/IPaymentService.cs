@@ -19,7 +19,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> PromotionPaymentForCommissionRate(SavePaymentInfor createPaymentRequest);
         Task<decimal> AmountofCommissionRateInMonthBySalon(Guid id, decimal commisionrate);
         Task<CreatePaymentResult> SendPaymentLink(Guid accountId, CreatePaymentRequest request);
-        Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid);
+        Task<StatusPayment> ConfirmPayment(string queryString, QueryRequest requestquery);
         Task<IPaginate<PaymentHistory>> GetPaymentHistory(DateTime? payDate, Guid? accountId, string? email,
                                                              string? paymentType, string? status, int page = 1, int size = 10);
         Task<bool> CreateWithdrawPayment(CreateWithdrawPaymentRequest request);
