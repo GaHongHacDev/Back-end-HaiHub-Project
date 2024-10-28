@@ -223,10 +223,13 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<StatusPayment> ConfirmPayment(string queryString, QueryRequest requestquery)
         {
-            var urlback = "http://localhost:5713/managerPayment";
+            
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{requestquery.Paymentlink}";
             try
             {
+                Guid? appointmentId = Guid.Parse(requestquery.appontmentid!);
+                Guid? accountid = Guid.Parse(requestquery.accountid!);
+                Guid? configid = Guid.Parse(requestquery.configid!);
                 var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              
@@ -242,12 +245,12 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.accountid);
+                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
                             var balance = account.Balance;
                             account.Balance = balance + requestquery.price;
                             _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
-                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.configid);
-                            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.appontmentid);
+                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentId);
                             if (config != null)
                             {
                                 var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
@@ -258,7 +261,7 @@ namespace Hairhub.Service.Services.Services
                                 _unitOfWork.GetRepository<Payment>().UpdateAsync(fakepayment);
                                 var nextpayment = new SavePaymentInfor
                                 {
-                                    AccountId = requestquery.accountid,
+                                    AccountId = (Guid)accountid,
                                     ConfigId = config.Id,
                                 };
                                 await FakePaymentForCommissionRate(nextpayment);
@@ -267,7 +270,7 @@ namespace Hairhub.Service.Services.Services
                                 var paymentAppointment = new Payment
                                 {
                                     Id = Guid.NewGuid(),    
-                                    AccountId = requestquery.accountid,
+                                    AccountId = (Guid)accountid,
                                     AppointmentId = appointment.Id,
                                     ConfigId = config == null ? null : config.Id,
                                     Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
@@ -284,7 +287,7 @@ namespace Hairhub.Service.Services.Services
                                 var paymentWallet = new Payment
                                 {
                                     Id = Guid.NewGuid(),
-                                    AccountId = requestquery.accountid,
+                                    AccountId = (Guid)accountid,
                                     AppointmentId = null,
                                     ConfigId = null,
                                     Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
@@ -300,9 +303,7 @@ namespace Hairhub.Service.Services.Services
                             var tran = new StatusPayment
                             {
                                 code = requestquery.Code,
-                                des = requestquery.des,
-                                url = $"http://localhost:5713/managerPayment?code={requestquery.Code}&price={requestquery.price}" +
-                                      (appointment != null ? $"&appointment={appointment.Id}" : ""),
+                                des = "Thành công rồi nè",                                
                                 Data = new data
                                 {
                                     status = requestquery.Status,

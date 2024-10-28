@@ -50,43 +50,42 @@ namespace Hairhub.API.Controllers
                 string code = Request.Query["code"]!;
                 string des = Request.Query["desc"]!;
                 string amount = Request.Query["amountRemaining"]!;
-                Guid? accountid = Guid.TryParse(Request.Query["accountId"], out var accountGuid) ? accountGuid : (Guid?)null;
-                Guid? configid = Guid.TryParse(Request.Query["config"], out var configGuid) ? configGuid : (Guid?)null;
-                Guid? appointment = Guid.TryParse(Request.Query["appointment"], out var appointmentGuid) ? appointmentGuid : (Guid?)null;
-
-                if (!Decimal.TryParse(Request.Query["amount"], out var price) ||
-                    !int.TryParse(Request.Query["ordercode"], out int orderCode))
-                {
-                    return BadRequest("Invalid format for amount or order code.");
-                }
-                
+                string accountid = Request.Query["accountId"]!;
+                string configid = Request.Query["config"]!;
+                var price = Decimal.Parse(Request.Query["amount"]!)!;
+                int orderCode = int.Parse(Request.Query["ordercode"]!);
 
 
                 var request = new QueryRequest
                 {
-                    accountid = (Guid)accountid!,
+                    accountid = accountid,
                     Code = code,
-                    configid = (Guid)configid!,
+                    configid = configid,
                     des = des,
                     orderCode = orderCode,
                     Paymentlink = paymentlink,
                     price = price,
                     Status = status,
-                    appontmentid = (Guid)appointment!,
-                }; 
+                };
+
+
+
+
+
+
 
                 if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))
                 {
                     return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
                 }
-                
+
                 var result = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, request);
 
 
                 if (result != null)
                 {
                     // Thanh toán thành công
-                    return Ok("Bạn Thanh toán thành công");
+                    return Ok(result.des);
                 }
                 else
                 {

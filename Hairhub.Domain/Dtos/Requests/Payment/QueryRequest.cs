@@ -9,18 +9,18 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
 {
     public class QueryRequest
     {
-        public string Paymentlink { get; set; }
-        public string Status { get; set; }
-        public string Code { get; set; }
-        public string des { get; set; }
+        public string? Paymentlink { get; set; }
+        public string? Status { get; set; }
+        public string? Code { get; set; }
+        public string? des { get; set; }
 
-        public Guid accountid { get; set; }
+        public string? accountid { get; set; }
 
-        public Guid appontmentid { get; set; }
-        public Guid configid { get; set; }
+        public string? appontmentid { get; set; }
+        public string? configid { get; set; }
         public decimal price { get; set; }
 
         public int orderCode { get; set; }
-        public string Url { get; set; }
+        public string? Url { get; set; }
     }
 }
