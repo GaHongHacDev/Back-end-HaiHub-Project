@@ -163,6 +163,7 @@ namespace Hairhub.Service.Services.Services
             {
                 string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
+                
                 var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
 
@@ -220,7 +221,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<StatusPayment> ConfirmPayment(string queryString, QueryRequest requestquery)
         {
-            
+            var urlback = "http://localhost:5713/managerPayment";
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{requestquery.Paymentlink}";
             try
             {
@@ -279,11 +280,12 @@ namespace Hairhub.Service.Services.Services
                             {
                                 code = requestquery.Code,
                                 des = requestquery.des,
+                                url = $"http://localhost:5713/managerPayment?code={requestquery.Code}&price={requestquery.price}",
                                 Data = new data
                                 {
                                     status = requestquery.Status,
                                     amount = requestquery.price
-                                }
+                                                                    }
                             };
                             isStatus = await _unitOfWork.CommitAsync() > 0;
                             return tran;

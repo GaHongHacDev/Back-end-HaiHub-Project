@@ -20,5 +20,6 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
         public decimal price { get; set; }
 
         public int orderCode { get; set; }
+        public string Url { get; set; }
     }
 }

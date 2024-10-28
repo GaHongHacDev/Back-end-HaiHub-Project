@@ -76,7 +76,7 @@ namespace Hairhub.API.Controllers
                 if (result != null)
                 {
                     // Thanh toán thành công
-                    return Ok(result);
+                    return Redirect(result.url);
                 }
                 else
                 {

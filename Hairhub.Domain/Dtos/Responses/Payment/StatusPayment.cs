@@ -12,6 +12,8 @@ namespace Hairhub.Domain.Dtos.Responses.Payment
 
         public string des {  get; set; }
 
+        public string url { get; set; }
+
         public data Data { get; set; }
 
     }
