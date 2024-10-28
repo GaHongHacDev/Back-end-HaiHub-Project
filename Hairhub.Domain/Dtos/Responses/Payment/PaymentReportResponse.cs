@@ -35,7 +35,7 @@ namespace Hairhub.Domain.Dtos.Responses.Payment
         public string Email { get; set; }   
 
         public string Phone {  get; set; }
-
+        public decimal Balance { get; set; }
         public string urlImage { get; set; }
 
     }
