@@ -50,11 +50,19 @@ namespace Hairhub.API.Controllers
                 string code = Request.Query["code"]!;
                 string des = Request.Query["desc"]!;
                 string amount = Request.Query["amountRemaining"]!;
-                var accountid = Guid.Parse(Request.Query["accountId"]!);
-                var configid = Guid.Parse(Request.Query["config"]!);
-                var appointment = Guid.Parse(Request.Query["appointment"]!);
-                var price = Decimal.Parse(Request.Query["amount"]!)!;
-                int orderCode = int.Parse(Request.Query["ordercode"]!);
+                if (!Guid.TryParse(Request.Query["accountId"], out var accountid) ||
+            !Guid.TryParse(Request.Query["config"], out var configid) ||
+            !Guid.TryParse(Request.Query["appointment"], out var appointment))
+                {
+                    return BadRequest("Invalid GUID format in one or more query parameters.");
+                }
+
+                if (!Decimal.TryParse(Request.Query["amount"], out var price) ||
+                    !int.TryParse(Request.Query["ordercode"], out int orderCode))
+                {
+                    return BadRequest("Invalid format for amount or order code.");
+                }
+                
 
 
                 var request = new QueryRequest
