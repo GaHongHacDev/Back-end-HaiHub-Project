@@ -166,7 +166,7 @@ namespace Hairhub.Service.Services.Services
                 string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
                 
-                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
+                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
 
 
@@ -242,10 +242,10 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.accountid);
+                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.accountid);
                             var balance = account.Balance;
                             account.Balance = balance + requestquery.price;
-                            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+                            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
                             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.configid);
                             if (config != null)
                             {
