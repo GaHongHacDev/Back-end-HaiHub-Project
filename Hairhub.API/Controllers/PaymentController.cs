@@ -66,13 +66,6 @@ namespace Hairhub.API.Controllers
                     price = price,
                     Status = status,
                 };
-
-
-
-
-
-
-
                 if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))
                 {
                     return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
@@ -89,7 +82,7 @@ namespace Hairhub.API.Controllers
                 else
                 {
                     // Thanh toán không thành công
-                    return Ok(result);
+                    return Ok("Thất bại rùi nè!!!");
                 }
 
             }

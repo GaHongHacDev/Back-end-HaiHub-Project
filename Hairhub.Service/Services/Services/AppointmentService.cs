@@ -1705,6 +1705,25 @@ namespace Hairhub.Service.Services.Services
             }
             return results;
         }
+
+        public async Task<bool> UpdateAppointmentFakeById(Guid id)
+        {
+            var appointmentFake = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if(appointmentFake == null) { throw new NotFoundException("Không tồn tại lịch hẹn"); }
+            appointmentFake.Status = AppointmentStatus.Booking;
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointmentFake);
+            bool isStatus = await _unitOfWork.CommitAsync() > 0;
+            return isStatus;
+        }
+
+        public async Task<bool> DeleteAppointmentFakeById(Guid id)
+        {
+            var appointmentFake = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (appointmentFake == null) { throw new NotFoundException("Không tồn tại lịch hẹn"); }            
+            _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointmentFake);
+            bool isStatus = await _unitOfWork.CommitAsync() > 0;
+            return isStatus;
+        }
         #endregion
 
     }

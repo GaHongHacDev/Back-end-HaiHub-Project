@@ -230,7 +230,9 @@ namespace Hairhub.Service.Services.Services
                 Guid? appointmentId = Guid.TryParse(requestquery.appontmentid, out var appointmentGuid) ? appointmentGuid : (Guid?)null;
                 Guid? accountid = Guid.TryParse(requestquery.accountid, out var accountGuid) ? accountGuid : (Guid?)null;
                 Guid? configid = Guid.TryParse(requestquery.configid, out var configGuid) ? configGuid : (Guid?)null;
-
+                var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentId);
+                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
                 var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              
@@ -246,12 +248,11 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+                            
                             var balance = account.Balance;
                             account.Balance = balance + requestquery.price;
                             _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
-                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
-                            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentId);
+                            
                             if (config != null)
                             {
                                 var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
@@ -274,7 +275,7 @@ namespace Hairhub.Service.Services.Services
                                     AccountId = (Guid)accountid,
                                     AppointmentId = appointment.Id,
                                     ConfigId = config == null ? null : config.Id,
-                                    Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
+                                    Description = $"Nạp tiền thành công vào ví",
                                     PaymentDate = DateTime.Now,
                                     TotalAmount = requestquery.price,
                                     Status = PaymentStatus.Paid,
@@ -282,6 +283,7 @@ namespace Hairhub.Service.Services.Services
                                     PaymentType = PaymentType.Deposit,   
                                     
                                 };
+                                await _appointmentservice.UpdateAppointmentFakeById(appointment.Id);
                                 await _unitOfWork.GetRepository<Payment>().InsertAsync(paymentAppointment);
                             } else if (appointment == null && config == null)
                             {
@@ -304,7 +306,7 @@ namespace Hairhub.Service.Services.Services
                             var tran = new StatusPayment
                             {
                                 code = requestquery.Code,
-                                des = "Thành công rồi nè",                                
+                                des = "Thành công rùi nè",                                
                                 Data = new data
                                 {
                                     status = requestquery.Status,
@@ -314,6 +316,7 @@ namespace Hairhub.Service.Services.Services
                             isStatus = await _unitOfWork.CommitAsync() > 0;
                             return tran;
                         }
+                        await _appointmentservice.DeleteAppointmentFakeById(appointment.Id);
                         return null!;
                     }
                     else
