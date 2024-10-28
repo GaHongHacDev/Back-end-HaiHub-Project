@@ -52,6 +52,7 @@ namespace Hairhub.API.Controllers
                 string amount = Request.Query["amountRemaining"]!;
                 var accountid = Guid.Parse(Request.Query["accountId"]!);
                 var configid = Guid.Parse(Request.Query["config"]!);
+                var appointment = Guid.Parse(Request.Query["appointment"]!);
                 var price = Decimal.Parse(Request.Query["amount"]!)!;
                 int orderCode = int.Parse(Request.Query["ordercode"]!);
 
@@ -66,6 +67,7 @@ namespace Hairhub.API.Controllers
                     Paymentlink = paymentlink,
                     price = price,
                     Status = status,
+                    appontmentid = appointment,
                 }; 
 
                 if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))

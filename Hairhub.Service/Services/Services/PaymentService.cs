@@ -163,7 +163,7 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
+                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}&appointment={request.AppointmentId}";
 
                 
                 var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
@@ -247,6 +247,7 @@ namespace Hairhub.Service.Services.Services
                             account.Balance = balance + requestquery.price;
                             _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
                             var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.configid);
+                            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.appontmentid);
                             if (config != null)
                             {
                                 var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
@@ -262,27 +263,46 @@ namespace Hairhub.Service.Services.Services
                                 };
                                 await FakePaymentForCommissionRate(nextpayment);
                             }
-                            else {
-                                var payment = new Payment
+                            else if (appointment != null) {
+                                var paymentAppointment = new Payment
                                 {
                                     Id = Guid.NewGuid(),    
                                     AccountId = requestquery.accountid,
-                                    AppointmentId = null,
+                                    AppointmentId = appointment.Id,
                                     ConfigId = config == null ? null : config.Id,
                                     Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
                                     PaymentDate = DateTime.Now,
                                     TotalAmount = requestquery.price,
                                     Status = PaymentStatus.Paid,
                                     PaymentCode = requestquery.Paymentlink,
-                                    PaymentType = PaymentType.Deposit,      
+                                    PaymentType = PaymentType.Deposit,   
+                                    
                                 };
-                                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(paymentAppointment);
+                            } else if (appointment == null && config == null)
+                            {
+                                var paymentWallet = new Payment
+                                {
+                                    Id = Guid.NewGuid(),
+                                    AccountId = requestquery.accountid,
+                                    AppointmentId = null,
+                                    ConfigId = null,
+                                    Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
+                                    PaymentDate = DateTime.Now,
+                                    TotalAmount = requestquery.price,
+                                    Status = PaymentStatus.Paid,
+                                    PaymentCode = requestquery.Paymentlink,
+                                    PaymentType = PaymentType.Deposit,
+
+                                };
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(paymentWallet);
                             }
                             var tran = new StatusPayment
                             {
                                 code = requestquery.Code,
                                 des = requestquery.des,
-                                url = $"http://localhost:5713/managerPayment?code={requestquery.Code}&price={requestquery.price}",
+                                url = $"http://localhost:5713/managerPayment?code={requestquery.Code}&price={requestquery.price}" +
+                                      (appointment != null ? $"&appointment={appointment.Id}" : ""),
                                 Data = new data
                                 {
                                     status = requestquery.Status,
