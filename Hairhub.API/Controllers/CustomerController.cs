@@ -37,7 +37,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CheckInByCustomer(CheckInRequest checkInRequest)
         {
             try

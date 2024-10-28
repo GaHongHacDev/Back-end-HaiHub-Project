@@ -218,8 +218,6 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-
-
         public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
         {
             

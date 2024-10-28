@@ -1027,6 +1027,11 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Sai tên phương thức thanh toán");
             }
             string paymentMethod = "";
+            string status = AppointmentStatus.Booking;
+            if (request.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
+            {
+                status = AppointmentStatus.Fake;
+            }
             if(request.PaymentMethod == null)
             {
                 paymentMethod = AppointmentPaymentMethod.PayInSalon;
@@ -1050,7 +1055,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPrice = request.TotalPrice,
                 OriginalPrice = request.OriginalPrice,
                 DiscountedPrice = request.DiscountedPrice,
-                Status = AppointmentStatus.Booking,
+                Status = status,
                 CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
                 PaymentMethod = request.PaymentMethod
@@ -1098,7 +1103,7 @@ namespace Hairhub.Service.Services.Services
             }
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformationId);
             //Tạo payment withdraw
-            if (AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) || AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+            if (AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
             {
                 Payment payment = new Payment()
                 {
