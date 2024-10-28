@@ -47,31 +47,44 @@ namespace Hairhub.API.Controllers
             {
                 string paymentlink = Request.Query["id"]!;
                 string status = Request.Query["status"]!;
+                string code = Request.Query["code"]!;
+                string des = Request.Query["desc"]!;
+                string amount = Request.Query["amountRemaining"]!;
                 var accountid = Guid.Parse(Request.Query["accountId"]!);
                 var configid = Guid.Parse(Request.Query["config"]!);
                 var price = Decimal.Parse(Request.Query["amount"]!)!;
                 int orderCode = int.Parse(Request.Query["ordercode"]!);
 
 
+                var request = new QueryRequest
+                {
+                    accountid = accountid,
+                    Code = code,
+                    configid = configid,
+                    des = des,
+                    orderCode = orderCode,
+                    Paymentlink = paymentlink,
+                    price = price,
+                    Status = status,
+                }; 
+
                 if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))
                 {
                     return Redirect("LINK_PHAN_HOI_KHONG_HOP_LE");
                 }
+                
+                var result = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, request);
 
 
-
-                bool isValid = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, paymentlink, accountid, (decimal)price, configid);
-
-
-                if (isValid != true)
+                if (result != null)
                 {
                     // Thanh toán thành công
-                    return Ok(isValid);
+                    return Redirect(result.url);
                 }
                 else
                 {
                     // Thanh toán không thành công
-                    return Ok(isValid);
+                    return Ok(result);
                 }
 
             }

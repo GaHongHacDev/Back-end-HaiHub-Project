@@ -163,9 +163,10 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                string returnUrl = $"https://localhost:7257/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
+                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
 
-                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
+                
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
 
 
@@ -218,10 +219,12 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
+
+
+        public async Task<StatusPayment> ConfirmPayment(string queryString, QueryRequest requestquery)
         {
-            
-            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
+            var urlback = "http://localhost:5713/managerPayment";
+            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{requestquery.Paymentlink}";
             try
             {
                 var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, getUrl);
@@ -239,22 +242,22 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+                            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.accountid);
                             var balance = account.Balance;
-                            account.Balance = balance + price;
-                            _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
-                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                            account.Balance = balance + requestquery.price;
+                            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == requestquery.configid);
                             if (config != null)
                             {
                                 var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
                                 fakepayment.Status = PaymentStatus.Paid;
-                                fakepayment.TotalAmount = price;
+                                fakepayment.TotalAmount = requestquery.price;
                                 fakepayment.PaymentDate = DateTime.UtcNow;
                                 fakepayment.Description = $"Thanh toán thành công tiền hoa hồng tháng {fakepayment.PaymentDate.Value.Month - 1}";
                                 _unitOfWork.GetRepository<Payment>().UpdateAsync(fakepayment);
                                 var nextpayment = new SavePaymentInfor
                                 {
-                                    AccountId = accountid,
+                                    AccountId = requestquery.accountid,
                                     ConfigId = config.Id,
                                 };
                                 await FakePaymentForCommissionRate(nextpayment);
@@ -263,21 +266,33 @@ namespace Hairhub.Service.Services.Services
                                 var payment = new Payment
                                 {
                                     Id = Guid.NewGuid(),    
-                                    AccountId = accountid,
+                                    AccountId = requestquery.accountid,
                                     AppointmentId = null,
                                     ConfigId = config == null ? null : config.Id,
                                     Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
                                     PaymentDate = DateTime.Now,
-                                    TotalAmount = price,
+                                    TotalAmount = requestquery.price,
                                     Status = PaymentStatus.Paid,
-                                    PaymentCode = paymentlinkId,
+                                    PaymentCode = requestquery.Paymentlink,
                                     PaymentType = PaymentType.Deposit,      
                                 };
                                 await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
                             }
+                            var tran = new StatusPayment
+                            {
+                                code = requestquery.Code,
+                                des = requestquery.des,
+                                url = $"http://localhost:5713/managerPayment?code={requestquery.Code}&price={requestquery.price}",
+                                Data = new data
+                                {
+                                    status = requestquery.Status,
+                                    amount = requestquery.price
+                                                                    }
+                            };
                             isStatus = await _unitOfWork.CommitAsync() > 0;
+                            return tran;
                         }
-                        return isStatus;
+                        return null!;
                     }
                     else
                     {

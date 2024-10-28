@@ -10,7 +10,8 @@ namespace Hairhub.Domain.Dtos.Requests.Appointments
     {
         public DateTime Day { get; set; }
         public Decimal AvailableSlot { get; set; }
-        public Guid SalonId { get; set; }
+        public Guid SalonId { get; set; }       
+        public string PaymentType { get; set; }
         public List<BookingDetailRequest> BookingDetail { get; set; }
     }
 
