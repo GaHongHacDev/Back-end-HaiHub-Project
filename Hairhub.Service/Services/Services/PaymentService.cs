@@ -301,7 +301,7 @@ namespace Hairhub.Service.Services.Services
                             {
                                 code = requestquery.Code,
                                 des = requestquery.des,
-                                url = $"http://localhost:5713/managerPayment?code={requestquery.Code}&price={requestquery.price}" +
+                                url = $"http://localhost:5713/managerPayment/{account.Id}?code={requestquery.Code}&price={requestquery.price}" +
                                       (appointment != null ? $"&appointment={appointment.Id}" : ""),
                                 Data = new data
                                 {
