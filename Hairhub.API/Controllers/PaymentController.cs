@@ -50,12 +50,9 @@ namespace Hairhub.API.Controllers
                 string code = Request.Query["code"]!;
                 string des = Request.Query["desc"]!;
                 string amount = Request.Query["amountRemaining"]!;
-                if (!Guid.TryParse(Request.Query["accountId"], out var accountid) ||
-            !Guid.TryParse(Request.Query["config"], out var configid) ||
-            !Guid.TryParse(Request.Query["appointment"], out var appointment))
-                {
-                    return BadRequest("Invalid GUID format in one or more query parameters.");
-                }
+                Guid? accountid = Guid.TryParse(Request.Query["accountId"], out var accountGuid) ? accountGuid : (Guid?)null;
+                Guid? configid = Guid.TryParse(Request.Query["config"], out var configGuid) ? configGuid : (Guid?)null;
+                Guid? appointment = Guid.TryParse(Request.Query["appointment"], out var appointmentGuid) ? appointmentGuid : (Guid?)null;
 
                 if (!Decimal.TryParse(Request.Query["amount"], out var price) ||
                     !int.TryParse(Request.Query["ordercode"], out int orderCode))
@@ -67,15 +64,15 @@ namespace Hairhub.API.Controllers
 
                 var request = new QueryRequest
                 {
-                    accountid = accountid,
+                    accountid = (Guid)accountid!,
                     Code = code,
-                    configid = configid,
+                    configid = (Guid)configid!,
                     des = des,
                     orderCode = orderCode,
                     Paymentlink = paymentlink,
                     price = price,
                     Status = status,
-                    appontmentid = appointment,
+                    appontmentid = (Guid)appointment!,
                 }; 
 
                 if (string.IsNullOrEmpty(paymentlink) || string.IsNullOrEmpty(status))
@@ -89,7 +86,7 @@ namespace Hairhub.API.Controllers
                 if (result != null)
                 {
                     // Thanh toán thành công
-                    return Redirect(result.url);
+                    return Ok("Bạn Thanh toán thành công");
                 }
                 else
                 {
