@@ -227,9 +227,10 @@ namespace Hairhub.Service.Services.Services
             var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{requestquery.Paymentlink}";
             try
             {
-                Guid? appointmentId = Guid.Parse(requestquery.appontmentid!);
-                Guid? accountid = Guid.Parse(requestquery.accountid!);
-                Guid? configid = Guid.Parse(requestquery.configid!);
+                Guid? appointmentId = Guid.TryParse(requestquery.appontmentid, out var appointmentGuid) ? appointmentGuid : (Guid?)null;
+                Guid? accountid = Guid.TryParse(requestquery.accountid, out var accountGuid) ? accountGuid : (Guid?)null;
+                Guid? configid = Guid.TryParse(requestquery.configid, out var configGuid) ? configGuid : (Guid?)null;
+
                 var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              

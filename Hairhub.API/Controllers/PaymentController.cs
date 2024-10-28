@@ -49,7 +49,6 @@ namespace Hairhub.API.Controllers
                 string status = Request.Query["status"]!;
                 string code = Request.Query["code"]!;
                 string des = Request.Query["desc"]!;
-                string amount = Request.Query["amountRemaining"]!;
                 string accountid = Request.Query["accountId"]!;
                 string configid = Request.Query["config"]!;
                 var price = Decimal.Parse(Request.Query["amount"]!)!;
