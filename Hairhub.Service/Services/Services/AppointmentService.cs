@@ -1337,7 +1337,7 @@ namespace Hairhub.Service.Services.Services
             {
                 year = DateTime.Now.Year;
             }
-            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate!.Value.Year == year && p.Status == PaymentStatus.Paid);
+            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate!.Value.Year == year && p.Status == PaymentStatus.Paid && p.ConfigId != null);
             var dataOfMonths = new DataOfMonths
             {
                 Jan = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 1).Sum(a => a.TotalAmount),
@@ -1706,12 +1706,15 @@ namespace Hairhub.Service.Services.Services
             return results;
         }
 
-        public async Task<bool> UpdateAppointmentFakeById(Guid id)
+        public async Task<bool> UpdateAppointmentFakeById(Guid? accountid, Guid? appointmentid)
         {
-            var appointmentFake = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == id);
-            if(appointmentFake == null) { throw new NotFoundException("Không tồn tại lịch hẹn"); }
+            var appointmentFake = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentid);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+            if (appointmentFake == null) { throw new NotFoundException("Không tồn tại lịch hẹn"); }
             appointmentFake.Status = AppointmentStatus.Booking;
+            account.Balance -= appointmentFake.TotalPrice;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointmentFake);
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             bool isStatus = await _unitOfWork.CommitAsync() > 0;
             return isStatus;
         }

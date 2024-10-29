@@ -12,6 +12,8 @@ namespace Hairhub.Domain.Dtos.Requests.Payment
         public Guid? ConfigId { get; set; }
         public Guid? AppointmentId { get; set; }
 
+        public Guid? SalonId  { get; set; }
+
         public decimal Price { get; set; }
         public string? Description { get; set; }
 

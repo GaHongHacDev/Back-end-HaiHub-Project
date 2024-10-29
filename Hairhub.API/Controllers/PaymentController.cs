@@ -51,6 +51,8 @@ namespace Hairhub.API.Controllers
                 string des = Request.Query["desc"]!;
                 string accountid = Request.Query["accountId"]!;
                 string configid = Request.Query["config"]!;
+                string appointment = Request.Query["appointment"]!;
+                string salon = Request.Query["salon"]!;
                 var price = Decimal.Parse(Request.Query["amount"]!)!;
                 int orderCode = int.Parse(Request.Query["ordercode"]!);
 
@@ -60,6 +62,8 @@ namespace Hairhub.API.Controllers
                     accountid = accountid,
                     Code = code,
                     configid = configid,
+                    appontmentid = appointment,
+                    salonid = salon,
                     des = des,
                     orderCode = orderCode,
                     Paymentlink = paymentlink,

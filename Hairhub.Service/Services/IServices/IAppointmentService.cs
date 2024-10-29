@@ -55,7 +55,7 @@ namespace Hairhub.Service.Services.IServices
         Task<List<(DateTime, decimal)>> RevenueofAppointmentDaybyDay(Guid id, DateTime? startdate, DateTime? enddate);
 
 
-        Task<bool> UpdateAppointmentFakeById(Guid id);
+        Task<bool> UpdateAppointmentFakeById(Guid? accountid, Guid? appointmentid);
 
         Task<bool> DeleteAppointmentFakeById(Guid id);
     }
