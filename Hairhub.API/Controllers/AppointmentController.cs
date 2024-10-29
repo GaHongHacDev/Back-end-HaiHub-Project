@@ -280,7 +280,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{status}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
