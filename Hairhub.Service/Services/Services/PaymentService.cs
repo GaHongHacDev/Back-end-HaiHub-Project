@@ -42,6 +42,7 @@ using Hairhub.Common.ThirdParties.Contract;
 using System.Drawing;
 using CloudinaryDotNet;
 using System.Security.Principal;
+using Hairhub.Domain.Dtos.Requests.Notification;
 
 
 namespace Hairhub.Service.Services.Services
@@ -55,11 +56,12 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAppointmentService _appointmentservice;
+        private readonly INotificationService _notificationservice;
         private readonly IMediaService _mediaService;
         private readonly IEmailService _emailService;
 
         public PaymentService(IOptions<PayOSSettings> settings, HttpClient client, IUnitOfWork unitOfWork, IConfiguration config, 
-                                IMapper mapper, IAppointmentService appointmentService, IMediaService mediaService, IEmailService emailService)
+                                IMapper mapper, IAppointmentService appointmentService, IMediaService mediaService, IEmailService emailService, INotificationService notificationservice)
         {
             _payOSSettings = settings.Value;
             _appointmentservice = appointmentService;
@@ -69,6 +71,8 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork = unitOfWork;
             _config = config;
             _mapper = mapper;
+            _notificationservice = notificationservice;
+            _appointmentservice = appointmentService;
         }
 
         private string ComputeHmacSha256(string data, string checksumKey)
@@ -163,8 +167,9 @@ namespace Hairhub.Service.Services.Services
         {
             try
             {
-                string returnUrl = $"https://localhost:7257/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}";
+                string returnUrl = $"https://hairhub.gahonghac.net/api/v1/payment/PaymentConfirm?accountId={accountId}&amount={request.Price}&config={request.ConfigId}&appointment={request.AppointmentId}&salon={request.SalonId}";
 
+                
                 var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountId);
                 if (account == null) throw new Exception("account not null!!");
 
@@ -218,12 +223,22 @@ namespace Hairhub.Service.Services.Services
             }
         }
 
-        public async Task<bool> ConfirmPayment(string queryString, string paymentlinkId, Guid accountid, decimal price, Guid? configid)
+
+
+        public async Task<StatusPayment> ConfirmPayment(string queryString, QueryRequest requestquery)
         {
             
-            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{paymentlinkId}";
+            var getUrl = $"https://api-merchant.payos.vn/v2/payment-requests/{requestquery.Paymentlink}";
             try
             {
+                Guid? appointmentId = Guid.TryParse(requestquery.appontmentid, out var appointmentGuid) ? appointmentGuid : (Guid?)null;
+                Guid? accountid = Guid.TryParse(requestquery.accountid, out var accountGuid) ? accountGuid : (Guid?)null;
+                Guid? configid = Guid.TryParse(requestquery.configid, out var configGuid) ? configGuid : (Guid?)null;
+                Guid? salonid = Guid.TryParse(requestquery.configid, out var salonGuid) ? salonGuid : (Guid?)null;
+                var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentId);
+                var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == salonid);
+                var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
                 var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, getUrl);
                 request.Headers.Add("x-client-id", _config["PayOS:ClientId"]);
                 request.Headers.Add("x-api-key", _config["PayOS:APIKey"]);              
@@ -239,45 +254,86 @@ namespace Hairhub.Service.Services.Services
                     {
                         if (status == "PAID")
                         {
-                            var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+                            
                             var balance = account.Balance;
-                            account.Balance = balance + price;
+                            account.Balance = balance + requestquery.price;
                             _unitOfWork.GetRepository<Domain.Entitities.Account>().UpdateAsync(account);
-                            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == configid);
+                            
                             if (config != null)
                             {
                                 var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
                                 fakepayment.Status = PaymentStatus.Paid;
-                                fakepayment.TotalAmount = price;
+                                fakepayment.TotalAmount = requestquery.price;
                                 fakepayment.PaymentDate = DateTime.UtcNow;
                                 fakepayment.Description = $"Thanh toán thành công tiền hoa hồng tháng {fakepayment.PaymentDate.Value.Month - 1}";
                                 _unitOfWork.GetRepository<Payment>().UpdateAsync(fakepayment);
                                 var nextpayment = new SavePaymentInfor
                                 {
-                                    AccountId = accountid,
+                                    AccountId = (Guid)accountid,
                                     ConfigId = config.Id,
                                 };
                                 await FakePaymentForCommissionRate(nextpayment);
                             }
-                            else {
-                                var payment = new Payment
+                            else if (appointment != null) {
+                                var paymentAppointment = new Payment
                                 {
                                     Id = Guid.NewGuid(),    
-                                    AccountId = accountid,
-                                    AppointmentId = null,
+                                    AccountId = (Guid)accountid,
+                                    AppointmentId = appointment.Id,
                                     ConfigId = config == null ? null : config.Id,
+                                    Description = $"Nạp tiền thành công vào ví",
+                                    PaymentDate = DateTime.Now,
+                                    TotalAmount = requestquery.price,
+                                    Status = PaymentStatus.Paid,
+                                    PaymentCode = requestquery.Paymentlink,
+                                    PaymentType = PaymentType.Deposit,   
+                                    
+                                };
+                                var noti = new NotificationRequest
+                                {
+                                    AppointmentId = appointment.Id,
+                                    Message = $"Khách hàng {account.UserName} đã đặt lịch ở cửa tiệm {salon.Name} " +
+                                    $"vào lúc {appointment.StartDate.TimeOfDay} ngày {appointment.StartDate.Day}",
+                                    Title = "Đã có đơn đặt lịch mới",
+                                    Type = "NewAppointment"
+                                };
+                                await _notificationservice.CreatedNotification(salon.Id, noti);
+                                await _appointmentservice.UpdateAppointmentFakeById(accountid ,appointment.Id);
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(paymentAppointment);
+                            } else if (appointment == null && config == null)
+                            {
+                                var paymentWallet = new Payment
+                                {
+                                    Id = Guid.NewGuid(),
+                                    AccountId = (Guid)accountid,
+                                    AppointmentId = null,
+                                    ConfigId = null,
                                     Description = $"Nạp tiền thành công vào ví{DateTime.Now}",
                                     PaymentDate = DateTime.Now,
-                                    TotalAmount = price,
+                                    TotalAmount = requestquery.price,
                                     Status = PaymentStatus.Paid,
-                                    PaymentCode = paymentlinkId,
-                                    PaymentType = PaymentType.Deposit,      
+                                    PaymentCode = requestquery.Paymentlink,
+                                    PaymentType = PaymentType.Deposit,
+
                                 };
-                                await _unitOfWork.GetRepository<Payment>().InsertAsync(payment);
+                                await _unitOfWork.GetRepository<Payment>().InsertAsync(paymentWallet);
                             }
-                            isStatus = await _unitOfWork.CommitAsync() > 0;
+                            var tran = new StatusPayment
+                            {
+                                code = requestquery.Code,
+                                des = "Thành công rùi nè",                                
+                                Data = new data
+                                {
+                                    status = requestquery.Status,
+                                    amount = requestquery.price
+                                                                    }
+                            };
+                            await _unitOfWork.CommitAsync();
+                            return tran;
                         }
-                        return isStatus;
+                        await _appointmentservice.DeleteAppointmentFakeById(appointment.Id);
+                        await _unitOfWork.CommitAsync();
+                        return null!;
                     }
                     else
                     {
