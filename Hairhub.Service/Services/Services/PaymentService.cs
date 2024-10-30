@@ -321,7 +321,8 @@ namespace Hairhub.Service.Services.Services
                             var tran = new StatusPayment
                             {
                                 code = requestquery.Code,
-                                des = "Thành công rùi nè",                                
+                                paymentId = account.Id,
+                                url = $"http://localhost:5173/successPayment?code={requestquery.Code}&amount={requestquery.price}&id={account.Id}",
                                 Data = new data
                                 {
                                     status = requestquery.Status,

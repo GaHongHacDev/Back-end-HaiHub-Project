@@ -10,7 +10,7 @@ namespace Hairhub.Domain.Dtos.Responses.Payment
     {
         public string code {  get; set; }
 
-        public string des {  get; set; }
+        public Guid? paymentId { get; set; }
 
         public string url { get; set; }
 

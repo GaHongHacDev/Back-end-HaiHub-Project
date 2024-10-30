@@ -81,12 +81,12 @@ namespace Hairhub.API.Controllers
                 if (result != null)
                 {
                     // Thanh toán thành công
-                    return Ok(result.des);
+                    return Ok(result.url);
                 }
                 else
                 {
                     // Thanh toán không thành công
-                    return Ok("Thất bại rùi nè!!!");
+                    return Ok(result.url);
                 }
 
             }
