@@ -76,7 +76,8 @@ namespace Hairhub.API.Controllers
                 }
 
                 var result = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, request);
-
+                string formattedAmount = $"{request.price:N0} VND";
+                
 
                 if (result != null && request.Code == "00")
                 {
@@ -99,7 +100,7 @@ namespace Hairhub.API.Controllers
                     <div class='container'>
                         <h1>THANH TOÁN THÀNH CÔNG</h1>
                         <p>Mã giao dịch: {request.Code}</p>
-                        <p>Số tiền: {request.price} VND</p>
+                        <p>Số tiền: {formattedAmount} VND</p>
                         <p>Cảm ơn bạn đã thanh toán!</p>
                     </div>
                 </body>
@@ -127,7 +128,7 @@ namespace Hairhub.API.Controllers
                     <div class='container'>
                         <h1>THANH TOÁN THẤT BẠI</h1>
                         <p>Mã giao dịch: {request.Code}</p>
-                        <p>Số tiền: {request.price} VND</p>
+                        <p>Số tiền: {formattedAmount} VND</p>
                         <p>Xin vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
                     </div>
                 </body>
