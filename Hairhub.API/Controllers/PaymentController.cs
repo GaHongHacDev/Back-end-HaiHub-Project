@@ -98,9 +98,9 @@ namespace Hairhub.API.Controllers
                 </head>
                 <body>
                     <div class='container'>
-                        <h1>THANH TOÁN THÀNH CÔNG</h1>
+                        <h1>THÀNH CÔNG RÙI NÈ</h1>
                         <p>Mã giao dịch: {request.Code}</p>
-                        <p>Số tiền: {formattedAmount} VND</p>
+                        <p>Số tiền: {formattedAmount}</p>
                         <p>Cảm ơn bạn đã thanh toán!</p>
                     </div>
                 </body>
@@ -126,9 +126,9 @@ namespace Hairhub.API.Controllers
                 </head>
                 <body>
                     <div class='container'>
-                        <h1>THANH TOÁN THẤT BẠI</h1>
+                        <h1>THẤT BẠI RÙI NÈ</h1>
                         <p>Mã giao dịch: {request.Code}</p>
-                        <p>Số tiền: {formattedAmount} VND</p>
+                        <p>Số tiền: {formattedAmount}</p>
                         <p>Xin vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
                     </div>
                 </body>
