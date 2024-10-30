@@ -143,7 +143,7 @@ namespace Hairhub.Service.Services.Services
                     AccountId = accountSalon.Id,
                     AppointmentId = appointment.Id,
                     Description = $"Nhận tiền từ cuộc hẹn với khách hàng {customer!.FullName}",
-                    PaymentDate = DateTime.UtcNow,
+                    PaymentDate = DateTime.Now,
                     TotalAmount = payMoney,
                     PaymentType = PaymentType.Deposit,
                     Status = PaymentStatus.Paid,
