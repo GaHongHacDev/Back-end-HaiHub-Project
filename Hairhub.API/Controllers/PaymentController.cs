@@ -76,20 +76,68 @@ namespace Hairhub.API.Controllers
                 }
 
                 var result = await _paymentservice.ConfirmPayment(Request.QueryString.Value!, request);
+                string formattedAmount = $"{request.price:N0} VND";
+                
 
-
-                if (result != null)
+                if (result != null && request.Code == "00")
                 {
                     // Thanh toán thành công
-                    return Ok(result.des);
+                    var successHtml = $@"
+                <!DOCTYPE html>
+                <html lang='en'>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <title>Payment Success</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; text-align: center; }}
+                        .container {{ margin-top: 50px; }}
+                        h1 {{ color: #4CAF50; font-size: 36px; font-weight: bold; }}
+                        p {{ font-size: 18px; }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h1>THÀNH CÔNG RÙI NÈ</h1>
+                        <p>Mã giao dịch: {request.Code}</p>
+                        <p>Số tiền: {formattedAmount}</p>
+                        <p>Cảm ơn bạn đã thanh toán!</p>
+                    </div>
+                </body>
+                </html>";
+                    return Content(successHtml, "text/html");
                 }
                 else
                 {
-                    // Thanh toán không thành công
-                    return Ok("Thất bại rùi nè!!!");
+                    // Thanh toán thất bại
+                    var failureHtml = $@"
+                <!DOCTYPE html>
+                <html lang='en'>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <title>Payment Failed</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; text-align: center; }}
+                        .container {{ margin-top: 50px; }}
+                        h1 {{ color: #FF0000; font-size: 36px; font-weight: bold; }}
+                        p {{ font-size: 18px; }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h1>THẤT BẠI RÙI NÈ</h1>
+                        <p>Mã giao dịch: {request.Code}</p>
+                        <p>Số tiền: {formattedAmount}</p>
+                        <p>Xin vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
+                    </div>
+                </body>
+                </html>";
+                    return Content(failureHtml, "text/html");
                 }
+            
 
-            }
+        }
             return Ok(false);
         }
         [HttpPost]

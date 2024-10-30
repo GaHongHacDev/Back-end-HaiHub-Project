@@ -320,8 +320,7 @@ namespace Hairhub.Service.Services.Services
                             }
                             var tran = new StatusPayment
                             {
-                                code = requestquery.Code,
-                                des = "Thành công rùi nè",                                
+                                code = requestquery.Code!,
                                 Data = new data
                                 {
                                     status = requestquery.Status,
