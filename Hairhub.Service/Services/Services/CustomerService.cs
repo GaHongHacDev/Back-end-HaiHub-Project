@@ -106,15 +106,17 @@ namespace Hairhub.Service.Services.Services
             appointment.Status = AppointmentStatus.Successed;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
 
-            var employeeId = appointment.AppointmentDetails.ElementAt(0).SalonEmployeeId;
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>()
-                                            .SingleOrDefaultAsync(
-                                                predicate: x=>x.Id == employeeId, 
-                                                include: x=>x.Include(s=>s.SalonInformation.SalonOwner)
-                                            );
-            var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformation.SalonOwner.AccountId);
+            
             if(appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByWallet) || appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
             {
+                var employeeId = appointment.AppointmentDetails.ElementAt(0).SalonEmployeeId;
+                var employee = await _unitOfWork.GetRepository<SalonEmployee>()
+                                                .SingleOrDefaultAsync(
+                                                    predicate: x => x.Id == employeeId,
+                                                    include: x => x.Include(s => s.SalonInformation.SalonOwner)
+                                                );
+                var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformation.SalonOwner.AccountId);
+
                 decimal payMoney = appointment.TotalPrice;
                 if (appointment.AppointmentDetailVouchers != null && appointment.AppointmentDetailVouchers!.Count !=0)
                 {
