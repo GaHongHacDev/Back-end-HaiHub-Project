@@ -112,11 +112,11 @@ namespace Hairhub.Service.Services.Services
                                                 predicate: x=>x.Id == employeeId, 
                                                 include: x=>x.Include(s=>s.SalonInformation.SalonOwner)
                                             );
-            var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformation.SalonOwner.Id);
+            var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformation.SalonOwner.AccountId);
             if(appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByWallet) || appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
             {
                 decimal payMoney = appointment.TotalPrice;
-                if (appointment.AppointmentDetailVouchers != null)
+                if (appointment.AppointmentDetailVouchers != null && appointment.AppointmentDetailVouchers!.Count !=0)
                 {
                     foreach(var item in appointment.AppointmentDetailVouchers)
                     {
@@ -124,13 +124,11 @@ namespace Hairhub.Service.Services.Services
                         if (voucher.IsSystemCreated)
                         {
                             payMoney = appointment.OriginalPrice;
+                            break;
                         }
                     }
                 }
-                else
-                {
-                    payMoney = appointment.OriginalPrice;
-                }
+
                 accountSalon.Balance += payMoney;
                 _unitOfWork.GetRepository<Account>().UpdateAsync(accountSalon);
 

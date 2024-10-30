@@ -73,24 +73,31 @@ namespace Hairhub.Common.ThirdParties.Implementation
         }
         public async Task<string> ChatMessage(AIChatMessageRequest request)
         {
-            var promptStr = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
+            var promptStr = $@"Tóm tắt câu hỏi sau của một khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
 
-                                Lưu ý: 
-                                1. Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
-                                2. Bỏ qua các thông khác trong câu hỏi không liên quan đến lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub. 
-                                3. [Thời gian] phải được viết dưới dạng ""MM/dd/yyyy HH:mm:ss"", thời gian hiện tại đang là: ""{DateTime.Now}"". 
-                                4. Các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" cần được chuyển thành thời gian cụ thể dựa trên ngày hiện tại.
+Lưu ý: 
+1. Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về **lịch hẹn**, **dịch vụ tóc**, **salon**, **barber shop**, **khuyến mãi**, **hướng dẫn sử dụng Hairhub**. 
+2. Bỏ qua các thông tin không liên quan đến các chủ đề trên. 
+3. **[Thời gian]** phải được viết dưới dạng **""dd/MM/yyyy HH:mm:ss""**. Ngày hôm nay là: ""{DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm:ss")}"". 
+4. Các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" cần được chuyển thành thời gian cụ thể dựa trên ngày hiện tại. **Ví dụ**, nếu thời gian hiện tại là **""24/10/2023 15:00:00""** và khách hàng nói ""hôm nay"", thì **[Thời gian]** sẽ là **""24/10/2023 15:00:00""**.
+5.Nếu không có thông tin thì trả lời ""null"".
+6.Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và** không được trình bày dưới dạng text box * *.
 
-                                Nếu không có thông tin thì trả lời ""null"". 
-                                Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và KHÔNG được dưới dạng text box. 
-                                Kết quả trả lời ứng với cột dữ liệu sau, chỉ trả lời với 6 cột dữ liệu bên dưới (Không trả lời thêm ngoài 6 dòng bên dưới):
+Kết quả trả lời cần tuân thủ theo định dạng 6 cột sau(Không trả lời thêm ngoài 6 dòng bên dưới):
 
-                                [Loại câu hỏi]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null];
-                                [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn]; 
-                                [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại];
-                                [Vị trí]: [Gần tôi, Địa điểm, null];
-                                [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
-                                [Thời gian]: [Thời gian trong câu hỏi lời của khách hàng theo định dạng ""MM/dd/yyyy HH:mm:ss"", null];";
+[Loại câu hỏi]: [Kiểm tra lịch hẹn, Tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, Tìm thời gian đặt lịch, Tìm salon hoặc barber shop, null];
+
+            [Loại hướng dẫn sử dụng]: [Đặt lịch hẹn, Hủy lịch hẹn, Quy trình check in, Xem lịch sử lịch hẹn, Xem trạng thái lịch hẹn, null];
+
+            [Trạng thái lịch hẹn]: [Hủy, Đang đặt, Đang, Thành công, Hoàn thành, Thất bại, null];
+
+            [Vị trí]: [Gần tôi, Địa điểm, null];
+
+            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
+
+            [Thời gian]: [Ngày và giờ cụ thể trong câu hỏi khách hàng, nếu có, theo định dạng ""dd / MM / yyyy HH: mm: ss""; nếu không có thì trả lời ""null""]";
+
+
 
             var promptStr1 = $@"Tóm tắt câu hỏi sau của 1 khách hàng đặt lịch cắt tóc trên hệ thống Hairhub, câu hỏi như sau: ""{request.AskMessage}""
 
@@ -143,6 +150,7 @@ namespace Hairhub.Common.ThirdParties.Implementation
 
             var apiResponse = JsonConvert.DeserializeObject<AIChatMessageResponse>(responseJson);
             var classificationText = apiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text;
+            return classificationText;
             if (classificationText != null)
             {
                 var lines = classificationText.Split(new[] { '\n', '\r', ';'}, StringSplitOptions.RemoveEmptyEntries);
