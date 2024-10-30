@@ -279,6 +279,26 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Route("{status}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, page, size);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("{SalonId}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAppointmentBySalonIdNoPaging([FromRoute] Guid SalonId)

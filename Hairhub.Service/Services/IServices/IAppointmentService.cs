@@ -58,6 +58,8 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> UpdateAppointmentFakeById(Guid? accountid, Guid? appointmentid);
 
         Task<bool> DeleteAppointmentFakeById(Guid id);
+
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, int page, int size);
     }
 }
 
