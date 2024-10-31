@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hairhub.Common.ThirdParties.Contract
+namespace Hairhub.Service.Services.IServices
 {
     public interface IGeminiAIService
     {

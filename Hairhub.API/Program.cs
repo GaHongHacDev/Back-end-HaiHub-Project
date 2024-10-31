@@ -1,7 +1,6 @@
 ﻿
 using BirthdayParty.WebApi.Constants;
 using Hairhub.API.Hubs;
-using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Infrastructure;
 using Hairhub.Infrastructure.Configuration;
 using Hairhub.Service.Helpers;

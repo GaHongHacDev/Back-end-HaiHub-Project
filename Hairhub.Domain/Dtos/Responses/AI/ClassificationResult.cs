@@ -13,6 +13,6 @@ namespace Hairhub.Domain.Dtos.Responses.AI
         public string? StatusAppointment { get; set; }
         public string? Position { get; set; }
         public string? SalonName { get; set; }
-        public string? Time { get; set; }
+        public DateTime? Time { get; set; }
     }
 }
