@@ -371,6 +371,7 @@ namespace Hairhub.Service.Services.Services
                                             .GetPagingListAsync(
                                                 predicate: predicate,
                                                 include: x=>x.Include(s=>s.Account).Include(s=>s.Account.Role),
+                                                orderBy: x=>x.OrderByDescending(x=>x.PaymentDate),
                                                 page: page, 
                                                 size: size
                                             );
