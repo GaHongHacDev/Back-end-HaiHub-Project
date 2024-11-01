@@ -95,13 +95,13 @@ namespace Hairhub.Service.Services.Services
                 message = "Bạn đã thêm lịch bận thành công";
                 return message;
             }
-            return null;
+            return null!;
         }
 
         public async Task<bool> DeleteofaBusySchedule(Guid employeeID)
         {
             var employee = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
-                                .SingleOrDefaultAsync(predicate: p => p.EmployeeId == employeeID && p.Status == BusyScheduleStatus.Successed);
+                                .SingleOrDefaultAsync(predicate: p => p.Id == employeeID && p.Status == BusyScheduleStatus.Successed);
             if (employee == null)
             {
                 throw new Exception("Nhân viên này không không có lịch bận");
@@ -111,7 +111,6 @@ namespace Hairhub.Service.Services.Services
              _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(employee);
             bool isDeleted = await _unitOfWork.CommitAsync() > 0;
             return isDeleted;
-
         }
 
         public async Task<string> UpdateofaBusySchedule(Guid employeeID, RequestCreationOfBusySchedule request)
@@ -173,7 +172,7 @@ namespace Hairhub.Service.Services.Services
                 message = "Bạn đã cập nhật bận thành công";
                 return message;
             }
-            return null;
+            return null!;
         }
     }
 }
