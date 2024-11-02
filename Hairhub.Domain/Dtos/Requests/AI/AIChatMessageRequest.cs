@@ -9,6 +9,7 @@ namespace Hairhub.Domain.Dtos.Requests.AI
     public class AIChatMessageRequest
     {
         public string AskMessage { get; set; }
+        public string? PreQuesion {  get; set; }
         public Guid CustomerId { get; set; }
     }
 }
