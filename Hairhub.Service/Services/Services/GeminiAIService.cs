@@ -117,24 +117,26 @@ namespace Hairhub.Service.Services.Services
 
         private async Task<string> CallGeminiAPI(string customerAsk)
         {
-            var promptStr = $@"Tóm tắt câu hỏi sau của một khách hàng đặt lịch cắt tóc trên hệ thống Hairhub: ""{customerAsk}""
-            Lưu ý:
-            1. Kết quả trả về được viết dưới dạng text, tập trung vào phân tích và tóm tắt câu hỏi của khách hàng về lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub.
-            2. Bỏ qua các thông tin không liên quan đến các chủ đề trên.
-            3. [Thời gian] phải được viết dưới dạng (dd/MM/yyyy HH:mm). Ngày hôm nay là: {DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm")} . 
-            4. Các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" cần được chuyển thành thời gian cụ thể dựa trên ngày hiện tại.
-            5. Nếu trong câu hỏi của khách hàng không đề cập đến trạng thái lịch hẹn nghĩa là [Trạng thái lịch hẹn]: tất cả.
-            6. Nếu không có thông tin thì trả lời  null .
-            7. Câu trả lời cần ngắn gọn, chỉ trả về dữ liệu dưới dạng text và không được trình bày dưới dạng text box.
+            var promptAsk = $@"Bạn là Hairhub Chatbot, một trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Tóm tắt câu hỏi của khách hàng trên hệ thống Hairhub: {customerAsk}.
 
-            Kết quả trả lời cần tuân thủ theo định dạng 6 cột sau (Không trả lời thêm ngoài 6 dòng bên dưới):
+                            Yêu cầu:
+                            1. Tóm tắt và phân tích câu hỏi của khách hàng, chỉ tập trung vào các chủ đề: lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub.
+                            2. Nếu câu hỏi là tìm kiếm salon (ví dụ: “Hairhub có những salon nào?”), hãy trả lời bằng danh sách salon hiện có.
+                            3. Bỏ qua mọi thông tin không liên quan đến các chủ đề trên.
+                            4. Định dạng [Thời gian] phải là (dd/MM/yyyy HH:mm). Ngày hôm nay là: {DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm")}.
+                            5. Chuyển các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" thành ngày và giờ cụ thể dựa trên ngày hiện tại.
+                            6. Nếu câu hỏi không đề cập đến trạng thái lịch hẹn, mặc định [Trạng thái lịch hẹn] là ""đang đặt"". Nếu có các cụm như (lịch hẹn bỏ lỡ) hoặc (lịch hẹn thất bại), đặt [Trạng thái lịch hẹn] là ""thất bại"".
+                            7. Nếu thiếu thông tin cần thiết, trả lời: null.
+                            8. Trả lời ngắn gọn dưới dạng text, không dùng text box.
 
-            [Loại câu hỏi]: [kiểm tra lịch hẹn, tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, tìm thời gian đặt lịch, tìm salon hoặc barber shop, null];
-            [Loại hướng dẫn sử dụng]: [đặt lịch hẹn, hủy lịch hẹn, quy trình check in, xem lịch sử lịch hẹn, xem trạng thái lịch hẹn, null];
-            [Trạng thái lịch hẹn]: [hủy, đang đặt, thành công, thất bại, tất cả, null];
-            [Vị trí]: [Gần tôi, Địa điểm, null];
-            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
-            [Thời gian]: [Ngày và giờ cụ thể trong câu hỏi khách hàng, nếu có, theo định dạng (dd/MM/yyyy HH:mm); nếu không có thì trả lời là: null];";
+                            Cấu trúc câu trả lời phải tuân thủ chính xác định dạng sau (chỉ trả về 6 dòng, không thêm thông tin khác):
+
+                            [Loại câu hỏi]: [kiểm tra lịch hẹn, tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, tìm kiếm thời gian trống để đặt lịch, salon/barber shop/nhân viên, null];
+                            [Loại hướng dẫn sử dụng]: [đặt lịch hẹn, hủy lịch hẹn, quy trình check in, xem lịch sử lịch hẹn, xem trạng thái lịch hẹn, null];
+                            [Trạng thái lịch hẹn]: [hủy, đang đặt, thành công, thất bại, tất cả, null];
+                            [Vị trí]: [Gần tôi, Địa điểm, null];
+                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
+                            [Thời gian]: [Ngày và giờ cụ thể trong câu hỏi khách hàng theo đúng định dạng (dd/MM/yyyy HH:mm); nếu không có thì trả lời là null].";
 
             var requestBody = new
             {
@@ -145,7 +147,7 @@ namespace Hairhub.Service.Services.Services
                         role = "user",
                         parts = new[]
                         {
-                            new { text = promptStr}
+                            new { text = promptAsk}
                         }
                     }
                 }
