@@ -343,9 +343,8 @@ namespace Hairhub.Service.Services.Services
                             7. Nếu thiếu thông tin cần thiết, trả lời: null.
                             8. Trả lời ngắn gọn dưới dạng text, không dùng text box.
 
-                            Cấu trúc câu trả lời phải tuân thủ chính xác định dạng sau (chỉ trả về 6 dòng, không thêm thông tin khác):
-
-                            [Loại câu hỏi]: [kiểm tra lịch hẹn, tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, tìm kiếm thời gian trống để đặt lịch, salon/barber shop/nhân viên, null];
+                            Hãy tóm tắt câu hỏi của khách hàng và trả lời theo tuân thủ chính xác định dạng 6 dòng sau (chỉ trả về 6 dòng, không thêm thông tin khác):
+                            [Loại câu hỏi]: [kiểm tra lịch hẹn, tìm khuyến mãi, hướng dẫn sử dụng Hairhub, tìm kiếm thời gian trống để đặt lịch, salon/barber shop/nhân viên, null];
                             [Loại hướng dẫn sử dụng]: [đặt lịch hẹn, hủy lịch hẹn, quy trình check in, xem lịch sử lịch hẹn, xem trạng thái lịch hẹn, null];
                             [Trạng thái lịch hẹn]: [hủy, đang đặt, thành công, thất bại, tất cả, null];
                             [Vị trí]: [Gần tôi, Địa điểm, null];
@@ -384,9 +383,9 @@ namespace Hairhub.Service.Services.Services
                             break;
                     }
                     break;
-                case "tìm thời gian đặt lịch":
+                case "tìm kiếm thời gian trống để đặt lịch":
                     break;
-                case "tìm salon hoặc barber shop":
+                case "salon/barber shop/nhân viên":
                     break;
                 case null:
                     return await SendMessageDefault(request.AskMessage);
