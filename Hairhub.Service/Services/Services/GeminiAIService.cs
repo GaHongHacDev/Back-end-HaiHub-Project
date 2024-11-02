@@ -1,6 +1,7 @@
 ﻿
 using Hairhub.Domain.Dtos.Requests.AI;
 using Hairhub.Domain.Dtos.Responses.AI;
+using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Entitities;
 using Hairhub.Domain.Enums;
 using Hairhub.Service.Repositories.IRepositories;
@@ -68,15 +69,16 @@ namespace Hairhub.Service.Services.Services
 
         private async Task<string> SendMessageDefault(string askCustomer)
         {
-            var promptStr = $@"Câu hỏi của người dùng trên hệ thống Hairhub như sau: ""{askCustomer}"". Hãy giúp Hairhub soạn 1 nội dung trả lời lại 
-                                khách hàng với nội dung chính như sau: ""Chào mừng bạn đến với Hairhub – Hệ thống kết nối giữa Salon/Barber Shop và khách hàng! 
-                                Tôi là Hairhub chatbot. Để tôi có thể hỗ trợ tốt hơn, vui lòng cung cấp câu hỏi liên quan đến một trong các chủ đề sau:
-                                1️. Kiểm tra lịch hẹn.
-                                2️. Tìm khuyến mãi hiện có.
-                                3️. Hướng dẫn sử dụng Hairhub.
-                                4️. Tìm thời gian đặt lịch phù hợp.
-                                5️. Tìm salon hoặc barber shop gần bạn.
-                                Hairhub Chatbot rất hân hạnh được hỗ trợ bạn"" ";
+            var promptStr = $@"Bạn là trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Hôm nay là {DateTime.Now.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}. Câu hỏi của người dùng là: ""{askCustomer}"".
+
+                            Vui lòng phản hồi bằng phong cách hài hước nhưng chuyên nghiệp và chỉ trả lời duy nhất bằng tiếng Việt. Nếu câu hỏi nằm ngoài hệ thống, hướng dẫn khách hàng đặt câu hỏi rõ ràng hơn theo các chủ đề sau:
+                            1. Kiểm tra lịch hẹn.
+                            2. Tìm khuyến mãi hiện có.
+                            3. Hướng dẫn sử dụng HairHub.
+                            4. Tìm thời gian đặt lịch phù hợp.
+                            5. Tìm salon hoặc barber shop gần bạn.
+
+                            Lưu ý: Bắt đầu phản hồi với lời chào mừng đến HairHub và tự giới thiệu bản thân là Chatbot HairHub. Chatbot hân hạnh được hỗ trợ khách hàng.";
             var requestBody = new
             {
                 contents = new[]
@@ -115,29 +117,8 @@ namespace Hairhub.Service.Services.Services
             return classificationText;
         }
 
-        private async Task<string> CallGeminiAPI(string customerAsk)
+        private async Task<string> CallGeminiAPI(string prompt)
         {
-            var promptAsk = $@"Bạn là Hairhub Chatbot, một trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Tóm tắt câu hỏi của khách hàng trên hệ thống Hairhub: {customerAsk}.
-
-                            Yêu cầu:
-                            1. Tóm tắt và phân tích câu hỏi của khách hàng, chỉ tập trung vào các chủ đề: lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub.
-                            2. Nếu câu hỏi là tìm kiếm salon (ví dụ: “Hairhub có những salon nào?”), hãy trả lời bằng danh sách salon hiện có.
-                            3. Bỏ qua mọi thông tin không liên quan đến các chủ đề trên.
-                            4. Định dạng [Thời gian] phải là (dd/MM/yyyy HH:mm). Ngày hôm nay là: {DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm")}.
-                            5. Chuyển các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" thành ngày và giờ cụ thể dựa trên ngày hiện tại.
-                            6. Nếu câu hỏi không đề cập đến trạng thái lịch hẹn, mặc định [Trạng thái lịch hẹn] là ""đang đặt"". Nếu có các cụm như (lịch hẹn bỏ lỡ) hoặc (lịch hẹn thất bại), đặt [Trạng thái lịch hẹn] là ""thất bại"".
-                            7. Nếu thiếu thông tin cần thiết, trả lời: null.
-                            8. Trả lời ngắn gọn dưới dạng text, không dùng text box.
-
-                            Cấu trúc câu trả lời phải tuân thủ chính xác định dạng sau (chỉ trả về 6 dòng, không thêm thông tin khác):
-
-                            [Loại câu hỏi]: [kiểm tra lịch hẹn, tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, tìm kiếm thời gian trống để đặt lịch, salon/barber shop/nhân viên, null];
-                            [Loại hướng dẫn sử dụng]: [đặt lịch hẹn, hủy lịch hẹn, quy trình check in, xem lịch sử lịch hẹn, xem trạng thái lịch hẹn, null];
-                            [Trạng thái lịch hẹn]: [hủy, đang đặt, thành công, thất bại, tất cả, null];
-                            [Vị trí]: [Gần tôi, Địa điểm, null];
-                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
-                            [Thời gian]: [Ngày và giờ cụ thể trong câu hỏi khách hàng theo đúng định dạng (dd/MM/yyyy HH:mm); nếu không có thì trả lời là null].";
-
             var requestBody = new
             {
                 contents = new[]
@@ -147,7 +128,7 @@ namespace Hairhub.Service.Services.Services
                         role = "user",
                         parts = new[]
                         {
-                            new { text = promptAsk}
+                            new { text = prompt}
                         }
                     }
                 }
@@ -212,6 +193,73 @@ namespace Hairhub.Service.Services.Services
             return clasifyAskCustomer;
         }
 
+        private async Task<string> FindVoucher()
+        {
+            var vouchers = await _unitOfWork.GetRepository<Voucher>().GetListAsync(predicate: x=>x.IsActive && x.ExpiryDate>=DateTime.Now);
+
+            if (vouchers == null || !vouchers.Any())
+            {
+                return "Hiện tại không có voucher nào.";
+            }
+            var voucherString = new StringBuilder();
+            voucherString.AppendLine("Hairhub có 2 loại voucher: voucher của hệ thống (áp dụng cho tất cả khách hàng sử dụng Hairhub), voucher của salon (chỉ áp dụng cho khách hàng đặt lịch tại salon này)." +
+                                     "Hãy giới thiệu cho khách hàng tất cả những voucher mà họ có thể sử dụng.");
+            voucherString.AppendLine("- Danh sách voucher hệ thống (áp dụng cho tất cả khách hàng đặt lịch trên Hairhub):");
+            var voucherSystem = vouchers.Where(v => v.IsSystemCreated).ToList();
+            if(voucherSystem!=null && voucherSystem!.Count != 0)
+            {
+                foreach (var voucher in voucherSystem) 
+                {
+                    //voucherString.Append($"   + Mã voucher: {voucher.Code}; ");
+                    voucherString.Append($"   + Mô tả: {voucher.Description}; ");
+                    voucherString.Append($"Số tiền đặt hàng tối thiểu: {voucher.MinimumOrderAmount:C}; ");
+                    voucherString.Append($"Phần trăm giảm giá: {voucher.DiscountPercentage}%; ");
+                    voucherString.Append($"Giảm giá tối đa: {voucher.MaximumDiscount:C}; ");
+                    voucherString.Append($"Số lượng khả dụng: {voucher.Quantity}; ");
+                    voucherString.Append($"Ngày bắt đầu: {voucher.StartDate:dd/MM/yyyy}; ");
+                    voucherString.Append($"Ngày hết hạn: {voucher.ExpiryDate:dd/MM/yyyy}; ");
+                    voucherString.Append($"Trạng thái: {(voucher.IsActive ? "Đang hoạt động" : "Không hoạt động")}\n");
+                    voucherString.AppendLine();
+                }
+            }
+            else
+            {
+                voucherString.AppendLine("Không có voucher của hệ thống.");
+            }
+
+            var voucherSalon = vouchers.Where(x => !x.IsSystemCreated && x.SalonInformationId != null)
+                                           .GroupBy(v => v.SalonInformationId)
+                                           .ToList();
+            voucherString.AppendLine("- Danh sách voucher của salon (áp dụng cho khách hàng đặt lịch tại salon này):");
+            if (vouchers!=null && voucherSalon.Count!=0)
+            {
+
+                foreach (var salonGroup in voucherSalon)
+                {
+                    var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == salonGroup.Key);
+                    voucherString.AppendLine($"  - Voucher của {salon.Name} (chỉ áp dụng khi đặt lịch tại salon {salon.Name})");
+
+                    foreach (var voucher in salonGroup)
+                    {
+                        //voucherString.Append($"     + Mã voucher: {voucher.Code}; ");
+                        voucherString.Append($"     + Mô tả: {voucher.Description}; ");
+                        voucherString.Append($"Số tiền đặt hàng tối thiểu: {voucher.MinimumOrderAmount:C}; ");
+                        voucherString.Append($"Phần trăm giảm giá: {voucher.DiscountPercentage}%; ");
+                        voucherString.Append($"Giảm giá tối đa: {voucher.MaximumDiscount:C} VNĐ; ");
+                        voucherString.Append($"Số lượng khả dụng: {voucher.Quantity}; ");
+                        voucherString.Append($"Ngày bắt đầu: {voucher.StartDate:dd/MM/yyyy}; ");
+                        voucherString.Append($"Ngày hết hạn: {voucher.ExpiryDate:dd/MM/yyyy}; ");
+                        voucherString.AppendLine($"Trạng thái: {(voucher.IsActive ? "Đang hoạt động" : "Không hoạt động")}");
+                    }
+                    voucherString.AppendLine(); 
+                }
+            }
+            else
+            {
+                voucherString.AppendLine("Không có voucher của salon.");
+            }
+            return voucherString.ToString();
+        }
         private async Task<string> kiemTraLichHen(string statusAppointment, DateTime? dateTime, Guid customerId)
         {
             string status = ""; 
@@ -282,16 +330,38 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<string> ChatMessage(AIChatMessageRequest request)
         {
-            request.AskMessage = request.AskMessage == null ? "" : request.AskMessage.Trim().ToLower();
-            string classificationText = await CallGeminiAPI(request.AskMessage);
+            string customerAsk = request.AskMessage == null ? "" : request.AskMessage.Trim().ToLower();
+            var promptAsk = $@"Bạn là Hairhub Chatbot, một trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Tóm tắt câu hỏi của khách hàng trên hệ thống Hairhub: {customerAsk}.
+
+                            Yêu cầu:
+                            1. Tóm tắt và phân tích câu hỏi của khách hàng, chỉ tập trung vào các chủ đề: lịch hẹn, dịch vụ tóc, salon, barber shop, khuyến mãi, hướng dẫn sử dụng Hairhub.
+                            2. Nếu câu hỏi là tìm kiếm salon (ví dụ: “Hairhub có những salon nào?”), hãy trả lời bằng danh sách salon hiện có.
+                            3. Bỏ qua mọi thông tin không liên quan đến các chủ đề trên.
+                            4. Định dạng [Thời gian] phải là (dd/MM/yyyy HH:mm). Ngày hôm nay là: {DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}.
+                            5. Chuyển các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" thành ngày và giờ cụ thể dựa trên ngày hiện tại.
+                            6. Nếu câu hỏi không đề cập đến trạng thái lịch hẹn, mặc định [Trạng thái lịch hẹn] là ""đang đặt"". Nếu có các cụm như (lịch hẹn bỏ lỡ) hoặc (lịch hẹn thất bại), đặt [Trạng thái lịch hẹn] là ""thất bại"".
+                            7. Nếu thiếu thông tin cần thiết, trả lời: null.
+                            8. Trả lời ngắn gọn dưới dạng text, không dùng text box.
+
+                            Cấu trúc câu trả lời phải tuân thủ chính xác định dạng sau (chỉ trả về 6 dòng, không thêm thông tin khác):
+
+                            [Loại câu hỏi]: [kiểm tra lịch hẹn, tìm khuyến mãi, Hướng dẫn sử dụng Hairhub, tìm kiếm thời gian trống để đặt lịch, salon/barber shop/nhân viên, null];
+                            [Loại hướng dẫn sử dụng]: [đặt lịch hẹn, hủy lịch hẹn, quy trình check in, xem lịch sử lịch hẹn, xem trạng thái lịch hẹn, null];
+                            [Trạng thái lịch hẹn]: [hủy, đang đặt, thành công, thất bại, tất cả, null];
+                            [Vị trí]: [Gần tôi, Địa điểm, null];
+                            [Tên Salon hoặc tên Barber shop]: [tên salon, tên barber shop, null];
+                            [Thời gian]: [Ngày và giờ cụ thể trong câu hỏi khách hàng theo đúng định dạng (dd/MM/yyyy HH:mm); nếu không có thì trả lời là null].";
+            string classificationText = await CallGeminiAPI(promptAsk);
             var clasifyAskCustomer = ClassifyPrompt(classificationText);
 
-
+            string dataHairhub = "";
             switch (clasifyAskCustomer.Intent)
             {
                 case "kiểm tra lịch hẹn":
-                    return await kiemTraLichHen(clasifyAskCustomer!.StatusAppointment!, clasifyAskCustomer.Time, request.CustomerId);
+                    dataHairhub = await kiemTraLichHen(clasifyAskCustomer!.StatusAppointment!, clasifyAskCustomer.Time, request.CustomerId);
+                    break;
                 case "tìm khuyến mãi":
+                    dataHairhub = await FindVoucher();
                     break;
                 case "hướng dẫn sử dụng Hairhub":
                     switch (clasifyAskCustomer.TyleGuid)
@@ -324,7 +394,21 @@ namespace Hairhub.Service.Services.Services
                     //Tôi không biết bạn đang hỏi qq dì cả???
                     break;
             }
-            return "";
+            var promptAnswer = $@"Bạn là ChatBot Hairhub, trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Hãy trả lời câu hỏi của khách hàng dựa trên dữ liệu có sẵn từ hệ thống HairHub.
+
+                                Lưu ý:
+                                1. Ngày hiện tại là: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}.
+                                2. Nếu câu hỏi của khách hàng là về “lịch hẹn sắp tới” hoặc “đang có lịch hẹn nào không”, kiểm tra các lịch hẹn có trạng thái “đang đặt”.
+                                3. Nếu câu hỏi của khách hàng là về “lịch hẹn bỏ lỡ” hoặc “lịch hẹn thất bại”, kiểm tra các lịch hẹn có trạng thái “thất bại”.
+                                4. Chỉ trả lời dựa trên dữ liệu đã cung cấp. Không thêm thông tin ngoài dữ liệu này.
+                                5. Phản hồi bằng phong cách hài hước nhưng chuyên nghiệp.
+                                6. Chỉ trả lời duy nhất bằng tiếng Việt.
+
+                                Câu hỏi của khách hàng: ""{customerAsk}""
+                                Dữ liệu từ HairHub: ""{dataHairhub}""
+                                ";
+            string result = await CallGeminiAPI(promptAnswer);
+            return result;
         }
     }
 }
