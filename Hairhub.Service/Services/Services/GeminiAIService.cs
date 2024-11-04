@@ -282,49 +282,56 @@ namespace Hairhub.Service.Services.Services
                     status = "";
                     break;
                 case null:
-                    status = "";
+                    status = AppointmentStatus.Booking;
                     //Lấy hết
                     break;
                 default:
-                    //thua, không có trạng thái sao mà kiểm tra???
+                    status = "";
                     break;
             }
-            if (dateTime == null)
+
+            var appointments = await _appointmentService.GetAppointmentGemini(customerId, status, dateTime);
+            if (appointments == null || appointments.Count == 0)
             {
-                dateTime = DateTime.Now;
+                return "Không có lịch hẹn nào cho thời gian và trạng thái được chỉ định.";
             }
-            var appointments = await _appointmentService.GetAppointmentCustomerByStatus(customerId, status, true, dateTime, 1, 10);
-            if (appointments.Items == null || !appointments.Items.Any())
+
+            if (appointments == null || appointments.Count == 0)
             {
                 return "Không có lịch hẹn nào cho thời gian và trạng thái được chỉ định.";
             }
 
             var appointmentsString = new StringBuilder();
-            appointmentsString.AppendLine($"Danh sách {appointments.Items.Count} lịch hẹn gần nhất ngày {dateTime.Value.Date:dd/MM/yyyy}:");
-            foreach (var appointment in appointments.Items)
-            {
-                appointmentsString.Append(
-                    $"- Salon: {appointment.SalonInformation.Name}, ");
+            appointmentsString.AppendLine($"Danh sách {appointments.Count} lịch hẹn:");
 
-                var appointmentDetails = appointment.AppointmentDetails;
-                appointmentsString.Append($"Dịch vụ: {appointment!.AppointmentDetails[0]!.ServiceName!}, ");
-                appointmentsString.Append($"Thời gian: {appointment.AppointmentDetails[0].StartTime:dd/MM/yyyy HH:mm}, ");
-                for (int i = 1; i<appointmentDetails.Count; i++) 
-                {
-                    appointmentsString.Append($"Dịch vụ: {appointment!.AppointmentDetails[i]!.ServiceName!}, ");
-                    appointmentsString.Append($"Thời gian: {appointment.AppointmentDetails[i].StartTime:dd/MM/yyyy HH:mm}, ");
-                }
+            int appointmentIndex = 1;
+            foreach (var appointment in appointments)
+            {
+                appointmentsString.Append($"{appointmentIndex}. ");
+                appointmentsString.Append($"Salon: {appointment.SalonInformation.Name}; ");
+                appointmentsString.Append($"địa chỉ: {appointment.SalonInformation.Address}; ");
+                appointmentsString.Append($"ngày hẹn: {appointment.StartDate:dd/MM/yyyy}; ");
+                appointmentsString.Append($"giá tiền: {appointment.TotalPrice} VNĐ; ");
+
                 string statusInVietnamese = appointment.Status switch
                 {
                     AppointmentStatus.Booking => "Đang Đặt",
-                    AppointmentStatus.CancelByCustomer => "Hủy bởi Khách hàng",
+                    AppointmentStatus.CancelByCustomer => "Đã Hủy",
                     AppointmentStatus.Successed => "Thành Công",
                     AppointmentStatus.Fail => "Thất Bại",
-                    AppointmentStatus.Fake => "Giả Mạo",
-                    _ => appointment.Status // Giữ nguyên nếu trạng thái không được định nghĩa trong switch
+                    AppointmentStatus.Fake => "",
+                    _ => appointment.Status
                 };
 
-                appointmentsString.AppendLine($"Trạng thái: {statusInVietnamese}\n");
+                appointmentsString.AppendLine($"trạng thái: {statusInVietnamese};");
+                appointmentsString.AppendLine("    Chi tiết cuộc hẹn:");
+
+                foreach (var detail in appointment.AppointmentDetails)
+                {
+                    appointmentsString.AppendLine($"  + Tên dịch vụ: {detail.ServiceName}; tên nhân viên: {detail.SalonEmployee.FullName}; thời gian bắt đầu: {detail.StartTime:dd/MM/yyyy HH:mm}; thời gian kết thúc: {detail.EndTime:dd/MM/yyyy HH:mm}");
+                }
+                appointmentIndex++;
+                appointmentsString.AppendLine();
             }
             return appointmentsString.ToString();
         }
@@ -402,6 +409,12 @@ namespace Hairhub.Service.Services.Services
             }
             return infoString.ToString();
         }
+
+        private async Task<Customer?> GetCustomerInfo(Guid customerId)
+        {
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == customerId);
+            return customer;
+        }
         public async Task<string> ChatMessage(AIChatMessageRequest request)
         {
             string customerAsk = request.AskMessage == null ? "" : request.AskMessage.Trim().ToLower();
@@ -415,7 +428,7 @@ namespace Hairhub.Service.Services.Services
                             3. Bỏ qua mọi thông tin không liên quan đến các chủ đề trên.
                             4. Định dạng [Thời gian] phải là (dd/MM/yyyy HH:mm). Ngày hôm nay là: {DateTime.Now.Date.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}.
                             5. Chuyển các từ ngữ thời gian tự nhiên như ""hôm nay"", ""ngày mai"", ""cuối tuần"" thành ngày và giờ cụ thể dựa trên ngày hiện tại.
-                            6. Nếu câu hỏi không đề cập đến trạng thái lịch hẹn, mặc định [Trạng thái lịch hẹn] là ""đang đặt"". Nếu có các cụm như (lịch hẹn bỏ lỡ) hoặc (lịch hẹn thất bại), đặt [Trạng thái lịch hẹn] là ""thất bại"".
+                            6. Nếu câu hỏi không tìm thấy trạng thái lịch hẹn, đặt [Trạng thái lịch hẹn] là ""đang đặt"". Nếu có các cụm như (lịch hẹn bỏ lỡ) hoặc (lịch hẹn thất bại), đặt [Trạng thái lịch hẹn] là ""thất bại"".
                             7. Nếu thiếu thông tin cần thiết, trả lời: null.
                             8. Trả lời ngắn gọn dưới dạng text, không dùng text box.
                             9. Tên [Tên Salon hoặc tên Barber shop] cần lược bỏ các từ như (salon), (barber shop), (tiệm tóc), (tiệm cắt tóc).
@@ -441,25 +454,7 @@ namespace Hairhub.Service.Services.Services
                     dataHairhub = await FindVoucher();
                     break;
                 case "hướng dẫn sử dụng Hairhub":
-                    switch (clasifyAskCustomer.TyleGuid)
-                    {
-                        case "Đặt lịch hẹn":
-                            break;
-                        case "Hủy lịch hẹn":
-                            break;
-                        case "Quy trình check in":
-                            break;
-                        case "Xem lịch sử lịch hẹn":
-                            break;
-                        case "Xem trạng thái lịch hẹn":
-                            break;
-                        case null:
-                            //Cần cung cấp thêm thông tin là hướng dẫn sử dụng về gì?
-                            break;
-                        default:
-                            //Chưa có thông tin cho hướng dẫn Hairhub này
-                            break;
-                    }
+                    dataHairhub = GeminiAIStr.allGuidesForGemini;
                     break;
                 case "tìm kiếm thời gian trống để đặt lịch":
                     break;
@@ -472,8 +467,18 @@ namespace Hairhub.Service.Services.Services
                     //Tôi không biết bạn đang hỏi qq dì cả???
                     break;
             }
+            string customerPrompt = "";
+            var customerInfo = await GetCustomerInfo(request.CustomerId);
+            if (customerInfo == null)
+            {
+                customerPrompt = "Không có thông tin.";
+            }
+            else
+            {
+                customerPrompt = $@"Tên: {customerInfo.FullName ?? "không có"}, giới tính: {customerInfo.Gender ?? "không có"}, ngày sinh: {customerInfo.DayOfBirth?.ToString("dd/MM/yyyy") ?? "không có"}, địa chỉ: {customerInfo.Address ?? "không có"}.";
+            }
             var promptAnswer = $@"Bạn là ChatBot Hairhub, trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Hãy trả lời câu hỏi của khách hàng dựa trên dữ liệu có sẵn từ hệ thống HairHub.
-
+                                Thông tin của khách hàng: {customerPrompt}
                                 Lưu ý:
                                 1. Ngày hiện tại là: {DateTime.Now.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}.
                                 2. Nếu câu hỏi của khách hàng là về “lịch hẹn sắp tới” hoặc “đang có lịch hẹn nào không”, kiểm tra các lịch hẹn có trạng thái “đang đặt”.

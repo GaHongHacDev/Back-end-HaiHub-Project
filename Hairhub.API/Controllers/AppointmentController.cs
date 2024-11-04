@@ -75,7 +75,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{SalonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
