@@ -77,67 +77,88 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate)
         {
-            throw new NotImplementedException();
-            /* var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
-             if (salon == null)
-             {
-                 throw new NotFoundException("Không tìm thấy salon, barber shop");
-             }
-             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
-             predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId, include: x => x.Include(s => s.SalonOwner));
+            if (salon == null)
+            {
+                throw new NotFoundException("Không tìm thấy salon, barber shop");
+            }
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date >= x.StartDate.Date);
 
-             var appointments = await _unitOfWork.GetRepository<Appointment>()
-                                                 .GetListAsync
-                                                 (
-                                                     predicate: predicate,
-                                                     orderBy: x => x.OrderByDescending(x => x.StartDate)
-                                                 );
-             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
-             var payment = await _unitOfWork.GetRepository<Payment>()
-                                             .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
-             if (payment == null)
-             {
-                 throw new NotFoundException("Không tìm thấy thông tin thanh toán");
-             }
-             if (appointments != null)
-             {
-                 int canceledAppointmentCount = 0;
-                 int successedAppointmentCount = 0;
-                 int failedAppointmentCount = 0;
-                 List<Appointment> appointmentsResponse = new List<Appointment>();
-
-                 foreach (var appointment in appointments)
-                 {
-                     switch (appointment.Status)
-                     {
-                         case AppointmentStatus.Successed:
-                             appointmentsResponse.Add(appointment);
-                             //Tính tiền HH mà salon chưa trả cho system
-                             if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
-                             {
-                                 response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                             }
-                             //Tính tổng tiền HH của salon từ start_date đến end_date
-                             response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                             //Tổng appointment thành công
-                             successedAppointmentCount++;
-                             break;
-                         case AppointmentStatus.Fail:
-                             //Tổng appointment thất bại
-                             failedAppointmentCount++;
-                             break;
-                         case AppointmentStatus.CancelByCustomer:
-                             //Tổng appointment bị khách hàng hủy
-                             canceledAppointmentCount++;
-                             break;
-                     }
-                 }
-                 response.CanceledAppointmentCount = canceledAppointmentCount;
-                 response.SuccessedAppointmentCount = successedAppointmentCount;
-                 response.FailedAppointmentCount = failedAppointmentCount;
-                 response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
-             }
-             return response;*/
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync
+                                                (
+                                                    predicate: predicate,
+                                                    orderBy: x => x.OrderByDescending(x => x.StartDate)
+                                                );
+            GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salon.SalonOwner.Id);
+            var payment = await _unitOfWork.GetRepository<Payment>()
+                                            .SingleOrDefaultAsync(predicate: p => p.AccountId == account.Id && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
+            if (appointments != null)
+            {
+                int canceledAppointmentCount = 0;
+                int successedAppointmentCount = 0;
+                int failedAppointmentCount = 0;
+                List<Appointment> appointmentsResponse = new List<Appointment>();
+                if (payment == null)
+                {
+                    response.CurrentComssion = 0;
+                    response.TotalComssion = 0;
+                    foreach (var appointment in appointments)
+                    {
+                        switch (appointment.Status)
+                        {
+                            case AppointmentStatus.Successed:
+                                appointmentsResponse.Add(appointment);
+                                successedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.Fail:
+                                //Tổng appointment thất bại
+                                failedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.CancelByCustomer:
+                                //Tổng appointment bị khách hàng hủy
+                                canceledAppointmentCount++;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var appointment in appointments)
+                    {
+                        switch (appointment.Status)
+                        {
+                            case AppointmentStatus.Successed:
+                                appointmentsResponse.Add(appointment);
+                                //Tính tiền HH mà salon chưa trả cho system
+                                if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
+                                {
+                                    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                                }
+                                //Tính tổng tiền HH của salon từ start_date đến end_date
+                                response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                                //Tổng appointment thành công
+                                successedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.Fail:
+                                //Tổng appointment thất bại
+                                failedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.CancelByCustomer:
+                                //Tổng appointment bị khách hàng hủy
+                                canceledAppointmentCount++;
+                                break;
+                        }
+                    }
+                }
+                response.CanceledAppointmentCount = canceledAppointmentCount;
+                response.SuccessedAppointmentCount = successedAppointmentCount;
+                response.FailedAppointmentCount = failedAppointmentCount;
+                response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
+            }
+            return response;
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
