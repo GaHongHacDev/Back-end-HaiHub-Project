@@ -92,7 +92,7 @@ namespace Hairhub.Service.Services.Services
                                                     orderBy: x => x.OrderByDescending(x => x.StartDate)
                                                 );
             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
-            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salon.SalonOwner.Id);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salon.SalonOwner.AccountId);
             var payment = await _unitOfWork.GetRepository<Payment>()
                                             .SingleOrDefaultAsync(predicate: p => p.AccountId == account.Id && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
             if (appointments != null)
