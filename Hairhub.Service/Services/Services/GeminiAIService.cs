@@ -8,6 +8,7 @@ using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System.Data.Entity;
 using System.Globalization;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -357,7 +358,7 @@ namespace Hairhub.Service.Services.Services
                 var services = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(predicate: x=>x.IsActive && x.SalonInformationId == salon.Id);
                 foreach (var service in services)
                 {
-                    infoString.AppendLine($"    - Tên dịch vụ: {service.ServiceName}; Giá: {(int)service.Price} VNĐ; Thời gian: {(int)(service.Time*60)} tiếng");
+                    infoString.AppendLine($"    - Tên dịch vụ: {service.ServiceName}; Giá: {(int)service.Price} VNĐ; Thời gian: {(int)(service.Time*60)} phút");
                 }
                 // Nhân viên của salon
                 infoString.AppendLine("  + Nhân viên của salon:");
@@ -379,6 +380,24 @@ namespace Hairhub.Service.Services.Services
                     else
                     {
                         infoString.AppendLine("      Thời gian làm việc: Không có lịch làm việc");
+                    }
+                    infoString.Append($"      Dịch vụ mà nhân viên {employee.FullName} thực hiện: ");
+                    var employeeServices = await _unitOfWork.GetRepository<ServiceHair>()
+                                                            .GetListAsync(
+                                                                predicate: x => x.ServiceEmployees.Any(s=>s.SalonEmployeeId == employee.Id) && x.IsActive
+                                                            );
+
+                    if (employeeServices.Any())
+                    {
+                        foreach(var service in employeeServices)
+                        {
+                            infoString.Append($"{service.ServiceName}, ");
+                        }
+                        infoString.AppendLine();
+                    }
+                    else
+                    {
+                        infoString.AppendLine("Không có dịch vụ nào.");
                     }
                 }
             }
