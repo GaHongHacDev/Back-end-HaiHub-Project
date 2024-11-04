@@ -70,16 +70,15 @@ namespace Hairhub.Service.Services.Services
 
         private async Task<string> SendMessageDefault(string askCustomer)
         {
-            var promptStr = $@"Bạn là trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub. Hôm nay là {DateTime.Now.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}. Câu hỏi của người dùng là: ""{askCustomer}"".
+            var promptStr = $@"Bạn là ChatBot Hairhub, trợ lý hỗ trợ khách hàng cho ứng dụng đặt lịch HairHub.. Hôm nay là {DateTime.Now.ToString("dd/MM/yyyy HH:mm")} - {DateTime.Now.DayOfWeek}. Câu hỏi của người dùng là: ""{askCustomer}"".
 
                             Vui lòng phản hồi bằng phong cách hài hước nhưng chuyên nghiệp và chỉ trả lời duy nhất bằng tiếng Việt. Nếu câu hỏi nằm ngoài hệ thống, hướng dẫn khách hàng đặt câu hỏi rõ ràng hơn theo các chủ đề sau:
                             1. Kiểm tra lịch hẹn.
                             2. Tìm khuyến mãi hiện có.
                             3. Hướng dẫn sử dụng HairHub.
                             4. Tìm thời gian đặt lịch phù hợp.
-                            5. Tìm salon hoặc barber shop gần bạn.
-
-                            Lưu ý: Bắt đầu phản hồi với lời chào mừng đến HairHub và tự giới thiệu bản thân là Chatbot HairHub. Chatbot hân hạnh được hỗ trợ khách hàng.";
+                            5. Tìm salon hoặc barber shop gần bạn.";
+                           // Lưu ý: Bắt đầu phản hồi với lời chào mừng đến HairHub và tự giới thiệu bản thân là Chatbot HairHub. Chatbot hân hạnh được hỗ trợ khách hàng.";
             var requestBody = new
             {
                 contents = new[]
