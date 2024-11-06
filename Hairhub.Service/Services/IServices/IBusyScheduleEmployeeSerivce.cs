@@ -16,7 +16,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteofaBusySchedule(Guid employeeID);
 
-
+        
 
     }
 }
