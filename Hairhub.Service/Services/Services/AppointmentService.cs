@@ -1051,18 +1051,22 @@ namespace Hairhub.Service.Services.Services
             }
             string paymentMethod = "";
             string status = AppointmentStatus.Booking;
-            if (request.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
-            {
-                status = AppointmentStatus.Fake;
-            }
             if (request.PaymentMethod == null)
             {
                 paymentMethod = AppointmentPaymentMethod.PayInSalon;
             }
             else
             {
+                //if (request.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
+                //{
+                //    status = AppointmentStatus.Fake;
+                //}
+                //else
+                //{
                 paymentMethod = request.PaymentMethod;
+                //}
             }
+
             var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == request.CustomerId, include: x => x.Include(s => s.Account));
             if (customer == null)
             {
