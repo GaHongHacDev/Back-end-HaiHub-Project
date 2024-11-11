@@ -1085,7 +1085,7 @@ namespace Hairhub.Service.Services.Services
                 Status = status,
                 CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
-                PaymentMethod = request.PaymentMethod
+                PaymentMethod = paymentMethod
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
