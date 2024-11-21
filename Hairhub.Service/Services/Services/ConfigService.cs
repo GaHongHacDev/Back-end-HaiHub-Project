@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Hairhub.Domain.Dtos.Requests.Config;
 using Hairhub.Domain.Dtos.Responses.Config;
+using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Voucher;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
@@ -28,10 +30,11 @@ namespace Hairhub.Service.Services.Services
         {
             var config = new Config()
             {
-                CommissionRate = request.CommissionRate,
-                MaintenanceFee = request.MaintenanceFee,
-                DateCreate = request.DateCreate,
-                IsActive = request.IsActive,
+                PakageName = request.PakageName,
+                PakageFee = request.PakageFee,
+                Description = request.Description,
+                DateCreate = DateTime.Now,
+                IsActive = true,
             };
 
             await _unitofwork.GetRepository<Config>().InsertAsync(config);
@@ -41,41 +44,47 @@ namespace Hairhub.Service.Services.Services
 
         
 
-        public async Task DeleteConfigAsync(Guid id)
+        public async Task<bool> DeleteConfigAsync(Guid id)
         {
-            var existconfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: e => e.Id == id,
-               orderBy: null,
-               include: null);
+            var existconfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: e => e.Id.Equals(id));
             if (existconfig == null)
             {
-                throw new Exception("Voucher Not Found");
+                throw new NotFoundException("ServiceHair not found!");
             }
-
             _unitofwork.GetRepository<Config>().DeleteAsync(existconfig);
-            _unitofwork.Commit();
+            bool isUpdate = await _unitofwork.CommitAsync() > 0;
+            return isUpdate;
 
         }
 
-        public async Task<IPaginate<GetConfigResponse>> GetAllConfigAsync(int page, int size)
+        public async Task<IPaginate<GetConfigResponse>> GetConfigAsync(int page, int size)
         {
             IPaginate<GetConfigResponse> config = await _unitofwork.GetRepository<Config>()
-                 .GetPagingListAsync(selector: x => new GetConfigResponse(x.CommissionRate, x.MaintenanceFee
-                 , x.DateCreate, x.IsActive), page: page, size: size, orderBy: x => x.OrderBy(x => x.DateCreate));
-
-            return config;
+                 .GetPagingListAsync(selector: x => new GetConfigResponse(x.PakageName, x.PakageFee
+                 ,x.Description ,x.DateCreate, x.IsActive), page: page, size: size, orderBy: x => x.OrderBy(x => x.PakageFee));
+            var ConfigResponses = new Paginate<GetConfigResponse>()
+            {
+                Page = config.Page,
+                Size = config.Size,
+                Total = config.Total,
+                TotalPages = config.TotalPages,
+                Items = _mapper.Map<IList<GetConfigResponse>>(config.Items),
+            };
+            return ConfigResponses;            
         }
 
         public async Task<GetConfigResponse>? GetConfigbyIdAsync(Guid id)
         {
             GetConfigResponse configresponse = await _unitofwork.GetRepository<Config>().
-                SingleOrDefaultAsync(selector: x => new GetConfigResponse(x.CommissionRate, x.MaintenanceFee,
-                x.DateCreate,x.IsActive), predicate: x => x.Id.Equals(id));
+                SingleOrDefaultAsync(selector: x => new GetConfigResponse(x.PakageName, x.PakageFee
+                 , x.Description, x.DateCreate, x.IsActive), predicate: x => x.Id.Equals(id));
 
             if (configresponse == null) return null;
-            return configresponse;
+            return _mapper.Map<GetConfigResponse>(configresponse);
         }
+ 
 
-        public async Task<UpdateConfigResponse> UpdateConfigAsync(Guid id, UpdateConfigRequest request)
+        public async Task<bool> UpdateConfigAsync(Guid id, UpdateConfigRequest request)
         {
             
             var existConfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(
@@ -87,16 +96,11 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new KeyNotFoundException("Cannot Find Config");
             }
-
-            existConfig.CommissionRate = request.CommissionRate;
-            existConfig.MaintenanceFee = request.MaintenanceFee;
-            existConfig.DateCreate = request.DateCreate;
-            existConfig.IsActive = request.IsActive;
-
+            existConfig = _mapper.Map<Config>(request);
             _unitofwork.GetRepository<Config>().UpdateAsync(existConfig);
-            _unitofwork.Commit();
-            return _mapper.Map<UpdateConfigResponse>(existConfig);
-            
+            bool isUpdate = await _unitofwork.CommitAsync() > 0;
+            return isUpdate;
+
         }
 
         

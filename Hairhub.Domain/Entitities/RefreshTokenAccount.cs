@@ -12,11 +12,6 @@ namespace Hairhub.Domain.Entitities
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
         public DateTime Expires { get; set; }
-        public bool IsActive
-        {
-            get { return DateTime.UtcNow <= Expires; }
-            private set {}
-        }
         public Guid AccountId { get; set; }
 
         public virtual Account Account { get; set; }

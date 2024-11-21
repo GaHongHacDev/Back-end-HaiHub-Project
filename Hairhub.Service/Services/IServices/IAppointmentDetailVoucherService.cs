@@ -18,6 +18,5 @@ namespace Hairhub.Service.Services.IServices
         Task<GetAppointmentDetailVoucherResponse> GetAppointmentDetailVoucherById(Guid id);
         Task<bool> CreateAppointmentDetailVoucher(CreateAppointmentDetailVoucherRequest request);
         Task<bool> UpdateAppointmentDetailVoucher(Guid id, UpdateAppointmentDetailVoucherRequest request);
-        Task<bool> DeleteAppointmentDetailVoucher(Guid id);
     }
 }

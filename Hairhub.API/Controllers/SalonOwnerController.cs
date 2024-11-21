@@ -21,8 +21,15 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllSalonOwner([FromQuery] int page=1, [FromQuery] int size=10)
         {
-            var salonOwnersResponse = await _salonOwnerService.GetAllSalonOwner(page, size);
-            return Ok(salonOwnersResponse);
+            try
+            {
+                var salonOwnersResponse = await _salonOwnerService.GetAllSalonOwner(page, size);
+                return Ok(salonOwnersResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -34,7 +41,7 @@ namespace Hairhub.API.Controllers
                 var salonOwnerResponse = await _salonOwnerService.GetSalonOwnerById(id);
                 if (salonOwnerResponse == null)
                 {
-                    return NotFound("Cannot find this SalonOwner!");
+                    return NotFound(new { message = "Cannot find this SalonOwner!" });
                 }
                 return Ok(salonOwnerResponse);
             }
@@ -58,8 +65,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -87,7 +93,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -111,7 +117,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {

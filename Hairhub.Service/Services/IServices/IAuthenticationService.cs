@@ -1,4 +1,5 @@
 ﻿using Hairhub.Domain.Dtos.Requests.Authentication;
+using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.Authentication;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace Hairhub.Service.Services.IServices
         public Task<LoginResponse> Login(string userName, string password);
         public Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest);
         public Task<bool> Logout(LogoutRequest logoutRequest);
+        public Task<FetchUserResponse> FetchUser(string accessToken);
     }
 }

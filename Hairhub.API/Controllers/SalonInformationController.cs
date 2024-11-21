@@ -44,22 +44,65 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{ownerId:Guid}")]
+        public async Task<IActionResult> GetSalonInformationByOwnerId([FromRoute] Guid ownerId)
+        {
+            try
+            {
+                var salonInformationResponse = await _salonInformationService.GetSalonByOwnerId(ownerId);
+                return Ok(salonInformationResponse);
+            }
+            catch(NotFoundException ex)
+            {
+                return NotFound(new { message = "Cannot find this SalonInformation!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSalonByServiceNameAddress(
+            [FromQuery] string? serviceName = null,
+            [FromQuery] string? salonAddress = null,
+            [FromQuery] string? salonName = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10)
+        {
+            try
+            {
+                var salonInformationResponse = await _salonInformationService.SearchSalonByNameAddressService(page, size, serviceName, salonAddress, salonName);
+                return Ok(salonInformationResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = "Cannot find this SalonInformation!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPost]
-        public async Task<IActionResult> CreateSalonInformation([FromBody] CreateSalonInformationRequest createSalonInformationRequest)
+        public async Task<IActionResult> CreateSalonInformation([FromForm] CreateSalonInformationRequest createSalonInformationRequest)
         {
             try
             {
                 var accoutResponse = await _salonInformationService.CreateSalonInformation(createSalonInformationRequest);
                 if (accoutResponse == null)
                 {
-                    return BadRequest("Cannot create SalonInformation!");
+                    return NotFound("Cannot create SalonInformation!");
                 }
                 return Ok(accoutResponse);
             }
             catch (NotFoundException ex)
             {
 
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -87,7 +130,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -111,7 +154,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {
@@ -135,7 +178,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {

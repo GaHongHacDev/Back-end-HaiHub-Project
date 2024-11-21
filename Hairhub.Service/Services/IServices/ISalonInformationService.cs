@@ -13,9 +13,11 @@ namespace Hairhub.Service.Services.IServices
     {
         Task<IPaginate<GetSalonInformationResponse>> GetAllSalonInformation(int page, int size);
         Task<GetSalonInformationResponse>? GetSalonInformationById(Guid id);
-        Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createAccountRequest);
+        Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest);
         Task<bool> UpdateSalonInformationById(Guid id, UpdateSalonInformationRequest updateSalonInformationRequest);
         Task<bool> DeleteSalonInformationById(Guid id);
         Task<bool> ActiveSalonInformation(Guid id);
+        Task<GetSalonInformationResponse>? GetSalonByOwnerId(Guid ownerId);
+        Task<IPaginate<SearchSalonByNameAddressServiceResponse>> SearchSalonByNameAddressService(int page, int size, string? serviceName = "", string? salonAddress = "", string? salonName = "");
     }
 }

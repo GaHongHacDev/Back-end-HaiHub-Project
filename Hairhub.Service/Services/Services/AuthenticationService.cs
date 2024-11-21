@@ -11,6 +11,10 @@ using System.Security.Cryptography;
 using Hairhub.Domain.Dtos.Requests.Authentication;
 using Hairhub.Domain.Dtos.Responses.Authentication;
 using Hairhub.Domain.Exceptions;
+using Hairhub.Domain.Dtos.Responses.Accounts;
+using AutoMapper;
+using Hairhub.Domain.Enums;
+using Hairhub.Domain.Dtos.Responses.Appointments;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -18,47 +22,87 @@ namespace Hairhub.Service.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuaration;
+        private readonly IMapper _mapper;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuaration)
+        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuaration, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _configuaration = configuaration;
+            _mapper = mapper;
         }
         public async Task<LoginResponse> Login(string userName, string password)
         {
 
-            var user = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
                 predicate: u => u.Username == userName && u.Password == password,
                 include: x => x.Include(a => a.Role));
             // return null if user not found
-            if (user == null)
+            if (account == null)
             {
                 return null;
             }
-            // authentication successful so generate jwt token and refresh token
-            var accessToken = GenerateToken(user.Username, user.RoleId.ToString());
-            var refreshToken = GenerateRefreshToken();
-            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(new RefreshTokenAccount()
+            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.AccountId == account.Id);
+            if(salonOwner==null && customer == null)
             {
-                Id = new Guid(accessToken),
+                throw new NotFoundException("Không tìm thấy tài khoản");
+            }
+            // authentication successful so generate jwt token and refresh token
+            var accessToken = GenerateToken(account.Username, account.Role.RoleName);
+            var refreshToken = GenerateRefreshToken();
+            var newRefrehToken = new RefreshTokenAccount()
+            {
+                Id = Guid.NewGuid(),
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                AccountId = user.Id,
-                Expires = DateTime.UtcNow.AddDays(30)
-            });
+                AccountId = account.Id,
+                Expires = DateTime.UtcNow.AddDays(30),
+            };
+            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(newRefrehToken); 
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
-            if (isInsert)
+            if (!isInsert)
             {
                 throw new Exception("Cannot insert token to DB");
             }
-            return new LoginResponse() { AccessToken = accessToken, RefreshToken = refreshToken };
+            return new LoginResponse() 
+                        {
+                            AccessToken = accessToken, RefreshToken = refreshToken, AccountId = account.Id,  RoleName = account.Role?.RoleName,
+                            CustomerResponse = customer!=null?_mapper.Map<CustomerLoginResponse>(customer):null, 
+                            SalonOwnerResponse = salonOwner!=null?_mapper.Map<SalonOwnerLoginResponse>(salonOwner):null
+                        };
+        }
+
+        public async Task<FetchUserResponse> FetchUser(string accessToken)
+        {
+            var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>()
+                .SingleOrDefaultAsync(
+                                        predicate: x=>x.AccessToken.Equals(accessToken) && x.Expires>=DateTime.Now,
+                                        include: x=>x.Include(y=>y.Account.Role));
+            if (refreshTokenEntity == null)
+            {
+                throw new NotFoundException("Không tìm thấy access token!");
+            }
+            var account = refreshTokenEntity.Account;
+            SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
+            if (salonOwner == null && customer == null)
+            {
+                throw new NotFoundException("Không tìm thấy tài khoản");
+            }
+            return new FetchUserResponse()
+            {
+                AccountId = account.Id,
+                RoleName = account.Role?.RoleName,
+                CustomerResponse = customer != null ? _mapper.Map<CustomerLoginResponse>(customer) : null,
+                SalonOwnerResponse = salonOwner != null ? _mapper.Map<SalonOwnerLoginResponse>(salonOwner) : null
+            };
         }
 
         public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest refreshTokenRequest)
         {
             var refreshTokenEntity = await _unitOfWork.GetRepository<RefreshTokenAccount>().SingleOrDefaultAsync(
                                                 predicate: x => x.RefreshToken == refreshTokenRequest.RefreshToken
-                                                && x.IsActive == true);
+                                                && x.Expires >= DateTime.Now);
             if (refreshTokenEntity == null)
             {
                 throw new Exception("RefreshToken not found or expired");
@@ -72,13 +116,13 @@ namespace Hairhub.Service.Services.Services
 
             var accessToken = GenerateToken(account.Username, account.RoleId.ToString());
             refreshTokenEntity.AccessToken = accessToken;
-            await _unitOfWork.GetRepository<RefreshTokenAccount>().InsertAsync(refreshTokenEntity);
+            _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (!isUpdate)
             {
                 throw new Exception("Cannot insert new access token to DB");
             }
-            return new RefreshTokenResponse() { AccessToken = accessToken };
+            return new RefreshTokenResponse() { AccessToken = refreshTokenEntity.AccessToken, RefreshToken = refreshTokenEntity.RefreshToken };
         }
 
         private string GenerateToken(string username, string roleName)

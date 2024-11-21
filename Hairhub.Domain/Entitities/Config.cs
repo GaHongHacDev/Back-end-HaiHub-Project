@@ -10,9 +10,11 @@ namespace Hairhub.Domain.Entitities
     public class Config
     {
         public Guid Id { get; set; }
-        public decimal? CommissionRate { get; set; }
-        public decimal? MaintenanceFee { get; set; }
-        public DateTime? DateCreate { get; set; }
-        public bool? IsActive { get; set; }
+        public string PakageName { get; set; }
+        public string Description { get; set; }
+        public decimal PakageFee { get; set; }
+        public DateTime DateCreate { get; set; }
+        public bool IsActive { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

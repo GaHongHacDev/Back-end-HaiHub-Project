@@ -24,7 +24,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllVoucher([FromQuery]int page=1, [FromQuery]int size=10) {
             
-            var listVoucher = await _voucherService.GetAllVoucherAsync(page, size);
+            var listVoucher = await _voucherService.GetVoucherAsync(page, size);
             return Ok(listVoucher);        
         }
         [HttpGet]
@@ -46,8 +46,26 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetVoucherBySalonId([FromRoute] Guid id, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var Voucher = await _voucherService.GetVoucherbySalonId(id, page, size);
+                if (Voucher == null)
+                {
+                    return NotFound("Cannont find this voucher!");
+                }
+                return Ok(Voucher);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet]
         
-        public async Task<IActionResult> GetVoucherByCode([FromRoute] string code)
+        public async Task<IActionResult> GetVoucherByCode(string code)
         {
             try
             {
@@ -71,11 +89,11 @@ namespace Hairhub.API.Controllers
             try
             {
                 var result = await _voucherService.CreateVoucherAsync(request);
-                if(result == null)
+                if(result == false)
                 {
                     return NotFound("Cannot create voucher!!!");
                 }
-                return Ok(result);
+                return Ok("Creted Successfully");
 
             } catch (Exception ex)
             {
@@ -84,30 +102,36 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
+        [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateVoucher([FromRoute]Guid id, [FromBody]UpdateVoucherRequest request)
         {
             try
             {
                 var result = await _voucherService.UpdateVoucherAsync(id, request);
-                if(result == null)
+                if(result == false)
                 {
                     return NotFound("Cannot Update Voucher");
                 }
-                return Ok(result);
+                return Ok("Updated successfully");
             } catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
         [HttpDelete]
+        [Route("{id:Guid}")]
         public async Task<IActionResult> DeleteVoucher([FromRoute]Guid id)
         {
             try
             {
-                 await _voucherService.DeleteVoucherAsync(id);
-                return Ok(new { Message = "Voucher deleted successfully." });
-
-            } catch (Exception ex)
+                var result = await _voucherService.DeleteVoucherAsync(id);
+                if (result == false)
+                {
+                    return NotFound("Cannot Delete Voucher");
+                }
+                return Ok("Deleted successfully");
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

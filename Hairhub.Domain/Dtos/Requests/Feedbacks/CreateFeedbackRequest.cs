@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,12 @@ namespace Hairhub.Domain.Dtos.Requests.Feedbacks
 {
     public class CreateFeedbackRequest
     {
-        public Guid? CustomerId { get; set; }
-        public Guid? AppointmentDetailId { get; set; }
+        public Guid SalonId { get; set; }
+        public Guid CustomerId { get; set; }
+        public Guid AppointmentId { get; set; }
         public int? Rating { get; set; }
         public string? Comment { get; set; }
+        public IFormFile? Img { get; set; }
+        public IFormFile? Video { get; set; }
     }
 }

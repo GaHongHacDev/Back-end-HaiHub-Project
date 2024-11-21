@@ -31,44 +31,19 @@ namespace Hairhub.Domain.Dtos.Responses.AppointmentDetails
         public Guid SalonInformationId { get; set; }
         public bool? isActive { get; set; }
     }
-    public class AppointmentResponse
-    {
-        public Guid Id { get; set; }
-        public DateTime? Date { get; set; }
-        public Decimal? TotalPrice { get; set; }
-        public Guid CustomerId { get; set; }
-        public bool? isActive { get; set; }
-    }
 
     public class GetAppointmentDetailResponse
     {
-        public GetAppointmentDetailResponse(Guid id, Guid? salonEmployeeId, Guid? serviceHairId, Guid? appointmentId, string? description, DateTime? date, DateTime? time, decimal? originalPrice, decimal? discountedPrice, bool? status)
-        {
-            Id = id;
-            SalonEmployeeId = salonEmployeeId;
-            ServiceHairId = serviceHairId;
-            AppointmentId = appointmentId;
-            Description = description;
-            Date = date;
-            Time = time;
-            OriginalPrice = originalPrice;
-            DiscountedPrice = discountedPrice;
-            Status = status;
-        }
-
         public Guid Id { get; set; }
-        public Guid? SalonEmployeeId { get; set; }
-        public Guid? ServiceHairId { get; set; }
-        public Guid? AppointmentId { get; set; }
+        public Guid SalonEmployeeId { get; set; }
+        public Guid ServiceHairId { get; set; }
+        public Guid AppointmentId { get; set; }
         public string? Description { get; set; }
-        public DateTime? Date { get; set; }
-        public DateTime? Time { get; set; }
-        public Decimal? OriginalPrice { get; set; }
-        public Decimal? DiscountedPrice { get; set; }
-        public bool? Status { get; set; }
+        public DateTime EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public string Status { get; set; }
 
         public SalonEmployeeResponse SalonEmployeeResponse { get; set; }
         public ServiceHairResponse ServiceHairResponse { get; set; }
-        public AppointmentResponse AppointmentResponse { get; set; }
     }
 }

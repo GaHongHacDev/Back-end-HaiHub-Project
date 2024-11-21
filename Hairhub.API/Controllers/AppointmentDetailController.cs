@@ -47,7 +47,7 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        [HttpPost]
+      /*  [HttpPost]
         public async Task<IActionResult> CreateAppointmentDetail([FromBody] CreateAppointmentDetailRequest createAppointmentRequest)
         {
             try
@@ -68,7 +68,7 @@ namespace Hairhub.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
+        }*/
 
         [HttpPut]
         [Route("{id:Guid}")]
@@ -90,7 +90,7 @@ namespace Hairhub.API.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace Hairhub.API.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return NotFound(ex.Message);
+                    return NotFound(new { message = ex.Message });
                 }
                 catch (Exception ex)
                 {

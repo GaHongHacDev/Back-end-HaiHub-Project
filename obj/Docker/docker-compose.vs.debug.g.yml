@@ -16,8 +16,8 @@ services:
       - ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true
       - NUGET_FALLBACK_PACKAGES=/.nuget/fallbackpackages
     volumes:
-      - D:\Ky8\Exe201\Hairhub\Hairhub.API:/app
-      - D:\Ky8\Exe201\Hairhub:/src
+      - D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project\Hairhub.API:/app
+      - D:\Ky8\Exe201\HairHubProject\Back-end-HaiHub-Project:/src
       - C:\Users\flami\vsdbg\vs2017u5:/remote_debugger:rw
       - C:\Users\flami\.nuget\packages\:/.nuget/packages:ro
       - C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages:/.nuget/fallbackpackages:ro
