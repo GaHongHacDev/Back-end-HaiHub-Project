@@ -271,5 +271,24 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        public async Task<IActionResult> GetPaymentCommistionInformation([FromBody] PaymentCommissionInforRequest request)
+        {
+            try
+            {
+                var result = await _paymentservice.GetCommissionOfPayment(request);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

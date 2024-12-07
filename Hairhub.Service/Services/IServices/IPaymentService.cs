@@ -28,6 +28,7 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetPaymentReportReponse>> GetPaymentReport(Guid? accountId, string? email, DateTime? createDate, string? status, int page, int size);
         Task<PaymentReportResponse> GetPaymentReportById(Guid id);
 
+        Task<ResponsePayment> GetCommissionOfPayment(PaymentCommissionInforRequest request);
 
     }
 }
