@@ -37,7 +37,8 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _configuaration;
         private readonly IEmailService _emailService;
         private string clientIdWeb = "160573115812-l88je63eolr52ichb690e7i8g3f59r9t.apps.googleusercontent.com";
-        private string clientIdAndroid = "435735956374-biv1qavtd6b0b79a1372s99v10qfsnpj.apps.googleusercontent.com";
+        private string clientIdAndroid = "421763180330-30url8nded4pl2mpi8c6ap94l3h4d731.apps.googleusercontent.com";
+                                          
         public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IConfiguration configuaration, IEmailService email)
         {
             _unitOfWork = unitOfWork;
