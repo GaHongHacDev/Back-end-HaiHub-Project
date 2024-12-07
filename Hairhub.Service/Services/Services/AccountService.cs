@@ -309,7 +309,12 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<DataOfMonths> GetNumberOfSalonOwnerOnMonth(int? year)
         {
-            var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: p => p.CreatedDate.Year == year && p.Role.RoleName == RoleEnum.SalonOwner.ToString());
+            var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync(
+                                                                                   predicate: p => p.CreatedDate.Year == year
+                                                                                    && p.Role.RoleName == RoleEnum.SalonOwner.ToString()
+                                                                                    && p.SalonOwners.Any(s => s.SalonInformations.Any(si => si.Status == SalonStatus.Approved.ToString())),
+                                                                                    include: i => i.Include(s => s.SalonOwners).ThenInclude(s => s.SalonInformations)
+                                                                                    );
             var dataOfMonths = new DataOfMonths
             {
                 Jan = accounts.Count(a => a.CreatedDate.Month == 1),
