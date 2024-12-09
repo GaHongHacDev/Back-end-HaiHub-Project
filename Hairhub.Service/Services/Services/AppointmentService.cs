@@ -1119,6 +1119,11 @@ namespace Hairhub.Service.Services.Services
                     };
 
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                    if (voucher.Quantity > 0)
+                    {
+                        voucher.Quantity -= 1;
+                    }
+                    _unitOfWork.GetRepository<Voucher>().UpdateAsync(voucher);
                 }
             }
 

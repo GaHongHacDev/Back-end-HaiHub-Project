@@ -163,7 +163,7 @@ namespace Hairhub.Service.Services.Services
             voucherResponse = (List<Voucher>)await _unitofwork
                 .GetRepository<Voucher>()
                 .GetListAsync(
-                    predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true,
+                    predicate: x => x.SalonInformationId == id && x.IsSystemCreated != true && x.Quantity>0,
                     include: query => query.Include(s => s.SalonInformation)
                  );
 
