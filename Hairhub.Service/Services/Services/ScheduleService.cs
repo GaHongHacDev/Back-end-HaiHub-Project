@@ -283,6 +283,16 @@ namespace Hairhub.Service.Services.Services
                 throw new Exception("Lịch làm việc không hợp lệ.");
             }
         }
+
+        public async Task<GetScheduleResponse> GetScheduleofDayByEmployeeId(Guid id)
+        {
+            string day = DateTime.Now.DayOfWeek.ToString();
+            var schedules = await _unitOfWork.GetRepository<Schedule>()
+            .SingleOrDefaultAsync(
+                predicate: x => x.EmployeeId == id && x.DayOfWeek == day
+            );
+            return _mapper.Map<GetScheduleResponse>(schedules);
+        }
     }
 }
     

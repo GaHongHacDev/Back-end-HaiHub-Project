@@ -670,5 +670,53 @@ namespace Hairhub.Service.Services.Services
             return paginateResponse;
         }
 
+        public async Task<ResponsePayment> GetCommissionOfPayment(PaymentCommissionInforRequest request)
+        {
+           var account = await _unitOfWork.GetRepository<Domain.Entitities.Account>().SingleOrDefaultAsync(predicate: p => p.Id == request.AccountId);
+               if (account == null) { throw new NotFoundException("Tài khoản này không tồn tại"); }
+           var salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: p => p.AccountId == account.Id, include: i => i.Include(p => p.Account));
+               if (salonOwner == null) { throw new NotFoundException("Owner này không tồn tại"); }
+           var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.OwnerId == salonOwner.Id);
+               if (salonInformation == null) { throw new NotFoundException("Salon này không tồn tại"); }
+           var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.Id == request.ConfigId);
+               if (config == null) { throw new NotFoundException("config này không tồn tại"); }
+            var payment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.AccountId == account.Id && p.Status == PaymentStatus.Fake,
+                                                                                         include: i => i.Include(p => p.Account).Include(p => p.Config));
+
+            var result = new ResponsePayment
+            {
+                Id = payment.Id,
+                TotalAmount = await AmountofCommissionRateInMonthBySalon(salonOwner.Id, (decimal)config.CommissionRate!),
+                PaymentDate = (DateTime)payment.PaymentDate!,
+                PaymentCode = payment.PaymentCode,
+                StartDate = (DateTime)payment.StartDate!,
+                EndDate = (DateTime)payment.EndDate!,
+                SalonOwners = new SalonOwnerPaymentResponse
+                {
+                    Id = salonOwner.Id,
+                    FullName = salonOwner.FullName,
+                    Email = salonOwner.Email,
+                    Phone = salonOwner.Phone,
+                    Address = salonOwner.Address,
+                    Img = salonOwner.Img
+                },
+                Config = new ConfigPaymentResponse
+                {
+                    Id = config.Id,
+                    Description = config.Description,
+                    PakageFee = (decimal)config.PakageFee!,
+                    PakageName = config.PakageName
+                },
+                SalonInformations = new SalonPaymentResponse
+                {
+                    Id = salonInformation.Id,
+                    Name = salonInformation.Name,
+                    Img = salonInformation.Img,
+                    Status =salonInformation.Status,
+                }
+               
+            };
+            return result;
+        }
     }
 }
