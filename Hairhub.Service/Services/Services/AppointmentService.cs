@@ -1294,6 +1294,13 @@ namespace Hairhub.Service.Services.Services
             await _mediaService.DeleteImageAsync(appoinment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
             appoinment.QrCodeImg = "";
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+            //Back tiền nếu đặt qua ví
+            if (appoinment!.PaymentMethod!.Equals("PAYBYWALLET"))
+            {
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == appoinment.Customer.AccountId);
+                account.Balance += appoinment.TotalPrice;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+            }
 
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (isUpdate)
