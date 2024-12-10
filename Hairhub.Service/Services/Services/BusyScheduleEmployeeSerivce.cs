@@ -121,7 +121,7 @@ namespace Hairhub.Service.Services.Services
             {
                 foreach (var item in listBusyDomain)
                 {
-                    listBusyScheduleResponse.Add(new GetBusyScheduleResponse() { StartTime = item.StartTime, EndTime = item.EndTime, Title = item.Note, IsBusySchedule = true });
+                    listBusyScheduleResponse.Add(new GetBusyScheduleResponse() { Id = item.Id, StartTime = item.StartTime, EndTime = item.EndTime, Title = item.Note, IsBusySchedule = true });
                 }
             }
             var listAppointment = await _unitOfWork.GetRepository<Appointment>()
@@ -145,6 +145,7 @@ namespace Hairhub.Service.Services.Services
                     }
                 }
             }
+            listBusyScheduleResponse = listBusyScheduleResponse.OrderBy(s=>s.StartTime).ToList();
             return listBusyScheduleResponse;
         }
 
