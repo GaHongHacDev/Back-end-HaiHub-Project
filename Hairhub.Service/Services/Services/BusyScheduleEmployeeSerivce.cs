@@ -126,7 +126,7 @@ namespace Hairhub.Service.Services.Services
             }
             var listAppointment = await _unitOfWork.GetRepository<Appointment>()
                                                     .GetListAsync(
-                                                                    predicate: x => x.StartDate.Date == dateTime.Date,
+                                                                    predicate: x => x.StartDate.Date == dateTime.Date && x.AppointmentDetails.Any(s=>s.SalonEmployeeId == employeeId),
                                                                     include: x => x.Include(s=>s.AppointmentDetails).Include(s=>s.Customer)
                                                                  );
             if (listAppointment != null)
