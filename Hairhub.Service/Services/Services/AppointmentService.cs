@@ -1119,6 +1119,11 @@ namespace Hairhub.Service.Services.Services
                     };
 
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                    if (voucher.Quantity > 0)
+                    {
+                        voucher.Quantity -= 1;
+                    }
+                    _unitOfWork.GetRepository<Voucher>().UpdateAsync(voucher);
                 }
             }
 
@@ -1294,6 +1299,13 @@ namespace Hairhub.Service.Services.Services
             await _mediaService.DeleteImageAsync(appoinment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
             appoinment.QrCodeImg = "";
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+            //Back tiền nếu đặt qua ví
+            if (appoinment!.PaymentMethod!.Equals("PAYBYWALLET"))
+            {
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == appoinment.Customer.AccountId);
+                account.Balance += appoinment.TotalPrice;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+            }
 
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (isUpdate)
