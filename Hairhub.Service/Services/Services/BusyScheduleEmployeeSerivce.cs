@@ -98,16 +98,16 @@ namespace Hairhub.Service.Services.Services
             return null!;
         }
 
-        public async Task<bool> DeleteofaBusySchedule(Guid employeeID)
+        public async Task<bool> DeleteofaBusySchedule(Guid BusyScheduleId)
         {
             var employee = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
-                                .SingleOrDefaultAsync(predicate: p => p.Id == employeeID && p.Status == BusyScheduleStatus.Successed);
+                                .SingleOrDefaultAsync(predicate: p => p.Id == BusyScheduleId && p.Status == BusyScheduleStatus.Successed);
             if (employee == null)
             {
                 throw new Exception("Nhân viên này không không có lịch bận");
             }
             employee.Status = BusyScheduleStatus.Fail;
-            employee.Id = employeeID;
+            employee.Id = BusyScheduleId;
             _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(employee);
             bool isDeleted = await _unitOfWork.CommitAsync() > 0;
             return isDeleted;
@@ -156,7 +156,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Nhân viên này không tồn tại");
             }
-            var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>().SingleOrDefaultAsync(predicate: p => p.EmployeeId == employee.Id);
+            var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>().SingleOrDefaultAsync(predicate: p => p.EmployeeId == employee.Id && p.Id == request.BusyScheduleId);
 
             CreationOfBusyScheduleResponse response = null;
             string message = string.Empty;
@@ -200,8 +200,9 @@ namespace Hairhub.Service.Services.Services
                     message = $"Bạn không thể thêm lịch bận vì còn lịch hẹn khác:\n{appointmentDetailsMessage}";
                     return message;
                 }
-                busySchedule.StartTime = (DateTime)request.StartDate;
-                busySchedule.EndTime = (DateTime)request.EndDate;
+                busySchedule.Id = request.BusyScheduleId;
+                busySchedule.StartTime = (DateTime)request.StartDate!;
+                busySchedule.EndTime = (DateTime)request.EndDate!;
                 busySchedule.Note = request.Note;
                 _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(busySchedule);
                 await _unitOfWork.CommitAsync();

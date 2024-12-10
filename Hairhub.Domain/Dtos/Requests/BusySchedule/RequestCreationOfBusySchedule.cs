@@ -8,7 +8,7 @@ namespace Hairhub.Domain.Dtos.Requests.BusySchedule
 {
     public class RequestCreationOfBusySchedule
     {
-
+        public Guid BusyScheduleId { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
