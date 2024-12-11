@@ -649,6 +649,20 @@ namespace Hairhub.Service.Services.Services
                     timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                 }
 
+                var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                    .GetListAsync(
+                                                    predicate: x => x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                && x.StartTime.Date == request.Day.Date && x.StartTime >= request.Day
+                                                  );
+
+                foreach (var item in busySchedule)
+                {
+                    decimal start = ParseTimeToDecimal(item.StartTime);
+                    decimal end = ParseTimeToDecimal(item.EndTime);
+                    await Console.Out.WriteLineAsync(start + " : " + end);
+                    timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                }
+
                 foreach (var timeSlot in timeSlotEmployee)
                 {
                     if (availableTimesDict.ContainsKey(timeSlot))
@@ -690,15 +704,9 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop có thể phục vụ dịch vụ này");
                 }
 
-                if (employees == null)
-                {
-                    throw new NotFoundException("Salon hiện không có nhân viên làm việc");
-                }
-
                 var tempAvailableTimes = new Dictionary<decimal, List<EmployeeAvailable>>();
 
                 foreach (var employee in employees)
-                //if (employee.Id.ToString().Equals("3644a197-4c84-4e6d-a4b1-5e9c82363d25"))
                 {
                     // Get schedule by id
                     var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
@@ -724,6 +732,20 @@ namespace Hairhub.Service.Services.Services
                                                                                  && x.Status.Equals(AppointmentStatus.Booking));
 
                     foreach (var item in appointmentDetails)
+                    {
+                        decimal start = ParseTimeToDecimal(item.StartTime);
+                        decimal end = ParseTimeToDecimal(item.EndTime);
+                        await Console.Out.WriteLineAsync(start + " : " + end);
+                        timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                    }
+
+                    var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                        .GetListAsync(
+                                                                        predicate: x=>x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed) 
+                                                                                    && x.StartTime.Date == request.Day.Date && x.StartTime>=request.Day
+                                                                      );
+
+                    foreach (var item in busySchedule)
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
