@@ -954,8 +954,8 @@ namespace Hairhub.Service.Services.Services
                                                             .SingleOrDefaultAsync(
                                                                                   predicate: x=>x.EmployeeId==employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
                                                                                             && (
-                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m)>startTimeProcess)
-                                                                                                || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
+                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m)>startTimeProcess)
+                                                                                                || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) > startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < endTimeProcess)
                                                                                                )
                                                                                  );
                         if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
@@ -999,7 +999,7 @@ namespace Hairhub.Service.Services.Services
                                                         .SingleOrDefaultAsync(
                                                                               predicate: x => x.EmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
                                                                                         && (
-                                                                                            ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m) >= startTimeProcess)
+                                                                                            ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m) > startTimeProcess)
                                                                                             || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
                                                                                            )
                                                                              );
