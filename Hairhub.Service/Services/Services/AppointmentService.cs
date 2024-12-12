@@ -829,9 +829,10 @@ namespace Hairhub.Service.Services.Services
             }
             Decimal endTimeSalon = scheduleSolon.EndTime.Hour + (scheduleSolon.EndTime.Minute) / 60m;
             List<EmployeeAvailable> listEmp = new List<EmployeeAvailable>();
-            Decimal waitingTime = 0;
+            
             for (int i = 0; i < request.BookingDetail.Count(); i++)
             {
+                Decimal waitingTime = 0;
                 var bookingDetail = request.BookingDetail[i];
                 //Get Serrvice Hair
                 var serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
@@ -845,7 +846,9 @@ namespace Hairhub.Service.Services.Services
                 }
                 //Get thời gian kết thúc sau khi thực hiện srv hair
                 startTimeProcess = endTimeProcess ??= request.AvailableSlot;
+                startTimeProcess += waitingTime;
                 endTimeProcess = startTimeProcess + serviceHair.Time;
+
                 //check end time of schedule có đủ thời gian thực hiện srv hair không 
                 if (endTimeSalon < endTimeProcess)
                 {
@@ -881,6 +884,12 @@ namespace Hairhub.Service.Services.Services
                         throw new Exception($"Không đủ thời gian hoặc thiếu nhân viên để thực hiện dịch vụ thứ {i + 1}");
                     }
                 }
+
+                if (waitingTime != 0)
+                {
+                    StartTimeBooking = StartTimeBooking.AddHours((double)waitingTime);
+                }
+                //*****************************************************************************************
                 var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
                 serviceHairResult.StartTime = StartTimeBooking;
                 StartTimeBooking = StartTimeBooking.AddHours((double)serviceHair.Time);
@@ -940,7 +949,16 @@ namespace Hairhub.Service.Services.Services
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                                  || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                         .ToList();
-                        if (appointmentDetails == null || appointmentDetails.Count == 0)
+                        //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
+                        var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                            .SingleOrDefaultAsync(
+                                                                                  predicate: x=>x.EmployeeId==employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                            && (
+                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m)>=startTimeProcess)
+                                                                                                || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
+                                                                                               )
+                                                                                 );
+                        if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                         }
@@ -976,7 +994,16 @@ namespace Hairhub.Service.Services.Services
                                                              || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                              || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                     .ToList();
-                    if (appointmentDetails == null || appointmentDetails.Count == 0)
+                    //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
+                    var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                        .SingleOrDefaultAsync(
+                                                                              predicate: x => x.EmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                        && (
+                                                                                            ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m) >= startTimeProcess)
+                                                                                            || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
+                                                                                           )
+                                                                             );
+                    if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                     }
