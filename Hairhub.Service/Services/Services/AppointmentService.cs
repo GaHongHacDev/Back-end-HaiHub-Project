@@ -1160,7 +1160,7 @@ namespace Hairhub.Service.Services.Services
             }
             foreach (var item in request.AppointmentDetails)
             {
-                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item, AppointmentStatus.Booking);
             }
             if (request.VoucherIds != null && request.VoucherIds.Count > 0)
             {
@@ -1988,7 +1988,7 @@ namespace Hairhub.Service.Services.Services
             }
             foreach (var item in request.AppointmentDetails)
             {
-                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item, AppointmentStatus.OutSide);
             }
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;

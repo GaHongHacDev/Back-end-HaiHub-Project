@@ -20,6 +20,6 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> ActiveSalonEmployee(Guid id);
         Task<bool> CreateAccountEmployee(CreateAccountEmployeeRequest request);
         Task<IList<GetEmployeeHighRatingResponse>> GetEmployeeHighRating(int? numberOfDay);
-        //Task<IList<GetEmployeeHighRatingResponse>> GetEmployeeHighRating(int? );
+        Task<GetEmployeesScheduleResponse> GetEmployeesSchedule(DateTime dateTime, Guid salonId);
     }
 }

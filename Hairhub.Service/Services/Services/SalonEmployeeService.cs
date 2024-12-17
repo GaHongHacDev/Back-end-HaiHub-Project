@@ -60,7 +60,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Email đã tồn tại");
             }
             var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == request.EmployeeId);
-            if (employee.AccountId != null) 
+            if (employee.AccountId != null)
             {
                 throw new NotFoundException("Nhân viên đã có tài khoản");
             }
@@ -72,13 +72,13 @@ namespace Hairhub.Service.Services.Services
             accountEmployee.IsActive = true;
             accountEmployee.CreatedDate = DateTime.Now;
             accountEmployee.Id = Guid.NewGuid();
-            
+
             employee.Email = request.Email;
             employee.AccountId = accountEmployee.Id;
             _unitOfWork.GetRepository<SalonEmployee>().UpdateAsync(employee);
             await _unitOfWork.GetRepository<Account>().InsertAsync(accountEmployee);
-            bool isSuccess = await _unitOfWork.CommitAsync()>0;
-            if (isSuccess) 
+            bool isSuccess = await _unitOfWork.CommitAsync() > 0;
+            if (isSuccess)
             {
                 await _emailService.SendEmailRegisterAccountAsync(request.Email, "Tạo tài khoản thành công trên Hairhub", employee.FullName, accountEmployee.UserName, accountEmployee.Password);
             }
@@ -324,16 +324,65 @@ namespace Hairhub.Service.Services.Services
         {
             var employees = await _unitOfWork.GetRepository<SalonEmployee>()
                                             .GetListAsync(
-                                                          predicate: x => x.IsActive && x.SalonInformation.Status.Equals(SalonStatus.Approved) && x.Rating!=0,
+                                                          predicate: x => x.IsActive && x.SalonInformation.Status.Equals(SalonStatus.Approved) && x.Rating != 0,
                                                             orderBy: q => q.OrderByDescending(s => s.Rating)
                                                                             .ThenByDescending(s => s.RatingCount),
                                                             take: 10
                                                          );
-            if (employees==null)
+            if (employees == null)
             {
                 employees = new List<SalonEmployee>();
             }
             return _mapper.Map<IList<GetEmployeeHighRatingResponse>>(employees);
+        }
+
+        public async Task<GetEmployeesScheduleResponse> GetEmployeesSchedule(DateTime dateTime, Guid salonId)
+        {
+            var response = new GetEmployeesScheduleResponse();
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
+            if (salon == null)
+            {
+                throw new Exception($"Không tìm thấy salon với id {salonId}");
+            }
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive);
+            foreach (var employee in employees)
+            {
+
+                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                    .GetListAsync(
+                                                                    predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == dateTime.Date
+                                                                                && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed) 
+                                                                                    || x.Appointment.Status.Equals(AppointmentStatus.Booking)),
+                                                                    include: x => x.Include(s => s.Appointment).ThenInclude(s => s.Customer),
+                                                                    orderBy: x => x.OrderBy(s => s.StartTime)
+                                                                 );
+                List<WorkSchedule> workSchedules = new List<WorkSchedule>();
+                foreach (var item in appointmentDetails)
+                {
+                    workSchedules.Add(new WorkSchedule()
+                    {
+                        StartTime = item.StartTime,
+                        EndTime = item.EndTime,
+                        Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
+                        Type = item.Status
+                    });
+                }
+                EmployeesSchedule employeesSchedule = new EmployeesSchedule()
+                {
+                    Id = employee.Id,
+                    Address = employee.Address,
+                    DateOfBirth = dateTime.Date,
+                    Email = employee.Email,
+                    FullName = employee.FullName,
+                    Gender = employee.Gender,
+                    Img = employee.Img,
+                    Phone = employee.Phone,
+                    WorkSchedules = workSchedules
+                };
+                response.employeesSchedules.Add(employeesSchedule);
+            }
+
+            return response;
         }
     }
 }
