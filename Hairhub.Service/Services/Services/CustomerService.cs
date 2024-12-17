@@ -305,7 +305,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<GetCustomerByEmailReponse> GetCustomerByEmail(string? email)
         {
             email = email == null? "":email.Trim();
-            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Email.Contains(email));
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Email.Equals(email));
             if (customer == null) 
             {
                 return null;
