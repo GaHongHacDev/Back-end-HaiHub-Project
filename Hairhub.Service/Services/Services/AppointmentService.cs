@@ -17,6 +17,9 @@ using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Common.ThirdParties.Contract;
 using System;
 using CloudinaryDotNet.Actions;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Common.Security;
+using Microsoft.Extensions.Configuration;
 //using CloudinaryDotNet;
 
 
@@ -31,8 +34,9 @@ namespace Hairhub.Service.Services.Services
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
+        private readonly IConfiguration _configuration;
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
-                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
+                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -40,6 +44,7 @@ namespace Hairhub.Service.Services.Services
             _qrCodeService = qrCodeService;
             _emailService = emailService;
             _mediaService = mediaService;
+            _configuration = configuration;
         }
 
         #region GET
@@ -649,6 +654,20 @@ namespace Hairhub.Service.Services.Services
                     timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                 }
 
+                var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                    .GetListAsync(
+                                                    predicate: x => x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                && x.StartTime.Date == request.Day.Date && x.StartTime >= request.Day
+                                                  );
+
+                foreach (var item in busySchedule)
+                {
+                    decimal start = ParseTimeToDecimal(item.StartTime);
+                    decimal end = ParseTimeToDecimal(item.EndTime);
+                    await Console.Out.WriteLineAsync(start + " : " + end);
+                    timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                }
+
                 foreach (var timeSlot in timeSlotEmployee)
                 {
                     if (availableTimesDict.ContainsKey(timeSlot))
@@ -690,15 +709,9 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop có thể phục vụ dịch vụ này");
                 }
 
-                if (employees == null)
-                {
-                    throw new NotFoundException("Salon hiện không có nhân viên làm việc");
-                }
-
                 var tempAvailableTimes = new Dictionary<decimal, List<EmployeeAvailable>>();
 
                 foreach (var employee in employees)
-                //if (employee.Id.ToString().Equals("3644a197-4c84-4e6d-a4b1-5e9c82363d25"))
                 {
                     // Get schedule by id
                     var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
@@ -724,6 +737,20 @@ namespace Hairhub.Service.Services.Services
                                                                                  && x.Status.Equals(AppointmentStatus.Booking));
 
                     foreach (var item in appointmentDetails)
+                    {
+                        decimal start = ParseTimeToDecimal(item.StartTime);
+                        decimal end = ParseTimeToDecimal(item.EndTime);
+                        await Console.Out.WriteLineAsync(start + " : " + end);
+                        timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                    }
+
+                    var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                        .GetListAsync(
+                                                                        predicate: x=>x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed) 
+                                                                                    && x.StartTime.Date == request.Day.Date && x.StartTime>=request.Day
+                                                                      );
+
+                    foreach (var item in busySchedule)
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
@@ -807,9 +834,10 @@ namespace Hairhub.Service.Services.Services
             }
             Decimal endTimeSalon = scheduleSolon.EndTime.Hour + (scheduleSolon.EndTime.Minute) / 60m;
             List<EmployeeAvailable> listEmp = new List<EmployeeAvailable>();
-            Decimal waitingTime = 0;
+            
             for (int i = 0; i < request.BookingDetail.Count(); i++)
             {
+                Decimal waitingTime = 0;
                 var bookingDetail = request.BookingDetail[i];
                 //Get Serrvice Hair
                 var serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
@@ -823,7 +851,9 @@ namespace Hairhub.Service.Services.Services
                 }
                 //Get thời gian kết thúc sau khi thực hiện srv hair
                 startTimeProcess = endTimeProcess ??= request.AvailableSlot;
+                startTimeProcess += waitingTime;
                 endTimeProcess = startTimeProcess + serviceHair.Time;
+
                 //check end time of schedule có đủ thời gian thực hiện srv hair không 
                 if (endTimeSalon < endTimeProcess)
                 {
@@ -859,6 +889,12 @@ namespace Hairhub.Service.Services.Services
                         throw new Exception($"Không đủ thời gian hoặc thiếu nhân viên để thực hiện dịch vụ thứ {i + 1}");
                     }
                 }
+
+                if (waitingTime != 0)
+                {
+                    StartTimeBooking = StartTimeBooking.AddHours((double)waitingTime);
+                }
+                //*****************************************************************************************
                 var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
                 serviceHairResult.StartTime = StartTimeBooking;
                 StartTimeBooking = StartTimeBooking.AddHours((double)serviceHair.Time);
@@ -918,7 +954,16 @@ namespace Hairhub.Service.Services.Services
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                                  || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                         .ToList();
-                        if (appointmentDetails == null || appointmentDetails.Count == 0)
+                        //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
+                        var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                            .SingleOrDefaultAsync(
+                                                                                  predicate: x=>x.EmployeeId==employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                            && (
+                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m)>startTimeProcess)
+                                                                                                || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) > startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < endTimeProcess)
+                                                                                               )
+                                                                                 );
+                        if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                         }
@@ -954,7 +999,16 @@ namespace Hairhub.Service.Services.Services
                                                              || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                              || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                     .ToList();
-                    if (appointmentDetails == null || appointmentDetails.Count == 0)
+                    //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
+                    var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                        .SingleOrDefaultAsync(
+                                                                              predicate: x => x.EmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                        && (
+                                                                                            ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m) > startTimeProcess)
+                                                                                            || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
+                                                                                           )
+                                                                             );
+                    if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                     }
@@ -1842,6 +1896,98 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             return appointmentResponse!;
+        }
+
+
+        public async Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request)
+        {
+
+            //Kiểm tra lịch làm việc employee
+            foreach (var appointmentItem in request.AppointmentDetails)
+            {
+                var appointmentDetailDomain = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                            .SingleOrDefaultAsync(
+                                                                predicate: x => ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
+                                                                                (x.EndTime > appointmentItem.StartTime && x.EndTime <= appointmentItem.EndTime) ||
+                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime >= appointmentItem.EndTime))
+                                                                                && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
+                                                            );
+                if (appointmentDetailDomain != null)
+                {
+                    throw new Exception("Thời gian vừa có khách hàng đặt. Hãy đặt lại ở khung giờ khác nhé");
+                }
+            }
+            Guid customerId;
+            if (request.CustomerId==null)
+            {
+                var role = await _unitOfWork.GetRepository<Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer));
+                if (role == null)
+                {
+                    throw new Exception("Role not found");
+                }
+                Account newAccount = new Account()
+                {
+                    Id = Guid.NewGuid(),
+                    Balance = 0,
+                    CreatedDate = DateTime.UtcNow,
+                    RoleId = role.RoleId,
+                    UserName = request.Email!,
+                    Password = AesEncoding.GenerateRandomPassword(),
+                    IsActive = true,
+                };
+                await _unitOfWork.GetRepository<Account>().InsertAsync(newAccount);
+
+                Customer newCustomer = new Customer()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = newAccount.Id,
+                    Img = _configuration["Default:Avatar_Default"],
+                    Email = request.Email,
+                    NumberOfReported = 0,
+                    FullName = request.FullName!,
+                };
+                await _unitOfWork.GetRepository<Customer>().InsertAsync(newCustomer);
+                customerId = newCustomer.Id;
+                await _emailService.SendEmailWithBodyAsync();
+            }
+            else
+            {
+                customerId = (Guid)request.CustomerId;
+            }
+
+            Guid id = Guid.NewGuid();
+            var appointment = new Appointment()
+            {
+                Id = id,
+                CustomerId = customerId ,
+                CreatedDate = DateTime.Now,
+                StartDate = request.StartDate,
+                TotalPrice = request.TotalPrice,
+                OriginalPrice = request.OriginalPrice,
+                DiscountedPrice = request.DiscountedPrice,
+                Status = AppointmentStatus.OutSide,
+                PaymentMethod = AppointmentPaymentMethod.PayInSalon
+            };
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+
+            if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
+            {
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+            foreach (var item in request.AppointmentDetails)
+            {
+                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+            }
+
+            var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == employeeId);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
+            }
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformationId);
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            return isInsert;
         }
         #endregion
 

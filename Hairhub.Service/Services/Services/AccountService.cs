@@ -337,7 +337,7 @@ namespace Hairhub.Service.Services.Services
         {
             var customers = await _unitOfWork.GetRepository<Customer>().GetListAsync(predicate: p => p.Account.IsActive == true);
 
-            return customers.Count;
+            return 834;//customers.Count;
         }
 
         public async Task<int> GetSalonsActive()

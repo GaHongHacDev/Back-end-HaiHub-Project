@@ -61,6 +61,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, int page, int size);
         Task<List<GetAppointmentResponse>> GetAppointmentGemini(Guid customerId, string? status, DateTime? date);
+        Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request);
     }
 }
 

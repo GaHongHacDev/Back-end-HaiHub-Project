@@ -13,5 +13,6 @@ namespace Hairhub.Domain.Enums
         public const string Fail = "FAILED";
         public const string Successed = "SUCCESSED";
         public const string Fake = "FAKE";
+        public const string OutSide = "OUT_SIDE";
     }
 }

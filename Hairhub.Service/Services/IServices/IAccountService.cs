@@ -1,4 +1,5 @@
 ﻿using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Domain.Dtos.Requests.Appointments;
 using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.AppointmentDetails;
 using Hairhub.Domain.Dtos.Responses.Authentication;

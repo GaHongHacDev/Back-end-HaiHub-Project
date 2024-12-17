@@ -301,6 +301,17 @@ namespace Hairhub.Service.Services.Services
             bool isUpdated = await _unitOfWork.CommitAsync() > 0;
             return isUpdated;
         }
+
+        public async Task<GetCustomerByEmailReponse> GetCustomerByEmail(string? email)
+        {
+            email = email == null? "":email.Trim();
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Email.Contains(email));
+            if (customer == null) 
+            {
+                return null;
+            }
+            return _mapper.Map<GetCustomerByEmailReponse>(customer);
+        }
     }
 }
 
