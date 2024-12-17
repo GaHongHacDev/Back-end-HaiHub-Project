@@ -21,6 +21,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
         public string? Email { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
+        public decimal? TotalPrice { get; set; }
         public List<WorkSchedule> WorkSchedules { get; set; }
     }
 

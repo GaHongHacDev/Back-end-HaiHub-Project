@@ -347,26 +347,30 @@ namespace Hairhub.Service.Services.Services
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive);
             foreach (var employee in employees)
             {
-
-                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                     .GetListAsync(
-                                                                    predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == dateTime.Date
-                                                                                && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed) 
-                                                                                    || x.Appointment.Status.Equals(AppointmentStatus.Booking)),
-                                                                    include: x => x.Include(s => s.Appointment).ThenInclude(s => s.Customer),
-                                                                    orderBy: x => x.OrderBy(s => s.StartTime)
+                                                                    predicate: x => x.AppointmentDetails.Any(s=>s.SalonEmployeeId == employee.Id) && x.StartDate.Date == dateTime.Date
+                                                                                && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) 
+                                                                                    || x.Status.Equals(AppointmentStatus.Booking)),
+                                                                    include: x=>x.Include(s=>s.AppointmentDetails).Include(s=>s.Customer)
                                                                  );
                 List<WorkSchedule> workSchedules = new List<WorkSchedule>();
-                foreach (var item in appointmentDetails)
+                decimal totalPrice=0;
+                foreach (var appointment in appointments)
                 {
-                    workSchedules.Add(new WorkSchedule()
+                    foreach (var item in appointment.AppointmentDetails)
                     {
-                        StartTime = item.StartTime,
-                        EndTime = item.EndTime,
-                        Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
-                        Type = item.Status
-                    });
+                        workSchedules.Add(new WorkSchedule()
+                        {
+                            StartTime = item.StartTime,
+                            EndTime = item.EndTime,
+                            Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
+                            Type = item.Status
+                        });
+                    }
+                    totalPrice += appointment.TotalPrice;
                 }
+                workSchedules.OrderBy(s=>s.StartTime);
                 EmployeesSchedule employeesSchedule = new EmployeesSchedule()
                 {
                     Id = employee.Id,
@@ -377,6 +381,7 @@ namespace Hairhub.Service.Services.Services
                     Gender = employee.Gender,
                     Img = employee.Img,
                     Phone = employee.Phone,
+                    TotalPrice = totalPrice,
                     WorkSchedules = workSchedules
                 };
                 response.employeesSchedules.Add(employeesSchedule);
