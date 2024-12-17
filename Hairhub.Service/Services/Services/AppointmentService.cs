@@ -1920,7 +1920,7 @@ namespace Hairhub.Service.Services.Services
             Guid customerId;
             if (request.CustomerId==null)
             {
-                var role = await _unitOfWork.GetRepository<Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer));
+                var role = await _unitOfWork.GetRepository<Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer.ToString()));
                 if (role == null)
                 {
                     throw new Exception("Role not found");
@@ -1943,12 +1943,13 @@ namespace Hairhub.Service.Services.Services
                     AccountId = newAccount.Id,
                     Img = _configuration["Default:Avatar_Default"],
                     Email = request.Email,
+                    Phone = request.Phone,
                     NumberOfReported = 0,
                     FullName = request.FullName!,
                 };
                 await _unitOfWork.GetRepository<Customer>().InsertAsync(newCustomer);
                 customerId = newCustomer.Id;
-                //await _emailService.SendEmailWithBodyAsync();
+                await _emailService.SendEmailRegisterAccountAsync(request.Email, "Tạo tài khoản Hairhub thành công", request.FullName!, newAccount.UserName, newAccount.Password);
             }
             else
             {
@@ -1978,14 +1979,6 @@ namespace Hairhub.Service.Services.Services
             {
                 await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
             }
-
-            var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == employeeId);
-            if (employee == null)
-            {
-                throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
-            }
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformationId);
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
