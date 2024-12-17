@@ -349,13 +349,13 @@ namespace Hairhub.Service.Services.Services
             {
                 var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                     .GetListAsync(
-                                                                    predicate: x => x.AppointmentDetails.Any(s=>s.SalonEmployeeId == employee.Id) && x.StartDate.Date == dateTime.Date
-                                                                                && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) 
+                                                                    predicate: x => x.AppointmentDetails.Any(s => s.SalonEmployeeId == employee.Id) && x.StartDate.Date == dateTime.Date
+                                                                                && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed)
                                                                                     || x.Status.Equals(AppointmentStatus.Booking)),
-                                                                    include: x=>x.Include(s=>s.AppointmentDetails).Include(s=>s.Customer)
+                                                                    include: x => x.Include(s => s.AppointmentDetails).Include(s => s.Customer)
                                                                  );
                 List<WorkSchedule> workSchedules = new List<WorkSchedule>();
-                decimal totalPrice=0;
+                decimal totalPrice = 0;
                 foreach (var appointment in appointments)
                 {
                     foreach (var item in appointment.AppointmentDetails)
@@ -368,9 +368,12 @@ namespace Hairhub.Service.Services.Services
                             Type = item.Status
                         });
                     }
-                    totalPrice += appointment.TotalPrice;
+                    if (!appointment.Status.Equals(AppointmentStatus.Booking))
+                    {
+                        totalPrice += appointment.TotalPrice;
+                    }
                 }
-                workSchedules.OrderBy(s=>s.StartTime);
+                workSchedules.OrderBy(s => s.StartTime);
                 EmployeesSchedule employeesSchedule = new EmployeesSchedule()
                 {
                     Id = employee.Id,
