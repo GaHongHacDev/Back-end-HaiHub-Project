@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿    using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.API.Hubs;
 using Hairhub.Domain.Dtos.Requests.Accounts;
@@ -96,11 +96,19 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{salonId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetAppointmentSalonByStatus([FromRoute] Guid salonId, [FromQuery]string? status, [FromQuery] bool isAscending, [FromQuery] DateTime? date, [FromQuery] string? customerName,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetAppointmentSalonByStatus(
+            [FromRoute] Guid salonId, 
+            [FromQuery] string? status, 
+            [FromQuery] bool isAscending, 
+            [FromQuery] DateTime? StartDate, 
+            [FromQuery] DateTime? EndDate, 
+            [FromQuery] string? customerName, 
+            [FromQuery] string? employeeName,
+            [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, date, customerName);
+                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, StartDate, EndDate,customerName, employeeName);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });

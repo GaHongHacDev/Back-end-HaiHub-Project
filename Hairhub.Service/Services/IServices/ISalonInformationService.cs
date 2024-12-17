@@ -34,5 +34,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request);
 
         
+
+        
     }
 }
