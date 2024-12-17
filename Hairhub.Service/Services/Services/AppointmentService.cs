@@ -308,24 +308,35 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status, bool isAscending, DateTime? date, string? customerName)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status, bool isAscending, DateTime? StartDate, DateTime? EndDate, string? customerName, string? employeeName)
         {
-            ExpressionStarter<Appointment> predicate;
-            if (date.HasValue)
-            {
-                predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) && x.StartDate.Date == date.Value.Date);
+            var predicate = PredicateBuilder.New<Appointment>(true);
 
-            }
-            else
+            
+            predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+
+
+            if (StartDate.HasValue && EndDate.HasValue)
             {
-                predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+                predicate = predicate.And(x => x.StartDate.Date >= StartDate.Value.Date && x.StartDate.Date <= EndDate.Value.Date);
             }
 
-            if (customerName != null)
+
+            if (!string.IsNullOrWhiteSpace(customerName))
             {
                 customerName = customerName.Trim();
-                predicate = predicate.And(x => x.Customer.FullName.ToUpper().Contains(customerName.ToUpper()));
+                predicate = predicate.And(x =>
+                    x.Customer.FullName.ToUpper().Contains(customerName.ToUpper()));
             }
+
+
+            if (!string.IsNullOrEmpty(employeeName))
+            {
+                employeeName = employeeName.Trim();
+                predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.FullName.ToUpper().Contains(employeeName.ToUpper())));
+            }
+
             if (status == null)
             {
                 status = "";
