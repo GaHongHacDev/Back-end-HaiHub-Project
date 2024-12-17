@@ -1948,7 +1948,7 @@ namespace Hairhub.Service.Services.Services
                 };
                 await _unitOfWork.GetRepository<Customer>().InsertAsync(newCustomer);
                 customerId = newCustomer.Id;
-                await _emailService.SendEmailWithBodyAsync();
+                //await _emailService.SendEmailWithBodyAsync();
             }
             else
             {
