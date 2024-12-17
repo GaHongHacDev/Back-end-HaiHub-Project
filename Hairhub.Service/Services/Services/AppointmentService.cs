@@ -17,6 +17,9 @@ using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Common.ThirdParties.Contract;
 using System;
 using CloudinaryDotNet.Actions;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Common.Security;
+using Microsoft.Extensions.Configuration;
 //using CloudinaryDotNet;
 
 
@@ -31,8 +34,9 @@ namespace Hairhub.Service.Services.Services
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
+        private readonly IConfiguration _configuration;
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
-                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
+                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -40,6 +44,7 @@ namespace Hairhub.Service.Services.Services
             _qrCodeService = qrCodeService;
             _emailService = emailService;
             _mediaService = mediaService;
+            _configuration = configuration;
         }
 
         #region GET
@@ -1891,6 +1896,98 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             return appointmentResponse!;
+        }
+
+
+        public async Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request)
+        {
+
+            //Kiểm tra lịch làm việc employee
+            foreach (var appointmentItem in request.AppointmentDetails)
+            {
+                var appointmentDetailDomain = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                            .SingleOrDefaultAsync(
+                                                                predicate: x => ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
+                                                                                (x.EndTime > appointmentItem.StartTime && x.EndTime <= appointmentItem.EndTime) ||
+                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime >= appointmentItem.EndTime))
+                                                                                && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
+                                                            );
+                if (appointmentDetailDomain != null)
+                {
+                    throw new Exception("Thời gian vừa có khách hàng đặt. Hãy đặt lại ở khung giờ khác nhé");
+                }
+            }
+            Guid customerId;
+            if (request.CustomerId==null)
+            {
+                var role = await _unitOfWork.GetRepository<Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer));
+                if (role == null)
+                {
+                    throw new Exception("Role not found");
+                }
+                Account newAccount = new Account()
+                {
+                    Id = Guid.NewGuid(),
+                    Balance = 0,
+                    CreatedDate = DateTime.UtcNow,
+                    RoleId = role.RoleId,
+                    UserName = request.Email!,
+                    Password = AesEncoding.GenerateRandomPassword(),
+                    IsActive = true,
+                };
+                await _unitOfWork.GetRepository<Account>().InsertAsync(newAccount);
+
+                Customer newCustomer = new Customer()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = newAccount.Id,
+                    Img = _configuration["Default:Avatar_Default"],
+                    Email = request.Email,
+                    NumberOfReported = 0,
+                    FullName = request.FullName!,
+                };
+                await _unitOfWork.GetRepository<Customer>().InsertAsync(newCustomer);
+                customerId = newCustomer.Id;
+                await _emailService.SendEmailWithBodyAsync();
+            }
+            else
+            {
+                customerId = (Guid)request.CustomerId;
+            }
+
+            Guid id = Guid.NewGuid();
+            var appointment = new Appointment()
+            {
+                Id = id,
+                CustomerId = customerId ,
+                CreatedDate = DateTime.Now,
+                StartDate = request.StartDate,
+                TotalPrice = request.TotalPrice,
+                OriginalPrice = request.OriginalPrice,
+                DiscountedPrice = request.DiscountedPrice,
+                Status = AppointmentStatus.OutSide,
+                PaymentMethod = AppointmentPaymentMethod.PayInSalon
+            };
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+
+            if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
+            {
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+            foreach (var item in request.AppointmentDetails)
+            {
+                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+            }
+
+            var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == employeeId);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
+            }
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformationId);
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            return isInsert;
         }
         #endregion
 

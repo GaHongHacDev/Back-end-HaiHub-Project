@@ -167,6 +167,19 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetCustomerByEmail([FromQuery] string? email)
+        {
+            try
+            {
+                var customers = await _customerService.GetCustomerByEmail(email);
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
