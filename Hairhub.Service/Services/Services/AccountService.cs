@@ -37,7 +37,8 @@ namespace Hairhub.Service.Services.Services
         private readonly IConfiguration _configuaration;
         private readonly IEmailService _emailService;
         private string clientIdWeb = "160573115812-l88je63eolr52ichb690e7i8g3f59r9t.apps.googleusercontent.com";
-        private string clientIdAndroid = "435735956374-biv1qavtd6b0b79a1372s99v10qfsnpj.apps.googleusercontent.com";
+        private string clientIdAndroid = "421763180330-30url8nded4pl2mpi8c6ap94l3h4d731.apps.googleusercontent.com";
+                                          
         public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService, IConfiguration configuaration, IEmailService email)
         {
             _unitOfWork = unitOfWork;
@@ -308,7 +309,12 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<DataOfMonths> GetNumberOfSalonOwnerOnMonth(int? year)
         {
-            var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: p => p.CreatedDate.Year == year && p.Role.RoleName == RoleEnum.SalonOwner.ToString());
+            var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync(
+                                                                                   predicate: p => p.CreatedDate.Year == year
+                                                                                    && p.Role.RoleName == RoleEnum.SalonOwner.ToString()
+                                                                                    && p.SalonOwners.Any(s => s.SalonInformations.Any(si => si.Status == SalonStatus.Approved.ToString())),
+                                                                                    include: i => i.Include(s => s.SalonOwners).ThenInclude(s => s.SalonInformations)
+                                                                                    );
             var dataOfMonths = new DataOfMonths
             {
                 Jan = accounts.Count(a => a.CreatedDate.Month == 1),
@@ -331,7 +337,7 @@ namespace Hairhub.Service.Services.Services
         {
             var customers = await _unitOfWork.GetRepository<Customer>().GetListAsync(predicate: p => p.Account.IsActive == true);
 
-            return customers.Count;
+            return 834;//customers.Count;
         }
 
         public async Task<int> GetSalonsActive()

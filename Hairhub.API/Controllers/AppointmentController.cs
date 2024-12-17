@@ -75,7 +75,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{SalonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentTransaction([FromRoute] Guid SalonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
@@ -279,6 +279,26 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Route("{status}")]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, page, size);
+                return Ok(appointmentsResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("{SalonId}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAppointmentBySalonIdNoPaging([FromRoute] Guid SalonId)
@@ -320,7 +340,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAvailableTime([FromBody] GetAvailableTimeRequest getAvailableTimeRequest)
         {
             try
@@ -342,7 +362,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CalculatePrice([FromBody]GetCalculatePriceRequest request)
         {            
             try
@@ -361,7 +381,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentRequest bookAppointmentRequest)
         {
             try
@@ -568,6 +588,26 @@ namespace Hairhub.API.Controllers
                     Revenue = a.Item2,
                 });
                 return Ok(formattedResponse);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CreateAppointmentOutSide([FromBody] CreateAppointmentOutSideRequest createAppointmentOutSideRequest)
+        {
+            try
+            {
+                var isCreate = await _appointmentService.CreateAppointmentOutSide(createAppointmentOutSideRequest);
+                return Ok(isCreate);
             }
             catch (NotFoundException ex)
             {

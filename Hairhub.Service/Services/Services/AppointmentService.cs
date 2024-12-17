@@ -16,6 +16,11 @@ using MailKit.Search;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
 using Hairhub.Common.ThirdParties.Contract;
 using System;
+using CloudinaryDotNet.Actions;
+using Hairhub.Domain.Dtos.Requests.Accounts;
+using Hairhub.Common.Security;
+using Microsoft.Extensions.Configuration;
+//using CloudinaryDotNet;
 
 
 
@@ -29,8 +34,9 @@ namespace Hairhub.Service.Services.Services
         private readonly IQRCodeService _qrCodeService;
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
+        private readonly IConfiguration _configuration;
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
-                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService)
+                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -38,6 +44,7 @@ namespace Hairhub.Service.Services.Services
             _qrCodeService = qrCodeService;
             _emailService = emailService;
             _mediaService = mediaService;
+            _configuration = configuration;
         }
 
         #region GET
@@ -75,67 +82,88 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate)
         {
-            throw new NotImplementedException();
-            /* var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
-             if (salon == null)
-             {
-                 throw new NotFoundException("Không tìm thấy salon, barber shop");
-             }
-             var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
-             predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date>=x.StartDate.Date);
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId, include: x => x.Include(s => s.SalonOwner));
+            if (salon == null)
+            {
+                throw new NotFoundException("Không tìm thấy salon, barber shop");
+            }
+            var predicate = PredicateBuilder.New<Appointment>(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            predicate = predicate.And(x => startDate.Date <= x.StartDate.Date && endDate.Date >= x.StartDate.Date);
 
-             var appointments = await _unitOfWork.GetRepository<Appointment>()
-                                                 .GetListAsync
-                                                 (
-                                                     predicate: predicate,
-                                                     orderBy: x => x.OrderByDescending(x => x.StartDate)
-                                                 );
-             GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
-             var payment = await _unitOfWork.GetRepository<Payment>()
-                                             .SingleOrDefaultAsync(predicate: p => p.SalonOWnerID == salon.OwnerId && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
-             if (payment == null)
-             {
-                 throw new NotFoundException("Không tìm thấy thông tin thanh toán");
-             }
-             if (appointments != null)
-             {
-                 int canceledAppointmentCount = 0;
-                 int successedAppointmentCount = 0;
-                 int failedAppointmentCount = 0;
-                 List<Appointment> appointmentsResponse = new List<Appointment>();
-
-                 foreach (var appointment in appointments)
-                 {
-                     switch (appointment.Status)
-                     {
-                         case AppointmentStatus.Successed:
-                             appointmentsResponse.Add(appointment);
-                             //Tính tiền HH mà salon chưa trả cho system
-                             if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
-                             {
-                                 response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                             }
-                             //Tính tổng tiền HH của salon từ start_date đến end_date
-                             response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
-                             //Tổng appointment thành công
-                             successedAppointmentCount++;
-                             break;
-                         case AppointmentStatus.Fail:
-                             //Tổng appointment thất bại
-                             failedAppointmentCount++;
-                             break;
-                         case AppointmentStatus.CancelByCustomer:
-                             //Tổng appointment bị khách hàng hủy
-                             canceledAppointmentCount++;
-                             break;
-                     }
-                 }
-                 response.CanceledAppointmentCount = canceledAppointmentCount;
-                 response.SuccessedAppointmentCount = successedAppointmentCount;
-                 response.FailedAppointmentCount = failedAppointmentCount;
-                 response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
-             }
-             return response;*/
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync
+                                                (
+                                                    predicate: predicate,
+                                                    orderBy: x => x.OrderByDescending(x => x.StartDate)
+                                                );
+            GetAppointmentTransactionResponse response = new GetAppointmentTransactionResponse();
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == salon.SalonOwner.AccountId);
+            var payment = await _unitOfWork.GetRepository<Payment>()
+                                            .SingleOrDefaultAsync(predicate: p => p.AccountId == account.Id && p.Status == PaymentStatus.Fake, orderBy: x => x.OrderByDescending(s => s.StartDate));
+            if (appointments != null)
+            {
+                int canceledAppointmentCount = 0;
+                int successedAppointmentCount = 0;
+                int failedAppointmentCount = 0;
+                List<Appointment> appointmentsResponse = new List<Appointment>();
+                if (payment == null)
+                {
+                    response.CurrentComssion = 0;
+                    response.TotalComssion = 0;
+                    foreach (var appointment in appointments)
+                    {
+                        switch (appointment.Status)
+                        {
+                            case AppointmentStatus.Successed:
+                                appointmentsResponse.Add(appointment);
+                                successedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.Fail:
+                                //Tổng appointment thất bại
+                                failedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.CancelByCustomer:
+                                //Tổng appointment bị khách hàng hủy
+                                canceledAppointmentCount++;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var appointment in appointments)
+                    {
+                        switch (appointment.Status)
+                        {
+                            case AppointmentStatus.Successed:
+                                appointmentsResponse.Add(appointment);
+                                //Tính tiền HH mà salon chưa trả cho system
+                                if (appointment.StartDate >= payment.StartDate && appointment.StartDate <= payment.EndDate)
+                                {
+                                    response.CurrentComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                                }
+                                //Tính tổng tiền HH của salon từ start_date đến end_date
+                                response.TotalComssion += (appointment.CommissionRate / 100) * appointment.TotalPrice;
+                                //Tổng appointment thành công
+                                successedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.Fail:
+                                //Tổng appointment thất bại
+                                failedAppointmentCount++;
+                                break;
+                            case AppointmentStatus.CancelByCustomer:
+                                //Tổng appointment bị khách hàng hủy
+                                canceledAppointmentCount++;
+                                break;
+                        }
+                    }
+                }
+                response.CanceledAppointmentCount = canceledAppointmentCount;
+                response.SuccessedAppointmentCount = successedAppointmentCount;
+                response.FailedAppointmentCount = failedAppointmentCount;
+                response.AppointmentTransactions = _mapper.Map<List<AppointmentTransaction>>(appointmentsResponse);
+            }
+            return response;
         }
 
         public async Task<IPaginate<GetAppointmentResponse>> GetHistoryAppointmentByCustomerId(int page, int size, Guid CustomerId)
@@ -393,7 +421,7 @@ namespace Hairhub.Service.Services.Services
                     .GetPagingListAsync(
                         predicate: predicate,
                         include: query => query.Include(a => a.Customer)
-                                               .Include(a => a.AppointmentDetails.Where(s=>s.SalonEmployeeId == employeeId))
+                                               .Include(a => a.AppointmentDetails.Where(s => s.SalonEmployeeId == employeeId))
                                                    .ThenInclude(ad => ad.SalonEmployee)
                                                        .ThenInclude(se => se.SalonInformation),
                         orderBy: query => query.OrderBy(a => a.AppointmentDetails!
@@ -626,6 +654,20 @@ namespace Hairhub.Service.Services.Services
                     timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                 }
 
+                var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                    .GetListAsync(
+                                                    predicate: x => x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                && x.StartTime.Date == request.Day.Date && x.StartTime >= request.Day
+                                                  );
+
+                foreach (var item in busySchedule)
+                {
+                    decimal start = ParseTimeToDecimal(item.StartTime);
+                    decimal end = ParseTimeToDecimal(item.EndTime);
+                    await Console.Out.WriteLineAsync(start + " : " + end);
+                    timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                }
+
                 foreach (var timeSlot in timeSlotEmployee)
                 {
                     if (availableTimesDict.ContainsKey(timeSlot))
@@ -667,15 +709,9 @@ namespace Hairhub.Service.Services.Services
                     throw new NotFoundException("Không tìm thấy nhân viên của salon, barber shop có thể phục vụ dịch vụ này");
                 }
 
-                if (employees == null)
-                {
-                    throw new NotFoundException("Salon hiện không có nhân viên làm việc");
-                }
-
                 var tempAvailableTimes = new Dictionary<decimal, List<EmployeeAvailable>>();
 
                 foreach (var employee in employees)
-                //if (employee.Id.ToString().Equals("3644a197-4c84-4e6d-a4b1-5e9c82363d25"))
                 {
                     // Get schedule by id
                     var scheduleEmp = await _unitOfWork.GetRepository<Schedule>()
@@ -701,6 +737,20 @@ namespace Hairhub.Service.Services.Services
                                                                                  && x.Status.Equals(AppointmentStatus.Booking));
 
                     foreach (var item in appointmentDetails)
+                    {
+                        decimal start = ParseTimeToDecimal(item.StartTime);
+                        decimal end = ParseTimeToDecimal(item.EndTime);
+                        await Console.Out.WriteLineAsync(start + " : " + end);
+                        timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
+                    }
+
+                    var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                        .GetListAsync(
+                                                                        predicate: x=>x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed) 
+                                                                                    && x.StartTime.Date == request.Day.Date && x.StartTime>=request.Day
+                                                                      );
+
+                    foreach (var item in busySchedule)
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
@@ -784,9 +834,10 @@ namespace Hairhub.Service.Services.Services
             }
             Decimal endTimeSalon = scheduleSolon.EndTime.Hour + (scheduleSolon.EndTime.Minute) / 60m;
             List<EmployeeAvailable> listEmp = new List<EmployeeAvailable>();
-            Decimal waitingTime = 0;
+            
             for (int i = 0; i < request.BookingDetail.Count(); i++)
             {
+                Decimal waitingTime = 0;
                 var bookingDetail = request.BookingDetail[i];
                 //Get Serrvice Hair
                 var serviceHair = await _unitOfWork.GetRepository<ServiceHair>()
@@ -800,7 +851,9 @@ namespace Hairhub.Service.Services.Services
                 }
                 //Get thời gian kết thúc sau khi thực hiện srv hair
                 startTimeProcess = endTimeProcess ??= request.AvailableSlot;
+                startTimeProcess += waitingTime;
                 endTimeProcess = startTimeProcess + serviceHair.Time;
+
                 //check end time of schedule có đủ thời gian thực hiện srv hair không 
                 if (endTimeSalon < endTimeProcess)
                 {
@@ -836,6 +889,12 @@ namespace Hairhub.Service.Services.Services
                         throw new Exception($"Không đủ thời gian hoặc thiếu nhân viên để thực hiện dịch vụ thứ {i + 1}");
                     }
                 }
+
+                if (waitingTime != 0)
+                {
+                    StartTimeBooking = StartTimeBooking.AddHours((double)waitingTime);
+                }
+                //*****************************************************************************************
                 var serviceHairResult = _mapper.Map<ServiceHairAvalibale>(serviceHair);
                 serviceHairResult.StartTime = StartTimeBooking;
                 StartTimeBooking = StartTimeBooking.AddHours((double)serviceHair.Time);
@@ -895,7 +954,16 @@ namespace Hairhub.Service.Services.Services
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                                  || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                         .ToList();
-                        if (appointmentDetails == null || appointmentDetails.Count == 0)
+                        //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
+                        var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                            .SingleOrDefaultAsync(
+                                                                                  predicate: x=>x.EmployeeId==employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                            && (
+                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m)>startTimeProcess)
+                                                                                                || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) > startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < endTimeProcess)
+                                                                                               )
+                                                                                 );
+                        if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                         }
@@ -931,7 +999,16 @@ namespace Hairhub.Service.Services.Services
                                                              || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                              || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
                                                     .ToList();
-                    if (appointmentDetails == null || appointmentDetails.Count == 0)
+                    //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
+                    var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                                        .SingleOrDefaultAsync(
+                                                                              predicate: x => x.EmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                        && (
+                                                                                            ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m) > startTimeProcess)
+                                                                                            || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
+                                                                                           )
+                                                                             );
+                    if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                     }
@@ -1021,21 +1098,30 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
-            if (!AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) && !AppointmentPaymentMethod.PayInSalon.Equals(request.PaymentMethod) 
-                && !AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod) && request.PaymentMethod!=null)
+            if (!AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) && !AppointmentPaymentMethod.PayInSalon.Equals(request.PaymentMethod)
+                && !AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod) && request.PaymentMethod != null)
             {
                 throw new NotFoundException("Sai tên phương thức thanh toán");
             }
             string paymentMethod = "";
-            if(request.PaymentMethod == null)
+            string status = AppointmentStatus.Booking;
+            if (request.PaymentMethod == null)
             {
                 paymentMethod = AppointmentPaymentMethod.PayInSalon;
             }
             else
             {
+                //if (request.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
+                //{
+                //    status = AppointmentStatus.Fake;
+                //}
+                //else
+                //{
                 paymentMethod = request.PaymentMethod;
+                //}
             }
-            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Id == request.CustomerId, include: x=>x.Include(s=>s.Account));
+
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Id == request.CustomerId, include: x => x.Include(s => s.Account));
             if (customer == null)
             {
                 throw new NotFoundException($"Không tìm thấy khách hàng với id {request.CustomerId}");
@@ -1050,10 +1136,10 @@ namespace Hairhub.Service.Services.Services
                 TotalPrice = request.TotalPrice,
                 OriginalPrice = request.OriginalPrice,
                 DiscountedPrice = request.DiscountedPrice,
-                Status = AppointmentStatus.Booking,
+                Status = status,
                 CommissionRate = config.CommissionRate,
                 QrCodeImg = url,
-                PaymentMethod = request.PaymentMethod
+                PaymentMethod = paymentMethod
             };
             await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
 
@@ -1085,20 +1171,25 @@ namespace Hairhub.Service.Services.Services
                         AppointmentId = appointment.Id,
                         VoucherId = item
                     };
-                    
+
                     await _unitOfWork.GetRepository<AppointmentDetailVoucher>().InsertAsync(appointmentVoucher);
+                    if (voucher.Quantity > 0)
+                    {
+                        voucher.Quantity -= 1;
+                    }
+                    _unitOfWork.GetRepository<Voucher>().UpdateAsync(voucher);
                 }
             }
 
             var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x=>x.Id == employeeId);
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == employeeId);
             if (employee == null)
             {
                 throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
             }
-            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformationId);
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformationId);
             //Tạo payment withdraw
-            if (AppointmentPaymentMethod.PayByBank.Equals(request.PaymentMethod) || AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
+            if (AppointmentPaymentMethod.PayByWallet.Equals(request.PaymentMethod))
             {
                 Payment payment = new Payment()
                 {
@@ -1119,7 +1210,7 @@ namespace Hairhub.Service.Services.Services
                 }
                 _unitOfWork.GetRepository<Account>().UpdateAsync(customer.Account);
             }
-            
+
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return (isInsert, id);
         }
@@ -1262,6 +1353,13 @@ namespace Hairhub.Service.Services.Services
             await _mediaService.DeleteImageAsync(appoinment!.QrCodeImg!, MediaPath.QR_APPOINTMENT);
             appoinment.QrCodeImg = "";
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
+            //Back tiền nếu đặt qua ví
+            if (appoinment!.PaymentMethod!.Equals("PAYBYWALLET"))
+            {
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == appoinment.Customer.AccountId);
+                account.Balance += appoinment.TotalPrice;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+            }
 
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
             if (isUpdate)
@@ -1332,7 +1430,7 @@ namespace Hairhub.Service.Services.Services
             {
                 year = DateTime.Now.Year;
             }
-            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate!.Value.Year == year && p.Status == PaymentStatus.Paid);
+            var payments = await _unitOfWork.GetRepository<Payment>().GetListAsync(predicate: p => p.PaymentDate!.Value.Year == year && p.Status == PaymentStatus.Paid && p.ConfigId != null);
             var dataOfMonths = new DataOfMonths
             {
                 Jan = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 1).Sum(a => a.TotalAmount),
@@ -1577,11 +1675,12 @@ namespace Hairhub.Service.Services.Services
         public async Task<(decimal, int)> RevenueandNumberofAppointment(Guid id, DateTime? startdate, DateTime enddate)
         {
             var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == id);
-            if (employee == null) {
-                throw new Exception("Nhân viên này không tồn tại");     
+            if (employee == null)
+            {
+                throw new Exception("Nhân viên này không tồn tại");
             }
             DateTime startDateFilter = startdate ?? DateTime.MinValue;
-            var revenue =  await  _unitOfWork.GetRepository<Appointment>().GetListAsync(
+            var revenue = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
                           predicate: p => p.AppointmentDetails.Any(detail => detail.SalonEmployeeId == employee.Id) &&
                                           p.StartDate >= startDateFilter &&
                                           p.StartDate <= enddate && p.Status == AppointmentStatus.Successed,
@@ -1649,10 +1748,10 @@ namespace Hairhub.Service.Services.Services
             DateTime startDateFilter = startdate ?? DateTime.MinValue;
             DateTime endDateFilter = enddate ?? DateTime.MaxValue;
 
-            
+
             var results = new List<(DateTime, int, int, int)>();
 
-            
+
             for (DateTime date = startDateFilter.Date; date <= endDateFilter.Date; date = date.AddDays(1))
             {
                 var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
@@ -1692,13 +1791,203 @@ namespace Hairhub.Service.Services.Services
                                     p.StartDate.Date == date && p.Status == AppointmentStatus.Successed,
                     include: x => x.Include(x => x.AppointmentDetails));
 
-                
+
                 decimal revenue = appointments.Sum(p => p.TotalPrice);
 
                 // Thêm kết quả của ngày vào danh sách kết quả
                 results.Add((date, revenue));
             }
             return results;
+        }
+
+        public async Task<bool> UpdateAppointmentFakeById(Guid? accountid, Guid? appointmentid)
+        {
+            var appointmentFake = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == appointmentid);
+            var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: p => p.Id == accountid);
+            if (appointmentFake == null) { throw new NotFoundException("Không tồn tại lịch hẹn"); }
+            appointmentFake.Status = AppointmentStatus.Booking;
+            account.Balance -= appointmentFake.TotalPrice;
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointmentFake);
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+            bool isStatus = await _unitOfWork.CommitAsync() > 0;
+            return isStatus;
+        }
+
+        public async Task<bool> DeleteAppointmentFakeById(Guid id)
+        {
+            var appointmentFake = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: p => p.Id == id);
+            if (appointmentFake == null) { throw new NotFoundException("Không tồn tại lịch hẹn"); }
+            _unitOfWork.GetRepository<Appointment>().DeleteAsync(appointmentFake);
+            bool isStatus = await _unitOfWork.CommitAsync() > 0;
+            return isStatus;
+        }
+
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, int page, int size)
+        {
+            //var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == AccountId);
+            //if (customer == null)
+            //{
+            //    throw new NotFoundException($"Không tìm thấy id của khách hàng");
+            //}
+            status = status == null ? "" : status.Trim();
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetPagingListAsync(
+                    predicate: x => x.Status.Contains(status),
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    page: page,
+                    size: size
+                );
+            var appointmentResponse = new Paginate<GetAppointmentResponse>()
+            {
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+                Items = _mapper.Map<IList<GetAppointmentResponse>>(appointments.Items),
+            };
+            foreach (var item in appointmentResponse.Items)
+            {
+                item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
+            }
+            return appointmentResponse;
+        }
+
+        public async Task<List<GetAppointmentResponse>> GetAppointmentGemini(Guid customerId, string? status, DateTime? date)
+        {
+            status = string.IsNullOrEmpty(status) ? "" : status;
+            ExpressionStarter<Appointment> predicate;
+            if (date.HasValue)
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.CustomerId == customerId && x.Status.Contains(status) && x.StartDate.Date == date.Value.Date);
+
+            }
+            else
+            {
+                predicate = PredicateBuilder.New<Appointment>(x => x.CustomerId == customerId && x.Status.Contains(status));
+            }
+
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                            .GetListAsync(
+                                                predicate: predicate,
+                                                include: query => query.Include(a => a.Customer)
+                                                                       .Include(a => a.AppointmentDetails)
+                                                                           .ThenInclude(ad => ad.SalonEmployee)
+                                                                               .ThenInclude(se => se.SalonInformation),
+                                                orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                                                                        .OrderByDescending(ad => ad.StartTime)!
+                                                .FirstOrDefault()!.StartTime)
+                                            );
+            foreach (var appointment in appointments)
+            {
+                appointment.AppointmentDetails = appointment.AppointmentDetails
+                    .OrderBy(ad => ad.StartTime)
+                    .ToList();
+            }
+
+            var appointmentResponse = _mapper.Map<List<GetAppointmentResponse>>(appointments);
+            if (appointmentResponse != null && appointmentResponse.Count > 0)
+            {
+                foreach (var item in appointmentResponse)
+                {
+                    item.IsFeedback = await _unitOfWork.GetRepository<Feedback>().SingleOrDefaultAsync(predicate: x => x.AppointmentId == item.Id && x.IsActive == true) != null;
+                }
+            }
+            return appointmentResponse!;
+        }
+
+
+        public async Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request)
+        {
+
+            //Kiểm tra lịch làm việc employee
+            foreach (var appointmentItem in request.AppointmentDetails)
+            {
+                var appointmentDetailDomain = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                            .SingleOrDefaultAsync(
+                                                                predicate: x => ((x.StartTime >= appointmentItem.StartTime && x.StartTime < appointmentItem.EndTime) ||
+                                                                                (x.EndTime > appointmentItem.StartTime && x.EndTime <= appointmentItem.EndTime) ||
+                                                                                (x.StartTime <= appointmentItem.StartTime && x.EndTime >= appointmentItem.EndTime))
+                                                                                && x.SalonEmployeeId == appointmentItem.SalonEmployeeId
+                                                            );
+                if (appointmentDetailDomain != null)
+                {
+                    throw new Exception("Thời gian vừa có khách hàng đặt. Hãy đặt lại ở khung giờ khác nhé");
+                }
+            }
+            Guid customerId;
+            if (request.CustomerId==null)
+            {
+                var role = await _unitOfWork.GetRepository<Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer));
+                if (role == null)
+                {
+                    throw new Exception("Role not found");
+                }
+                Account newAccount = new Account()
+                {
+                    Id = Guid.NewGuid(),
+                    Balance = 0,
+                    CreatedDate = DateTime.UtcNow,
+                    RoleId = role.RoleId,
+                    UserName = request.Email!,
+                    Password = AesEncoding.GenerateRandomPassword(),
+                    IsActive = true,
+                };
+                await _unitOfWork.GetRepository<Account>().InsertAsync(newAccount);
+
+                Customer newCustomer = new Customer()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = newAccount.Id,
+                    Img = _configuration["Default:Avatar_Default"],
+                    Email = request.Email,
+                    NumberOfReported = 0,
+                    FullName = request.FullName!,
+                };
+                await _unitOfWork.GetRepository<Customer>().InsertAsync(newCustomer);
+                customerId = newCustomer.Id;
+                await _emailService.SendEmailWithBodyAsync();
+            }
+            else
+            {
+                customerId = (Guid)request.CustomerId;
+            }
+
+            Guid id = Guid.NewGuid();
+            var appointment = new Appointment()
+            {
+                Id = id,
+                CustomerId = customerId ,
+                CreatedDate = DateTime.Now,
+                StartDate = request.StartDate,
+                TotalPrice = request.TotalPrice,
+                OriginalPrice = request.OriginalPrice,
+                DiscountedPrice = request.DiscountedPrice,
+                Status = AppointmentStatus.OutSide,
+                PaymentMethod = AppointmentPaymentMethod.PayInSalon
+            };
+            await _unitOfWork.GetRepository<Appointment>().InsertAsync(appointment);
+
+            if (request.AppointmentDetails == null || request.AppointmentDetails.Count == 0)
+            {
+                throw new NotFoundException("Không tìm thấy đơn đặt lịch");
+            }
+            foreach (var item in request.AppointmentDetails)
+            {
+                await _appointmentDetailService.CreateAppointmentDetailFromAppointment(appointment.Id, item);
+            }
+
+            var employeeId = request.AppointmentDetails[0].SalonEmployeeId;
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == employeeId);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Không tìm thấy nhân viên với id {employeeId}");
+            }
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformationId);
+            bool isInsert = await _unitOfWork.CommitAsync() > 0;
+            return isInsert;
         }
         #endregion
 

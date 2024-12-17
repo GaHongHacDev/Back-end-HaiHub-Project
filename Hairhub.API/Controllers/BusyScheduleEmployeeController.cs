@@ -63,7 +63,6 @@ namespace Hairhub.API.Controllers
         }
         [HttpPut]
         [Route("{id:Guid}")]
-
         public async Task<IActionResult> UpdateBusySchedule([FromRoute] Guid id, [FromBody] RequestCreationOfBusySchedule request)
         {
             try
@@ -74,6 +73,26 @@ namespace Hairhub.API.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{employeeId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonEmployee)]
+        public async Task<IActionResult> GetBusyScheduleEmployee([FromRoute] Guid employeeId, [FromQuery] DateTime dateTime)
+        {
+            try
+            {
+                var busySchedule = await _busyScheduleEmployeeSerivce.GetBusySchedule(employeeId, dateTime);
+                if (busySchedule == null)
+                {
+                    return NotFound(new { message = "Cannot find this schedule!" });
+                }
+                return Ok(busySchedule);
             }
             catch (Exception ex)
             {

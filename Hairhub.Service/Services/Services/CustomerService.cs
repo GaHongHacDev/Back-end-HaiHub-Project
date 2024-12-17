@@ -106,17 +106,19 @@ namespace Hairhub.Service.Services.Services
             appointment.Status = AppointmentStatus.Successed;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
 
-            var employeeId = appointment.AppointmentDetails.ElementAt(0).SalonEmployeeId;
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>()
-                                            .SingleOrDefaultAsync(
-                                                predicate: x=>x.Id == employeeId, 
-                                                include: x=>x.Include(s=>s.SalonInformation.SalonOwner)
-                                            );
-            var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == employee.SalonInformation.SalonOwner.Id);
+            
             if(appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByWallet) || appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
             {
+                var employeeId = appointment.AppointmentDetails.ElementAt(0).SalonEmployeeId;
+                var employee = await _unitOfWork.GetRepository<SalonEmployee>()
+                                                .SingleOrDefaultAsync(
+                                                    predicate: x => x.Id == employeeId,
+                                                    include: x => x.Include(s => s.SalonInformation.SalonOwner)
+                                                );
+                var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformation.SalonOwner.AccountId);
+
                 decimal payMoney = appointment.TotalPrice;
-                if (appointment.AppointmentDetailVouchers != null)
+                if (appointment.AppointmentDetailVouchers != null && appointment.AppointmentDetailVouchers!.Count !=0)
                 {
                     foreach(var item in appointment.AppointmentDetailVouchers)
                     {
@@ -124,13 +126,11 @@ namespace Hairhub.Service.Services.Services
                         if (voucher.IsSystemCreated)
                         {
                             payMoney = appointment.OriginalPrice;
+                            break;
                         }
                     }
                 }
-                else
-                {
-                    payMoney = appointment.OriginalPrice;
-                }
+
                 accountSalon.Balance += payMoney;
                 _unitOfWork.GetRepository<Account>().UpdateAsync(accountSalon);
 
@@ -143,7 +143,7 @@ namespace Hairhub.Service.Services.Services
                     AccountId = accountSalon.Id,
                     AppointmentId = appointment.Id,
                     Description = $"Nhận tiền từ cuộc hẹn với khách hàng {customer!.FullName}",
-                    PaymentDate = DateTime.UtcNow,
+                    PaymentDate = DateTime.Now,
                     TotalAmount = payMoney,
                     PaymentType = PaymentType.Deposit,
                     Status = PaymentStatus.Paid,
@@ -300,6 +300,17 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<StyleHairCustomer>().UpdateAsync(image);
             bool isUpdated = await _unitOfWork.CommitAsync() > 0;
             return isUpdated;
+        }
+
+        public async Task<GetCustomerByEmailReponse> GetCustomerByEmail(string? email)
+        {
+            email = email == null? "":email.Trim();
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Email.Contains(email));
+            if (customer == null) 
+            {
+                return null;
+            }
+            return _mapper.Map<GetCustomerByEmailReponse>(customer);
         }
     }
 }

@@ -49,6 +49,22 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
+        public async Task<IActionResult> GetScheduleofDayByEmployeeId([FromRoute] Guid id)
+        {
+            try
+            {
+                var schedules = await _scheduleService.GetScheduleofDayByEmployeeId(id);
+                return Ok(schedules);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetScheduleById(Guid id) {
             try

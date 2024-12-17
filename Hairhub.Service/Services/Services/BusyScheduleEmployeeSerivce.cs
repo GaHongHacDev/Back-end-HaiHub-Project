@@ -31,97 +31,13 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<string> CreationofaBusySchedule(Guid employeeID, RequestCreationOfBusySchedule request)
         {
-            
+
             var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == employeeID);
             if (employee == null)
             {
                 throw new Exception("Nhân viên này không tồn tại");
             }
 
-            
-            CreationOfBusyScheduleResponse response = null;
-            string message = string.Empty;
-
-            
-            if (request != null)
-            {
-                
-                var appointments = await _unitOfWork.GetRepository<Appointment>()
-                    .GetListAsync(
-                        predicate: p => p.AppointmentDetails
-                            .Any(s => s.SalonEmployeeId == employee.Id && s.StartTime > request.StartDate && s.StartTime <= request.EndDate && s.Status == AppointmentStatus.Booking),
-                        include: s => s.Include(s => s.AppointmentDetails).Include(s => s.Customer),
-                        orderBy: s => s.OrderBy(d => d.StartDate)
-                    );
-
-                
-                if (appointments != null && appointments.Count >= 1)
-                {
-                    var listapp = new List<CreationOfBusyScheduleResponse>();
-
-                    foreach (var appointment in appointments)
-                    {
-                        
-                        var customerName = appointment.Customer != null ? appointment.Customer.FullName : "Unknown Customer";                    
-                        var appointmentDetails = (await _appointmentDetailService.GetAppointmentDetailByAppointmentId(appointment.Id) as List<GetAppointmentDetailResponse>) ?? new List<GetAppointmentDetailResponse>();
-                        response = new CreationOfBusyScheduleResponse
-                        {
-                            CustomerName = customerName,
-                            StartTime = appointment.StartDate.Date,
-                            AppointmentDetails = appointmentDetails
-                        };
-
-                        listapp.Add(response);
-                    }
-                    var appointmentDetailsMessage = string.Join("\n", listapp.Select(app =>
-                        $"Customer Name: {app.CustomerName}, Appointment Start Time: {app.StartTime}, Appointment Details: " +
-                        string.Join(", ", app.AppointmentDetails.Select(ad =>
-                            $"[Start: {ad.StartTime}, End: {ad.EndTime}, Service: {ad.ServiceName}]"))
-                    ));
-                    message = $"Bạn không thể thêm lịch bận vì còn lịch hẹn khác:\n{appointmentDetailsMessage}";
-                    return message;
-                }
-                var busySchedule = new BusyScheduleEmployee
-                {
-                    Id = Guid.NewGuid(),
-                    EmployeeId = employee.Id,
-                    StartTime = request.StartDate ?? DateTime.MinValue, 
-                    EndTime = request.EndDate ?? DateTime.MinValue, 
-                    Note = request.Note,
-                    Status = BusyScheduleStatus.Successed,
-                };
-                await _unitOfWork.GetRepository<BusyScheduleEmployee>().InsertAsync(busySchedule);
-                await _unitOfWork.CommitAsync();
-                message = "Bạn đã thêm lịch bận thành công";
-                return message;
-            }
-            return null;
-        }
-
-        public async Task<bool> DeleteofaBusySchedule(Guid employeeID)
-        {
-            var employee = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
-                                .SingleOrDefaultAsync(predicate: p => p.EmployeeId == employeeID && p.Status == BusyScheduleStatus.Successed);
-            if (employee == null)
-            {
-                throw new Exception("Nhân viên này không không có lịch bận");
-            }
-            employee.Status = BusyScheduleStatus.Fail;
-            employee.Id = employeeID;
-             _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(employee);
-            bool isDeleted = await _unitOfWork.CommitAsync() > 0;
-            return isDeleted;
-
-        }
-
-        public async Task<string> UpdateofaBusySchedule(Guid employeeID, RequestCreationOfBusySchedule request)
-        {
-            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == employeeID);
-            if (employee == null)
-            {
-                throw new Exception("Nhân viên này không tồn tại");
-            }
-            var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>().SingleOrDefaultAsync(predicate: p => p.EmployeeId == employee.Id);
 
             CreationOfBusyScheduleResponse response = null;
             string message = string.Empty;
@@ -165,15 +81,135 @@ namespace Hairhub.Service.Services.Services
                     message = $"Bạn không thể thêm lịch bận vì còn lịch hẹn khác:\n{appointmentDetailsMessage}";
                     return message;
                 }
-                busySchedule.StartTime = (DateTime)request.StartDate;
-                busySchedule.EndTime = (DateTime)request.EndDate;
-                busySchedule.Note = request.Note; 
-                 _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(busySchedule);
+                var busySchedule = new BusyScheduleEmployee
+                {
+                    Id = Guid.NewGuid(),
+                    EmployeeId = employee.Id,
+                    StartTime = request.StartDate ?? DateTime.MinValue,
+                    EndTime = request.EndDate ?? DateTime.MinValue,
+                    Note = request.Note,
+                    Status = BusyScheduleStatus.Successed,
+                };
+                await _unitOfWork.GetRepository<BusyScheduleEmployee>().InsertAsync(busySchedule);
+                await _unitOfWork.CommitAsync();
+                message = "Bạn đã thêm lịch bận thành công";
+                return message;
+            }
+            return null!;
+        }
+
+        public async Task<bool> DeleteofaBusySchedule(Guid BusyScheduleId)
+        {
+            var employee = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
+                                .SingleOrDefaultAsync(predicate: p => p.Id == BusyScheduleId && p.Status == BusyScheduleStatus.Successed);
+            if (employee == null)
+            {
+                throw new Exception("Nhân viên này không không có lịch bận");
+            }
+            employee.Status = BusyScheduleStatus.Fail;
+            employee.Id = BusyScheduleId;
+            _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(employee);
+            bool isDeleted = await _unitOfWork.CommitAsync() > 0;
+            return isDeleted;
+        }
+
+        public async Task<List<GetBusyScheduleResponse>> GetBusySchedule(Guid employeeId, DateTime dateTime)
+        {
+            List<GetBusyScheduleResponse> listBusyScheduleResponse = new List<GetBusyScheduleResponse>();
+            var listBusyDomain = await _unitOfWork.GetRepository<BusyScheduleEmployee>().GetListAsync(predicate: x => x.Status.Equals("SUCCESSED") && x.StartTime.Date == dateTime.Date);
+            if (listBusyDomain != null)
+            {
+                foreach (var item in listBusyDomain)
+                {
+                    listBusyScheduleResponse.Add(new GetBusyScheduleResponse() { Id = item.Id, StartTime = item.StartTime, EndTime = item.EndTime, Title = item.Note, IsBusySchedule = true });
+                }
+            }
+            var listAppointment = await _unitOfWork.GetRepository<Appointment>()
+                                                    .GetListAsync(
+                                                                    predicate: x => x.StartDate.Date == dateTime.Date && x.AppointmentDetails.Any(s=>s.SalonEmployeeId == employeeId),
+                                                                    include: x => x.Include(s=>s.AppointmentDetails).Include(s=>s.Customer)
+                                                                 );
+            if (listAppointment != null)
+            {
+                foreach (var item in listAppointment)
+                {
+                    foreach(var item2 in item.AppointmentDetails)
+                    {
+                        listBusyScheduleResponse.Add(new GetBusyScheduleResponse() { 
+                            IdAppointment = item.Id,
+                            StartTime = item2.StartTime,
+                            EndTime = item2.EndTime, 
+                            Title = $"Lịch hẹn với khách hàng {item.Customer.FullName}", 
+                            IsBusySchedule = false 
+                        });
+                    }
+                }
+            }
+            listBusyScheduleResponse = listBusyScheduleResponse.OrderBy(s=>s.StartTime).ToList();
+            return listBusyScheduleResponse;
+        }
+
+        public async Task<string> UpdateofaBusySchedule(Guid employeeID, RequestCreationOfBusySchedule request)
+        {
+            var employee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: p => p.Id == employeeID);
+            if (employee == null)
+            {
+                throw new Exception("Nhân viên này không tồn tại");
+            }
+            var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>().SingleOrDefaultAsync(predicate: p => p.EmployeeId == employee.Id && p.Id == request.BusyScheduleId);
+
+            CreationOfBusyScheduleResponse response = null;
+            string message = string.Empty;
+
+
+            if (request != null)
+            {
+
+                var appointments = await _unitOfWork.GetRepository<Appointment>()
+                    .GetListAsync(
+                        predicate: p => p.AppointmentDetails
+                            .Any(s => s.SalonEmployeeId == employee.Id && s.StartTime > request.StartDate && s.StartTime <= request.EndDate && s.Status == AppointmentStatus.Booking),
+                        include: s => s.Include(s => s.AppointmentDetails).Include(s => s.Customer),
+                        orderBy: s => s.OrderBy(d => d.StartDate)
+                    );
+
+
+                if (appointments != null && appointments.Count >= 1)
+                {
+                    var listapp = new List<CreationOfBusyScheduleResponse>();
+
+                    foreach (var appointment in appointments)
+                    {
+
+                        var customerName = appointment.Customer != null ? appointment.Customer.FullName : "Unknown Customer";
+                        var appointmentDetails = (await _appointmentDetailService.GetAppointmentDetailByAppointmentId(appointment.Id) as List<GetAppointmentDetailResponse>) ?? new List<GetAppointmentDetailResponse>();
+                        response = new CreationOfBusyScheduleResponse
+                        {
+                            CustomerName = customerName,
+                            StartTime = appointment.StartDate.Date,
+                            AppointmentDetails = appointmentDetails
+                        };
+
+                        listapp.Add(response);
+                    }
+                    var appointmentDetailsMessage = string.Join("\n", listapp.Select(app =>
+                        $"Customer Name: {app.CustomerName}, Appointment Start Time: {app.StartTime}, Appointment Details: " +
+                        string.Join(", ", app.AppointmentDetails.Select(ad =>
+                            $"[Start: {ad.StartTime}, End: {ad.EndTime}, Service: {ad.ServiceName}]"))
+                    ));
+                    message = $"Bạn không thể thêm lịch bận vì còn lịch hẹn khác:\n{appointmentDetailsMessage}";
+                    return message;
+                }
+                busySchedule.Id = request.BusyScheduleId;
+                busySchedule.StartTime = (DateTime)request.StartDate!;
+                busySchedule.EndTime = (DateTime)request.EndDate!;
+                busySchedule.Note = request.Note;
+                _unitOfWork.GetRepository<BusyScheduleEmployee>().UpdateAsync(busySchedule);
                 await _unitOfWork.CommitAsync();
                 message = "Bạn đã cập nhật bận thành công";
                 return message;
             }
-            return null;
+            return null!;
         }
     }
 }

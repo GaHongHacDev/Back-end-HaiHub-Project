@@ -18,6 +18,7 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
         public decimal? CommissionRate { get; set; }
         public string Status { get; set; }
         public bool IsFeedback { get; set; }
+        public string PaymentMethod { get; set; }
         public List<GetAppointmentDetailResponse> AppointmentDetails { get; set; } = new List<GetAppointmentDetailResponse>();
         public AppointmentSalon SalonInformation { get; set; }
         public CustomerAppointment Customer { get; set; }

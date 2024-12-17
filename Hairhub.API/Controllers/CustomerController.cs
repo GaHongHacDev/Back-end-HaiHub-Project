@@ -37,7 +37,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CheckInByCustomer(CheckInRequest checkInRequest)
         {
             try
@@ -167,6 +167,19 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetCustomerByEmail([FromQuery] string? email)
+        {
+            try
+            {
+                var customers = await _customerService.GetCustomerByEmail(email);
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

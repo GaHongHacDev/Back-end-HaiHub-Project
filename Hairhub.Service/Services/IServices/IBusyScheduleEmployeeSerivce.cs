@@ -14,7 +14,9 @@ namespace Hairhub.Service.Services.IServices
 
         Task<string> UpdateofaBusySchedule(Guid employeeID, RequestCreationOfBusySchedule request);
 
-        Task<bool> DeleteofaBusySchedule(Guid employeeID);
+        Task<bool> DeleteofaBusySchedule(Guid BusyScheduleId);
+
+        Task<List<GetBusyScheduleResponse>> GetBusySchedule(Guid employeeId, DateTime dateTime);
 
     }
 }

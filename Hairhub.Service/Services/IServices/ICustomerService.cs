@@ -29,7 +29,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> UpdateCustomerImagesHistory(Guid Id, UpdateCustomerImageHistoryRequest request);
 
-
+        Task<GetCustomerByEmailReponse> GetCustomerByEmail (string email);
         
     }
 }
