@@ -344,6 +344,13 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception($"Không tìm thấy salon với id {salonId}");
             }
+            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x=>x.SalonId == salon.Id && x.DayOfWeek.Equals(dateTime.DayOfWeek));
+            if (salon == null)
+            {
+                throw new Exception("Không tìm thấy lịch làm việc của salon");
+            }
+            response.StartTimeSalon = schedule.StartTime;
+            response.EndTimeSalon = schedule.EndTime;
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive);
             foreach (var employee in employees)
             {
@@ -362,6 +369,7 @@ namespace Hairhub.Service.Services.Services
                     {
                         workSchedules.Add(new WorkSchedule()
                         {
+                            AppointmentId = appointment.Id,
                             StartTime = item.StartTime,
                             EndTime = item.EndTime,
                             Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
