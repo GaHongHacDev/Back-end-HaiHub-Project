@@ -123,7 +123,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonId:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> FrequentlyCustomers(
             [FromRoute] Guid salonId,
             [FromQuery] string? time,
