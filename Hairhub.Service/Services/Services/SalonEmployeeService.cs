@@ -344,8 +344,8 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception($"Không tìm thấy salon với id {salonId}");
             }
-            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x=>x.SalonId == salon.Id && x.DayOfWeek.Equals(dateTime.DayOfWeek));
-            if (salon == null)
+            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x=>x.SalonId == salon.Id && x.DayOfWeek.Equals(dateTime.DayOfWeek.ToString()));
+            if (schedule == null)
             {
                 throw new Exception("Không tìm thấy lịch làm việc của salon");
             }

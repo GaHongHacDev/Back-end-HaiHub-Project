@@ -204,7 +204,7 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetEmployeesWorkSchedule([FromRoute] Guid salonId,[FromQuery] DateTime dateTime)
         {
             try
