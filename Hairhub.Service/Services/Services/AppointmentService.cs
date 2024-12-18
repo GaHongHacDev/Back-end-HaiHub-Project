@@ -20,6 +20,7 @@ using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Common.Security;
 using Microsoft.Extensions.Configuration;
+using Hairhub.Domain.Dtos.Responses.SalonInformations;
 //using CloudinaryDotNet;
 
 
@@ -401,7 +402,95 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse!;
         }
+        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
 
+
+            predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
+                && ad.Status == AppointmentStatus.Successed || ad.Status == AppointmentStatus.OutSide));
+            DateTime currentDate = DateTime.Now;
+            DateTime resultDate;
+
+            if (time!.Contains("ALL"))
+            {
+                resultDate = DateTime.MinValue;
+                predicate = predicate.And(x => x.StartDate.Date <= resultDate);
+            }
+            else if (time!.Contains("DAY"))
+            {
+                resultDate = currentDate.Date;
+                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
+            }
+            else if (time!.Contains("WEEK"))
+            {
+                resultDate = currentDate.AddDays(-7);
+                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
+            }
+            else if (time!.Contains("MONTH"))
+            {
+                resultDate = currentDate.AddDays(-30);
+                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
+            }
+            else if (time!.Contains("YEAR"))
+            {
+                resultDate = currentDate.AddDays(-365);
+                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
+            }
+            else
+            {
+                throw new ArgumentException("Invalid time parameter");
+            }
+
+
+            IEnumerable<Appointment> appointments;
+
+            appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                        .OrderByDescending(ad => ad.StartTime)!
+                        .FirstOrDefault()!.StartTime)
+                );
+
+
+            var statisticsList = appointments
+            .Where(a => a.Customer != null)
+            .GroupBy(a => new { a.Customer.Id, a.Customer.FullName, a.Customer.Phone })
+            .Select(group => new StatictisofCustomer
+            {
+                CustomerID = group.Key.Id,
+                Name = group.Key.FullName,
+                Phone = group.Key.Phone,
+                NumberofSuccessAppointment = group.Count(),
+                TotalPrice = group.Sum(a => a.TotalPrice)
+            })
+            .ToList();
+
+
+            var totalRecords = statisticsList.Count;
+            var totalPages = (int)Math.Ceiling((double)totalRecords / size);
+
+            var pagedStatistics = statisticsList
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToList();
+            var result = new Paginate<StatictisofCustomer>
+            {
+                Page = page,
+                Size = size,
+                Total = totalRecords,
+                TotalPages = totalPages,
+                Items = pagedStatistics
+            };
+
+            return result;
+        }
         public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(Guid employeeId, int page, int size, string? status, bool isAscending, DateTime? date, string? customerName)
         {
             ExpressionStarter<Appointment> predicate;

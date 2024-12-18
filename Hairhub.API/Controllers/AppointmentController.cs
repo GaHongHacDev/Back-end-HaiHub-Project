@@ -122,6 +122,29 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
+        [Route("{salonId:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> FrequentlyCustomers(
+            [FromRoute] Guid salonId,
+            [FromQuery] string? time,
+            [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, page, size, time);
+                if (appointmentResponse == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy khách hàng" });
+                }
+                return Ok(appointmentResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("{employeeId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
         public async Task<IActionResult> GetAppointmentEmployeeByStatus([FromRoute] Guid employeeId, [FromQuery] string? status, [FromQuery] bool isAscending, [FromQuery] DateTime? date, [FromQuery] string? customerName, [FromQuery] int page = 1, [FromQuery] int size = 10)
