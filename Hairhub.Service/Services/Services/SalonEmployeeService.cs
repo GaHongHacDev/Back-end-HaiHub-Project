@@ -335,5 +335,62 @@ namespace Hairhub.Service.Services.Services
             }
             return _mapper.Map<IList<GetEmployeeHighRatingResponse>>(employees);
         }
+
+        public async Task<GetEmployeesScheduleResponse> GetEmployeesSchedule(DateTime dateTime, Guid salonId)
+        {
+            var response = new GetEmployeesScheduleResponse();
+            var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: x => x.Id == salonId);
+            if (salon == null)
+            {
+                throw new Exception($"Không tìm thấy salon với id {salonId}");
+            }
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive);
+            foreach (var employee in employees)
+            {
+                var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                    .GetListAsync(
+                                                                    predicate: x => x.AppointmentDetails.Any(s => s.SalonEmployeeId == employee.Id) && x.StartDate.Date == dateTime.Date
+                                                                                && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed)
+                                                                                    || x.Status.Equals(AppointmentStatus.Booking)),
+                                                                    include: x => x.Include(s => s.AppointmentDetails).Include(s => s.Customer)
+                                                                 );
+                List<WorkSchedule> workSchedules = new List<WorkSchedule>();
+                decimal totalPrice = 0;
+                foreach (var appointment in appointments)
+                {
+                    foreach (var item in appointment.AppointmentDetails)
+                    {
+                        workSchedules.Add(new WorkSchedule()
+                        {
+                            StartTime = item.StartTime,
+                            EndTime = item.EndTime,
+                            Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
+                            Type = item.Status
+                        });
+                    }
+                    if (!appointment.Status.Equals(AppointmentStatus.Booking))
+                    {
+                        totalPrice += appointment.TotalPrice;
+                    }
+                }
+                workSchedules.OrderBy(s => s.StartTime);
+                EmployeesSchedule employeesSchedule = new EmployeesSchedule()
+                {
+                    Id = employee.Id,
+                    Address = employee.Address,
+                    DateOfBirth = dateTime.Date,
+                    Email = employee.Email,
+                    FullName = employee.FullName,
+                    Gender = employee.Gender,
+                    Img = employee.Img,
+                    Phone = employee.Phone,
+                    TotalPrice = totalPrice,
+                    WorkSchedules = workSchedules
+                };
+                response.employeesSchedules.Add(employeesSchedule);
+            }
+
+            return response;
+        }
     }
 }

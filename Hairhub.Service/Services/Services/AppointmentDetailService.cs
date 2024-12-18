@@ -75,7 +75,7 @@ namespace Hairhub.Service.Services.Services
 
         #region CreateAppointment
 
-        public async Task<bool> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest)
+        public async Task<bool> CreateAppointmentDetailFromAppointment(Guid appointmentId, AppointmentDetailRequest createAppointmentDetailRequest, string status)
         {
             var salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.Id == createAppointmentDetailRequest.SalonEmployeeId);
             if (salonEmployee == null)
@@ -92,7 +92,7 @@ namespace Hairhub.Service.Services.Services
             {
                 Id = Guid.NewGuid(),
                 AppointmentId = appointmentId,
-                Status = AppointmentStatus.Booking,
+                Status = status,
                 Description = createAppointmentDetailRequest.Description,
                 EndTime = createAppointmentDetailRequest.EndTime,
                 StartTime = createAppointmentDetailRequest.StartTime,
