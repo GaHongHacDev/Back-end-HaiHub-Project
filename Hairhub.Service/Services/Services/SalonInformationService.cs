@@ -903,32 +903,30 @@ namespace Hairhub.Service.Services.Services
 
             return result;
         }
-        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
+        public async Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
         {
             EmployeeStatictisResponse result = new EmployeeStatictisResponse();
-            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
-            foreach (var employee in employees)
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetPagingListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive, page: page, size: size);
+            foreach (var employee in employees.Items)
             {
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                          .GetPagingListAsync(
+                                                          .GetListAsync(
                                                                         predicate: x=>x.SalonEmployeeId == employee.Id 
                                                                                     && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)),
-                                                                        include: x => x.Include(s => s.Appointment),
-                                                                        page: page,
-                                                                        size: size
+                                                                        include: x => x.Include(s => s.Appointment)
                                                                        );
-                var uniqueCustomerCount = appointmentDetails.Items
+                var uniqueCustomerCount = appointmentDetails
                                             .Select(x => x.Appointment.CustomerId) 
                                             .Distinct()                            
                                             .Count();
-                decimal revenue = appointmentDetails.Items
+                decimal revenue = appointmentDetails
                                                 .Where(ad => ad.PriceServiceHair.HasValue) 
                                                 .Sum(ad => ad.PriceServiceHair.Value);
                 result.EmployeeStatictis.Add(new EmployeeStatictis()
                 {
                     FullName = employee.FullName,
                     Id = employee.Id,
-                    NumberOfService = appointmentDetails.Items.Count(),
+                    NumberOfService = appointmentDetails.Count(),
                     NumberOfUsers = uniqueCustomerCount,
                     Revenue = revenue
                 });
@@ -962,7 +960,14 @@ namespace Hairhub.Service.Services.Services
                     result.EmployeeStatictis.OrderBy(x => x.NumberOfService);
                     break;
             }
-            return result;
+            return new Paginate<EmployeeStatictisResponse>
+            {
+                Page = page,
+                Size = size,
+                Total = employees.Total,
+                TotalPages = employees.TotalPages,
+                Items = (IList<EmployeeStatictisResponse>)result
+            }; 
         }
 
     }
