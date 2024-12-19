@@ -14,7 +14,9 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public int? NumberOfOutsideAppointment { get; set; }
         public int? NumberOfPlatformAppointment { get; set; }
         public int? NumberOfCancelAppointment { get; set; }
-        public int? NumberOfFailedAppointment { get; set; }
+        public int? NumberOfFailedAppointment { get; set; } 
+        public double? RateOfReturnCustomers { get; set; }
+        public decimal? ValueAverageOnProduct { get; set; }
 
     }
 }

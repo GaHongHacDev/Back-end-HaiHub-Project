@@ -78,11 +78,13 @@ namespace Hairhub.API.Controllers
             [FromRoute] Guid salonId,
             [FromQuery] DateTime? StartDate,
             [FromQuery] DateTime? EndDate,
-            [FromQuery] string? filter)
+            [FromQuery] string? filter,
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10)
         {
             try
             {
-                var result = await _salonInformationService.ServiceStatistics(salonId, StartDate, EndDate, filter);
+                var result = await _salonInformationService.ServiceStatistics(salonId, StartDate, EndDate, filter, page, size);
                 if (result == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });

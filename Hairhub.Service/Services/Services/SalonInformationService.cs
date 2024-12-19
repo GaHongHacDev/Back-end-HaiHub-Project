@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Hairhub.Common.ThirdParties.Contract;
 using Hairhub.Common.ThirdParties.Implementation;
 using Hairhub.Domain.Dtos.Requests.SalonEmployees;
@@ -764,22 +765,45 @@ namespace Hairhub.Service.Services.Services
                         .OrderByDescending(ad => ad.StartTime)!
                         .FirstOrDefault()!.StartTime)
                 );
+            var totalRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
+                                            .Sum(a => a.TotalPrice);
+
+            var outsideRevenue = appointments.Where(a => a.Status == AppointmentStatus.OutSide)
+                                              .Sum(a => a.TotalPrice);
+            var platformRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed)
+                                               .Sum(a => a.TotalPrice);
+
+            var totalCustomers = appointments.Select(a => a.Customer.Id).Distinct().Count();
+            var returningCustomers = appointments
+                .GroupBy(a => a.Customer.Id)
+                .Where(g => g.Count() > 1)
+                .Count();
+            double? rateOfReturnCustomers = totalCustomers > 0
+                ? (double)returningCustomers / totalCustomers * 100
+                : 0;
+
+            var totalServicesUsed = appointments.Sum(a => a.AppointmentDetails.Count);
+            decimal? valueAverageOnProduct = totalServicesUsed > 0
+                ? totalRevenue / totalServicesUsed
+                : 0;
 
             var revenueStatistics = new RevenueStatistics
             {
-                TotalRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide).Sum(a => a.TotalPrice),
-                OutsideRevenue = appointments.Where(a => a.Status == AppointmentStatus.OutSide).Sum(a => a.TotalPrice),
-                PlatformRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed).Sum(a => a.TotalPrice),
+                TotalRevenue = totalRevenue,
+                OutsideRevenue = outsideRevenue,
+                PlatformRevenue = platformRevenue,
                 NumberOfOutsideAppointment = appointments.Count(a => a.Status == AppointmentStatus.OutSide),
                 NumberOfPlatformAppointment = appointments.Count(a => a.Status == AppointmentStatus.Successed),
                 NumberOfCancelAppointment = appointments.Count(a => a.Status == AppointmentStatus.CancelByCustomer),
-                NumberOfFailedAppointment = appointments.Count(a => a.Status == AppointmentStatus.Fail)
+                NumberOfFailedAppointment = appointments.Count(a => a.Status == AppointmentStatus.Fail),
+                RateOfReturnCustomers = rateOfReturnCustomers,
+                ValueAverageOnProduct = valueAverageOnProduct
             };
 
             return revenueStatistics;
         }
 
-        public async Task<List<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter)
+        public async Task<IPaginate<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter, int page, int size)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
@@ -840,28 +864,44 @@ namespace Hairhub.Service.Services.Services
             switch (filter)
             {
                 case "Số lượng sử dụng tăng dần":
-                    list.OrderBy(x => x.NumberOfUses).ToList();
+                    list = list.OrderBy(x => x.NumberOfUses).ToList();
                     break;
                 case "Số lượng sử dụng giảm dần":
-                    list.OrderByDescending(x => x.NumberOfUses).ToList();
+                    list = list.OrderByDescending(x => x.NumberOfUses).ToList();
                     break;
                 case "Số lượng khách tăng dần":
-                    list.OrderBy(x => x.NumberOfCustomers).ToList();
+                    list = list.OrderBy(x => x.NumberOfCustomers).ToList();
                     break;
                 case "Số lượng khách giảm dần":
-                    list.OrderByDescending(x => x.NumberOfCustomers).ToList();
+                    list = list.OrderByDescending(x => x.NumberOfCustomers).ToList();
                     break;
                 case "Số doanh thu tăng dần":
-                    list.OrderBy(x => x.RevenueFromService).ToList();
+                    list = list.OrderBy(x => x.RevenueFromService).ToList();
                     break;
                 case "Số doanh thu giảm dần":
-                    list.OrderByDescending(x => x.RevenueFromService).ToList();
+                    list = list.OrderByDescending(x => x.RevenueFromService).ToList();
                     break;
                 default:
-                    list.OrderBy(x => x.NumberOfUses).ToList();
+                    list = list.OrderBy(x => x.NumberOfUses).ToList();
                     break;
             }
-            return list;
+            var totalRecords = list.Count;
+            var totalPages = (int)Math.Ceiling((double)totalRecords / size);
+
+            var pagedStatistics = list
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToList();
+            var result = new Paginate<ServiceStatistics>
+            {
+                Page = page,
+                Size = size,
+                Total = totalRecords,
+                TotalPages = totalPages,
+                Items = pagedStatistics
+            };
+
+            return result;
         }
         public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter)
         {
@@ -924,5 +964,6 @@ namespace Hairhub.Service.Services.Services
             }
             return result;
         }
+
     }
 }
