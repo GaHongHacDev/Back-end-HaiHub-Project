@@ -73,15 +73,16 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         [Route("{salonId:Guid}")]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> ServiceStatistics(
             [FromRoute] Guid salonId,
             [FromQuery] DateTime? StartDate,
-            [FromQuery] DateTime? EndDate)
+            [FromQuery] DateTime? EndDate,
+            [FromQuery] string? filter)
         {
             try
             {
-                var result = await _salonInformationService.ServiceStatistics(salonId, StartDate, EndDate);
+                var result = await _salonInformationService.ServiceStatistics(salonId, StartDate, EndDate, filter);
                 if (result == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });

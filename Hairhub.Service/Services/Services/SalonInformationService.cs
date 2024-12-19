@@ -737,7 +737,6 @@ namespace Hairhub.Service.Services.Services
             return result;
         }
 
-<<<<<<< HEAD
         public async Task<RevenueStatistics> RevenueStatistics(Guid salonId, DateTime? startDate, DateTime? endDate)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
@@ -780,7 +779,7 @@ namespace Hairhub.Service.Services.Services
             return revenueStatistics;
         }
 
-        public async Task<List<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate)
+        public async Task<List<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
@@ -834,8 +833,36 @@ namespace Hairhub.Service.Services.Services
                     NumberOfCustomers = numberOfCustomers
                 });
             }
+            if (filter.IsNullOrEmpty())
+            {
+                filter = "";
+            }
+            switch (filter)
+            {
+                case "Số lượng sử dụng tăng dần":
+                    list.OrderBy(x => x.NumberOfUses).ToList();
+                    break;
+                case "Số lượng sử dụng giảm dần":
+                    list.OrderByDescending(x => x.NumberOfUses).ToList();
+                    break;
+                case "Số lượng khách tăng dần":
+                    list.OrderBy(x => x.NumberOfCustomers).ToList();
+                    break;
+                case "Số lượng khách giảm dần":
+                    list.OrderByDescending(x => x.NumberOfCustomers).ToList();
+                    break;
+                case "Số doanh thu tăng dần":
+                    list.OrderBy(x => x.RevenueFromService).ToList();
+                    break;
+                case "Số doanh thu giảm dần":
+                    list.OrderByDescending(x => x.RevenueFromService).ToList();
+                    break;
+                default:
+                    list.OrderBy(x => x.NumberOfUses).ToList();
+                    break;
+            }
             return list;
-=======
+        }
         public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter)
         {
             EmployeeStatictisResponse result = new EmployeeStatictisResponse();
@@ -894,7 +921,6 @@ namespace Hairhub.Service.Services.Services
                     break;
             }
             return result;
->>>>>>> 1a9f71d06e2c8aae4975f2233820a3f0201e2961
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Hairhub.Service.Services.IServices
         Task<GetSalonInformationResponse>? GetSalonInformationById(Guid id);
         Task<GetSalonInformationResponse>? GetSalonByEmployeeId(Guid id);
 
-        Task<List<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate);
+        Task<List<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter);
         Task<RevenueStatistics> RevenueStatistics(Guid salonId, DateTime? startDate, DateTime? endDate);
         Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest);
         Task<bool> UpdateSalonInformationById(Guid id, UpdateSalonInformationRequest updateSalonInformationRequest);
