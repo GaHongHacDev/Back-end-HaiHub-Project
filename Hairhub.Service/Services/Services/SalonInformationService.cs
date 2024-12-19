@@ -737,30 +737,32 @@ namespace Hairhub.Service.Services.Services
             return result;
         }
 
-        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter)
+        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
         {
             EmployeeStatictisResponse result = new EmployeeStatictisResponse();
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
             foreach (var employee in employees)
             {
-                ICollection<AppointmentDetail> appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                          .GetListAsync(
+                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                                          .GetPagingListAsync(
                                                                         predicate: x=>x.SalonEmployeeId == employee.Id 
                                                                                     && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)),
-                                                                        include: x=>x.Include(s=>s.Appointment)
+                                                                        include: x => x.Include(s => s.Appointment),
+                                                                        page: page,
+                                                                        size: size
                                                                        );
-                var uniqueCustomerCount = appointmentDetails
+                var uniqueCustomerCount = appointmentDetails.Items
                                             .Select(x => x.Appointment.CustomerId) 
                                             .Distinct()                            
                                             .Count();
-                decimal revenue = appointmentDetails
+                decimal revenue = appointmentDetails.Items
                                                 .Where(ad => ad.PriceServiceHair.HasValue) 
                                                 .Sum(ad => ad.PriceServiceHair.Value);
                 result.EmployeeStatictis.Add(new EmployeeStatictis()
                 {
                     FullName = employee.FullName,
                     Id = employee.Id,
-                    NumberOfService = appointmentDetails.Count(),
+                    NumberOfService = appointmentDetails.Items.Count(),
                     NumberOfUsers = uniqueCustomerCount,
                     Revenue = revenue
                 });

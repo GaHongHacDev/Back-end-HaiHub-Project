@@ -35,6 +35,6 @@ namespace Hairhub.Service.Services.IServices
 
         Task<CompileRevenueSalonByYearResponse> CompileRevenueSalonByYear(Guid salonId, int year);
         Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid salonId, int year);
-        Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter);
+        Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size);
     }
 }
