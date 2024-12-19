@@ -903,7 +903,7 @@ namespace Hairhub.Service.Services.Services
 
             return result;
         }
-        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter)
+        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
         {
             EmployeeStatictisResponse result = new EmployeeStatictisResponse();
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
