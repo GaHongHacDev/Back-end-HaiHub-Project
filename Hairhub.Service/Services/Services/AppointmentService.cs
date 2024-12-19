@@ -414,9 +414,8 @@ namespace Hairhub.Service.Services.Services
             DateTime resultDate;
 
             if (time!.Contains("ALL"))
-            {
-                resultDate = DateTime.MinValue;
-                predicate = predicate.And(x => x.StartDate.Date <= resultDate);
+            {                
+                predicate = predicate.And(x => x.StartDate.Date <= currentDate);
             }
             else if (time!.Contains("DAY"))
             {

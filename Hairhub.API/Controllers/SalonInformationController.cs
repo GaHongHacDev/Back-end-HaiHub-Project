@@ -49,6 +49,51 @@ namespace Hairhub.API.Controllers
             var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(name, status, page, size);
             return Ok(salonInformationsResponse);
         }
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> RevenueStatistics(
+            [FromRoute] Guid salonId,
+            [FromQuery] DateTime? StartDate,
+            [FromQuery] DateTime? EndDate)
+        {
+            try
+            {
+                var result = await _salonInformationService.RevenueStatistics(salonId, StartDate, EndDate);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> ServiceStatistics(
+            [FromRoute] Guid salonId,
+            [FromQuery] DateTime? StartDate,
+            [FromQuery] DateTime? EndDate,
+            [FromQuery] string? filter)
+        {
+            try
+            {
+                var result = await _salonInformationService.ServiceStatistics(salonId, StartDate, EndDate, filter);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetSalonSuggestion()

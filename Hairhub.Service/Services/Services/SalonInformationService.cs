@@ -737,7 +737,133 @@ namespace Hairhub.Service.Services.Services
             return result;
         }
 
-        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
+        public async Task<RevenueStatistics> RevenueStatistics(Guid salonId, DateTime? startDate, DateTime? endDate)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+
+            predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+            } else
+            {
+                predicate = predicate.And(x =>  x.StartDate <= DateTime.Now);
+            }
+            IEnumerable<Appointment> appointments;
+
+            appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                        .OrderByDescending(ad => ad.StartTime)!
+                        .FirstOrDefault()!.StartTime)
+                );
+
+            var revenueStatistics = new RevenueStatistics
+            {
+                TotalRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide).Sum(a => a.TotalPrice),
+                OutsideRevenue = appointments.Where(a => a.Status == AppointmentStatus.OutSide).Sum(a => a.TotalPrice),
+                PlatformRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed).Sum(a => a.TotalPrice),
+                NumberOfOutsideAppointment = appointments.Count(a => a.Status == AppointmentStatus.OutSide),
+                NumberOfPlatformAppointment = appointments.Count(a => a.Status == AppointmentStatus.Successed),
+                NumberOfCancelAppointment = appointments.Count(a => a.Status == AppointmentStatus.CancelByCustomer),
+                NumberOfFailedAppointment = appointments.Count(a => a.Status == AppointmentStatus.Fail)
+            };
+
+            return revenueStatistics;
+        }
+
+        public async Task<List<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+
+            predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+            }
+            else
+            {
+                predicate = predicate.And(x => x.StartDate <= DateTime.Now);
+            }
+            IEnumerable<Appointment> appointments;
+
+            appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate.And(x => x.Status == AppointmentStatus.OutSide || x.Status == AppointmentStatus.Successed),
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                        .OrderByDescending(ad => ad.StartTime)!
+                        .FirstOrDefault()!.StartTime)
+                );
+            var services = await _unitOfWork.GetRepository<ServiceHair>()
+                .GetListAsync(predicate: p => p.SalonInformationId == salonId);
+
+            List<ServiceStatistics> list = new List<ServiceStatistics>();
+            foreach (var service in services)
+            {
+                var appointmentDetailsWithService = appointments.SelectMany(a => a.AppointmentDetails).Where(ad => ad.ServiceName == service.ServiceName);
+
+                var numberOfUses = appointmentDetailsWithService.Count();
+
+                var revenueFromService = appointmentDetailsWithService.Sum(ad => ad.PriceServiceHair);
+
+                var numberOfCustomers = appointments
+                    .Where(a => a.AppointmentDetails.Any(ad => ad.ServiceName == service.ServiceName))
+                    .Select(a => a.Customer.Id)
+                    .Distinct()
+                    .Count();
+
+                list.Add(new ServiceStatistics
+                {
+                    ServiceName = service.ServiceName,
+                    NumberOfUses = numberOfUses,
+                    RevenueFromService = revenueFromService,
+                    NumberOfCustomers = numberOfCustomers
+                });
+            }
+            if (filter.IsNullOrEmpty())
+            {
+                filter = "";
+            }
+            switch (filter)
+            {
+                case "Số lượng sử dụng tăng dần":
+                    list.OrderBy(x => x.NumberOfUses).ToList();
+                    break;
+                case "Số lượng sử dụng giảm dần":
+                    list.OrderByDescending(x => x.NumberOfUses).ToList();
+                    break;
+                case "Số lượng khách tăng dần":
+                    list.OrderBy(x => x.NumberOfCustomers).ToList();
+                    break;
+                case "Số lượng khách giảm dần":
+                    list.OrderByDescending(x => x.NumberOfCustomers).ToList();
+                    break;
+                case "Số doanh thu tăng dần":
+                    list.OrderBy(x => x.RevenueFromService).ToList();
+                    break;
+                case "Số doanh thu giảm dần":
+                    list.OrderByDescending(x => x.RevenueFromService).ToList();
+                    break;
+                default:
+                    list.OrderBy(x => x.NumberOfUses).ToList();
+                    break;
+            }
+            return list;
+        }
+        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter)
         {
             EmployeeStatictisResponse result = new EmployeeStatictisResponse();
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
