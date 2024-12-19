@@ -36,7 +36,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request);
 
-        Task<CompileRevenueSalonByYearResponse> CompileRevenueSalonByYear(Guid SalonId, int Year);
-        Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid SalonId, int Year);
+        Task<CompileRevenueSalonByYearResponse> CompileRevenueSalonByYear(Guid salonId, int year);
+        Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid salonId, int year);
+        Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter);
     }
 }
