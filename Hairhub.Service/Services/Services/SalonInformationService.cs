@@ -469,10 +469,10 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> AddSalonInformationImages(Guid Salonid, AddSalonImagesRequest request)
         {
             var salon = await _unitOfWork.GetRepository<SalonInformation>().SingleOrDefaultAsync(predicate: p => p.Id == Salonid);
-            if (salon == null) throw new Exception("Salon không tồn tại") ;
+            if (salon == null) throw new Exception("Salon không tồn tại");
 
-                for (int i = 0; i < request.SalonImages.Count; i++)
-                {
+            for (int i = 0; i < request.SalonImages.Count; i++)
+            {
                 var urlImg = await _mediaService.UploadAnImage(request.SalonImages[i], MediaPath.SALONINFORMATION_IMG, salon.Id.ToString() + "/" + i.ToString());
                 //var urlVideo = await _mediaservice.UploadAVideo(request.Video, MediaPath.FEEDBACK_VIDEO, newFeedback.Id.ToString());
                 StaticFile staticFile = new StaticFile()
@@ -482,9 +482,9 @@ namespace Hairhub.Service.Services.Services
                     Img = urlImg,
                 };
                 await _unitOfWork.GetRepository<StaticFile>().InsertAsync(staticFile);
-                }
-           bool isSuccessed = await _unitOfWork.CommitAsync() > 0;
-           return isSuccessed;
+            }
+            bool isSuccessed = await _unitOfWork.CommitAsync() > 0;
+            return isSuccessed;
         }
 
         public async Task<IPaginate<SalonInformationImagesResponse>> GetSalonInformationImages(Guid salonid, int page, int size)
@@ -496,7 +496,7 @@ namespace Hairhub.Service.Services.Services
 
             if (salonImages == null) throw new Exception("Salon không có hình");
 
-            
+
             var salonInformationResponses = new Paginate<SalonInformationImagesResponse>()
             {
                 Page = salonImages.Page,
@@ -511,16 +511,230 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request)
         {
             bool isDeleted = false;
-            if (request != null) {
-                foreach(var imageid in request.ImagesId)
+            if (request != null)
+            {
+                foreach (var imageid in request.ImagesId)
                 {
                     var image = await _unitOfWork.GetRepository<StaticFile>().SingleOrDefaultAsync(predicate: p => p.Id == imageid);
                     _unitOfWork.GetRepository<StaticFile>().DeleteAsync(image);
                 }
-                 isDeleted = await _unitOfWork.CommitAsync() > 0;
-            
+                isDeleted = await _unitOfWork.CommitAsync() > 0;
+
             }
-            return isDeleted;   
+            return isDeleted;
+        }
+
+        private async Task<decimal> CaculateRevenue(int endDay, int month, int year, Guid SalonId, string statusAppointment)
+        {
+            DateTime StartTime = new DateTime(year, month, 1);
+            DateTime EndTime = new DateTime(year, month, endDay);
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync(
+                                                                predicate: x => x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == SalonId)
+                                                                            && x.StartDate.Date >= StartTime.Date && x.StartDate <= EndTime.Date && x.Status.Equals(statusAppointment)
+                                                             );
+            decimal result = 0;
+            foreach (var appointment in appointments)
+            {
+                result += appointment.TotalPrice;
+            }
+            return result;
+        }
+
+        public async Task<CompileRevenueSalonByYearResponse> CompileRevenueSalonByYear(Guid SalonId, int Year)
+        {
+            CompileRevenueSalonByYearResponse result = new CompileRevenueSalonByYearResponse();
+            decimal totalInSideRevenue = 0;
+            decimal totalOutSideRevenue = 0;
+            decimal totalRevenue = 0;
+            for (int i = 1; i <= 12; i++)
+            {
+                decimal tempInsideRevenue = 0, tempOutSideRevenue = 0;
+                switch (i)
+                {
+                    case 1:
+                        tempInsideRevenue = await CaculateRevenue(31, 1, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 1, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 2:
+                        if((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0)){
+                            tempInsideRevenue = await CaculateRevenue(29, 2, Year, SalonId, AppointmentStatus.Successed);
+                            tempOutSideRevenue = await CaculateRevenue(29, 2, Year, SalonId, AppointmentStatus.OutSide);
+                        }
+                        else
+                        {
+                            tempInsideRevenue = await CaculateRevenue(28, 2, Year, SalonId, AppointmentStatus.Successed);
+                            tempOutSideRevenue = await CaculateRevenue(28, 2, Year, SalonId, AppointmentStatus.OutSide);
+                        }
+                        break;
+                    case 3:
+                        tempInsideRevenue = await CaculateRevenue(31, 3, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 3, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 4:
+                        tempInsideRevenue = await CaculateRevenue(30, 4, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(30, 4, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 5:
+                        tempInsideRevenue = await CaculateRevenue(31, 5, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 5, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 6:
+                        tempInsideRevenue = await CaculateRevenue(30, 6, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(30, 6, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 7:
+                        tempInsideRevenue = await CaculateRevenue(31, 7, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 7, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 8:
+                        tempInsideRevenue = await CaculateRevenue(31, 8, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 8, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 9:
+                        tempInsideRevenue = await CaculateRevenue(30, 9, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(30, 9, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 10:
+                        tempInsideRevenue = await CaculateRevenue(31, 10, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 10, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 11:
+                        tempInsideRevenue = await CaculateRevenue(30, 11, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(30, 11, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                    case 12:
+                        tempInsideRevenue = await CaculateRevenue(31, 12, Year, SalonId, AppointmentStatus.Successed);
+                        tempOutSideRevenue = await CaculateRevenue(31, 12, Year, SalonId, AppointmentStatus.OutSide);
+                        break;
+                }
+
+                totalInSideRevenue += tempInsideRevenue;
+                totalOutSideRevenue += tempOutSideRevenue;
+                result.revenuewStatistics.Add(new RevenueStatistic()
+                {
+                    InSideRevenue = tempInsideRevenue,
+                    OutSideRevenue = tempOutSideRevenue,
+                    TotalRevenue = tempInsideRevenue + tempOutSideRevenue,
+                    Month = $"Tháng {i}"
+                });
+            }
+
+            totalRevenue = totalInSideRevenue + totalOutSideRevenue;
+            if (totalRevenue == 0)
+            {
+                result.OutSideRevenuePercent = 0;
+                result.InSideRevenuePercent = 0;
+            }
+            else
+            {
+                result.OutSideRevenuePercent = (totalOutSideRevenue / totalRevenue) * 100;
+                result.InSideRevenuePercent = (totalInSideRevenue/ totalRevenue) * 100;
+            }
+            return result;
+        }
+
+        private async Task<long> CaculateNumberOfAppointment(int endDay, int month, int year, Guid SalonId, string statusAppointment)
+        {
+            DateTime StartTime = new DateTime(year, month, 1);
+            DateTime EndTime = new DateTime(year, month, endDay);
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync(
+                                                                predicate: x => x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == SalonId)
+                                                                            && x.StartDate.Date >= StartTime.Date && x.StartDate <= EndTime.Date && x.Status.Equals(statusAppointment)
+                                                             );
+            return appointments.Count();
+        }
+
+        public async Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid SalonId, int Year)
+        {
+            CompileAppointmentSalonByYearResponse result = new CompileAppointmentSalonByYearResponse();
+            long totalInSideAppointment = 0, totalOutSideAppointment = 0, totalCancelAppointment = 0, totalFailedAppointment = 0;
+            for (int i = 1; i <= 12; i++)
+            {
+                int endDay = 0;
+                switch (i)
+                {
+                    case 1:
+                        endDay = 31;
+                        break;
+                    case 2:
+                        if ((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0))
+                        {
+                            endDay = 29;
+                        }
+                        else
+                        {
+                            endDay = 28;
+                        }
+                        break;
+                    case 3:
+                        endDay = 31;
+                        break;
+                    case 4:
+                        endDay = 30;
+                        break;
+                    case 5:
+                        endDay = 31;
+                        break;
+                    case 6:
+                        endDay = 30;
+                        break;
+                    case 7:
+                        endDay = 31;
+                        break;
+                    case 8:
+                        endDay = 31;
+                        break;
+                    case 9:
+                        endDay = 30;
+                        break;
+                    case 10:
+                        endDay = 31;
+                        break;
+                    case 11:
+                        endDay = 30;
+                        break;
+                    case 12:
+                        endDay = 31;
+                        break;
+                }
+                long tempInSideAppointment = await CaculateNumberOfAppointment(endDay, i, Year, SalonId, AppointmentStatus.Successed);
+                long tempOutSideAppointment = await CaculateNumberOfAppointment(endDay, i, Year, SalonId, AppointmentStatus.OutSide);
+                long tempCancelAppointment = await CaculateNumberOfAppointment(endDay, i, Year, SalonId, AppointmentStatus.CancelByCustomer);
+                long tempFailedAppointment = await CaculateNumberOfAppointment(endDay, i, Year, SalonId, AppointmentStatus.Fail);
+
+                totalInSideAppointment += tempInSideAppointment;
+                totalOutSideAppointment += tempOutSideAppointment;
+                totalCancelAppointment += tempCancelAppointment;
+                totalFailedAppointment += tempFailedAppointment;
+                result.revenuewStatistics.Add(new AppointmentStatistic()
+                {
+                    CancelAppointment = tempCancelAppointment,
+                    FailedAppointment = tempFailedAppointment,
+                    InSideAppointment = tempInSideAppointment,
+                    OutSideAppointment = tempOutSideAppointment,
+                    TotalAppointment = tempInSideAppointment + tempOutSideAppointment + tempCancelAppointment + tempFailedAppointment,
+                    Month = $"Tháng {i}"
+                });
+            }
+
+            long totalAppointment = totalInSideAppointment + totalOutSideAppointment + totalCancelAppointment + totalFailedAppointment;
+            if (totalAppointment == 0)
+            {
+                result.OutSideAppointmentPercent = 0;
+                result.InSideAppointmentPercent = 0;
+                result.FailedAppointmentPercent = 0;
+                result.CancelAppointmentPercent = 0;
+            }
+            else
+            {
+                result.OutSideAppointmentPercent = ((decimal)totalOutSideAppointment /totalAppointment)*100;
+                result.InSideAppointmentPercent = ((decimal)totalInSideAppointment /totalAppointment)*100;
+                result.FailedAppointmentPercent = ((decimal)totalFailedAppointment / totalAppointment)*100;
+                result.CancelAppointmentPercent = ((decimal)totalCancelAppointment /totalAppointment)*100;
+            }
+            return result;
         }
     }
 }

@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -339,7 +340,48 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CompileRevenueSalonByYear([FromRoute] Guid salonId, [FromQuery] int year)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CompileRevenueSalonByYear(salonId, year);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
 
-
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CompileAppointmentSalonByYear([FromRoute] Guid salonId, [FromQuery] int year)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CompileAppointmentSalonByYear(salonId, year);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
     }
 }
