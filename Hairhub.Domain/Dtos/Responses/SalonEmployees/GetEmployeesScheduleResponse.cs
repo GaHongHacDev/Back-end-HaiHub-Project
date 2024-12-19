@@ -9,6 +9,8 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
     
         public class GetEmployeesScheduleResponse
         {
+            public TimeOnly? StartTimeSalon {  get; set; } 
+            public TimeOnly? EndTimeSalon {  get; set; }
             public List<EmployeesSchedule> employeesSchedules { get; set; } = new List<EmployeesSchedule>();
         }
 
@@ -28,6 +30,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonEmployees
 
         public class WorkSchedule
         {
+            public Guid AppointmentId { get; set; }
             public DateTime StartTime { get; set; }
             public DateTime EndTime { get; set; }
             public string? Note { get; set; }
