@@ -2141,6 +2141,13 @@ namespace Hairhub.Service.Services.Services
             result.ReturnRate = (double)customersWithAtLeastTwoAppointments/totalUniqueBookingCustomer;
             return result;
         }
+
+        public Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName)
+        {
+            throw new NotImplementedException();
+        }
+
+
         #endregion
 
     }

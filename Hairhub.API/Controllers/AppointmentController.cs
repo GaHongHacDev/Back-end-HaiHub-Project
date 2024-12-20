@@ -653,7 +653,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> AdminOverallStatistic()
         {
             try
@@ -670,6 +670,23 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetAppointmentTodayByAdmin([FromRoute] string? salonName)
+        {
+            try
+            {
+                var response = await _appointmentService.GetAppointmentTodayByAdmin(salonName);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
