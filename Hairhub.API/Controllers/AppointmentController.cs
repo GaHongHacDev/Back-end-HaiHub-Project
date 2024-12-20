@@ -672,11 +672,11 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         //[Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAppointmentTodayByAdmin([FromQuery] string? salonName, [FromQuery] string? appointmentStatus)
+        public async Task<IActionResult> GetAppointmentTodayByAdmin([FromQuery] string? salonName, [FromQuery] string? appointmentStatus, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var response = await _appointmentService.GetAppointmentTodayByAdmin(salonName, appointmentStatus);
+                var response = await _appointmentService.GetAppointmentTodayByAdmin(salonName, appointmentStatus, page, size);
                 return Ok(response);
             }
             catch (NotFoundException ex)

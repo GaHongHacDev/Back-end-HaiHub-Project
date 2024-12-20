@@ -2145,7 +2145,7 @@ namespace Hairhub.Service.Services.Services
             return result;
         }
 
-        public async Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus)
+        public async Task<IPaginate<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus, int page, int size)
         {
             if (salonName.IsNullOrEmpty())
             {
@@ -2182,23 +2182,32 @@ namespace Hairhub.Service.Services.Services
             predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformation.Name.ToLower().Contains(salonName!.ToLower())));
             List<GetAppointmentTodayAdminResponse> result = new List<GetAppointmentTodayAdminResponse>();
             var appointments = await _unitOfWork.GetRepository<Appointment>()
-                                                .GetListAsync(
+                                                .GetPagingListAsync(
                                                                 predicate: predicate, 
-                                                                include: x=>x.Include(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee).ThenInclude(s=>s.SalonInformation)
+                                                                include: x=>x.Include(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee).ThenInclude(s=>s.SalonInformation),
+                                                                page: page,
+                                                                size: size
                                                              );
-            foreach(var item in appointments)
+            foreach(var item in appointments.Items)
             {
                 result.Add(new GetAppointmentTodayAdminResponse()
                 {
                     Id = item.Id,
-                    SalonName = item.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation.Name,
+                    SalonName = item.AppointmentDetails.FirstOrDefault()!.SalonEmployee.SalonInformation.Name,
                     Status = item.Status,
                     CommissionRevenue = (decimal)(item.TotalPrice * item.CommissionRate)!/100,
                     TotalPrice = item.TotalPrice
                 });
             }
 
-            return result;
+            return new Paginate<GetAppointmentTodayAdminResponse>()
+            {
+                Items = result,
+                Page = appointments.Page,
+                Size = appointments.Size,
+                Total = appointments.Total,
+                TotalPages = appointments.TotalPages,
+            };
         }
 
 
