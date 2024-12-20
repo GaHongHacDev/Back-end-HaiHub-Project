@@ -21,6 +21,9 @@ using Hairhub.Domain.Dtos.Requests.Accounts;
 using Hairhub.Common.Security;
 using Microsoft.Extensions.Configuration;
 using Hairhub.Domain.Dtos.Responses.SalonInformations;
+using Microsoft.IdentityModel.Tokens;
+using Hairhub.Domain.Dtos.Responses.Customers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 //using CloudinaryDotNet;
 
 
@@ -1193,7 +1196,7 @@ namespace Hairhub.Service.Services.Services
 
             Guid id = Guid.NewGuid();
             string url = await _qrCodeService.GenerateQR(id);
-            if (String.IsNullOrEmpty(url))
+            if (url.IsNullOrEmpty())
             {
                 throw new Exception("Lỗi không thể tạo QR check in cho đơn đặt lịch này");
             }
@@ -2123,7 +2126,7 @@ namespace Hairhub.Service.Services.Services
             var appointmentToday = appointments.Where(x => x.Status.Equals(AppointmentStatus.Successed));
             foreach (var item in appointmentToday)
             {
-                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!;
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!/100;
             }       
             result.RevenueToday = totalRevenue;
 
@@ -2132,19 +2135,63 @@ namespace Hairhub.Service.Services.Services
             totalRevenue = 0;
             foreach(var item in totalAppointment)
             {
-                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!;
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!/100;
             }
             result.TotalRevenue = totalRevenue;
             //Tỷ lệ quay lại = so khach hang dat lich >=2 / so khach hang dat lich
             var customersWithAtLeastTwoAppointments = appointments.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count(); 
             var totalUniqueBookingCustomer = totalAppointment.Select(x => x.CustomerId).Distinct().Count();
-            result.ReturnRate = (double)customersWithAtLeastTwoAppointments/totalUniqueBookingCustomer;
+            result.ReturnRate = (double)customersWithAtLeastTwoAppointments/totalUniqueBookingCustomer*100;
             return result;
         }
 
-        public Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName)
+        public async Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus)
         {
-            throw new NotImplementedException();
+
+            ExpressionStarter<Appointment> predicate = PredicateBuilder.New<Appointment>(x => x.StartDate.Date == DateTime.UtcNow.Date);
+            if (!appointmentStatus.IsNullOrEmpty())
+            {
+                switch (appointmentStatus)
+                {
+                    case "Tất cả":
+                        predicate = PredicateBuilder.New<Appointment>(x => x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                    case "Thành công":
+                        predicate = PredicateBuilder.New<Appointment>(x => x.Status.Equals(AppointmentStatus.Successed) && x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                    case "Trên hệ thống":
+                        predicate = PredicateBuilder.New<Appointment>(x => !x.Status.Equals(AppointmentStatus.OutSide) && x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                    case "Hủy":
+                        predicate = PredicateBuilder.New<Appointment>(x => x.Status.Equals(AppointmentStatus.CancelByCustomer) && x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                    case "Thất bại":
+                        predicate = PredicateBuilder.New<Appointment>(x => x.Status.Equals(AppointmentStatus.Fail) && x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                    case "Ngoài hệ thống":
+                        predicate = PredicateBuilder.New<Appointment>(x => x.Status.Equals(AppointmentStatus.OutSide) && x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                    default:
+                        predicate = PredicateBuilder.New<Appointment>(x => x.StartDate.Date == DateTime.UtcNow.Date);
+                        break;
+                }
+            }
+
+            List<GetAppointmentTodayAdminResponse> result = new List<GetAppointmentTodayAdminResponse>();
+            var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: predicate, include: x=>x.Include(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee).ThenInclude(s=>s.SalonInformation));
+            foreach(var item in appointments)
+            {
+                result.Add(new GetAppointmentTodayAdminResponse()
+                {
+                    Id = item.Id,
+                    SalonName = item.AppointmentDetails.FirstOrDefault().SalonEmployee.SalonInformation.Name,
+                    Status = item.Status,
+                    CommissionRevenue = (decimal)(item.TotalPrice * item.CommissionRate)!/100,
+                    TotalPrice = item.TotalPrice
+                });
+            }
+
+            return result;
         }
 
 

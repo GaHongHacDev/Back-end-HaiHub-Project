@@ -67,7 +67,7 @@ namespace Hairhub.Service.Services.IServices
         Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request);
 
         Task<AdminOverallStatisticResponse> AdminOverallStatistic();
-        Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName);
+        Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus);
     }
 }
 

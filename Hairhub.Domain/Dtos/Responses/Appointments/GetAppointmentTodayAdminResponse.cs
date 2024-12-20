@@ -9,7 +9,7 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
     public class GetAppointmentTodayAdminResponse
     {
         public Guid Id { get; set; }
-        public string CustomerName { get; set; }
+        public string Status { get; set; }
         public string SalonName { get; set; }
         public decimal TotalPrice { get; set; }
         public decimal CommissionRevenue { get; set; }
