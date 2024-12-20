@@ -634,7 +634,7 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAppointmentOutSide([FromBody] CreateAppointmentOutSideRequest createAppointmentOutSideRequest)
         {
             try
@@ -651,5 +651,25 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> AdminOverallStatistic()
+        {
+            try
+            {
+                var response = await _appointmentService.AdminOverallStatistic();
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

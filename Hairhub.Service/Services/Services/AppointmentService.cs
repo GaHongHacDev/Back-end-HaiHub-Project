@@ -2090,6 +2090,56 @@ namespace Hairhub.Service.Services.Services
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
             return isInsert;
         }
+
+        public async Task<AdminOverallStatisticResponse> AdminOverallStatistic()
+        {
+            AdminOverallStatisticResponse result = new AdminOverallStatisticResponse();
+            var role = await _unitOfWork.GetRepository<Hairhub.Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x=>x.RoleName.Equals(RoleEnum.Customer.ToString()));
+            if (role == null)
+            {
+                throw new NotFoundException("Không tìm thấy role Customer");
+            }
+            var account = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: x=>x.RoleId == role.RoleId && x.IsActive);
+            //Tổng số lượng User
+            result.TotalCustomer = account.Count();
+            // SỐ lượng user đang hoạt động
+            result.NumberOfActiveCustomer = 1000;
+            //Số lượng salon
+            var salons = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: x => x.Status.Equals(SalonStatus.Approved));
+            result.NumberOfSalon = (salons==null || salons.Count ==0) ? 0 : salons.Count();
+            //Số lượng khách hàng đặt lịch:
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                          .GetListAsync(
+                                                        predicate: x => x.Status.Equals(x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Booking) && x.StartDate.Date == DateTime.UtcNow.Date)
+                                                       );
+            result.NumnberOfBookingCustomer = appointments.Select(x => x.CustomerId).Distinct().Count();
+            
+            //Số đơn report mới trong hôm nay
+            var reports = await _unitOfWork.GetRepository<Report>().GetListAsync(predicate: x=>x.CreateDate.Date == DateTime.UtcNow.Date);
+            result.NumberOfReport = (reports == null || reports.Count == 0) ? 0 : reports.Count();
+
+            //Doanh thu hệ thống trong hôm nay:
+            decimal totalRevenue = 0;
+            var appointmentToday = appointments.Where(x => x.Status.Equals(AppointmentStatus.Successed));
+            foreach (var item in appointmentToday)
+            {
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!;
+            }       
+            result.RevenueToday = totalRevenue;
+
+            //Tổng doanh thu hệ thống
+            var totalAppointment= await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x=>x.Status.Equals(AppointmentStatus.Successed));
+            totalRevenue = 0;
+            foreach(var item in totalAppointment)
+            {
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!;
+            }
+            result.TotalRevenue = totalRevenue;
+            //Tỷ lệ quay lại
+            var totalUniqueBookingCustomer = totalAppointment.Select(x => x.CustomerId).Distinct().Count();
+            result.ReturnRate = (double)totalUniqueBookingCustomer/result.TotalCustomer;
+            return result;
+        }
         #endregion
 
     }
