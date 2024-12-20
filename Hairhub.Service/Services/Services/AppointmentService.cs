@@ -1921,23 +1921,32 @@ namespace Hairhub.Service.Services.Services
             return isStatus;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, int page, int size)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, int page, int size)
         {
-            //var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == AccountId);
-            //if (customer == null)
-            //{
-            //    throw new NotFoundException($"Không tìm thấy id của khách hàng");
-            //}
             status = status == null ? "" : status.Trim();
+            var predicate = PredicateBuilder.New<Appointment>(x => x.Status.Contains(status));
+
+            if (startTime != null && endTime != null)
+            {
+                predicate = predicate.And(x => x.StartDate.Date >= startTime.Value.Date && x.StartDate.Date <= endTime.Value.Date);
+            }
+
+            if (!string.IsNullOrEmpty(salonName))
+            {
+                predicate = predicate.And(x => x.AppointmentDetails.Any(ad =>
+                    ad.SalonEmployee.SalonInformation.Name.ToLower().Contains(salonName.ToLower())));
+            }
+
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetPagingListAsync(
-                    predicate: x => x.Status.Contains(status),
+                    predicate: predicate,
                     include: query => query.Include(a => a.Customer)
                                            .Include(a => a.AppointmentDetails)
                                                .ThenInclude(ad => ad.SalonEmployee)
                                                    .ThenInclude(se => se.SalonInformation),
                     page: page,
-                    size: size
+                    size: size,
+                    orderBy: x => x.OrderByDescending(x=>x.StartDate)
                 );
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
