@@ -2147,7 +2147,10 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<List<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus)
         {
-
+            if (salonName.IsNullOrEmpty())
+            {
+                salonName = "";
+            }
             ExpressionStarter<Appointment> predicate = PredicateBuilder.New<Appointment>(x => x.StartDate.Date == DateTime.UtcNow.Date);
             if (!appointmentStatus.IsNullOrEmpty())
             {
@@ -2176,9 +2179,13 @@ namespace Hairhub.Service.Services.Services
                         break;
                 }
             }
-
+            predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformation.Name.ToLower().Contains(salonName!.ToLower())));
             List<GetAppointmentTodayAdminResponse> result = new List<GetAppointmentTodayAdminResponse>();
-            var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: predicate, include: x=>x.Include(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee).ThenInclude(s=>s.SalonInformation));
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync(
+                                                                predicate: predicate, 
+                                                                include: x=>x.Include(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee).ThenInclude(s=>s.SalonInformation)
+                                                             );
             foreach(var item in appointments)
             {
                 result.Add(new GetAppointmentTodayAdminResponse()
