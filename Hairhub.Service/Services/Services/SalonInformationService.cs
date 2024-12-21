@@ -915,7 +915,8 @@ namespace Hairhub.Service.Services.Services
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
                                                           .GetListAsync(
                                                                         predicate: x => x.SalonEmployeeId == employee.Id
-                                                                                    && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)),
+                                                                                    && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)) 
+                                                                                    && x.StartTime.Date >= startDate.Date && x.EndTime.Date <= endDate.Date,
                                                                         include: x => x.Include(s => s.Appointment)
                                                                        );
                 var uniqueCustomerCount = appointmentDetails
@@ -942,25 +943,25 @@ namespace Hairhub.Service.Services.Services
             switch (filter)
             {
                 case "Số lượng dịch vụ tăng dần":
-                    result.OrderBy(x => x.NumberOfService);
+                    result = result.OrderBy(x => x.NumberOfService).ToList();
                     break;
                 case "Số lượng dịch vụ giảm dần":
-                    result.OrderByDescending(x => x.NumberOfService);
+                    result = result.OrderByDescending(x => x.NumberOfService).ToList();
                     break;
                 case "Số lượng khách tăng dần":
-                    result.OrderBy(x => x.NumberOfUsers);
+                    result = result.OrderBy(x => x.NumberOfUsers).ToList();
                     break;
                 case "Số lượng khách giảm dần":
-                    result.OrderByDescending(x => x.NumberOfUsers);
+                    result = result.OrderByDescending(x => x.NumberOfUsers).ToList();
                     break;
                 case "Số doanh thu tăng dần":
-                    result.OrderBy(x => x.Revenue);
+                    result = result.OrderBy(x => x.Revenue).ToList();
                     break;
                 case "Số doanh thu giảm dần":
-                    result.OrderByDescending(x => x.NumberOfUsers);
+                    result = result.OrderByDescending(x => x.NumberOfUsers).ToList();
                     break;
                 default:
-                    result.OrderBy(x => x.NumberOfService);
+                    result = result.OrderBy(x => x.NumberOfService).ToList();
                     break;
             }
             return new Paginate<EmployeeStatictisResponse>
