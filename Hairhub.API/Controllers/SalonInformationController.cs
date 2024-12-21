@@ -3,6 +3,7 @@ using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.SalonInformations;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
+using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +48,53 @@ namespace Hairhub.API.Controllers
         {
             var salonInformationsResponse = await _salonInformationService.GetSalonByStatus(name, status, page, size);
             return Ok(salonInformationsResponse);
+        }
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> RevenueStatistics(
+            [FromRoute] Guid salonId,
+            [FromQuery] DateTime? StartDate,
+            [FromQuery] DateTime? EndDate)
+        {
+            try
+            {
+                var result = await _salonInformationService.RevenueStatistics(salonId, StartDate, EndDate);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> ServiceStatistics(
+            [FromRoute] Guid salonId,
+            [FromQuery] DateTime? StartDate,
+            [FromQuery] DateTime? EndDate,
+            [FromQuery] string? filter,
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10)
+        {
+            try
+            {
+                var result = await _salonInformationService.ServiceStatistics(salonId, StartDate, EndDate, filter, page, size);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet]
@@ -339,7 +387,70 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CompileRevenueSalonByYear([FromRoute] Guid salonId, [FromQuery] int year)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CompileRevenueSalonByYear(salonId, year);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
 
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CompileAppointmentSalonByYear([FromRoute] Guid salonId, [FromQuery] int year)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CompileAppointmentSalonByYear(salonId, year);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
 
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CompileEmployeeSalon([FromRoute] Guid salonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] string? filter, [FromQuery] int page =1, [FromQuery] int size = 10)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CompileEmployeeRevenue(salonId, startDate, endDate, filter, page, size);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
     }
 }

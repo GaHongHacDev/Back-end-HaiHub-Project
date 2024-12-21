@@ -3,6 +3,7 @@ using Hairhub.Domain.Dtos.Responses.Accounts;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using Hairhub.Domain.Dtos.Responses.Dashboard;
+using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Hairhub.Domain.Specifications;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,8 @@ namespace Hairhub.Service.Services.IServices
         Task<List<GetAppointmentResponse>> GetAppointmentSalonByStatusNoPaing(Guid salonId, string? status, DateTime? startDate, DateTime? endDate);
         Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(Guid employeeId, int page, int size, string? status, bool isAscending, DateTime? date, string? customerName);
+
+        Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time);
 
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
@@ -59,9 +62,12 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteAppointmentFakeById(Guid id);
 
-        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, int page, int size);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, int page, int size);
         Task<List<GetAppointmentResponse>> GetAppointmentGemini(Guid customerId, string? status, DateTime? date);
         Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request);
+
+        Task<AdminOverallStatisticResponse> AdminOverallStatistic();
+        Task<IPaginate<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus, int page, int size);
     }
 }
 

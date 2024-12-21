@@ -201,5 +201,21 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetEmployeesWorkSchedule([FromRoute] Guid salonId,[FromQuery] DateTime dateTime)
+        {
+            try
+            {
+                var result = await _salonEmployeeService.GetEmployeesSchedule(dateTime, salonId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

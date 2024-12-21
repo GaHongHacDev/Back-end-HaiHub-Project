@@ -16,6 +16,6 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         
         public int? NumberofSuccessAppointment { get; set; }
 
-        public int? TotalPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
     }
 }

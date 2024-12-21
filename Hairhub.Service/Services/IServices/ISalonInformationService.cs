@@ -18,6 +18,9 @@ namespace Hairhub.Service.Services.IServices
         Task<IPaginate<GetSalonInformationResponse>> GetSalonByStatus(string? name, string? status, int page, int size);
         Task<GetSalonInformationResponse>? GetSalonInformationById(Guid id);
         Task<GetSalonInformationResponse>? GetSalonByEmployeeId(Guid id);
+
+        Task<IPaginate<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter, int page, int size);
+        Task<RevenueStatistics> RevenueStatistics(Guid salonId, DateTime? startDate, DateTime? endDate);
         Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest);
         Task<bool> UpdateSalonInformationById(Guid id, UpdateSalonInformationRequest updateSalonInformationRequest);
         Task<bool> DeleteSalonInformationById(Guid id);
@@ -33,8 +36,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteSalonInformationImages(DeleteImagesRequest request);
 
-        
-
-        
+        Task<CompileRevenueSalonByYearResponse> CompileRevenueSalonByYear(Guid salonId, int year);
+        Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid salonId, int year);
+        Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size);
     }
 }
