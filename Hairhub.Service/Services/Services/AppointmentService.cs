@@ -1273,7 +1273,7 @@ namespace Hairhub.Service.Services.Services
                     }
                     var appointmentVoucher = new AppointmentDetailVoucher()
                     {
-                        Id = new Guid(),
+                        Id = Guid.NewGuid(),
                         AppointmentId = appointment.Id,
                         VoucherId = item
                     };
