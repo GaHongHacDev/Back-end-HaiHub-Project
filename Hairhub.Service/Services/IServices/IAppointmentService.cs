@@ -62,9 +62,12 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteAppointmentFakeById(Guid id);
 
-        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, int page, int size);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, int page, int size);
         Task<List<GetAppointmentResponse>> GetAppointmentGemini(Guid customerId, string? status, DateTime? date);
         Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request);
+
+        Task<AdminOverallStatisticResponse> AdminOverallStatistic();
+        Task<IPaginate<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus, int page, int size);
     }
 }
 

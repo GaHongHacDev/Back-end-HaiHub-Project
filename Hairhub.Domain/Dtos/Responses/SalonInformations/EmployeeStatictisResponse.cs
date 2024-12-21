@@ -8,10 +8,6 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
 {
     public class EmployeeStatictisResponse
     {
-        public List<EmployeeStatictis> EmployeeStatictis { get; set; } = new List<EmployeeStatictis>();
-    }
-    public class EmployeeStatictis
-    {
         public Guid Id { get; set; }
         public string FullName { get; set; }
         public long NumberOfService { get; set; }

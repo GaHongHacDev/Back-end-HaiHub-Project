@@ -903,17 +903,17 @@ namespace Hairhub.Service.Services.Services
 
             return result;
         }
-        public async Task<EmployeeStatictisResponse> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter)
+        public async Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
         {
-            EmployeeStatictisResponse result = new EmployeeStatictisResponse();
-            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
-            foreach (var employee in employees)
+            List<EmployeeStatictisResponse> result = new List<EmployeeStatictisResponse>();
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetPagingListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive, page: page, size: size);
+            foreach (var employee in employees.Items)
             {
-                ICollection<AppointmentDetail> appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
                                                           .GetListAsync(
                                                                         predicate: x=>x.SalonEmployeeId == employee.Id 
                                                                                     && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)),
-                                                                        include: x=>x.Include(s=>s.Appointment)
+                                                                        include: x => x.Include(s => s.Appointment)
                                                                        );
                 var uniqueCustomerCount = appointmentDetails
                                             .Select(x => x.Appointment.CustomerId) 
@@ -922,7 +922,7 @@ namespace Hairhub.Service.Services.Services
                 decimal revenue = appointmentDetails
                                                 .Where(ad => ad.PriceServiceHair.HasValue) 
                                                 .Sum(ad => ad.PriceServiceHair.Value);
-                result.EmployeeStatictis.Add(new EmployeeStatictis()
+                result.Add(new EmployeeStatictisResponse()
                 {
                     FullName = employee.FullName,
                     Id = employee.Id,
@@ -939,28 +939,35 @@ namespace Hairhub.Service.Services.Services
             switch (filter)
             {
                 case "Số lượng dịch vụ tăng dần":
-                    result.EmployeeStatictis.OrderBy(x => x.NumberOfService);
+                    result.OrderBy(x => x.NumberOfService);
                     break;
                 case "Số lượng dịch vụ giảm dần":
-                    result.EmployeeStatictis.OrderByDescending(x => x.NumberOfService);
+                    result.OrderByDescending(x => x.NumberOfService);
                     break;
                 case "Số lượng khách tăng dần":
-                    result.EmployeeStatictis.OrderBy(x => x.NumberOfUsers);
+                    result.OrderBy(x => x.NumberOfUsers);
                     break;
                 case "Số lượng khách giảm dần":
-                    result.EmployeeStatictis.OrderByDescending(x => x.NumberOfUsers);
+                    result.OrderByDescending(x => x.NumberOfUsers);
                     break;
                 case "Số doanh thu tăng dần":
-                    result.EmployeeStatictis.OrderBy(x => x.Revenue);
+                    result.OrderBy(x => x.Revenue);
                     break;
                 case "Số doanh thu giảm dần":
-                    result.EmployeeStatictis.OrderByDescending(x => x.NumberOfUsers);
+                    result.OrderByDescending(x => x.NumberOfUsers);
                     break;
                 default:
-                    result.EmployeeStatictis.OrderBy(x => x.NumberOfService);
+                    result.OrderBy(x => x.NumberOfService);
                     break;
             }
-            return result;
+            return new Paginate<EmployeeStatictisResponse>
+            {
+                Page = page,
+                Size = size,
+                Total = employees.Total,
+                TotalPages = employees.TotalPages,
+                Items = (IList<EmployeeStatictisResponse>)result
+            }; 
         }
 
     }

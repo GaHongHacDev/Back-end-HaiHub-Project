@@ -1,4 +1,4 @@
-﻿    using AutoMapper;
+﻿using AutoMapper;
 using Hairhub.API.Constants;
 using Hairhub.API.Hubs;
 using Hairhub.Domain.Dtos.Requests.Accounts;
@@ -60,7 +60,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetHistoryAppointmentByCustomerId(page, size,customerId);
+                var appointmentResponse = await _appointmentService.GetHistoryAppointmentByCustomerId(page, size, customerId);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Cannot find this appointment!" });
@@ -97,18 +97,18 @@ namespace Hairhub.API.Controllers
         [Route("{salonId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> GetAppointmentSalonByStatus(
-            [FromRoute] Guid salonId, 
-            [FromQuery] string? status, 
-            [FromQuery] bool isAscending, 
-            [FromQuery] DateTime? StartDate, 
-            [FromQuery] DateTime? EndDate, 
-            [FromQuery] string? customerName, 
+            [FromRoute] Guid salonId,
+            [FromQuery] string? status,
+            [FromQuery] bool isAscending,
+            [FromQuery] DateTime? StartDate,
+            [FromQuery] DateTime? EndDate,
+            [FromQuery] string? customerName,
             [FromQuery] string? employeeName,
             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, StartDate, EndDate,customerName, employeeName);
+                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, StartDate, EndDate, customerName, employeeName);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
@@ -209,7 +209,7 @@ namespace Hairhub.API.Controllers
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
         {
             try
-            {               
+            {
                 var accountResponse = await _appointmentService.CreateAppointment(createAppointmentRequest);
                 if (accountResponse.Item1 == false)
                 {
@@ -231,7 +231,7 @@ namespace Hairhub.API.Controllers
                 return Ok(response);
             }
             catch (NotFoundException ex)
-            {           
+            {
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
@@ -250,7 +250,7 @@ namespace Hairhub.API.Controllers
                 bool isUpdate = await _appointmentService.UpdateAppointmentById(id, updateAppointmentRequest);
                 if (!isUpdate)
                 {
-                    return BadRequest(new {message = "Không thể cập nhật đơn đặt lịch"});
+                    return BadRequest(new { message = "Không thể cập nhật đơn đặt lịch" });
                 }
                 return Ok("Cập nhật đơn đặt lịch thành công");
             }
@@ -293,7 +293,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{AccountId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetAppointmentByAccountId([FromRoute] Guid AccountId,[FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetAppointmentByAccountId([FromRoute] Guid AccountId, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
@@ -303,7 +303,8 @@ namespace Hairhub.API.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -312,11 +313,11 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{status}")]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? salonName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, page, size);
+                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, startDate, endDate, salonName, page, size);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)
@@ -352,7 +353,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{customerId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
-        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] bool isAscending, 
+        public async Task<IActionResult> GetAppointmentCustomerByStatus([FromRoute] Guid customerId, [FromQuery] string? status, [FromQuery] bool isAscending,
                                                                           [FromQuery] DateTime? date, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
@@ -382,7 +383,8 @@ namespace Hairhub.API.Controllers
                     return NotFound(new { message = "Không tìm thấy thời gian phù hợp để thực hiện dịch vụ này" });
                 }
                 return Ok(appointmentResponse);
-            }catch(NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
@@ -394,8 +396,8 @@ namespace Hairhub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Customer + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CalculatePrice([FromBody]GetCalculatePriceRequest request)
-        {            
+        public async Task<IActionResult> CalculatePrice([FromBody] GetCalculatePriceRequest request)
+        {
             try
             {
                 var result = await _appointmentService.CalculatePrice(request);
@@ -435,7 +437,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAppointmentbyStatusByAdmin([FromQuery]string status, [FromQuery] int year)
+        public async Task<IActionResult> GetAppointmentbyStatusByAdmin([FromQuery] string status, [FromQuery] int year)
         {
             try
             {
@@ -453,7 +455,7 @@ namespace Hairhub.API.Controllers
         }
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetRevenueByAdmin([FromQuery]int year)
+        public async Task<IActionResult> GetRevenueByAdmin([FromQuery] int year)
         {
             try
             {
@@ -529,7 +531,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{id:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonEmployee)]
-        public async Task<IActionResult> RevenueandNumberofAppointment([FromRoute] Guid id, [FromQuery]DateTime? startdate, [FromQuery] DateTime enddate)
+        public async Task<IActionResult> RevenueandNumberofAppointment([FromRoute] Guid id, [FromQuery] DateTime? startdate, [FromQuery] DateTime enddate)
         {
             try
             {
@@ -538,7 +540,7 @@ namespace Hairhub.API.Controllers
                 {
                     TotalRevenue = appointmentsResponse.Item1,
                     TotalAppointmentSuccessed = appointmentsResponse.Item2,
-                    
+
                 };
                 return Ok(formattedResponse);
             }
@@ -632,13 +634,50 @@ namespace Hairhub.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> CreateAppointmentOutSide([FromBody] CreateAppointmentOutSideRequest createAppointmentOutSideRequest)
         {
             try
             {
                 var isCreate = await _appointmentService.CreateAppointmentOutSide(createAppointmentOutSideRequest);
                 return Ok(isCreate);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> AdminOverallStatistic()
+        {
+            try
+            {
+                var response = await _appointmentService.AdminOverallStatistic();
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetAppointmentTodayByAdmin([FromQuery] string? salonName, [FromQuery] string? appointmentStatus, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            try
+            {
+                var response = await _appointmentService.GetAppointmentTodayByAdmin(salonName, appointmentStatus, page, size);
+                return Ok(response);
             }
             catch (NotFoundException ex)
             {
