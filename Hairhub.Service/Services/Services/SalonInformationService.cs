@@ -24,6 +24,7 @@ using System;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Numerics;
 using static QRCoder.PayloadGenerator;
 
 namespace Hairhub.Service.Services.Services
@@ -558,7 +559,8 @@ namespace Hairhub.Service.Services.Services
                         tempOutSideRevenue = await CaculateRevenue(31, 1, Year, SalonId, AppointmentStatus.OutSide);
                         break;
                     case 2:
-                        if((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0)){
+                        if ((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0))
+                        {
                             tempInsideRevenue = await CaculateRevenue(29, 2, Year, SalonId, AppointmentStatus.Successed);
                             tempOutSideRevenue = await CaculateRevenue(29, 2, Year, SalonId, AppointmentStatus.OutSide);
                         }
@@ -630,7 +632,7 @@ namespace Hairhub.Service.Services.Services
             else
             {
                 result.OutSideRevenuePercent = (totalOutSideRevenue / totalRevenue) * 100;
-                result.InSideRevenuePercent = (totalInSideRevenue/ totalRevenue) * 100;
+                result.InSideRevenuePercent = (totalInSideRevenue / totalRevenue) * 100;
             }
             return result;
         }
@@ -730,10 +732,10 @@ namespace Hairhub.Service.Services.Services
             }
             else
             {
-                result.OutSideAppointmentPercent = ((decimal)totalOutSideAppointment /totalAppointment)*100;
-                result.InSideAppointmentPercent = ((decimal)totalInSideAppointment /totalAppointment)*100;
-                result.FailedAppointmentPercent = ((decimal)totalFailedAppointment / totalAppointment)*100;
-                result.CancelAppointmentPercent = ((decimal)totalCancelAppointment /totalAppointment)*100;
+                result.OutSideAppointmentPercent = ((decimal)totalOutSideAppointment / totalAppointment) * 100;
+                result.InSideAppointmentPercent = ((decimal)totalInSideAppointment / totalAppointment) * 100;
+                result.FailedAppointmentPercent = ((decimal)totalFailedAppointment / totalAppointment) * 100;
+                result.CancelAppointmentPercent = ((decimal)totalCancelAppointment / totalAppointment) * 100;
             }
             return result;
         }
@@ -748,9 +750,10 @@ namespace Hairhub.Service.Services.Services
             if (startDate.HasValue && endDate.HasValue)
             {
                 predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
-            } else
+            }
+            else
             {
-                predicate = predicate.And(x =>  x.StartDate <= DateTime.Now);
+                predicate = predicate.And(x => x.StartDate <= DateTime.Now);
             }
             IEnumerable<Appointment> appointments;
 
@@ -906,21 +909,21 @@ namespace Hairhub.Service.Services.Services
         public async Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
         {
             List<EmployeeStatictisResponse> result = new List<EmployeeStatictisResponse>();
-            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetPagingListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive, page: page, size: size);
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetPagingListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive, page: page, size: size);
             foreach (var employee in employees.Items)
             {
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
                                                           .GetListAsync(
-                                                                        predicate: x=>x.SalonEmployeeId == employee.Id 
+                                                                        predicate: x => x.SalonEmployeeId == employee.Id
                                                                                     && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)),
                                                                         include: x => x.Include(s => s.Appointment)
                                                                        );
                 var uniqueCustomerCount = appointmentDetails
-                                            .Select(x => x.Appointment.CustomerId) 
-                                            .Distinct()                            
+                                            .Select(x => x.Appointment.CustomerId)
+                                            .Distinct()
                                             .Count();
                 decimal revenue = appointmentDetails
-                                                .Where(ad => ad.PriceServiceHair.HasValue) 
+                                                .Where(ad => ad.PriceServiceHair.HasValue)
                                                 .Sum(ad => ad.PriceServiceHair.Value);
                 result.Add(new EmployeeStatictisResponse()
                 {
@@ -967,8 +970,66 @@ namespace Hairhub.Service.Services.Services
                 Total = employees.Total,
                 TotalPages = employees.TotalPages,
                 Items = (IList<EmployeeStatictisResponse>)result
-            }; 
+            };
         }
 
+        public async Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime startDate, DateTime endDate)
+        {
+            List<CompileAppointmentSalonResponse> responses = new List<CompileAppointmentSalonResponse>();
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync(
+                                                                predicate: x => x.StartDate.Date >= startDate.Date && x.StartDate.Date <= endDate.Date
+                                                                && x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId)
+                                                             );
+            //Lịch hẹn ngoài
+            var outSideAppointments = appointments.Where(x => x.Status.Equals(AppointmentStatus.OutSide));
+            long customerUnique = outSideAppointments.Select(x => x.CustomerId).Distinct().Count();
+            decimal revenue = outSideAppointments.Sum(s => s.TotalPrice);
+            responses.Add(new CompileAppointmentSalonResponse()
+            {
+                AppointmentQuantity = outSideAppointments.Count(),
+                AppointmentType = "Lịch hẹn ngoài hệ thống",
+                CustomerQuantity = customerUnique,
+                Revenue = revenue,
+                Percent = (appointments == null || appointments.Count() == 0) ? 0 : (double)outSideAppointments.Count() / appointments.Count() * 100
+            });
+            //Lịch hẹn trên hệ thống
+            IEnumerable<Appointment> appointmentsWhere = appointments.Where(x => x.Status.Equals(AppointmentStatus.Successed));
+            customerUnique = appointmentsWhere.Select(x => x.CustomerId).Distinct().Count();
+            revenue = appointmentsWhere.Sum(s => s.TotalPrice);
+            responses.Add(new CompileAppointmentSalonResponse()
+            {
+                AppointmentQuantity = appointmentsWhere.Count(),
+                AppointmentType = "Lịch hẹn thành công",
+                CustomerQuantity = customerUnique,
+                Revenue = revenue,
+                Percent = (appointments == null || appointments.Count() == 0) ? 0 : (double)appointmentsWhere.Count() / appointments.Count() * 100
+            });
+            //Lịch hẹn thất bại
+            appointmentsWhere = appointments.Where(x => x.Status.Equals(AppointmentStatus.Fail));
+            customerUnique = appointmentsWhere.Select(x => x.CustomerId).Distinct().Count();
+            revenue = appointmentsWhere.Sum(s => s.TotalPrice);
+            responses.Add(new CompileAppointmentSalonResponse()
+            {
+                AppointmentQuantity = appointmentsWhere.Count(),
+                AppointmentType = "Lịch hẹn thất bại",
+                CustomerQuantity = customerUnique,
+                Revenue = revenue,
+                Percent = (appointments == null || appointments.Count() == 0) ? 0 : (double)appointmentsWhere.Count() / appointments.Count() * 100
+            });
+            //Lịch hẹn bị hủy
+            appointmentsWhere = appointments.Where(x => x.Status.Equals(AppointmentStatus.CancelByCustomer));
+            customerUnique = appointmentsWhere.Select(x => x.CustomerId).Distinct().Count();
+            revenue = appointmentsWhere.Sum(s => s.TotalPrice);
+            responses.Add(new CompileAppointmentSalonResponse()
+            {
+                AppointmentQuantity = appointmentsWhere.Count(),
+                AppointmentType = "Lịch hẹn bị hủy",
+                CustomerQuantity = customerUnique,
+                Revenue = revenue,
+                Percent = (appointments == null || appointments.Count() == 0) ? 0 : (double)appointmentsWhere.Count() / appointments.Count() * 100
+            });
+            return responses;
+        }
     }
 }
