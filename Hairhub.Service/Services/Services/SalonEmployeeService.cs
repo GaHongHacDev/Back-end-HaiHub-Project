@@ -377,11 +377,11 @@ namespace Hairhub.Service.Services.Services
                                 Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
                                 Type = item.Status
                             });
+                            if (!appointment.Status.Equals(AppointmentStatus.Booking))
+                            {
+                                totalPrice += (decimal)item.PriceServiceHair!;
+                            }
                         }
-                    }
-                    if (!appointment.Status.Equals(AppointmentStatus.Booking))
-                    {
-                        totalPrice += appointment.TotalPrice;
                     }
                 }
                 workSchedules.OrderBy(s => s.StartTime);
