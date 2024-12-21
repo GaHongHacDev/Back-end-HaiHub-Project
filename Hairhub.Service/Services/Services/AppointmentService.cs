@@ -312,7 +312,7 @@ namespace Hairhub.Service.Services.Services
             return appointmentResponse;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status, bool isAscending, DateTime? StartDate, DateTime? EndDate, string? customerName, string? employeeName)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentSalonByStatus(int page, int size, Guid salonId, string? status, bool isAscending, DateTime? StartDate, DateTime? EndDate, string? customerName, string? employeeName, string? serviceName)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
@@ -326,6 +326,10 @@ namespace Hairhub.Service.Services.Services
                 predicate = predicate.And(x => x.StartDate.Date >= StartDate.Value.Date && x.StartDate.Date <= EndDate.Value.Date);
             }
 
+            if (!serviceName.IsNullOrEmpty())
+            {
+                predicate = predicate.And(x => x.AppointmentDetails.Any(s=>s.ServiceName!.ToLower().Contains(serviceName!.ToLower())));
+            }
 
             if (!string.IsNullOrWhiteSpace(customerName))
             {

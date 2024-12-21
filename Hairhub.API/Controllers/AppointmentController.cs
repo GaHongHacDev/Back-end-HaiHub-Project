@@ -104,11 +104,12 @@ namespace Hairhub.API.Controllers
             [FromQuery] DateTime? EndDate,
             [FromQuery] string? customerName,
             [FromQuery] string? employeeName,
+            [FromQuery] string? serviceName,
             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, StartDate, EndDate, customerName, employeeName);
+                var appointmentResponse = await _appointmentService.GetAppointmentSalonByStatus(page, size, salonId, status, isAscending, StartDate, EndDate, customerName, employeeName, serviceName);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
