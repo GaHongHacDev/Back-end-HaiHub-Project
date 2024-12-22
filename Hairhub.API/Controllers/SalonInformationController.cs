@@ -452,5 +452,27 @@ namespace Hairhub.API.Controllers
                 }
             }
         }
+
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CompileAppointmentSalon([FromRoute] Guid salonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CompileAppointmentSalon(salonId, startDate, endDate);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
     }
 }

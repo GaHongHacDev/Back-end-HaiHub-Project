@@ -367,18 +367,21 @@ namespace Hairhub.Service.Services.Services
                 {
                     foreach (var item in appointment.AppointmentDetails)
                     {
-                        workSchedules.Add(new WorkSchedule()
+                        if(item.SalonEmployeeId == employee.Id)
                         {
-                            AppointmentId = appointment.Id,
-                            StartTime = item.StartTime,
-                            EndTime = item.EndTime,
-                            Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
-                            Type = item.Status
-                        });
-                    }
-                    if (!appointment.Status.Equals(AppointmentStatus.Booking))
-                    {
-                        totalPrice += appointment.TotalPrice;
+                            workSchedules.Add(new WorkSchedule()
+                            {
+                                AppointmentId = appointment.Id,
+                                StartTime = item.StartTime,
+                                EndTime = item.EndTime,
+                                Note = $"Lịch hẹn với khách hàng {item.Appointment.Customer.FullName}",
+                                Type = item.Status
+                            });
+                            if (!appointment.Status.Equals(AppointmentStatus.Booking))
+                            {
+                                totalPrice += (decimal)item.PriceServiceHair!;
+                            }
+                        }
                     }
                 }
                 workSchedules.OrderBy(s => s.StartTime);
