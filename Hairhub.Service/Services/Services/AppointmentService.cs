@@ -2113,7 +2113,7 @@ namespace Hairhub.Service.Services.Services
             //Tổng số lượng User
             result.TotalCustomer = account.Count();
             // SỐ lượng user đang hoạt động
-            result.NumberOfActiveCustomer = 1000;
+            result.NumberOfActiveCustomer = account.Where(s => s.LoginDate.HasValue && s.LoginDate.Value.Date >= DateTime.UtcNow.Date.AddDays(-7)).Count();
             //Số lượng salon
             var salons = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: x => x.Status.Equals(SalonStatus.Approved));
             result.NumberOfSalon = (salons==null || salons.Count ==0) ? 0 : salons.Count();
