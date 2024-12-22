@@ -2142,11 +2142,11 @@ namespace Hairhub.Service.Services.Services
             totalRevenue = 0;
             foreach(var item in totalAppointment)
             {
-                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!/100;
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate / 100)!;
             }
             result.TotalRevenue = totalRevenue;
             //Tỷ lệ quay lại = so khach hang dat lich >=2 / so khach hang dat lich
-            var customersWithAtLeastTwoAppointments = appointments.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count(); 
+            var customersWithAtLeastTwoAppointments = totalAppointment.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count(); 
             var totalUniqueBookingCustomer = totalAppointment.Select(x => x.CustomerId).Distinct().Count();
             result.ReturnRate = (double)customersWithAtLeastTwoAppointments/totalUniqueBookingCustomer*100;
             return result;
