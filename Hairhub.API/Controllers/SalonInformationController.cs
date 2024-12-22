@@ -93,6 +93,26 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> StatisticOfAccountParticipating(
+            [FromQuery] string filter)
+        {
+            try
+            {
+                var result = await _salonInformationService.StatisticsOfAccountParticipating(filter);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy tài khoản nào trên hệ thống" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> StatisticSalonRevenue([FromQuery] Guid? SalonId, [FromQuery] string? filter)
         {
             try

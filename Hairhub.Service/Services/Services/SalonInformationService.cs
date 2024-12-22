@@ -1341,5 +1341,88 @@ namespace Hairhub.Service.Services.Services
                 }
             return result;
         }
+
+        public async Task<StatisticsOfSalonsParticipating> StatisticsOfAccountParticipating(string filter)
+        {
+            var account = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: p => p.IsActive == true);
+
+            IEnumerable<Account> accounts;
+            DateTime currentDate = DateTime.Now;
+            DateTime resultDate;
+            var result = new StatisticsOfSalonsParticipating();
+
+            switch (filter)
+            {
+                case "YEAR":
+                    result.InYears = new List<InYear>();
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        resultDate = new DateTime(currentDate.Year, month, 1);
+                        var endDate = resultDate.AddMonths(1).AddDays(-1);
+
+                        accounts = account.Where(salon => salon.CreatedDate >= resultDate && salon.CreatedDate <= endDate);
+
+                        result.InYears.Add(new InYear
+                        {
+                            NumofMonth = resultDate.ToString("MMMM"),
+                            value = accounts.Count()
+                        });
+                    }
+                    break;
+
+                case "MONTH":
+                    result.InMonths = new List<InMonth>();
+                    resultDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    var lastDayOfMonth = resultDate.AddMonths(1).AddDays(-1);
+
+                    for (DateTime date = resultDate; date <= lastDayOfMonth; date = date.AddDays(1))
+                    {
+                        accounts = account.Where(salon => salon.CreatedDate!.Date == date.Date);
+
+                        result.InMonths.Add(new InMonth
+                        {
+                            NumofDate = date.ToString("dd"),
+                            value = accounts.Count()
+                        });
+                    }
+                    break;
+
+                case "WEEK":
+                    result.InWeeks = new List<InWeek>();
+                    var firstDayOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + 1);
+                    var lastDayOfWeek = firstDayOfWeek.AddDays(6);
+
+                    for (DateTime date = firstDayOfWeek; date <= lastDayOfWeek; date = date.AddDays(1))
+                    {
+                        accounts = account.Where(salon => salon.CreatedDate!.Date == date.Date);
+
+                        result.InWeeks.Add(new InWeek
+                        {
+                            NumofDate = date.ToString("dddd"),
+                            value = accounts.Count()
+                        });
+                    }
+                    break;
+
+                default:
+                    result.InYears = new List<InYear>();
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        resultDate = new DateTime(currentDate.Year, month, 1);
+                        var endDate = resultDate.AddMonths(1).AddDays(-1);
+
+                        accounts = account.Where(salon => salon.CreatedDate >= resultDate && salon.CreatedDate <= endDate);
+
+                        result.InYears.Add(new InYear
+                        {
+                            NumofMonth = resultDate.ToString("MMMM"),
+                            value = accounts.Count()
+                        });
+                    }
+                    break;
+            }
+
+            return result;
+        }
     }
 }
