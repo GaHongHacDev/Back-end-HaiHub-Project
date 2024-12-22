@@ -19,6 +19,7 @@ using Hairhub.Service.Services.IServices;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
@@ -765,6 +766,37 @@ namespace Hairhub.Service.Services.Services
                         .OrderByDescending(ad => ad.StartTime)!
                         .FirstOrDefault()!.StartTime)
                 );
+
+            /*decimal? DiscountPrice = (await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
+    .GetListAsync(predicate: p => appointments.Select(a => a.Id).Contains(p.AppointmentId) &&
+                                   p.Voucher.IsSystemCreated.Equals("0")))
+    .SelectMany(app => _unitOfWork.GetRepository<Appointment>()
+        .GetListAsync(predicate: p => p.Id == app.AppointmentId &&
+                                      (p.Status == AppointmentStatus.OutSide ||
+                                       p.Status == AppointmentStatus.Successed))
+        .Result)
+    .Sum(p => p.DiscountedPrice);*/
+
+            decimal? DiscountPrice = 0; // Khởi tạo biến trước khi sử dụng
+
+            foreach (var appointment in appointments)
+            {
+                var voucherDiscount = await _unitOfWork.GetRepository<AppointmentDetailVoucher>()
+                    .GetListAsync(predicate: p => p.AppointmentId == appointment.Id && p.Voucher.IsSystemCreated.Equals("0"));
+
+                foreach (var app in voucherDiscount)
+                {
+                    var discount = await _unitOfWork.GetRepository<Appointment>()
+                        .GetListAsync(predicate: p => p.Id == app.AppointmentId &&
+                                                       (p.Status == AppointmentStatus.OutSide ||
+                                                        p.Status == AppointmentStatus.Successed));
+
+                    foreach (var price in discount)
+                    {
+                        DiscountPrice += price.DiscountedPrice; // Tính toán giá trị
+                    }
+                }
+            }
             var totalRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
                                             .Sum(a => a.TotalPrice);
 
@@ -797,7 +829,8 @@ namespace Hairhub.Service.Services.Services
                 NumberOfCancelAppointment = appointments.Count(a => a.Status == AppointmentStatus.CancelByCustomer),
                 NumberOfFailedAppointment = appointments.Count(a => a.Status == AppointmentStatus.Fail),
                 RateOfReturnCustomers = rateOfReturnCustomers,
-                ValueAverageOnProduct = valueAverageOnProduct
+                ValueAverageOnProduct = valueAverageOnProduct, 
+                PriceDiscountforCustomers = DiscountPrice
             };
 
             return revenueStatistics;
@@ -970,5 +1003,281 @@ namespace Hairhub.Service.Services.Services
             }; 
         }
 
+        public async Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsParticipating(string filter)
+        {
+            var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: p => p.Status == SalonStatus.Approved);
+            
+            IEnumerable<SalonInformation> salons;
+            DateTime currentDate = DateTime.Now;
+            DateTime resultDate;
+            var result = new StatisticsOfSalonsParticipating();
+
+            switch(filter)
+            {
+                case "YEAR":
+                    result.InYears = new List<InYear>();
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        resultDate = new DateTime(currentDate.Year, month, 1);
+                        var endDate = resultDate.AddMonths(1).AddDays(-1); 
+
+                        salons = salonInformation.Where(salon => salon.CreatedAt >= resultDate && salon.CreatedAt <= endDate);
+
+                        result.InYears.Add(new InYear
+                        {
+                            NumofMonth = resultDate.ToString("MMMM"), 
+                            value = salons.Count()
+                        });
+                    }
+                    break;
+
+                case "MONTH":
+                    result.InMonths = new List<InMonth>();
+                    resultDate = new DateTime(currentDate.Year, currentDate.Month, 1); 
+                    var lastDayOfMonth = resultDate.AddMonths(1).AddDays(-1); 
+
+                    for (DateTime date = resultDate; date <= lastDayOfMonth; date = date.AddDays(1))
+                    {
+                        salons = salonInformation.Where(salon => salon.CreatedAt!.Value.Date == date.Date);
+
+                        result.InMonths.Add(new InMonth
+                        {
+                            NumofDate = date.ToString("dd"), 
+                            value = salons.Count()
+                        });
+                    }
+                    break;
+
+                case "WEEK":
+                    result.InWeeks = new List<InWeek>();
+                    var firstDayOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + 1); 
+                    var lastDayOfWeek = firstDayOfWeek.AddDays(6); 
+
+                    for (DateTime date = firstDayOfWeek; date <= lastDayOfWeek; date = date.AddDays(1))
+                    {
+                        salons = salonInformation.Where(salon => salon.CreatedAt!.Value.Date == date.Date);
+
+                        result.InWeeks.Add(new InWeek
+                        {
+                            NumofDate = date.ToString("dddd"), 
+                            value = salons.Count()
+                        });
+                    }
+                    break;
+
+                default:
+                    result.InYears = new List<InYear>();
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        resultDate = new DateTime(currentDate.Year, month, 1);
+                        var endDate = resultDate.AddMonths(1).AddDays(-1);
+
+                        salons = salonInformation.Where(salon => salon.CreatedAt >= resultDate && salon.CreatedAt <= endDate);
+
+                        result.InYears.Add(new InYear
+                        {
+                            NumofMonth = resultDate.ToString("MMMM"),
+                            value = salons.Count()
+                        });
+                    }
+                    break;
+            }
+
+            return result;
+
+
+        }
+
+        public async Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsRevenue(Guid? salonid, string? filter)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+            if (salonid != null)
+            {
+                predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformation.Id == salonid));
+            }
+
+            DateTime currentDate = DateTime.Now;
+            DateTime startDate = currentDate, endDate = currentDate;
+
+            switch (filter?.ToUpper())
+            {
+                case "YEAR":
+                    startDate = new DateTime(currentDate.Year, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+                case "MONTH":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+                case "WEEK":
+                    int diff = currentDate.DayOfWeek == DayOfWeek.Sunday ? -6 : (int)DayOfWeek.Monday - (int)currentDate.DayOfWeek;
+                    startDate = currentDate.AddDays(diff).Date;
+                    endDate = startDate.AddDays(6).AddTicks(-1);
+                    break;
+                default:
+                    startDate = currentDate.Date;
+                    endDate = currentDate.Date.AddDays(1).AddTicks(-1);
+                    break;
+            }
+
+            predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: x => x.Include(s => s.AppointmentDetails)
+                                   .ThenInclude(s => s.SalonEmployee)
+                                   .ThenInclude(s => s.SalonInformation)
+                );
+
+            var groupedAppointments = appointments
+                .GroupBy(x => x.StartDate.Date)
+                .ToDictionary(g => g.Key, g => g.Sum(a => a.TotalPrice));
+
+            var result = new StatisticsOfSalonsParticipating
+            {
+                InMonths = new List<InMonth>(),
+                InYears = new List<InYear>(),
+                InWeeks = new List<InWeek>()
+            };
+
+            if (filter?.ToUpper() == "MONTH")
+            {
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
+                {
+                    var date = new DateTime(currentDate.Year, currentDate.Month, day);
+                    result.InMonths!.Add(new InMonth
+                    {
+                        NumofDate = date.ToString("dd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
+                }
+            }
+            else if (filter?.ToUpper() == "YEAR")
+            {
+                for (int month = 1; month <= 12; month++)
+                {
+                    var monthStart = new DateTime(currentDate.Year, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+                    result.InYears!.Add(new InYear
+                    {
+                        NumofMonth = monthStart.ToString("MMMM"),
+                        value = appointments
+                            .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
+                            .Sum(x => x.TotalPrice)
+                    });
+                }
+            }
+            else if (filter?.ToUpper() == "WEEK")
+            {
+                var startOfWeek = startDate;
+                for (int i = 0; i < 7; i++)
+                {
+                    var date = startOfWeek.AddDays(i);
+                    result.InWeeks!.Add(new InWeek
+                    {
+                        NumofDate = date.ToString("dddd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<StatisticsOfSalonsParticipating> StatisticsRevenueOfPlatForm(string? filter)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+            DateTime currentDate = DateTime.Now;
+            DateTime startDate = currentDate, endDate = currentDate;
+
+            switch (filter?.ToUpper())
+            {
+                case "YEAR":
+                    startDate = new DateTime(currentDate.Year, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+                case "MONTH":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+                case "WEEK":
+                    int diff = currentDate.DayOfWeek == DayOfWeek.Sunday ? -6 : (int)DayOfWeek.Monday - (int)currentDate.DayOfWeek;
+                    startDate = currentDate.AddDays(diff).Date;
+                    endDate = startDate.AddDays(6).AddTicks(-1);
+                    break;
+                default:
+                    startDate = currentDate.Date;
+                    endDate = currentDate.Date.AddDays(1).AddTicks(-1);
+                    break;
+            }
+
+            predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+            
+
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate.And(x => x.Status == AppointmentStatus.Successed),
+                    include: x => x.Include(s => s.AppointmentDetails)
+                                   .ThenInclude(s => s.SalonEmployee)
+                                   .ThenInclude(s => s.SalonInformation)
+                );
+
+            var groupedAppointments = appointments
+                .GroupBy(x => x.StartDate.Date)
+                .ToDictionary(g => g.Key, g => g.Sum(a => a.TotalPrice * 0.1m));
+
+            var result = new StatisticsOfSalonsParticipating
+            {
+                InMonths = new List<InMonth>(),
+                InYears = new List<InYear>(),
+                InWeeks = new List<InWeek>()
+            };
+
+            if (filter?.ToUpper() == "MONTH")
+            {
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
+                {
+                    var date = new DateTime(currentDate.Year, currentDate.Month, day);
+                    result.InMonths!.Add(new InMonth
+                    {
+                        NumofDate = date.ToString("dd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
+                }
+            }
+            else if (filter?.ToUpper() == "YEAR")
+            {
+                for (int month = 1; month <= 12; month++)
+                {
+                    var monthStart = new DateTime(currentDate.Year, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+                    result.InYears!.Add(new InYear
+                    {
+                        NumofMonth = monthStart.ToString("MMMM"),
+                        value = appointments
+                            .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
+                            .Sum(x => x.TotalPrice)
+                    });
+                }
+            }
+            else if (filter?.ToUpper() == "WEEK")
+            {
+                var startOfWeek = startDate;
+                for (int i = 0; i < 7; i++)
+                {
+                    var date = startOfWeek.AddDays(i);
+                    result.InWeeks!.Add(new InWeek
+                    {
+                        NumofDate = date.ToString("dddd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
+                }
+            }
+
+            return result;
+        }
     }
 }

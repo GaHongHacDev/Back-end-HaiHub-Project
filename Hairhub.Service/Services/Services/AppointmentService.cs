@@ -24,6 +24,9 @@ using Hairhub.Domain.Dtos.Responses.SalonInformations;
 using Microsoft.IdentityModel.Tokens;
 using Hairhub.Domain.Dtos.Responses.Customers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Drawing;
+using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
 //using CloudinaryDotNet;
 
 
@@ -2208,6 +2211,166 @@ namespace Hairhub.Service.Services.Services
                 Total = appointments.Total,
                 TotalPages = appointments.TotalPages,
             };
+        }
+
+        public async Task<StatisticsNumberOfAppointmentOnPlatform> StatisticsNumberOfAppointmentOnPlatform(Guid? SalonId, string? filter)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+            if (SalonId.HasValue)
+            {
+                predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformation.Id == SalonId));
+            }
+
+            DateTime currentDate = DateTime.Now;
+            DateTime startDate = currentDate;
+            DateTime endDate = currentDate;
+
+            
+            switch (filter?.ToUpper())
+            {
+                case "YEAR":
+                    startDate = new DateTime(currentDate.Year, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+
+                case "MONTH":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+
+                case "WEEK":
+                    int diff = currentDate.DayOfWeek == DayOfWeek.Sunday ? -6 : (int)DayOfWeek.Monday - (int)currentDate.DayOfWeek;
+                    startDate = currentDate.AddDays(diff).Date;
+                    endDate = startDate.AddDays(6).AddTicks(-1);
+                    break;
+
+                default: 
+                    startDate = currentDate.Date;
+                    endDate = currentDate.Date.AddDays(1).AddTicks(-1);
+                    break;
+            }
+
+            
+            predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+
+            
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: x => x.Include(s => s.AppointmentDetails)
+                                   .ThenInclude(s => s.SalonEmployee)
+                                   .ThenInclude(s => s.SalonInformation)
+                );
+
+            
+            var totalAppointments = appointments.Count();
+            var result = new StatisticsNumberOfAppointmentOnPlatform
+            {
+                TotalAppointmenOnPlatform = totalAppointments,
+                RateOfOut_SideAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.OutSide) / totalAppointments * 100 : 0,
+                RateOfSuccessedAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Successed) / totalAppointments * 100 : 0,
+                RateOfFailAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Fail) / totalAppointments * 100 : 0,
+                RateOfCancelAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer) / totalAppointments * 100 : 0
+            };
+            
+            return result;
+        }
+
+        public async Task<StatisticAppointmentInYear> GetAppointmentStatistics(Guid? SalonId, string? filter)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+            if (SalonId.HasValue)
+            {
+                predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformation.Id == SalonId));
+            }
+
+            DateTime currentDate = DateTime.Now;
+            DateTime startDate = currentDate;
+            DateTime endDate = currentDate;
+
+            switch (filter?.ToUpper())
+            {
+                case "YEAR":
+                    startDate = new DateTime(currentDate.Year, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+
+                case "MONTH":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+
+                case "WEEK":
+                    int diff = currentDate.DayOfWeek == DayOfWeek.Sunday ? -6 : (int)DayOfWeek.Monday - (int)currentDate.DayOfWeek;
+                    startDate = currentDate.AddDays(diff).Date;
+                    endDate = startDate.AddDays(6).AddTicks(-1);
+                    break;
+
+                default: 
+                    startDate = currentDate.Date;
+                    endDate = currentDate.Date.AddDays(1).AddTicks(-1);
+                    break;
+            }
+
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: x => x.Include(s => s.AppointmentDetails)
+                                   .ThenInclude(s => s.SalonEmployee)
+                                   .ThenInclude(s => s.SalonInformation)
+                );
+
+            var result = new StatisticAppointmentInYear();
+
+            if (filter?.ToUpper() == "MONTH")
+            {
+                result.TimeFrame = "Month";
+
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
+                {
+                    var date = new DateTime(currentDate.Year, currentDate.Month, day);
+
+                    result.OutsideAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.OutSide);
+                    result.SuccessedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Successed);
+                    result.FailedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Fail);
+                    result.CanceledAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.CancelByCustomer);
+                }
+            }
+            else if (filter?.ToUpper() == "YEAR")
+            {
+                result.TimeFrame = "Year";
+
+                for (int month = 1; month <= 12; month++)
+                {
+                    var monthStart = new DateTime(currentDate.Year, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+
+                    result.OutsideAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.OutSide);
+                    result.SuccessedAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.Successed);
+                    result.FailedAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.Fail);
+                    result.CanceledAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.CancelByCustomer);
+                }
+            }
+            else if (filter?.ToUpper() == "WEEK")
+            {
+                result.TimeFrame = "Week";
+                
+
+                var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + (int)DayOfWeek.Monday);
+                var endOfWeek = startOfWeek.AddDays(6);
+
+                for (int i = 0; i < 7; i++)
+                {
+                    var date = startOfWeek.AddDays(i);
+                    result.OutsideAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.OutSide);
+                    result.SuccessedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Successed);
+                    result.FailedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Fail);
+                    result.CanceledAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.CancelByCustomer);
+                }
+            }
+            return result;
         }
 
 

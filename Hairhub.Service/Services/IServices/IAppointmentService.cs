@@ -33,6 +33,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time);
 
+        Task<StatisticsNumberOfAppointmentOnPlatform> StatisticsNumberOfAppointmentOnPlatform(Guid? SalonId, string? filter);
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
         Task<BookAppointmentResponse> BookAppointment(BookAppointmentRequest request);
         Task<(bool, Guid)> CreateAppointment(CreateAppointmentRequest request);
@@ -68,6 +69,10 @@ namespace Hairhub.Service.Services.IServices
 
         Task<AdminOverallStatisticResponse> AdminOverallStatistic();
         Task<IPaginate<GetAppointmentTodayAdminResponse>> GetAppointmentTodayByAdmin(string? salonName, string? appointmentStatus, int page, int size);
+
+        Task<StatisticAppointmentInYear> GetAppointmentStatistics(Guid? SalonId, string? filter);
+
+
     }
 }
 

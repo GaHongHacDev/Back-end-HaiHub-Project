@@ -688,5 +688,43 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> StatisticsNumberOfAppointmentOnPlatform([FromQuery] Guid? SalonId, [FromQuery] string? filter)
+        {
+            try
+            {
+                var response = await _appointmentService.StatisticsNumberOfAppointmentOnPlatform(SalonId, filter);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> StatisticAppointmentInYear([FromQuery] Guid? SalonId, [FromQuery] string? filter)
+        {
+            try
+            {
+                var response = await _appointmentService.GetAppointmentStatistics(SalonId, filter);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

@@ -72,6 +72,62 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> StatisticOfSalonParticipating(
+            [FromQuery] string filter)
+        {
+            try
+            {
+                var result = await _salonInformationService.StatisticsOfSalonsParticipating(filter);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy salon nào trên hệ thống" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> StatisticSalonRevenue([FromQuery] Guid? SalonId, [FromQuery] string? filter)
+        {
+            try
+            {
+                var response = await _salonInformationService.StatisticsOfSalonsRevenue(SalonId, filter);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> StatisticRevenueofPlatform([FromQuery] string? filter)
+        {
+            try
+            {
+                var response = await _salonInformationService.StatisticsRevenueOfPlatForm(filter);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet]
         [Route("{salonId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> ServiceStatistics(
