@@ -92,7 +92,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> StatisticSalonRevenue([FromQuery] Guid? SalonId, [FromQuery] string? filter)
         {
             try
@@ -110,7 +110,7 @@ namespace Hairhub.API.Controllers
             }
         }
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> StatisticRevenueofPlatform([FromQuery] string? filter)
         {
             try

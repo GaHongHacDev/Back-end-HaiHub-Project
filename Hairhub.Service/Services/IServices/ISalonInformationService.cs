@@ -39,15 +39,15 @@ namespace Hairhub.Service.Services.IServices
         Task<CompileRevenueSalonByYearResponse> CompileRevenueSalonByYear(Guid salonId, int year);
         Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid salonId, int year);
         Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size);
-<<<<<<< HEAD
+
         Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime startDate, DateTime endDate);
-=======
+
 
         Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsParticipating(string filter);
 
         Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsRevenue(Guid? salonid, string? filter);
 
         Task<StatisticsOfSalonsParticipating> StatisticsRevenueOfPlatForm(string? filter);
->>>>>>> ChauHien
+
     }
 }

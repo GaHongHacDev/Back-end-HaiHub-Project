@@ -1007,7 +1007,7 @@ namespace Hairhub.Service.Services.Services
             };
         }
 
-<<<<<<< HEAD
+
         public async Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime startDate, DateTime endDate)
         {
             List<CompileAppointmentSalonResponse> responses = new List<CompileAppointmentSalonResponse>();
@@ -1065,7 +1065,7 @@ namespace Hairhub.Service.Services.Services
                 Percent = (appointments == null || appointments.Count() == 0) ? 0 : (double)appointmentsWhere.Count() / appointments.Count() * 100
             });
             return responses;
-=======
+        }
         public async Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsParticipating(string filter)
         {
             var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: p => p.Status == SalonStatus.Approved);
@@ -1299,49 +1299,47 @@ namespace Hairhub.Service.Services.Services
                 InWeeks = new List<InWeek>()
             };
 
-            if (filter?.ToUpper() == "MONTH")
-            {
-                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
+                if (filter?.ToUpper() == "MONTH")
                 {
-                    var date = new DateTime(currentDate.Year, currentDate.Month, day);
-                    result.InMonths!.Add(new InMonth
+                    for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
                     {
-                        NumofDate = date.ToString("dd"),
-                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
-                    });
+                        var date = new DateTime(currentDate.Year, currentDate.Month, day);
+                        result.InMonths!.Add(new InMonth
+                        {
+                            NumofDate = date.ToString("dd"),
+                            value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                        });
+                    }
                 }
-            }
-            else if (filter?.ToUpper() == "YEAR")
-            {
-                for (int month = 1; month <= 12; month++)
+                else if (filter?.ToUpper() == "YEAR")
                 {
-                    var monthStart = new DateTime(currentDate.Year, month, 1);
-                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
-                    result.InYears!.Add(new InYear
+                    for (int month = 1; month <= 12; month++)
                     {
-                        NumofMonth = monthStart.ToString("MMMM"),
-                        value = appointments
-                            .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
-                            .Sum(x => x.TotalPrice)
-                    });
+                        var monthStart = new DateTime(currentDate.Year, month, 1);
+                        var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+                        result.InYears!.Add(new InYear
+                        {
+                            NumofMonth = monthStart.ToString("MMMM"),
+                            value = appointments
+                                .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
+                                .Sum(x => x.TotalPrice)
+                        });
+                    }
                 }
-            }
-            else if (filter?.ToUpper() == "WEEK")
-            {
-                var startOfWeek = startDate;
-                for (int i = 0; i < 7; i++)
+                else if (filter?.ToUpper() == "WEEK")
                 {
-                    var date = startOfWeek.AddDays(i);
-                    result.InWeeks!.Add(new InWeek
+                    var startOfWeek = startDate;
+                    for (int i = 0; i < 7; i++)
                     {
-                        NumofDate = date.ToString("dddd"),
-                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
-                    });
+                        var date = startOfWeek.AddDays(i);
+                        result.InWeeks!.Add(new InWeek
+                        {
+                            NumofDate = date.ToString("dddd"),
+                            value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                        });
+                    }
                 }
-            }
-
             return result;
->>>>>>> ChauHien
         }
     }
 }
