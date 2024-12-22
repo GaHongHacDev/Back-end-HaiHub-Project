@@ -18,5 +18,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public double? RateOfReturnCustomers { get; set; }
         public decimal? ValueAverageOnProduct { get; set; }
 
+        public decimal? PriceDiscountforCustomers { get; set; }
+
     }
 }
