@@ -41,6 +41,10 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_active");
 
+                    b.Property<DateTime?>("LoginDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("login_date");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(50)

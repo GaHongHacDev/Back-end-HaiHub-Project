@@ -2113,7 +2113,7 @@ namespace Hairhub.Service.Services.Services
             //Tổng số lượng User
             result.TotalCustomer = account.Count();
             // SỐ lượng user đang hoạt động
-            result.NumberOfActiveCustomer = 1000;
+            result.NumberOfActiveCustomer = account.Where(s => s.LoginDate.HasValue && s.LoginDate.Value.Date >= DateTime.UtcNow.Date.AddDays(-7)).Count();
             //Số lượng salon
             var salons = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: x => x.Status.Equals(SalonStatus.Approved));
             result.NumberOfSalon = (salons==null || salons.Count ==0) ? 0 : salons.Count();
@@ -2142,11 +2142,11 @@ namespace Hairhub.Service.Services.Services
             totalRevenue = 0;
             foreach(var item in totalAppointment)
             {
-                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!/100;
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate / 100)!;
             }
             result.TotalRevenue = totalRevenue;
             //Tỷ lệ quay lại = so khach hang dat lich >=2 / so khach hang dat lich
-            var customersWithAtLeastTwoAppointments = appointments.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count(); 
+            var customersWithAtLeastTwoAppointments = totalAppointment.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count(); 
             var totalUniqueBookingCustomer = totalAppointment.Select(x => x.CustomerId).Distinct().Count();
             result.ReturnRate = (double)customersWithAtLeastTwoAppointments/totalUniqueBookingCustomer*100;
             return result;

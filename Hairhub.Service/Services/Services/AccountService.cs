@@ -204,6 +204,7 @@ namespace Hairhub.Service.Services.Services
             account.IsActive = true;
             account.IsActive = true;
             account.CreatedDate = DateTime.UtcNow;
+            account.LoginDate = DateTime.UtcNow;
 
             if (RoleEnum.Customer.ToString().Equals(createAccountRequest.RoleName))
             {
@@ -394,6 +395,8 @@ namespace Hairhub.Service.Services.Services
                 {
                     throw new NotFoundException("Email không tồn tại trên hệ thống");
                 }
+                account.LoginDate = DateTime.UtcNow;
+                _unitOfWork.GetRepository<Account>().UpdateAsync(account);
                 SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
                 Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
                 SalonEmployee salonEmployee = await _unitOfWork.GetRepository<SalonEmployee>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
@@ -484,7 +487,8 @@ namespace Hairhub.Service.Services.Services
                 Password = AesEncoding.GenerateRandomPassword(),
                 RoleId = role.RoleId,
                 IsActive = true,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                LoginDate = DateTime.UtcNow,
             };
             Customer customer = null!;
             SalonOwner salonOwner = null!;

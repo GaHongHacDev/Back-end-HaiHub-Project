@@ -45,6 +45,8 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Không tìm thấy access token!");
             }
             var account = refreshTokenEntity.Account;
+            account.LoginDate = DateTime.UtcNow;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
@@ -76,6 +78,8 @@ namespace Hairhub.Service.Services.Services
             {
                 return null;
             }
+            account.LoginDate = DateTime.UtcNow;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             SalonOwner salonOwner = await _unitOfWork.GetRepository<SalonOwner>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Customer customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
             Admin admin = await _unitOfWork.GetRepository<Admin>().SingleOrDefaultAsync(predicate: x => x.AccountId == account.Id);
@@ -130,7 +134,8 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new Exception("Account not found or expired");
             }
-
+            account.LoginDate = DateTime.UtcNow;
+            _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             var accessToken = JWTHelper.GenerateToken(account.UserName, account.Role.RoleName!, _configuaration["JWTSettings:Key"]!, _configuaration["JWTSettings:Issuer"]!, _configuaration["JWTSettings:Audience"]!);
             refreshTokenEntity.AccessToken = accessToken;
             _unitOfWork.GetRepository<RefreshTokenAccount>().UpdateAsync(refreshTokenEntity);
