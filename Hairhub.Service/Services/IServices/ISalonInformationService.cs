@@ -45,6 +45,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsParticipating(string filter);
 
+        Task<StatisticsOfSalonsParticipating> StatisticsOfAccountParticipating(string filter);
+
         Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsRevenue(Guid? salonid, string? filter);
 
         Task<StatisticsOfSalonsParticipating> StatisticsRevenueOfPlatForm(string? filter);
