@@ -751,10 +751,10 @@ namespace Hairhub.Service.Services.Services
 
                 // Get appointment detail => Check available time
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                          .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                             && x.StartTime.Date == request.Day.Date
-                                                                             && x.EndTime.Date == request.Day.Date
-                                                                             && x.Status.Equals(AppointmentStatus.Booking));
+                                                          .GetListAsync(
+                                                                            predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                             && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                       );
 
                 foreach (var item in appointmentDetails)
                 {
@@ -840,16 +840,15 @@ namespace Hairhub.Service.Services.Services
 
                     // Get appointment detail => Check available time
                     var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                              .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                                 && x.StartTime.Date == request.Day.Date
-                                                                                 && x.EndTime.Date == request.Day.Date
-                                                                                 && x.Status.Equals(AppointmentStatus.Booking));
+                                                              .GetListAsync(
+                                                                                predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                                                && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                            );
 
                     foreach (var item in appointmentDetails)
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
-                        await Console.Out.WriteLineAsync(start + " : " + end);
                         timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                     }
 
@@ -1054,10 +1053,10 @@ namespace Hairhub.Service.Services.Services
                     {
                         //Get appointment detail => Check available time
                         var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                        .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                               && x.StartTime.Date == request.Day.Date
-                                                                               && x.EndTime.Date == request.Day.Date
-                                                                               && x.Status.Equals(AppointmentStatus.Booking)))
+                                                        .GetListAsync(
+                                                                        predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                               && ( x.Status.Equals(AppointmentStatus.Booking)) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                        )
                                                         .ToList()
                                                         .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
@@ -1099,10 +1098,11 @@ namespace Hairhub.Service.Services.Services
                 {
                     //Get appointment detail => Check available time
                     var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                           && x.StartTime.Date == request.Day.Date
-                                                                           && x.EndTime.Date == request.Day.Date
-                                                                           && x.Status.Equals(AppointmentStatus.Booking)))
+                                                    .GetListAsync(
+                                                                    predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                           && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                 )
+                                                    )
                                                     .ToList()
                                                     .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
                                                              || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
