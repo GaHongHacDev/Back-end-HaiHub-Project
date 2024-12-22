@@ -84,6 +84,7 @@ namespace Hairhub.Infrastructure
                 entity.Property(e => e.UserName).HasMaxLength(50).HasColumnName("username");
                 entity.Property(e => e.Password).HasMaxLength(50).HasColumnName("password");
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+                entity.Property(e => e.LoginDate).HasColumnName("login_date").IsRequired(false);
                 entity.Property(e => e.RoleId).HasMaxLength(64).HasColumnName("role_id");
                 entity.Property(e => e.Balance).HasColumnName("balance");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");

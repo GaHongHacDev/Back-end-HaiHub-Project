@@ -19,6 +19,7 @@ namespace Hairhub.Domain.Entitities
 
         public Guid RoleId { get; set; }
         public decimal Balance { get; set; }
+        public DateTime? LoginDate { get; set; }
 
         public bool IsActive {  get; set; }
 
