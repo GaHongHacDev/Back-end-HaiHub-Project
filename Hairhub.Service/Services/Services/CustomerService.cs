@@ -24,6 +24,7 @@ using Hairhub.Domain.Dtos.Responses.Appointments;
 using static QRCoder.Base64QRCode;
 using System.Xml.Linq;
 using System.Linq.Expressions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -41,24 +42,45 @@ namespace Hairhub.Service.Services.Services
         }
         public async Task<IPaginate<GetCustomerResponse>> GetCustomers(string? email, bool? status, string? customerName, bool? isAscendingBooking, int page, int size)
         {
-            Expression<Func<Customer, bool>> predicate = c =>
-                (string.IsNullOrEmpty(email) || c.Email.Contains(email)) &&
-                (string.IsNullOrEmpty(customerName) || c.FullName.Contains(customerName)) &&  
-                (!status.HasValue || c.Account.IsActive == status.Value); 
-
-            var customerEntities = await _unitOfWork.GetRepository<Customer>()
+            ICollection<Customer> customerEntities;
+            if (email.IsNullOrEmpty())
+            {
+                email = "";
+            }
+            if (customerName.IsNullOrEmpty())
+            {
+                customerName = "";
+            }
+            if (status==null)
+            {
+                customerEntities = await _unitOfWork.GetRepository<Customer>()
                 .GetListAsync(
-                    predicate: predicate,
+                    predicate: c => c.Email!.Contains(email!) && c.FullName.Contains(customerName!),
                     include: query => query.Include(s => s.Account)
                 );
+            }
+            else
+            {
+                customerEntities = await _unitOfWork.GetRepository<Customer>()
+                .GetListAsync(
+                    predicate: c => c.Email!.Contains(email!) && c.FullName.Contains(customerName!) && c.Account.IsActive == status.Value,
+                    include: query => query.Include(s => s.Account)
+                );
+            }
+
+            
             var result = _mapper.Map<IList<GetCustomerResponse>>(customerEntities);
             foreach (var item in result) {
                 item.NumberOfAppointment = (await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x => x.CustomerId == item.Id && x.Status.Equals(AppointmentStatus.Successed))).Count;
+                if (item.NumberOfAppointment > 0)
+                {
+                    Console.WriteLine(item.Id);
+                }
             }
 
             if (isAscendingBooking != null)
             {
-                result = (isAscendingBooking == true) ? result.OrderBy(x => x.NumberOfAppointment).ToList() : result.OrderBy(x => x.NumberOfAppointment).ToList();
+                result = (isAscendingBooking == true) ? result.OrderBy(x => x.NumberOfAppointment).ToList() : result.OrderByDescending(x => x.NumberOfAppointment).ToList();
             }
 
             var pagedResult = result.Skip((page - 1) * size).Take(size).ToList();
