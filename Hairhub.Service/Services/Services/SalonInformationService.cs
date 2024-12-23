@@ -404,14 +404,29 @@ namespace Hairhub.Service.Services.Services
         public async Task<List<SalonSuggesstionResponse>> GetSalonSuggestion()
         {
             var salons = await _unitOfWork.GetRepository<SalonInformation>()
-                .GetListAsync(
-                predicate: x => x.Status.Equals(SalonStatus.Approved),
-                    orderBy: q => q.OrderByDescending(s => s.Rate)
-                                  .ThenByDescending(s => s.TotalReviewer),
-                    take: 20
-                );
+        .GetListAsync(
+            predicate: x => x.Status.Equals(SalonStatus.Approved),
+            orderBy: q => q.OrderByDescending(s => s.Rate)
+                          .ThenByDescending(s => s.TotalReviewer),
+            take: 20
+        );
 
-            return _mapper.Map<List<SalonSuggesstionResponse>>(salons);
+            var salonSuggestionResponses = new List<SalonSuggesstionResponse>();
+            foreach (var salon in salons)
+            {
+                var successfulAppointmentsCount = await _unitOfWork.GetRepository<Appointment>()
+                    .GetListAsync(predicate: p => p.AppointmentDetails
+                        .Any(ad => ad.SalonEmployee.SalonInformationId == salon.Id
+                                   && ad.Status == AppointmentStatus.Successed));
+
+                var Count = successfulAppointmentsCount.Count();
+                var response = _mapper.Map<SalonSuggesstionResponse>(salon);
+                response.NumberOfSuccessedAppointment = Count;
+
+                salonSuggestionResponses.Add(response);
+            }
+
+            return salonSuggestionResponses;
         }
 
         public async Task<ReviewRevenueReponse> ReviewRevenue(Guid SalonId, DateTime startDate, DateTime endDate)

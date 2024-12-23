@@ -17,6 +17,7 @@ namespace Hairhub.Domain.Dtos.Responses.SalonInformations
         public int TotalReviewer { get; set; }
         public string Status { get; set; }
 
+        public int? NumberOfSuccessedAppointment { get; set; }
 
     }
 
