@@ -19,6 +19,7 @@ namespace Hairhub.Domain.Dtos.Responses.Customers
         public string? Address { get; set; }
         public string? Img { get; set; }
         public int? NumberOfReported { get; set; }
+        public long NumberOfAppointment { get; set; }
         public AccountResponse Account { get; set; }
     }
 }

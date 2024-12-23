@@ -314,11 +314,11 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{status}")]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? salonName, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? salonName, [FromQuery] string? customerName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, startDate, endDate, salonName, page, size);
+                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, startDate, endDate, salonName, customerName, page, size);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)

@@ -1931,7 +1931,7 @@ namespace Hairhub.Service.Services.Services
             return isStatus;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, int page, int size)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, string? customerName, int page, int size)
         {
             status = status == null ? "" : status.Trim();
             var predicate = PredicateBuilder.New<Appointment>(x => x.Status.Contains(status));
@@ -1945,6 +1945,11 @@ namespace Hairhub.Service.Services.Services
             {
                 predicate = predicate.And(x => x.AppointmentDetails.Any(ad =>
                     ad.SalonEmployee.SalonInformation.Name.ToLower().Contains(salonName.ToLower())));
+            }
+            if (!string.IsNullOrEmpty(customerName))
+            {
+                customerName = customerName.Trim();
+                predicate = predicate.And(x => x.Customer.FullName.ToLower().Contains(customerName.ToLower()));
             }
 
             var appointments = await _unitOfWork.GetRepository<Appointment>()
