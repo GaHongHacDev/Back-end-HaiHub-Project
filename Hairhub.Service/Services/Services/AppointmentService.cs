@@ -319,7 +319,7 @@ namespace Hairhub.Service.Services.Services
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
-            
+
             predicate = predicate.And(x =>
                 x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
 
@@ -331,7 +331,7 @@ namespace Hairhub.Service.Services.Services
 
             if (!serviceName.IsNullOrEmpty())
             {
-                predicate = predicate.And(x => x.AppointmentDetails.Any(s=>s.ServiceName!.ToLower().Contains(serviceName!.ToLower())));
+                predicate = predicate.And(x => x.AppointmentDetails.Any(s => s.ServiceName!.ToLower().Contains(serviceName!.ToLower())));
             }
 
             if (!string.IsNullOrWhiteSpace(customerName))
@@ -424,7 +424,7 @@ namespace Hairhub.Service.Services.Services
             DateTime resultDate;
 
             if (time!.Contains("ALL"))
-            {                
+            {
                 predicate = predicate.And(x => x.StartDate.Date <= currentDate);
             }
             else if (time!.Contains("DAY"))
@@ -751,10 +751,10 @@ namespace Hairhub.Service.Services.Services
 
                 // Get appointment detail => Check available time
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                          .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                             && x.StartTime.Date == request.Day.Date
-                                                                             && x.EndTime.Date == request.Day.Date
-                                                                             && x.Status.Equals(AppointmentStatus.Booking));
+                                                          .GetListAsync(
+                                                                            predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                             && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                       );
 
                 foreach (var item in appointmentDetails)
                 {
@@ -840,23 +840,22 @@ namespace Hairhub.Service.Services.Services
 
                     // Get appointment detail => Check available time
                     var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                              .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                                 && x.StartTime.Date == request.Day.Date
-                                                                                 && x.EndTime.Date == request.Day.Date
-                                                                                 && x.Status.Equals(AppointmentStatus.Booking));
+                                                              .GetListAsync(
+                                                                                predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                                                && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                            );
 
                     foreach (var item in appointmentDetails)
                     {
                         decimal start = ParseTimeToDecimal(item.StartTime);
                         decimal end = ParseTimeToDecimal(item.EndTime);
-                        await Console.Out.WriteLineAsync(start + " : " + end);
                         timeSlotEmployee.RemoveAll(slot => slot >= start && slot < end);
                     }
 
                     var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
                                                         .GetListAsync(
-                                                                        predicate: x=>x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed) 
-                                                                                    && x.StartTime.Date == request.Day.Date && x.StartTime>=request.Day
+                                                                        predicate: x => x.EmployeeId == employee.Id && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                    && x.StartTime.Date == request.Day.Date && x.StartTime >= request.Day
                                                                       );
 
                     foreach (var item in busySchedule)
@@ -943,7 +942,7 @@ namespace Hairhub.Service.Services.Services
             }
             Decimal endTimeSalon = scheduleSolon.EndTime.Hour + (scheduleSolon.EndTime.Minute) / 60m;
             List<EmployeeAvailable> listEmp = new List<EmployeeAvailable>();
-            
+
             for (int i = 0; i < request.BookingDetail.Count(); i++)
             {
                 Decimal waitingTime = 0;
@@ -1054,10 +1053,10 @@ namespace Hairhub.Service.Services.Services
                     {
                         //Get appointment detail => Check available time
                         var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                        .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                               && x.StartTime.Date == request.Day.Date
-                                                                               && x.EndTime.Date == request.Day.Date
-                                                                               && x.Status.Equals(AppointmentStatus.Booking)))
+                                                        .GetListAsync(
+                                                                        predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                               && (x.Status.Equals(AppointmentStatus.Booking)) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                        )
                                                         .ToList()
                                                         .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
@@ -1066,13 +1065,13 @@ namespace Hairhub.Service.Services.Services
                         //Kiem tra co busy schedule nao trong khoang thoi gian lam dich vu khong?
                         var busySchedule = await _unitOfWork.GetRepository<BusyScheduleEmployee>()
                                                             .SingleOrDefaultAsync(
-                                                                                  predicate: x=>x.EmployeeId==employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
+                                                                                  predicate: x => x.EmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.Status.Equals(BusyScheduleStatus.Successed)
                                                                                             && (
-                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m)>startTimeProcess)
+                                                                                                ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < startTimeProcess && (decimal)(x.EndTime.Hour + x.EndTime.Minute / 60m) > startTimeProcess)
                                                                                                 || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) > startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) < endTimeProcess)
                                                                                                )
                                                                                  );
-                        if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
+                        if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule == null)
                         {
                             listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                         }
@@ -1099,10 +1098,11 @@ namespace Hairhub.Service.Services.Services
                 {
                     //Get appointment detail => Check available time
                     var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                    .GetListAsync(predicate: x => x.SalonEmployeeId == employee.Id
-                                                                           && x.StartTime.Date == request.Day.Date
-                                                                           && x.EndTime.Date == request.Day.Date
-                                                                           && x.Status.Equals(AppointmentStatus.Booking)))
+                                                    .GetListAsync(
+                                                                    predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                           && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                 )
+                                                    )
                                                     .ToList()
                                                     .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
                                                              || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
@@ -1117,7 +1117,7 @@ namespace Hairhub.Service.Services.Services
                                                                                             || ((decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) >= startTimeProcess && (decimal)(x.StartTime.Hour + x.StartTime.Minute / 60m) <= endTimeProcess)
                                                                                            )
                                                                              );
-                    if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule==null)
+                    if ((appointmentDetails == null || appointmentDetails.Count == 0) && busySchedule == null)
                     {
                         listEmp.Add(new EmployeeAvailable() { Id = employee.Id, FullName = employee.FullName, Img = employee.Img });
                     }
@@ -1465,7 +1465,7 @@ namespace Hairhub.Service.Services.Services
             //Back tiền nếu đặt qua ví
             if (appoinment!.PaymentMethod!.Equals("PAYBYWALLET"))
             {
-                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x=>x.Id == appoinment.Customer.AccountId);
+                var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == appoinment.Customer.AccountId);
                 account.Balance += appoinment.TotalPrice;
                 _unitOfWork.GetRepository<Account>().UpdateAsync(account);
             }
@@ -1956,7 +1956,7 @@ namespace Hairhub.Service.Services.Services
                                                    .ThenInclude(se => se.SalonInformation),
                     page: page,
                     size: size,
-                    orderBy: x => x.OrderByDescending(x=>x.StartDate)
+                    orderBy: x => x.OrderByDescending(x => x.StartDate)
                 );
             var appointmentResponse = new Paginate<GetAppointmentResponse>()
             {
@@ -2036,7 +2036,7 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             Guid customerId;
-            if (request.CustomerId==null)
+            if (request.CustomerId == null)
             {
                 var role = await _unitOfWork.GetRepository<Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer.ToString()));
                 if (role == null)
@@ -2078,7 +2078,7 @@ namespace Hairhub.Service.Services.Services
             var appointment = new Appointment()
             {
                 Id = id,
-                CustomerId = customerId ,
+                CustomerId = customerId,
                 CreatedDate = DateTime.Now,
                 StartDate = request.StartDate,
                 TotalPrice = request.TotalPrice,
@@ -2104,28 +2104,28 @@ namespace Hairhub.Service.Services.Services
         public async Task<AdminOverallStatisticResponse> AdminOverallStatistic()
         {
             AdminOverallStatisticResponse result = new AdminOverallStatisticResponse();
-            var role = await _unitOfWork.GetRepository<Hairhub.Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x=>x.RoleName.Equals(RoleEnum.Customer.ToString()));
+            var role = await _unitOfWork.GetRepository<Hairhub.Domain.Entitities.Role>().SingleOrDefaultAsync(predicate: x => x.RoleName.Equals(RoleEnum.Customer.ToString()));
             if (role == null)
             {
                 throw new NotFoundException("Không tìm thấy role Customer");
             }
-            var account = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: x=>x.RoleId == role.RoleId && x.IsActive);
+            var account = await _unitOfWork.GetRepository<Account>().GetListAsync(predicate: x => x.RoleId == role.RoleId && x.IsActive);
             //Tổng số lượng User
             result.TotalCustomer = account.Count();
             // SỐ lượng user đang hoạt động
             result.NumberOfActiveCustomer = account.Where(s => s.LoginDate.HasValue && s.LoginDate.Value.Date >= DateTime.UtcNow.Date.AddDays(-7)).Count();
             //Số lượng salon
             var salons = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: x => x.Status.Equals(SalonStatus.Approved));
-            result.NumberOfSalon = (salons==null || salons.Count ==0) ? 0 : salons.Count();
+            result.NumberOfSalon = (salons == null || salons.Count == 0) ? 0 : salons.Count();
             //Số lượng khách hàng đặt lịch:
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                           .GetListAsync(
                                                         predicate: x => x.Status.Equals(x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Booking) && x.StartDate.Date == DateTime.UtcNow.Date)
                                                        );
             result.NumnberOfBookingCustomer = appointments.Select(x => x.CustomerId).Distinct().Count();
-            
+
             //Số đơn report mới trong hôm nay
-            var reports = await _unitOfWork.GetRepository<Report>().GetListAsync(predicate: x=>x.CreateDate.Date == DateTime.UtcNow.Date);
+            var reports = await _unitOfWork.GetRepository<Report>().GetListAsync(predicate: x => x.CreateDate.Date == DateTime.UtcNow.Date);
             result.NumberOfReport = (reports == null || reports.Count == 0) ? 0 : reports.Count();
 
             //Doanh thu hệ thống trong hôm nay:
@@ -2133,22 +2133,22 @@ namespace Hairhub.Service.Services.Services
             var appointmentToday = appointments.Where(x => x.Status.Equals(AppointmentStatus.Successed));
             foreach (var item in appointmentToday)
             {
-                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)!/100;
-            }       
+                totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate)! / 100;
+            }
             result.RevenueToday = totalRevenue;
 
             //Tổng doanh thu hệ thống
-            var totalAppointment= await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x=>x.Status.Equals(AppointmentStatus.Successed));
+            var totalAppointment = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x => x.Status.Equals(AppointmentStatus.Successed));
             totalRevenue = 0;
-            foreach(var item in totalAppointment)
+            foreach (var item in totalAppointment)
             {
                 totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate / 100)!;
             }
             result.TotalRevenue = totalRevenue;
             //Tỷ lệ quay lại = so khach hang dat lich >=2 / so khach hang dat lich
-            var customersWithAtLeastTwoAppointments = totalAppointment.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count(); 
+            var customersWithAtLeastTwoAppointments = totalAppointment.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count();
             var totalUniqueBookingCustomer = totalAppointment.Select(x => x.CustomerId).Distinct().Count();
-            result.ReturnRate = (double)customersWithAtLeastTwoAppointments/totalUniqueBookingCustomer*100;
+            result.ReturnRate = (double)customersWithAtLeastTwoAppointments / totalUniqueBookingCustomer * 100;
             return result;
         }
 
@@ -2190,19 +2190,19 @@ namespace Hairhub.Service.Services.Services
             List<GetAppointmentTodayAdminResponse> result = new List<GetAppointmentTodayAdminResponse>();
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                 .GetPagingListAsync(
-                                                                predicate: predicate, 
-                                                                include: x=>x.Include(s=>s.AppointmentDetails).ThenInclude(s=>s.SalonEmployee).ThenInclude(s=>s.SalonInformation),
+                                                                predicate: predicate,
+                                                                include: x => x.Include(s => s.AppointmentDetails).ThenInclude(s => s.SalonEmployee).ThenInclude(s => s.SalonInformation),
                                                                 page: page,
                                                                 size: size
                                                              );
-            foreach(var item in appointments.Items)
+            foreach (var item in appointments.Items)
             {
                 result.Add(new GetAppointmentTodayAdminResponse()
                 {
                     Id = item.Id,
                     SalonName = item.AppointmentDetails.FirstOrDefault()!.SalonEmployee.SalonInformation.Name,
                     Status = item.Status,
-                    CommissionRevenue = (decimal)(item.TotalPrice * item.CommissionRate)!/100,
+                    CommissionRevenue = (decimal)(item.TotalPrice * item.CommissionRate)! / 100,
                     TotalPrice = item.TotalPrice
                 });
             }
@@ -2230,7 +2230,7 @@ namespace Hairhub.Service.Services.Services
             DateTime startDate = currentDate;
             DateTime endDate = currentDate;
 
-            
+
             switch (filter?.ToUpper())
             {
                 case "YEAR":
@@ -2249,16 +2249,16 @@ namespace Hairhub.Service.Services.Services
                     endDate = startDate.AddDays(6).AddTicks(-1);
                     break;
 
-                default: 
+                default:
                     startDate = currentDate.Date;
                     endDate = currentDate.Date.AddDays(1).AddTicks(-1);
                     break;
             }
 
-            
+
             predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
 
-            
+
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetListAsync(
                     predicate: predicate,
@@ -2267,7 +2267,7 @@ namespace Hairhub.Service.Services.Services
                                    .ThenInclude(s => s.SalonInformation)
                 );
 
-            
+
             var totalAppointments = appointments.Count();
             var result = new StatisticsNumberOfAppointmentOnPlatform
             {
@@ -2277,7 +2277,7 @@ namespace Hairhub.Service.Services.Services
                 RateOfFailAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Fail) / totalAppointments * 100 : 0,
                 RateOfCancelAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer) / totalAppointments * 100 : 0
             };
-            
+
             return result;
         }
 
@@ -2312,7 +2312,7 @@ namespace Hairhub.Service.Services.Services
                     endDate = startDate.AddDays(6).AddTicks(-1);
                     break;
 
-                default: 
+                default:
                     startDate = currentDate.Date;
                     endDate = currentDate.Date.AddDays(1).AddTicks(-1);
                     break;
@@ -2360,7 +2360,7 @@ namespace Hairhub.Service.Services.Services
             else if (filter?.ToUpper() == "WEEK")
             {
                 result.TimeFrame = "Week";
-                
+
 
                 var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + (int)DayOfWeek.Monday);
                 var endOfWeek = startOfWeek.AddDays(6);
