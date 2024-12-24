@@ -50,6 +50,6 @@ namespace Hairhub.Service.Services.IServices
         Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsRevenue(Guid? salonid, string? filter);
 
         Task<StatisticsOfSalonsParticipating> StatisticsRevenueOfPlatForm(string? filter);
-        Task<GetCustomerQuantityResponse> CustomerQuantityToday(Guid salonId);
+        Task<GetCustomerQuantityResponse> CustomerQuantityToday(Guid salonId, DateTime date);
     }
 }
