@@ -419,20 +419,20 @@ namespace Hairhub.Service.Services.Services
             if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.Successed))
             {
                 predicate = predicate.And(x =>
-                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
-                            && ad.Status == AppointmentStatus.Successed));
+                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
+                            && x.Status == AppointmentStatus.Successed);
             }
             else if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.OutSide))
             {
                 predicate = predicate.And(x =>
-                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
-                            && ad.Status == AppointmentStatus.OutSide));
+                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
+                            && x.Status == AppointmentStatus.OutSide);
             }
             else
             {
                 predicate = predicate.And(x =>
-                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
-                && ad.Status == AppointmentStatus.Successed || ad.Status == AppointmentStatus.OutSide));
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
+                && (x.Status == AppointmentStatus.Successed || x.Status == AppointmentStatus.OutSide));
             }
 
             if (startDate!=null && endDate != null)

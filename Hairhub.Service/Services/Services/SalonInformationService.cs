@@ -1439,5 +1439,10 @@ namespace Hairhub.Service.Services.Services
 
             return result;
         }
+
+        public Task<GetCustomerQuantityResponse> CustomerQuantityToday(Guid salonId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
