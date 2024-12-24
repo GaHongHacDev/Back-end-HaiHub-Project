@@ -127,12 +127,13 @@ namespace Hairhub.API.Controllers
         [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> FrequentlyCustomers(
             [FromRoute] Guid salonId,
-            [FromQuery] string? time,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, page, size, time);
+                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, page, size);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy khách hàng" });

@@ -412,7 +412,7 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse!;
         }
-        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time)
+        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, int page, int size)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
@@ -420,39 +420,10 @@ namespace Hairhub.Service.Services.Services
             predicate = predicate.And(x =>
                 x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
                 && ad.Status == AppointmentStatus.Successed || ad.Status == AppointmentStatus.OutSide));
-            DateTime currentDate = DateTime.Now;
-            DateTime resultDate;
-
-            if (time!.Contains("ALL"))
+           if(startDate!=null && endDate != null)
             {
-                predicate = predicate.And(x => x.StartDate.Date <= currentDate);
+                predicate = predicate.And(x=>x.StartDate.Date>=startDate.Value.Date && x.StartDate.Date<=endDate.Value.Date);
             }
-            else if (time!.Contains("DAY"))
-            {
-                resultDate = currentDate.Date;
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else if (time!.Contains("WEEK"))
-            {
-                resultDate = currentDate.AddDays(-7);
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else if (time!.Contains("MONTH"))
-            {
-                resultDate = currentDate.AddDays(-30);
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else if (time!.Contains("YEAR"))
-            {
-                resultDate = currentDate.AddDays(-365);
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else
-            {
-                throw new ArgumentException("Invalid time parameter");
-            }
-
-
             IEnumerable<Appointment> appointments;
 
             appointments = await _unitOfWork.GetRepository<Appointment>()

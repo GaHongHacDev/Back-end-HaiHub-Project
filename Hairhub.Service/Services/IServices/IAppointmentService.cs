@@ -31,7 +31,7 @@ namespace Hairhub.Service.Services.IServices
         Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(Guid employeeId, int page, int size, string? status, bool isAscending, DateTime? date, string? customerName);
 
-        Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time);
+        Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, int page, int size);
 
         Task<StatisticsNumberOfAppointmentOnPlatform> StatisticsNumberOfAppointmentOnPlatform(Guid? SalonId, string? filter);
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
