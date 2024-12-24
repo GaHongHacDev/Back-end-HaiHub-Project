@@ -129,11 +129,13 @@ namespace Hairhub.API.Controllers
             [FromRoute] Guid salonId,
             [FromQuery] DateTime? startDate,
             [FromQuery] DateTime? endDate,
+            [FromQuery] string? statusAppointment,
+            [FromQuery] string? filter,
             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, page, size);
+                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, statusAppointment, filter, page, size);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy khách hàng" });
@@ -711,7 +713,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> StatisticAppointmentInYear([FromQuery] Guid? SalonId, [FromQuery] string? filter)
         {
             try
@@ -728,5 +730,24 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        //[HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        //public async Task<IActionResult> Customer([FromQuery] Guid? SalonId, [FromQuery] string? filter)
+        //{
+        //    try
+        //    {
+        //        var response = await _appointmentService.GetAppointmentStatistics(SalonId, filter);
+        //        return Ok(response);
+        //    }
+        //    catch (NotFoundException ex)
+        //    {
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
     }
 }

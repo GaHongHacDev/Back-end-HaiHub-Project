@@ -412,15 +412,30 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse!;
         }
-        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, int page, int size)
+        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, string? statusAppointment, string? filter, int page, int size)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
-
-            predicate = predicate.And(x =>
+            if (statusAppointment.Equals(AppointmentStatus.Successed))
+            {
+                predicate = predicate.And(x =>
+                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
+                            && ad.Status == AppointmentStatus.Successed));
+            }
+            else if (statusAppointment.Equals(AppointmentStatus.OutSide))
+            {
+                predicate = predicate.And(x =>
+                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
+                            && ad.Status == AppointmentStatus.OutSide));
+            }
+            else
+            {
+                predicate = predicate.And(x =>
                 x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
                 && ad.Status == AppointmentStatus.Successed || ad.Status == AppointmentStatus.OutSide));
-           if(startDate!=null && endDate != null)
+            }
+
+            if (startDate!=null && endDate != null)
             {
                 predicate = predicate.And(x=>x.StartDate.Date>=startDate.Value.Date && x.StartDate.Date<=endDate.Value.Date);
             }
@@ -452,6 +467,24 @@ namespace Hairhub.Service.Services.Services
             })
             .ToList();
 
+            if (filter != null)
+            {
+                switch (filter)
+                {
+                    case "Số cuộc hẹn giảm dần":
+                        statisticsList = statisticsList.OrderByDescending(s => s.NumberofSuccessAppointment).ToList();
+                        break;
+                    case "Số cuộc hẹn tăng dần":
+                        statisticsList = statisticsList.OrderBy(s => s.NumberofSuccessAppointment).ToList();
+                        break;
+                    case "Số tiền tăng dần":
+                        statisticsList = statisticsList.OrderBy(s => s.TotalPrice).ToList();
+                        break;
+                    case "Số tiền giảm dần":
+                        statisticsList = statisticsList.OrderByDescending(s => s.TotalPrice).ToList();
+                        break;
+                }
+            }
 
             var totalRecords = statisticsList.Count;
             var totalPages = (int)Math.Ceiling((double)totalRecords / size);
