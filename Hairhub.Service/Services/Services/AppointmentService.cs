@@ -416,13 +416,13 @@ namespace Hairhub.Service.Services.Services
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
-            if (statusAppointment.Equals(AppointmentStatus.Successed))
+            if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.Successed))
             {
                 predicate = predicate.And(x =>
                             x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
                             && ad.Status == AppointmentStatus.Successed));
             }
-            else if (statusAppointment.Equals(AppointmentStatus.OutSide))
+            else if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.OutSide))
             {
                 predicate = predicate.And(x =>
                             x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
