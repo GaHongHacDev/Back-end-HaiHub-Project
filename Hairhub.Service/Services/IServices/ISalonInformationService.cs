@@ -55,5 +55,6 @@ namespace Hairhub.Service.Services.IServices
         Task<GetCustomerQuantityResponse> CustomerQuantityToday(Guid salonId, DateTime date);
 
         Task<List<GetServiceStatisticByDateResponse>> GetServiceStatisticByDate(Guid salonId, DateTime date);
+        Task<List<GetEmployeeEvaluationResponse>> EmployeeEvaluation(Guid salonId, DateTime? startDate, DateTime? endDate);
     }
 }

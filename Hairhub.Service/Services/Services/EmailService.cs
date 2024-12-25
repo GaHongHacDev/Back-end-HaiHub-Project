@@ -209,7 +209,7 @@ namespace Hairhub.Service.Services.Services
             try
             {
                 var emailBody = _configuration["EmailSetting:GeneralEmailBody"];
-                emailBody = emailBody.Replace("{PROJECT_NAME}", _configuration["Project_HairHub:PROJECT_NAME"]);
+                emailBody = emailBody!.Replace("{PROJECT_NAME}", _configuration["Project_HairHub:PROJECT_NAME"]);
                 emailBody = emailBody.Replace("{FULL_NAME}", fullName);
                 emailBody = emailBody.Replace("{BODY_EMAIL}", bodyEmail);
                 emailBody = emailBody.Replace("{PHONE_NUMBER}", _configuration["Project_HairHub:PHONE_NUMBER"]);
@@ -306,7 +306,7 @@ namespace Hairhub.Service.Services.Services
         public async Task<bool> CheckOtpEmail(CheckOtpRequest checkOtpRequest)
         {
             var otpEmail = await _unitOfWork.GetRepository<OTP>().SingleOrDefaultAsync(
-                                                        predicate: x => x.Email.Equals(checkOtpRequest.Email),
+                                                        predicate: x => x.Email!.Equals(checkOtpRequest.Email),
                                                         orderBy: y => y.OrderByDescending(y => y.EndTime));
             if (otpEmail == null)
             {

@@ -1622,6 +1622,46 @@ namespace Hairhub.Service.Services.Services
             }
             responses = responses.OrderByDescending(s => s.NumberOfUses).ToList();
             return responses;
+<<<<<<< HEAD
+=======
+        }
+
+        public async Task<List<GetEmployeeEvaluationResponse>> EmployeeEvaluation(Guid salonId, DateTime? startDate, DateTime? endDate)
+        {
+            var responses = new List<GetEmployeeEvaluationResponse>();
+
+            var predicate = PredicateBuilder.New<Feedback>(true);
+            predicate = predicate.And(x=>x.Appointment.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId) && x.IsActive);
+            if(startDate!=null && endDate != null)
+            {
+                predicate = predicate.And(x =>x.CreateDate.Date>=startDate.Value.Date && x.CreateDate.Date<=endDate.Value.Date);
+            }
+            var feedbacks = await _unitOfWork.GetRepository<Feedback>()
+                                      .GetListAsync(
+                                          predicate: predicate,
+                                          include: x => x.Include(f => f.FeedbackDetails)
+                                                         .ThenInclude(fd => fd.AppointmentDetail)
+                                      );
+
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
+            foreach (var employee in employees)
+            {
+                var employeeFeedbackDetails = feedbacks
+                    .SelectMany(f => f.FeedbackDetails)
+                    .Where(fd => fd.AppointmentDetail.SalonEmployeeId == employee.Id);
+
+                var totalRatings = employeeFeedbackDetails.Sum(fd => fd.Rating);
+                var ratingCount = employeeFeedbackDetails.Count();
+                var averageRating = ratingCount > 0 ? (decimal)totalRatings / ratingCount : 0;
+                responses.Add(new GetEmployeeEvaluationResponse
+                {
+                    Id = employee.Id,
+                    FullName = employee.FullName,
+                    Rate = averageRating
+                });
+            }
+            return responses;
+>>>>>>> c8acb95311f70ceeb7dee0c0d4a7497ef6d23f41
         }
     }
 }
