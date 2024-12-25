@@ -144,7 +144,7 @@ namespace Hairhub.Service.Services.Services
                         StartTime = itemSchedule.StartTime,
                         IsActive = itemSchedule.IsActive
                     };
-                    _scheduleService.CreateScheduleEmployee(scheduleEmployee);
+                    await _scheduleService.CreateScheduleEmployee(scheduleEmployee);
                 }
                 //create Service Employee
                 foreach (var itemServiceHair in item.ServiceHairId)
