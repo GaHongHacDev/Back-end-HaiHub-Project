@@ -31,7 +31,7 @@ namespace Hairhub.Service.Services.IServices
         Task<GetAppointmentTransactionResponse> GetAppointmentTransaction(Guid salonId, DateTime startDate, DateTime endDate);
         Task<IPaginate<GetAppointmentResponse>> GetAppointmentEmployeeByStatus(Guid employeeId, int page, int size, string? status, bool isAscending, DateTime? date, string? customerName);
 
-        Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time);
+        Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, string? appointmentStatus, string? filter, int page, int size);
 
         Task<StatisticsNumberOfAppointmentOnPlatform> StatisticsNumberOfAppointmentOnPlatform(Guid? SalonId, string? filter);
         Task<GetCalculatePriceResponse> CalculatePrice(GetCalculatePriceRequest calculatePriceRequest);
@@ -63,7 +63,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteAppointmentFakeById(Guid id);
 
-        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, int page, int size);
+        Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, string? customerName, int page, int size);
         Task<List<GetAppointmentResponse>> GetAppointmentGemini(Guid customerId, string? status, DateTime? date);
         Task<bool> CreateAppointmentOutSide(CreateAppointmentOutSideRequest request);
 

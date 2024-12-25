@@ -1439,5 +1439,72 @@ namespace Hairhub.Service.Services.Services
 
             return result;
         }
+
+        private List<int> GetHoursList(TimeOnly startTime, TimeOnly endTime)
+        {
+            List<int> hours = new List<int>();
+            int startHour = startTime.Minute > 0 ? startTime.Hour + 1 : startTime.Hour;
+            for (int hour = startHour; hour <= endTime.Hour; hour++)
+            {
+                hours.Add(hour);
+            }
+            return hours;
+        }
+
+        public async Task<GetCustomerQuantityResponse> CustomerQuantityToday(Guid salonId, DateTime date)
+        {
+            GetCustomerQuantityResponse response = new GetCustomerQuantityResponse();
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync(
+                                                                predicate: x=> x.AppointmentDetails.Any(ad=>ad.SalonEmployee.SalonInformationId == salonId) && x.StartDate.Date == date.Date 
+                                                                            && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Booking)),
+                                                                include: x=>x.Include(s=>s.AppointmentDetails)
+                                                             );
+            int newCus = 0, oldCus = 0;
+            foreach (var item in appointments) 
+            {
+                var appointment = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) && x.CustomerId == item.CustomerId && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed )|| x.Status.Equals(AppointmentStatus.Booking)));
+                if (appointment.Count > 1)
+                {
+                    oldCus++;
+                }
+                else
+                {
+                    newCus++;
+                }
+            }
+            response.CustomerDate.TotalCustomer = appointments.Count();
+            response.CustomerDate.NumberOfNewCustomer = newCus;
+            response.CustomerDate.NumberOfOldCustomer = oldCus;
+            response.CustomerDate.OldCustomerPercent = (double)oldCus / response.CustomerDate.TotalCustomer;
+            response.CustomerDate.NewCustomerPercent = (double)newCus / response.CustomerDate.TotalCustomer;
+
+            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x=>x.SalonId == salonId);
+            if (schedule == null)
+            {
+                throw new NotFoundException($"Không tìm thấy lịch làm việc của salon với id {salonId}");
+            }
+
+            List<int> listTime = GetHoursList(schedule.StartTime, schedule.EndTime);
+            foreach(var item in listTime)
+            {
+                DateTime date1 = new DateTime(date.Year, date.Month, date.Day).AddHours(item);
+                DateTime date2 = new DateTime(date.Year, date.Month, date.Day).AddHours(item+1);
+                var uniqueCustomerCount = (appointments ?? new List<Appointment>()) 
+                    .Where(x => x.AppointmentDetails != null && 
+                                x.AppointmentDetails.Any(ad => ad.StartTime >= date1 && ad.StartTime < date2))
+                    .Select(x => x.CustomerId)
+                    .Distinct()
+                    .Count();
+
+                response.CharCustomer.Add(new ChartCustomer()
+                {
+                    NumberOfCustomer = uniqueCustomerCount,
+                    Time = item
+                });
+            }
+
+            return response;
+        }
     }
 }

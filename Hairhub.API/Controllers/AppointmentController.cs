@@ -124,15 +124,18 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{salonId:Guid}")]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> FrequentlyCustomers(
             [FromRoute] Guid salonId,
-            [FromQuery] string? time,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
+            [FromQuery] string? statusAppointment,
+            [FromQuery] string? filter,
             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, page, size, time);
+                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, statusAppointment, filter, page, size);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy khách hàng" });
@@ -313,12 +316,12 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         [Route("{status}")]
-        [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? salonName, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> GetAppointmentByStatus([FromRoute] string status, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? salonName, [FromQuery] string? customerName, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, startDate, endDate, salonName, page, size);
+                var appointmentsResponse = await _appointmentService.GetAppointmentAdminByStatus(status, startDate, endDate, salonName, customerName, page, size);
                 return Ok(appointmentsResponse);
             }
             catch (NotFoundException ex)
@@ -710,7 +713,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> StatisticAppointmentInYear([FromQuery] Guid? SalonId, [FromQuery] string? filter)
         {
             try
@@ -727,5 +730,24 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        //[HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin)]
+        //public async Task<IActionResult> Customer([FromQuery] Guid? SalonId, [FromQuery] string? filter)
+        //{
+        //    try
+        //    {
+        //        var response = await _appointmentService.GetAppointmentStatistics(SalonId, filter);
+        //        return Ok(response);
+        //    }
+        //    catch (NotFoundException ex)
+        //    {
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
     }
 }

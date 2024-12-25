@@ -6,6 +6,7 @@ using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Hairhub.API.Controllers
 {
@@ -538,6 +539,28 @@ namespace Hairhub.API.Controllers
                 try
                 {
                     var result = await _salonInformationService.CompileAppointmentSalon(salonId, startDate, endDate);
+                    return Ok(result);
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CustomerQuantityByDate([FromRoute] Guid salonId, [FromQuery] DateTime date)
+        {
+            {
+                try
+                {
+                    var result = await _salonInformationService.CustomerQuantityToday(salonId, date);
                     return Ok(result);
                 }
                 catch (NotFoundException ex)

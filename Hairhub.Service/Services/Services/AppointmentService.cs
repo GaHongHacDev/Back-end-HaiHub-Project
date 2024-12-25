@@ -412,47 +412,33 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse!;
         }
-        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, int page, int size, string? time)
+        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, string? statusAppointment, string? filter, int page, int size)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
-
-            predicate = predicate.And(x =>
-                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id
-                && ad.Status == AppointmentStatus.Successed || ad.Status == AppointmentStatus.OutSide));
-            DateTime currentDate = DateTime.Now;
-            DateTime resultDate;
-
-            if (time!.Contains("ALL"))
+            if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.Successed))
             {
-                predicate = predicate.And(x => x.StartDate.Date <= currentDate);
+                predicate = predicate.And(x =>
+                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
+                            && x.Status == AppointmentStatus.Successed);
             }
-            else if (time!.Contains("DAY"))
+            else if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.OutSide))
             {
-                resultDate = currentDate.Date;
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else if (time!.Contains("WEEK"))
-            {
-                resultDate = currentDate.AddDays(-7);
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else if (time!.Contains("MONTH"))
-            {
-                resultDate = currentDate.AddDays(-30);
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
-            }
-            else if (time!.Contains("YEAR"))
-            {
-                resultDate = currentDate.AddDays(-365);
-                predicate = predicate.And(x => x.StartDate.Date >= resultDate && x.StartDate.Date <= currentDate);
+                predicate = predicate.And(x =>
+                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
+                            && x.Status == AppointmentStatus.OutSide);
             }
             else
             {
-                throw new ArgumentException("Invalid time parameter");
+                predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
+                && (x.Status == AppointmentStatus.Successed || x.Status == AppointmentStatus.OutSide));
             }
 
-
+            if (startDate!=null && endDate != null)
+            {
+                predicate = predicate.And(x=>x.StartDate.Date>=startDate.Value.Date && x.StartDate.Date<=endDate.Value.Date);
+            }
             IEnumerable<Appointment> appointments;
 
             appointments = await _unitOfWork.GetRepository<Appointment>()
@@ -481,6 +467,24 @@ namespace Hairhub.Service.Services.Services
             })
             .ToList();
 
+            if (filter != null)
+            {
+                switch (filter)
+                {
+                    case "Số cuộc hẹn giảm dần":
+                        statisticsList = statisticsList.OrderByDescending(s => s.NumberofSuccessAppointment).ToList();
+                        break;
+                    case "Số cuộc hẹn tăng dần":
+                        statisticsList = statisticsList.OrderBy(s => s.NumberofSuccessAppointment).ToList();
+                        break;
+                    case "Số tiền tăng dần":
+                        statisticsList = statisticsList.OrderBy(s => s.TotalPrice).ToList();
+                        break;
+                    case "Số tiền giảm dần":
+                        statisticsList = statisticsList.OrderByDescending(s => s.TotalPrice).ToList();
+                        break;
+                }
+            }
 
             var totalRecords = statisticsList.Count;
             var totalPages = (int)Math.Ceiling((double)totalRecords / size);
@@ -1931,7 +1935,7 @@ namespace Hairhub.Service.Services.Services
             return isStatus;
         }
 
-        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, int page, int size)
+        public async Task<IPaginate<GetAppointmentResponse>> GetAppointmentAdminByStatus(string status, DateTime? startTime, DateTime? endTime, string? salonName, string? customerName, int page, int size)
         {
             status = status == null ? "" : status.Trim();
             var predicate = PredicateBuilder.New<Appointment>(x => x.Status.Contains(status));
@@ -1945,6 +1949,11 @@ namespace Hairhub.Service.Services.Services
             {
                 predicate = predicate.And(x => x.AppointmentDetails.Any(ad =>
                     ad.SalonEmployee.SalonInformation.Name.ToLower().Contains(salonName.ToLower())));
+            }
+            if (!string.IsNullOrEmpty(customerName))
+            {
+                customerName = customerName.Trim();
+                predicate = predicate.And(x => x.Customer.FullName.ToLower().Contains(customerName.ToLower()));
             }
 
             var appointments = await _unitOfWork.GetRepository<Appointment>()

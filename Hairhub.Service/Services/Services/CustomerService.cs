@@ -22,6 +22,9 @@ using Hairhub.Domain.Dtos.Responses.Feedbacks;
 using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Dtos.Responses.Appointments;
 using static QRCoder.Base64QRCode;
+using System.Xml.Linq;
+using System.Linq.Expressions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -37,26 +40,58 @@ namespace Hairhub.Service.Services.Services
             _mapper = mapper;
             _mediaService = mediaService;
         }
-        public async Task<IPaginate<GetCustomerResponse>> GetCustomers(string? email, bool? status, int page, int size)
+        public async Task<IPaginate<GetCustomerResponse>> GetCustomers(string? email, bool? status, string? customerName, bool? isAscendingBooking, int page, int size)
         {
+            ICollection<Customer> customerEntities;
+            if (email.IsNullOrEmpty())
+            {
+                email = "";
+            }
+            if (customerName.IsNullOrEmpty())
+            {
+                customerName = "";
+            }
+            if (status==null)
+            {
+                customerEntities = await _unitOfWork.GetRepository<Customer>()
+                .GetListAsync(
+                    predicate: c => c.Email!.Contains(email!) && c.FullName.Contains(customerName!),
+                    include: query => query.Include(s => s.Account)
+                );
+            }
+            else
+            {
+                customerEntities = await _unitOfWork.GetRepository<Customer>()
+                .GetListAsync(
+                    predicate: c => c.Email!.Contains(email!) && c.FullName.Contains(customerName!) && c.Account.IsActive == status.Value,
+                    include: query => query.Include(s => s.Account)
+                );
+            }
 
-            var customerEntities = await _unitOfWork.GetRepository<Customer>()
-        .GetPagingListAsync(
-            predicate: c =>
-                (string.IsNullOrEmpty(email) || c.Email.Contains(email)) &&
-                (!status.HasValue || c.Account.IsActive == status.Value),  // Nullable bool handling
-            include: query => query.Include(s => s.Account),
-            page: page,
-            size: size
-        );
+            
+            var result = _mapper.Map<IList<GetCustomerResponse>>(customerEntities);
+            foreach (var item in result) {
+                item.NumberOfAppointment = (await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x => x.CustomerId == item.Id && x.Status.Equals(AppointmentStatus.Successed))).Count;
+                if (item.NumberOfAppointment > 0)
+                {
+                    Console.WriteLine(item.Id);
+                }
+            }
+
+            if (isAscendingBooking != null)
+            {
+                result = (isAscendingBooking == true) ? result.OrderBy(x => x.NumberOfAppointment).ToList() : result.OrderByDescending(x => x.NumberOfAppointment).ToList();
+            }
+
+            var pagedResult = result.Skip((page - 1) * size).Take(size).ToList();
 
             var paginateResponse = new Paginate<GetCustomerResponse>
             {
-                Page = customerEntities.Page,
-                Size = customerEntities.Size,
-                Total = customerEntities.Total,
-                TotalPages = customerEntities.TotalPages,
-                Items = _mapper.Map<IList<GetCustomerResponse>>(customerEntities.Items)
+                Page = page,
+                Size = size,
+                Total = result.Count,
+                TotalPages = (int)Math.Ceiling((double)result.Count / size),
+                Items = pagedResult
             };
 
             return paginateResponse;
@@ -80,14 +115,15 @@ namespace Hairhub.Service.Services.Services
             {
                 string decyptEAS = AesEncoding.DecryptAES(dataAES);
                 appointmentId = Guid.Parse(decyptEAS);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new NotFoundException("Checkin thất bại. Vui lòng checkin lại hoặc liên hệ với admin");
             }
             var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync
                                                                                                 (
                                                                                                     predicate: x => x.Id == appointmentId,
-                                                                                                    include: x => x.Include(s => s.AppointmentDetails).Include(s=>s.AppointmentDetailVouchers)
+                                                                                                    include: x => x.Include(s => s.AppointmentDetails).Include(s => s.AppointmentDetailVouchers)
                                                                                                 );
             if (appointment == null)
             {
@@ -106,8 +142,8 @@ namespace Hairhub.Service.Services.Services
             appointment.Status = AppointmentStatus.Successed;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
 
-            
-            if(appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByWallet) || appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
+
+            if (appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByWallet) || appointment.PaymentMethod.Equals(AppointmentPaymentMethod.PayByBank))
             {
                 var employeeId = appointment.AppointmentDetails.ElementAt(0).SalonEmployeeId;
                 var employee = await _unitOfWork.GetRepository<SalonEmployee>()
@@ -118,11 +154,11 @@ namespace Hairhub.Service.Services.Services
                 var accountSalon = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Id == employee.SalonInformation.SalonOwner.AccountId);
 
                 decimal payMoney = appointment.TotalPrice;
-                if (appointment.AppointmentDetailVouchers != null && appointment.AppointmentDetailVouchers!.Count !=0)
+                if (appointment.AppointmentDetailVouchers != null && appointment.AppointmentDetailVouchers!.Count != 0)
                 {
-                    foreach(var item in appointment.AppointmentDetailVouchers)
+                    foreach (var item in appointment.AppointmentDetailVouchers)
                     {
-                        var voucher = await _unitOfWork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: x=>x.Id == item.VoucherId);
+                        var voucher = await _unitOfWork.GetRepository<Voucher>().SingleOrDefaultAsync(predicate: x => x.Id == item.VoucherId);
                         if (voucher.IsSystemCreated)
                         {
                             payMoney = appointment.OriginalPrice;
@@ -197,9 +233,9 @@ namespace Hairhub.Service.Services.Services
             }
 
             bool isCreated = await _unitOfWork.CommitAsync() > 0;
-            return isCreated;           
+            return isCreated;
         }
-            
+
         public async Task<IPaginate<CustomerImageHistoryResponse>> GetCustomerImagesHistory(Guid customerId, int page, int size)
         {
             var customer = await _unitOfWork.GetRepository<Customer>()
@@ -234,7 +270,7 @@ namespace Hairhub.Service.Services.Services
             {
                 throw new NotFoundException("Lịch sử không tồn tại");
             }
-            
+
             var imgUrl = await _unitOfWork.GetRepository<ImageStyle>().GetListAsync(predicate: p => p.StyleHairCustomerId == Id);
 
             _unitOfWork.GetRepository<StyleHairCustomer>().DeleteAsync(image);
@@ -244,7 +280,7 @@ namespace Hairhub.Service.Services.Services
         }
 
         public async Task<bool> UpdateCustomerImagesHistory(Guid Id, UpdateCustomerImageHistoryRequest request)
-            {
+        {
             var image = await _unitOfWork.GetRepository<StyleHairCustomer>()
        .SingleOrDefaultAsync(predicate: p => p.Id == Id);
 
@@ -253,7 +289,7 @@ namespace Hairhub.Service.Services.Services
                 throw new NotFoundException("Lịch sử không tồn tại");
             }
 
-            
+
             image.Id = Id;
             if (!string.IsNullOrEmpty(request.Title))
             {
@@ -266,7 +302,7 @@ namespace Hairhub.Service.Services.Services
             }
             image.UpdateddAt = DateTime.Now;
 
-            
+
             if (request.RemoveImageStyleIds != null && request.RemoveImageStyleIds.Count > 0)
             {
                 var stylesToRemove = await _unitOfWork.GetRepository<ImageStyle>()
@@ -304,9 +340,9 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<GetCustomerByEmailReponse> GetCustomerByEmail(string? email)
         {
-            email = email == null? "":email.Trim();
-            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x=>x.Email.Equals(email));
-            if (customer == null) 
+            email = email == null ? "" : email.Trim();
+            var customer = await _unitOfWork.GetRepository<Customer>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(email));
+            if (customer == null)
             {
                 return null;
             }
