@@ -1519,7 +1519,6 @@ namespace Hairhub.Service.Services.Services
             return response;
         }
 
-<<<<<<< HEAD
         public async Task<RevenueByHours> RevenueStatistics(Guid salonId, DateTime? Date)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
@@ -1583,7 +1582,7 @@ namespace Hairhub.Service.Services.Services
             };
 
             return revenueStatistics;
-=======
+        }
         public async Task<List<GetServiceStatisticByDateResponse>> GetServiceStatisticByDate(Guid salonId, DateTime date)
         {
             List<GetServiceStatisticByDateResponse> responses = new List<GetServiceStatisticByDateResponse>();
@@ -1623,7 +1622,6 @@ namespace Hairhub.Service.Services.Services
             }
             responses = responses.OrderByDescending(s => s.NumberOfUses).ToList();
             return responses;
->>>>>>> 3fe9d65bda9ce2763ebac48ba9527e2b4b18a63c
         }
     }
 }
