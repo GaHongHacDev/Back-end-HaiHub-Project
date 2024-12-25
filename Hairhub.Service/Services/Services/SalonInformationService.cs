@@ -1475,10 +1475,21 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             response.CustomerDate.TotalCustomer = appointments.Count();
-            response.CustomerDate.NumberOfNewCustomer = newCus;
-            response.CustomerDate.NumberOfOldCustomer = oldCus;
-            response.CustomerDate.OldCustomerPercent = (double)oldCus / response.CustomerDate.TotalCustomer;
-            response.CustomerDate.NewCustomerPercent = (double)newCus / response.CustomerDate.TotalCustomer;
+            if (response.CustomerDate.TotalCustomer == 0)
+            {
+                response.CustomerDate.NumberOfNewCustomer = 0;
+                response.CustomerDate.NumberOfOldCustomer = 0;
+                response.CustomerDate.OldCustomerPercent = 0;
+                response.CustomerDate.NewCustomerPercent = 0;
+            }
+            else
+            {
+                response.CustomerDate.NumberOfNewCustomer = newCus;
+                response.CustomerDate.NumberOfOldCustomer = oldCus;
+                response.CustomerDate.OldCustomerPercent = (double)oldCus / response.CustomerDate.TotalCustomer;
+                response.CustomerDate.NewCustomerPercent = (double)newCus / response.CustomerDate.TotalCustomer;
+            }
+           
 
             var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x=>x.SalonId == salonId);
             if (schedule == null)
@@ -1508,6 +1519,7 @@ namespace Hairhub.Service.Services.Services
             return response;
         }
 
+<<<<<<< HEAD
         public async Task<RevenueByHours> RevenueStatistics(Guid salonId, DateTime? Date)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
@@ -1571,6 +1583,47 @@ namespace Hairhub.Service.Services.Services
             };
 
             return revenueStatistics;
+=======
+        public async Task<List<GetServiceStatisticByDateResponse>> GetServiceStatisticByDate(Guid salonId, DateTime date)
+        {
+            List<GetServiceStatisticByDateResponse> responses = new List<GetServiceStatisticByDateResponse>();
+            var serviceHairs = await _unitOfWork.GetRepository<ServiceHair>().GetListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive);
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
+                                                .GetListAsync(
+                                                                predicate: x => x.AppointmentDetails.Any(x => x.SalonEmployee.SalonInformationId == salonId) && x.StartDate.Date == date.Date
+                                                                            && (x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.OutSide)),
+                                                                include: x => x.Include(s => s.AppointmentDetails)
+                                                             );
+            if (appointments == null || !appointments.Any())
+            {
+                foreach (var serviceHair in serviceHairs)
+                {
+                    responses.Add(new GetServiceStatisticByDateResponse
+                    {
+                        Id = serviceHair.Id,
+                        ServiceName = serviceHair.ServiceName,
+                        NumberOfUses = 0
+                    });
+                }
+                return responses;
+            }
+
+            foreach (var serviceHair in serviceHairs)
+            {
+                int numberOfUses = appointments
+                    .SelectMany(a => a.AppointmentDetails)
+                    .Count(detail => detail.ServiceHairId == serviceHair.Id);
+
+                responses.Add(new GetServiceStatisticByDateResponse
+                {
+                    Id = serviceHair.Id,
+                    ServiceName = serviceHair.ServiceName,
+                    NumberOfUses = numberOfUses
+                });
+            }
+            responses = responses.OrderByDescending(s => s.NumberOfUses).ToList();
+            return responses;
+>>>>>>> 3fe9d65bda9ce2763ebac48ba9527e2b4b18a63c
         }
     }
 }
