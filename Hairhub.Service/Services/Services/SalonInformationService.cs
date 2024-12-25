@@ -27,6 +27,7 @@ using System.Drawing.Printing;
 using System.Linq;
 using System.Numerics;
 using static QRCoder.PayloadGenerator;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Hairhub.Service.Services.Services
 {
@@ -1505,6 +1506,71 @@ namespace Hairhub.Service.Services.Services
             }
 
             return response;
+        }
+
+        public async Task<RevenueByHours> RevenueStatistics(Guid salonId, DateTime? Date)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+
+
+            predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
+            if (Date.HasValue)
+            {
+                var startOfDay = Date.Value.Date;
+                var endOfDay = startOfDay.AddDays(1);
+                predicate = predicate.And(x => x.StartDate >= startOfDay && x.StartDate < endOfDay);
+            }
+            else
+            {
+                var today = DateTime.Now.Date;
+                var endOfDay = today.AddDays(1);
+                predicate = predicate.And(x => x.StartDate >= today && x.StartDate < endOfDay);
+            }
+            IEnumerable<Appointment> appointments;
+
+            appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                        .OrderByDescending(ad => ad.StartTime)!
+                        .FirstOrDefault()!.StartTime)
+                );
+            var totalRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
+                                            .Sum(a => a.TotalPrice);
+
+            var outsideRevenue = appointments.Where(a => a.Status == AppointmentStatus.OutSide)
+                                              .Sum(a => a.TotalPrice);
+            var platformRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed)
+                                               .Sum(a => a.TotalPrice);
+            var hourlyRevenueData = appointments
+        .SelectMany(a => a.AppointmentDetails
+            .Where(ad => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
+            .Select(ad => new { Hour = ad.EndTime.Hour, Price = ad.PriceServiceHair }))
+        .GroupBy(x => x.Hour)
+        .ToDictionary(g => g.Key, g => g.Sum(x => x.Price));
+
+
+            var hourlyRevenue = Enumerable.Range(0, 24)
+                .Select(hour => new HourlyRevenue
+                {
+                    Hour = hour,
+                    Revenue = hourlyRevenueData.ContainsKey(hour) ? hourlyRevenueData[hour] : 0
+                })
+                .ToList();
+            var revenueStatistics = new RevenueByHours
+            {
+                TotalRevenue = totalRevenue,
+                OutsideRevenue = outsideRevenue,
+                PlatformRevenue = platformRevenue,
+                HourlyRevenues = hourlyRevenue
+            };
+
+            return revenueStatistics;
         }
     }
 }

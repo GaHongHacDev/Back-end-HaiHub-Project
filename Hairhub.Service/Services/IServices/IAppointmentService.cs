@@ -72,6 +72,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<StatisticAppointmentInYear> GetAppointmentStatistics(Guid? SalonId, string? filter);
 
+        Task<ServiceEvaluate> serviceEvaluated(Guid salonid, DateTime? startDate, DateTime? endDate);
+
 
     }
 }

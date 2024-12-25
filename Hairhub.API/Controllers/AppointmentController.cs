@@ -208,6 +208,9 @@ namespace Hairhub.API.Controllers
             }
         }
 
+
+
+
         [HttpPost]
         //[Authorize(Roles = RoleNameAuthor.Customer)]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentRequest createAppointmentRequest)
@@ -291,6 +294,28 @@ namespace Hairhub.API.Controllers
                 {
                     return BadRequest(new { message = ex.Message });
                 }
+            }
+        }
+
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> EvaluatedService(
+            [FromRoute] Guid salonId,
+            [FromQuery] DateTime? startdate, [FromQuery] DateTime? enddate)
+        {
+            try
+            {
+                var result = await _appointmentService.serviceEvaluated(salonId, startdate, enddate);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 

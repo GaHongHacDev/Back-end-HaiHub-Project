@@ -456,17 +456,19 @@ namespace Hairhub.Service.Services.Services
 
             var statisticsList = appointments
             .Where(a => a.Customer != null)
-            .GroupBy(a => new { a.Customer.Id, a.Customer.FullName, a.Customer.Phone })
+            .SelectMany(a => a.AppointmentDetails)
+            .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
             .Select(group => new StatictisofCustomer
-            {
+             {
                 CustomerID = group.Key.Id,
                 Name = group.Key.FullName,
                 Phone = group.Key.Phone,
-                NumberofSuccessAppointment = group.Count(),
-                TotalPrice = group.Sum(a => a.TotalPrice)
+                NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.Successed),
+                TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
+                UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
             })
             .ToList();
-
+    
             if (filter != null)
             {
                 switch (filter)
@@ -2384,6 +2386,50 @@ namespace Hairhub.Service.Services.Services
                 }
             }
             return result;
+        }
+
+        public async Task<ServiceEvaluate> serviceEvaluated(Guid salonid, DateTime? startDate, DateTime? endDate)
+        {
+            var predicate = PredicateBuilder.New<Appointment>(true);
+            predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonid));
+            if (startDate.HasValue  && endDate.HasValue)
+            {
+                predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+            }
+            IEnumerable<Appointment> appointments;
+
+            appointments = await _unitOfWork.GetRepository<Appointment>()
+                .GetListAsync(
+                    predicate: predicate,
+                    include: query => query.Include(a => a.Customer)
+                                           .Include(a => a.AppointmentDetails)
+                                               .ThenInclude(ad => ad.SalonEmployee)
+                                                   .ThenInclude(se => se.SalonInformation),
+                    orderBy: query => query.OrderBy(a => a.AppointmentDetails!
+                        .OrderByDescending(ad => ad.StartTime)!
+                        .FirstOrDefault()!.StartTime)
+                );
+
+            var groupedServices = appointments
+        .Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
+        .SelectMany(a => a.AppointmentDetails)
+        .GroupBy(ad => ad.ServiceName)
+        .Select(group => new EvaluateService
+        {
+            ServiceName = group.Key,
+            Number = group.Count().ToString()
+        }).OrderBy(o => o.Number)
+        .ToList();
+
+            // Tạo đối tượng ServiceEvaluate để trả về
+            var result = new ServiceEvaluate
+            {
+                evaluatedServices = groupedServices
+            };
+
+            return result;
+
+
         }
 
 
