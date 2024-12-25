@@ -72,6 +72,30 @@ namespace Hairhub.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("{salonId:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> RevenueStatisticsOnOverview(
+            [FromRoute] Guid salonId,
+            [FromQuery] DateTime? Date)
+        {
+            try
+            {
+                var result = await _salonInformationService.RevenueStatistics(salonId, Date);
+                if (result == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy đơn đặt lịch" });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
         [HttpGet]
         [Authorize(Roles = RoleNameAuthor.Admin)]
         public async Task<IActionResult> StatisticOfSalonParticipating(

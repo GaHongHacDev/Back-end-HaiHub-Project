@@ -21,6 +21,8 @@ namespace Hairhub.Service.Services.IServices
 
         Task<IPaginate<ServiceStatistics>> ServiceStatistics(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter, int page, int size);
         Task<RevenueStatistics> RevenueStatistics(Guid salonId, DateTime? startDate, DateTime? endDate);
+        Task<RevenueByHours> RevenueStatistics(Guid salonId, DateTime? Date);
+
         Task<CreateSalonInformationResponse> CreateSalonInformation(CreateSalonInformationRequest createSalonInformationRequest);
         Task<bool> UpdateSalonInformationById(Guid id, UpdateSalonInformationRequest updateSalonInformationRequest);
         Task<bool> DeleteSalonInformationById(Guid id);
