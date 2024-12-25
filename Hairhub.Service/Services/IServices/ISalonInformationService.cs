@@ -51,5 +51,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<StatisticsOfSalonsParticipating> StatisticsRevenueOfPlatForm(string? filter);
         Task<GetCustomerQuantityResponse> CustomerQuantityToday(Guid salonId, DateTime date);
+
+        Task<List<GetServiceStatisticByDateResponse>> GetServiceStatisticByDate(Guid salonId, DateTime date);
     }
 }
