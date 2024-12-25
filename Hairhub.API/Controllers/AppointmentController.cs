@@ -767,9 +767,9 @@ namespace Hairhub.API.Controllers
                     var isDelete = await _appointmentService.CancelOutsideAppointment(id);
                     if (!isDelete)
                     {
-                        return BadRequest(new { message = "Không thể hủy đơn đặt lịch" });
+                        return BadRequest(new { message = "Hủy lịch hẹn ngoài thất bại" });
                     }
-                    return Ok("Hủy Đơn đặt lịch thành công");
+                    return Ok("Hủy lịch hẹn ngoài thành công");
                 }
                 catch (NotFoundException ex)
                 {
