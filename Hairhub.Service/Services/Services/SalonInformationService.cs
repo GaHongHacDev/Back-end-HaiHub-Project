@@ -1523,7 +1523,6 @@ namespace Hairhub.Service.Services.Services
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
-
             predicate = predicate.And(x =>
                 x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId));
             if (Date.HasValue)
@@ -1538,9 +1537,8 @@ namespace Hairhub.Service.Services.Services
                 var endOfDay = today.AddDays(1);
                 predicate = predicate.And(x => x.StartDate >= today && x.StartDate < endOfDay);
             }
-            IEnumerable<Appointment> appointments;
 
-            appointments = await _unitOfWork.GetRepository<Appointment>()
+            var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetListAsync(
                     predicate: predicate,
                     include: query => query.Include(a => a.Customer)
@@ -1551,34 +1549,85 @@ namespace Hairhub.Service.Services.Services
                         .OrderByDescending(ad => ad.StartTime)!
                         .FirstOrDefault()!.StartTime)
                 );
-            var totalRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
-                                            .Sum(a => a.TotalPrice);
 
-            var outsideRevenue = appointments.Where(a => a.Status == AppointmentStatus.OutSide)
-                                              .Sum(a => a.TotalPrice);
-            var platformRevenue = appointments.Where(a => a.Status == AppointmentStatus.Successed)
-                                               .Sum(a => a.TotalPrice);
-            var hourlyRevenueData = appointments
-        .SelectMany(a => a.AppointmentDetails
-            .Where(ad => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
-            .Select(ad => new { Hour = ad.EndTime.Hour, Price = ad.PriceServiceHair }))
-        .GroupBy(x => x.Hour)
-        .ToDictionary(g => g.Key, g => g.Sum(x => x.Price));
+            
+            var salon = await _unitOfWork.GetRepository<Schedule>()
+                .SingleOrDefaultAsync(predicate: x => x.SalonId == salonId);
+            
+            var startHour = salon?.StartTime.Hour ?? 0;
+            var endHour = (salon?.EndTime.Hour + 1) ?? 23;
 
+           
+            var totalRevenue = appointments
+                .Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
+                .Sum(a => a.TotalPrice);
 
-            var hourlyRevenue = Enumerable.Range(0, 24)
-                .Select(hour => new HourlyRevenue
+            var outsideRevenue = appointments
+                .Where(a => a.Status == AppointmentStatus.OutSide)
+                .Sum(a => a.TotalPrice);
+
+            
+            var platformRevenue = appointments
+                .Where(a => a.Status == AppointmentStatus.Successed)
+                .Sum(a => a.TotalPrice);
+
+            
+            var hourlyTotalRevenueData = appointments
+                .SelectMany(a => a.AppointmentDetails
+                    .Where(ad => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
+                    .Select(ad => new { Hour = ad.EndTime.Hour, Price = ad.PriceServiceHair }))
+                .GroupBy(x => x.Hour)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.Price));
+
+            var hourlyTotalRevenues = Enumerable.Range(startHour, endHour - startHour + 1)
+                .Select(hour => new HourlyTotalRevenue
                 {
                     Hour = hour,
-                    Revenue = hourlyRevenueData.ContainsKey(hour) ? hourlyRevenueData[hour] : 0
+                    Revenue = hourlyTotalRevenueData.ContainsKey(hour) ? hourlyTotalRevenueData[hour] : 0
                 })
                 .ToList();
+
+            
+            var hourlyPlatformRevenueData = appointments
+                .SelectMany(a => a.AppointmentDetails
+                    .Where(ad => a.Status == AppointmentStatus.Successed)
+                    .Select(ad => new { Hour = ad.EndTime.Hour, Price = ad.PriceServiceHair }))
+                .GroupBy(x => x.Hour)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.Price));
+
+            var hourlyPlatformRevenues = Enumerable.Range(startHour, endHour - startHour + 1)
+                .Select(hour => new HourlyPlatformRevenue
+                {
+                    Hour = hour,
+                    Revenue = hourlyPlatformRevenueData.ContainsKey(hour) ? hourlyPlatformRevenueData[hour] : 0
+                })
+                .ToList();
+
+            
+            var hourlyOutsideRevenueData = appointments
+                .SelectMany(a => a.AppointmentDetails
+                    .Where(ad => a.Status == AppointmentStatus.OutSide)
+                    .Select(ad => new { Hour = ad.EndTime.Hour, Price = ad.PriceServiceHair }))
+                .GroupBy(x => x.Hour)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.Price));
+
+            var hourlyOutsideRevenues = Enumerable.Range(startHour, endHour - startHour + 1)
+                .Select(hour => new HourlyOutsideRevenue
+                {
+                    Hour = hour,
+                    Revenue = hourlyOutsideRevenueData.ContainsKey(hour) ? hourlyOutsideRevenueData[hour] : 0
+                })
+                .ToList();
+
+            // Tạo kết quả thống kê doanh thu
             var revenueStatistics = new RevenueByHours
             {
                 TotalRevenue = totalRevenue,
                 OutsideRevenue = outsideRevenue,
                 PlatformRevenue = platformRevenue,
-                HourlyRevenues = hourlyRevenue
+                HourlyTotalRevenues = hourlyTotalRevenues,
+                HourlyPlatformRevenues = hourlyPlatformRevenues,
+                HourlyOutSideRevenues = hourlyOutsideRevenues
             };
 
             return revenueStatistics;
@@ -1622,8 +1671,6 @@ namespace Hairhub.Service.Services.Services
             }
             responses = responses.OrderByDescending(s => s.NumberOfUses).ToList();
             return responses;
-<<<<<<< HEAD
-=======
         }
 
         public async Task<List<GetEmployeeEvaluationResponse>> EmployeeEvaluation(Guid salonId, DateTime? startDate, DateTime? endDate)
@@ -1661,7 +1708,6 @@ namespace Hairhub.Service.Services.Services
                 });
             }
             return responses;
->>>>>>> c8acb95311f70ceeb7dee0c0d4a7497ef6d23f41
         }
     }
 }
