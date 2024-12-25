@@ -2432,6 +2432,24 @@ namespace Hairhub.Service.Services.Services
 
         }
 
+        public async Task<bool> CancelOutsideAppointment(Guid id)
+        {
+            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x=>x.Id == id && x.Status.Equals(AppointmentStatus.OutSide), include: x=>x.Include(s=>s.AppointmentDetails));
+            if (appointment == null)
+            {
+                throw new NotFoundException($"Không tìm thấy lịch hẹn ngoài với id {id}");
+            }
+            appointment.Status = AppointmentStatus.CancelOutSide;
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
+            foreach (var item in appointment.AppointmentDetails)
+            {
+                item.Status = AppointmentStatus.CancelOutSide;
+                _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(item);
+            }
+            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            return isUpdate;
+        }
+
 
         #endregion
 
