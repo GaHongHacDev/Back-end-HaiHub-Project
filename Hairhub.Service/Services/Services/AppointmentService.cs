@@ -453,21 +453,59 @@ namespace Hairhub.Service.Services.Services
                         .FirstOrDefault()!.StartTime)
                 );
 
+            List<StatictisofCustomer> statisticsList;
+            if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.Successed))
+            {
+                statisticsList = appointments
+                .Where(a => a.Customer != null)
+                .SelectMany(a => a.AppointmentDetails)
+                .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
+                .Select(group => new StatictisofCustomer
+                {
+                    CustomerID = group.Key.Id,
+                    Name = group.Key.FullName,
+                    Phone = group.Key.Phone,
+                    NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.Successed),
+                    TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
+                    UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
+                })
+                .ToList();
+            }
+            else if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.OutSide))
+            {
+                statisticsList = appointments
+                .Where(a => a.Customer != null)
+                .SelectMany(a => a.AppointmentDetails)
+                .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
+                .Select(group => new StatictisofCustomer
+                {
+                    CustomerID = group.Key.Id,
+                    Name = group.Key.FullName,
+                    Phone = group.Key.Phone,
+                    NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.OutSide),
+                    TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.OutSide).Sum(ad => ad.PriceServiceHair),
+                    UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
+                })
+                .ToList();
+            }
+            else
+            {
+                statisticsList = appointments
+                .Where(a => a.Customer != null)
+                .SelectMany(a => a.AppointmentDetails)
+                .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
+                .Select(group => new StatictisofCustomer
+                {
+                    CustomerID = group.Key.Id,
+                    Name = group.Key.FullName,
+                    Phone = group.Key.Phone,
+                    NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.OutSide || ad.Appointment.Status == AppointmentStatus.Successed),
+                    TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.OutSide || ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
+                    UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
+                })
+                .ToList();
+            }
 
-            var statisticsList = appointments
-            .Where(a => a.Customer != null)
-            .SelectMany(a => a.AppointmentDetails)
-            .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
-            .Select(group => new StatictisofCustomer
-             {
-                CustomerID = group.Key.Id,
-                Name = group.Key.FullName,
-                Phone = group.Key.Phone,
-                NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.Successed),
-                TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
-                UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
-            })
-            .ToList();
     
             if (filter != null)
             {
