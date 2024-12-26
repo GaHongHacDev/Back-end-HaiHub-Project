@@ -42,7 +42,7 @@ namespace Hairhub.Service.Services.IServices
         Task<CompileAppointmentSalonByYearResponse> CompileAppointmentSalonByYear(Guid salonId, int year);
         Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size);
 
-        Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime startDate, DateTime endDate);
+        Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime? startDate, DateTime? endDate);
 
 
         Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsParticipating(string filter);
