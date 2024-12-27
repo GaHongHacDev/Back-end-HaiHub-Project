@@ -2582,7 +2582,6 @@ namespace Hairhub.Service.Services.Services
                 ? appointments.Count(x => x.Status == AppointmentStatus.Fail) * 100.0 / totalAppointments
                 : 0;
 
-            // Tạo response
             var response = new GetCompileAppointmentAdmin
             {
                 CompileAppointmentByDayOfWeek = compileByDayOfWeek,
