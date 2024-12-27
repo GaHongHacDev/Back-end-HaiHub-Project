@@ -15,5 +15,6 @@ namespace Hairhub.Domain.Dtos.Requests.Config
         public decimal? CommissionRate { get; set; }
         public int? NumberOfDay { get; set; }
         public bool IsActive { get; set; }
+        public string Type { get; set; }
     }
 }

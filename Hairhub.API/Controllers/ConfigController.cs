@@ -2,6 +2,7 @@
 using Hairhub.API.Constants;
 using Hairhub.Domain.Dtos.Requests.Config;
 using Hairhub.Domain.Dtos.Requests.Voucher;
+using Hairhub.Domain.Exceptions;
 using Hairhub.Service.Services.IServices;
 using Hairhub.Service.Services.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -114,9 +115,8 @@ namespace Hairhub.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost]
-        
-       
         public async Task<IActionResult> GetConfigIdofCommissioRate()
         {
             try
@@ -131,6 +131,29 @@ namespace Hairhub.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetConfigByType([FromQuery] string? type)
+        {
+            try
+            {
+                var config = await _configservice.GetConfigByType(type);
+                if (config == null)
+                {
+                    return BadRequest("Không có config");
+                }
+                return Ok(config);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 

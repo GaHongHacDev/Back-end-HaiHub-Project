@@ -25,7 +25,7 @@ namespace Hairhub.Infrastructure
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-           //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
+         //  optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DockerConnectionString"));
         }
 
@@ -641,6 +641,7 @@ namespace Hairhub.Infrastructure
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.PakageName).HasMaxLength(100).HasColumnName("pakage_name");
+                entity.Property(e => e.Type).HasMaxLength(50).HasColumnName("type");
                 entity.Property(e => e.Description).HasMaxLength(250).HasColumnName("description");
                 entity.Property(e => e.PakageFee).HasColumnType("decimal(18, 2)").HasColumnName("pakage_fee").IsRequired(false);
                 entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)").HasColumnName("commission_rate").IsRequired(false);

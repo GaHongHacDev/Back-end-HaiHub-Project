@@ -390,6 +390,12 @@ namespace Hairhub.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("pakage_name");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("type");
+
                     b.HasKey("Id");
 
                     b.ToTable("config", (string)null);

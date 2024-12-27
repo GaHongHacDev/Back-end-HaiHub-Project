@@ -17,6 +17,7 @@ namespace Hairhub.Domain.Entitities
         public decimal? CommissionRate { get; set; }
         public int? NumberOfDay {  get; set; }     
         public bool IsActive { get; set; }
+        public string Type { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
     }
 }

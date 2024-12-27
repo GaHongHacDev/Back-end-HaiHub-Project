@@ -4,10 +4,13 @@ using Hairhub.Domain.Dtos.Responses.Config;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
 using Hairhub.Domain.Dtos.Responses.Voucher;
 using Hairhub.Domain.Entitities;
+using Hairhub.Domain.Enums;
 using Hairhub.Domain.Exceptions;
 using Hairhub.Domain.Specifications;
 using Hairhub.Service.Repositories.IRepositories;
 using Hairhub.Service.Services.IServices;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,31 +31,28 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<CreateConfigResponse> CreateConfigAsync(CreateConfigRequest request)
         {
-            try
+            if (!request.Type.Equals(ConfigType.Commission) && !request.Type.Equals(ConfigType.Subcription))
             {
-                var config = new Config()
-                {
-                    PakageName = request.PakageName,
-                    PakageFee = request.PakageFee,
-                    Description = request.Description,
-                    NumberOfDay = request.NumberOfDay,
-                    CommissionRate = request.CommissionRate,
-                    DateCreate = DateTime.Now,
-                    IsActive = request.IsActive,
-                };
-
-                await _unitofwork.GetRepository<Config>().InsertAsync(config);
-                await _unitofwork.CommitAsync();
-                return _mapper.Map<CreateConfigResponse>(config);
-
-            } catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
+                throw new NotFoundException("Loại gói không hợp lệ");
             }
-            
+            var config = new Config()
+            {
+                PakageName = request.PakageName,
+                PakageFee = request.PakageFee,
+                Description = request.Description,
+                NumberOfDay = request.NumberOfDay,
+                CommissionRate = request.CommissionRate,
+                DateCreate = DateTime.Now,
+                IsActive = request.IsActive,
+                Type = request.Type,
+            };
+
+            await _unitofwork.GetRepository<Config>().InsertAsync(config);
+            await _unitofwork.CommitAsync();
+            return _mapper.Map<CreateConfigResponse>(config);
         }
 
-        
+
 
         public async Task<bool> DeleteConfigAsync(Guid id)
         {
@@ -78,7 +78,7 @@ namespace Hairhub.Service.Services.Services
                 TotalPages = config.TotalPages,
                 Items = _mapper.Map<IList<GetConfigResponse>>(config.Items),
             };
-            return ConfigResponses;            
+            return ConfigResponses;
         }
 
         public async Task<GetConfigResponse>? GetConfigbyIdAsync(Guid id)
@@ -87,14 +87,14 @@ namespace Hairhub.Service.Services.Services
             if (config == null)
             {
                 throw new NotFoundException("Không tìm thấy Config này ");
-            } 
+            }
             return _mapper.Map<GetConfigResponse>(config);
         }
- 
+
 
         public async Task<bool> UpdateConfigAsync(Guid id, UpdateConfigRequest request)
         {
-            
+
             var existConfig = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(
             predicate: e => e.Id == id);
 
@@ -111,9 +111,19 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<Guid> GetConfigIdofCommissionRate()
         {
-            var config = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.CommissionRate != null);
+            var config = await _unitofwork.GetRepository<Config>().SingleOrDefaultAsync(predicate: p => p.CommissionRate != null && p.Type.Equals(ConfigType.Commission));
             Guid id = config.Id;
             return id;
+        }
+
+        public async Task<IList<GetConfigResponse>> GetConfigByType(string? type)
+        {
+            if (type.IsNullOrEmpty())
+            {
+                type = "";
+            }
+            var config = await _unitofwork.GetRepository<Config>().GetListAsync(predicate: x=>x.Type.Contains(type!) && x.IsActive);
+            return _mapper.Map<IList<GetConfigResponse>>(config);
         }
     }
 }
