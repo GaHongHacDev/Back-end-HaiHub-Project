@@ -557,7 +557,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{salonId:Guid}")]
         [Authorize(Roles = RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CompileAppointmentSalon([FromRoute] Guid salonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<IActionResult> CompileAppointmentSalon([FromRoute] Guid salonId, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
             {
                 try

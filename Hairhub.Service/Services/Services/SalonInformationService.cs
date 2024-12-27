@@ -1024,14 +1024,26 @@ namespace Hairhub.Service.Services.Services
         }
 
 
-        public async Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime startDate, DateTime endDate)
+        public async Task<List<CompileAppointmentSalonResponse>> CompileAppointmentSalon(Guid salonId, DateTime? startDate, DateTime? endDate)
         {
             List<CompileAppointmentSalonResponse> responses = new List<CompileAppointmentSalonResponse>();
-            var appointments = await _unitOfWork.GetRepository<Appointment>()
-                                                .GetListAsync(
-                                                                predicate: x => x.StartDate.Date >= startDate.Date && x.StartDate.Date <= endDate.Date
-                                                                && x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId)
-                                                             );
+            ICollection<Appointment> appointments;
+            if (startDate!=null && endDate != null)
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                                    .GetListAsync(
+                                                    predicate: x => x.StartDate.Date >= startDate!.Value.Date && x.StartDate.Date <= endDate!.Value.Date
+                                                    && x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId)
+                                                 );
+            }
+            else
+            {
+                appointments = await _unitOfWork.GetRepository<Appointment>()
+                                    .GetListAsync(
+                                                    predicate: x=>x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId)
+                                                 );
+            }
+
             //Lịch hẹn ngoài
             var outSideAppointments = appointments.Where(x => x.Status.Equals(AppointmentStatus.OutSide));
             long customerUnique = outSideAppointments.Select(x => x.CustomerId).Distinct().Count();

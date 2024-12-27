@@ -453,21 +453,59 @@ namespace Hairhub.Service.Services.Services
                         .FirstOrDefault()!.StartTime)
                 );
 
+            List<StatictisofCustomer> statisticsList;
+            if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.Successed))
+            {
+                statisticsList = appointments
+                .Where(a => a.Customer != null)
+                .SelectMany(a => a.AppointmentDetails)
+                .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
+                .Select(group => new StatictisofCustomer
+                {
+                    CustomerID = group.Key.Id,
+                    Name = group.Key.FullName,
+                    Phone = group.Key.Phone,
+                    NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.Successed),
+                    TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
+                    UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
+                })
+                .ToList();
+            }
+            else if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.OutSide))
+            {
+                statisticsList = appointments
+                .Where(a => a.Customer != null)
+                .SelectMany(a => a.AppointmentDetails)
+                .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
+                .Select(group => new StatictisofCustomer
+                {
+                    CustomerID = group.Key.Id,
+                    Name = group.Key.FullName,
+                    Phone = group.Key.Phone,
+                    NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.OutSide),
+                    TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.OutSide).Sum(ad => ad.PriceServiceHair),
+                    UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
+                })
+                .ToList();
+            }
+            else
+            {
+                statisticsList = appointments
+                .Where(a => a.Customer != null)
+                .SelectMany(a => a.AppointmentDetails)
+                .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
+                .Select(group => new StatictisofCustomer
+                {
+                    CustomerID = group.Key.Id,
+                    Name = group.Key.FullName,
+                    Phone = group.Key.Phone,
+                    NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.OutSide || ad.Appointment.Status == AppointmentStatus.Successed),
+                    TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.OutSide || ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
+                    UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
+                })
+                .ToList();
+            }
 
-            var statisticsList = appointments
-            .Where(a => a.Customer != null)
-            .SelectMany(a => a.AppointmentDetails)
-            .GroupBy(ad => new { ad.Appointment.Customer.Id, ad.Appointment.Customer.FullName, ad.Appointment.Customer.Phone })
-            .Select(group => new StatictisofCustomer
-             {
-                CustomerID = group.Key.Id,
-                Name = group.Key.FullName,
-                Phone = group.Key.Phone,
-                NumberofSuccessAppointment = group.Count(ad => ad.Appointment.Status == AppointmentStatus.Successed),
-                TotalPrice = group.Where(ad => ad.Appointment.Status == AppointmentStatus.Successed).Sum(ad => ad.PriceServiceHair),
-                UserService = group.Select(ad => ad.ServiceName).Distinct().ToList()!
-            })
-            .ToList();
     
             if (filter != null)
             {
@@ -2430,6 +2468,24 @@ namespace Hairhub.Service.Services.Services
             return result;
 
 
+        }
+
+        public async Task<bool> CancelOutsideAppointment(Guid id)
+        {
+            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x=>x.Id == id && x.Status.Equals(AppointmentStatus.OutSide), include: x=>x.Include(s=>s.AppointmentDetails));
+            if (appointment == null)
+            {
+                throw new NotFoundException($"Không tìm thấy lịch hẹn ngoài với id {id}");
+            }
+            appointment.Status = AppointmentStatus.CancelOutSide;
+            _unitOfWork.GetRepository<Appointment>().UpdateAsync(appointment);
+            foreach (var item in appointment.AppointmentDetails)
+            {
+                item.Status = AppointmentStatus.CancelOutSide;
+                _unitOfWork.GetRepository<AppointmentDetail>().UpdateAsync(item);
+            }
+            bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            return isUpdate;
         }
 
 

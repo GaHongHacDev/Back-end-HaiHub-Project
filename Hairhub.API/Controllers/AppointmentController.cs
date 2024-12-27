@@ -756,6 +756,32 @@ namespace Hairhub.API.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("{id:Guid}")]
+        [Authorize(Roles = RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> CancelOutsideAppointment([FromRoute] Guid id)
+        {
+            {
+                try
+                {
+                    var isDelete = await _appointmentService.CancelOutsideAppointment(id);
+                    if (!isDelete)
+                    {
+                        return BadRequest(new { message = "Hủy lịch hẹn ngoài thất bại" });
+                    }
+                    return Ok("Hủy lịch hẹn ngoài thành công");
+                }
+                catch (NotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+            }
+        }
+
         //[HttpGet]
         //[Authorize(Roles = RoleNameAuthor.Admin)]
         //public async Task<IActionResult> Customer([FromQuery] Guid? SalonId, [FromQuery] string? filter)
