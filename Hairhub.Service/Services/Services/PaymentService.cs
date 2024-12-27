@@ -262,7 +262,7 @@ namespace Hairhub.Service.Services.Services
                             if (config != null)
                             {
                                 var fakepayment = await _unitOfWork.GetRepository<Payment>().SingleOrDefaultAsync(predicate: p => p.Status == PaymentStatus.Fake);
-                                fakepayment.Status = PaymentStatus.Paid;
+                                fakepayment.Status = PaymentStatus.Salon_Paid;
                                 fakepayment.TotalAmount = requestquery.price;
                                 fakepayment.PaymentDate = DateTime.UtcNow;
                                 fakepayment.Description = $"Thanh toán thành công tiền hoa hồng tháng {fakepayment.PaymentDate.Value.Month - 1}";
