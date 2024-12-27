@@ -100,7 +100,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                if(id == null)
+                if (id == null)
                 {
                     return BadRequest("Config Id is null or empty");
                 }
@@ -109,11 +109,15 @@ namespace Hairhub.API.Controllers
                 {
                     return BadRequest(new { message = "Không thể cập nhật gói" });
                 }
-                return Ok("Update ServiceHair successfully");
+                return Ok("Update gói thành công");
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
         [HttpDelete]

@@ -117,10 +117,23 @@ namespace Hairhub.Service.Services.Services
 
             if (existConfig == null)
             {
-                throw new KeyNotFoundException("Không tìm thấy Config này ");
+                throw new NotFoundException("Không tìm thấy Config này ");
             }
-            existConfig = _mapper.Map<Config>(request);
-            existConfig.Id = id;
+            if (existConfig.Type.Equals(ConfigType.Commission))
+            {
+                existConfig.PakageName = request.PakageName;
+                existConfig.Description = request.Description;
+                existConfig.CommissionRate = request.CommissionRate;
+                existConfig.IsActive = request.IsActive;
+            }
+            else
+            {
+                existConfig.PakageName = request.PakageName;
+                existConfig.Description = request.Description;
+                existConfig.IsActive = request.IsActive;
+                existConfig.NumberOfDay = request.NumberOfDay;
+                existConfig.PakageFee = request.PakageFee;
+            }
             _unitofwork.GetRepository<Config>().UpdateAsync(existConfig);
             bool isUpdate = await _unitofwork.CommitAsync() > 0;
             return isUpdate;
