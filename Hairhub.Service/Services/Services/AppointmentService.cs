@@ -2552,6 +2552,48 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
+        public async Task<GetCompileAppointmentAdmin> GetCompileAppointmentAdmin()
+        {
+            var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
+                predicate: x => x.Status == AppointmentStatus.Successed ||
+                                x.Status == AppointmentStatus.Fail ||
+                                x.Status == AppointmentStatus.CancelByCustomer
+            );
+
+            var compileByDayOfWeek = appointments
+                .Where(x => x.Status == AppointmentStatus.Successed)
+                .GroupBy(x => x.StartDate.DayOfWeek)
+                .Select(g => new CompileAppointmentByDayOfWeek
+                {
+                    DayOfWeek = g.Key.ToString(), 
+                    NumberOfSuccessedAppointment = g.LongCount()
+                })
+                .ToList();
+
+            long totalAppointments = appointments.Count;
+
+            double successedAppointmentPercent = totalAppointments > 0
+                ? appointments.Count(x => x.Status == AppointmentStatus.Successed) * 100.0 / totalAppointments
+                : 0;
+            double cancelAppointmentPercent = totalAppointments > 0
+                ? appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer) * 100.0 / totalAppointments
+                : 0;
+            double failedAppointmentPercent = totalAppointments > 0
+                ? appointments.Count(x => x.Status == AppointmentStatus.Fail) * 100.0 / totalAppointments
+                : 0;
+
+            // Tạo response
+            var response = new GetCompileAppointmentAdmin
+            {
+                CompileAppointmentByDayOfWeek = compileByDayOfWeek,
+                SuccessedAppointmentPercent = successedAppointmentPercent,
+                CancelAppointmentPercent = cancelAppointmentPercent,
+                FailedAppointmentPercent = failedAppointmentPercent
+            };
+
+            return response;
+        }
+
 
         #endregion
 

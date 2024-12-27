@@ -75,6 +75,7 @@ namespace Hairhub.Service.Services.IServices
         Task<ServiceEvaluate> serviceEvaluated(Guid salonid, DateTime? startDate, DateTime? endDate);
 
         Task<bool> CancelOutsideAppointment(Guid id);
+        Task<GetCompileAppointmentAdmin> GetCompileAppointmentAdmin();
     }
 }
 

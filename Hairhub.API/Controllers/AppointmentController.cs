@@ -782,23 +782,23 @@ namespace Hairhub.API.Controllers
             }
         }
 
-        //[HttpGet]
+        [HttpGet]
         //[Authorize(Roles = RoleNameAuthor.Admin)]
-        //public async Task<IActionResult> Customer([FromQuery] Guid? SalonId, [FromQuery] string? filter)
-        //{
-        //    try
-        //    {
-        //        var response = await _appointmentService.GetAppointmentStatistics(SalonId, filter);
-        //        return Ok(response);
-        //    }
-        //    catch (NotFoundException ex)
-        //    {
-        //        return NotFound(new { message = ex.Message });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        public async Task<IActionResult> CompileAppointmentAdmin()
+        {
+            try
+            {
+                var response = await _appointmentService.GetCompileAppointmentAdmin();
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
