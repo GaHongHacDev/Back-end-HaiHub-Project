@@ -123,19 +123,19 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Route("{salonId:Guid}")]
         //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
         public async Task<IActionResult> FrequentlyCustomers(
-            [FromRoute] Guid salonId,
+            [FromQuery] Guid? salonId,
             [FromQuery] DateTime? startDate,
             [FromQuery] DateTime? endDate,
             [FromQuery] string? statusAppointment,
             [FromQuery] string? filter,
+            [FromQuery] string? customertype,
             [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             try
             {
-                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, statusAppointment, filter, page, size);
+                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, statusAppointment,filter, customertype, page, size);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy khách hàng" });

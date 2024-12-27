@@ -412,27 +412,30 @@ namespace Hairhub.Service.Services.Services
             }
             return appointmentResponse!;
         }
-        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, string? statusAppointment, string? filter, int page, int size)
+        public async Task<IPaginate<StatictisofCustomer>> NumberAppointmentOfAppointment(Guid? id, DateTime? startDate, DateTime? endDate, string? statusAppointment, string? filter, string? customertype, int page, int size)
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
+
+            if(id != null)
+            {
+                predicate = predicate.And(x =>
+                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id));
+            }
 
             if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.Successed))
             {
                 predicate = predicate.And(x =>
-                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
-                            && x.Status == AppointmentStatus.Successed);
+                             x.Status == AppointmentStatus.Successed);
             }
             else if (!statusAppointment.IsNullOrEmpty() && statusAppointment!.Equals(AppointmentStatus.OutSide))
             {
                 predicate = predicate.And(x =>
-                            x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
-                            && x.Status == AppointmentStatus.OutSide);
+                            x.Status == AppointmentStatus.OutSide);
             }
             else
             {
                 predicate = predicate.And(x =>
-                x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id)
-                && (x.Status == AppointmentStatus.Successed || x.Status == AppointmentStatus.OutSide));
+                 (x.Status == AppointmentStatus.Successed || x.Status == AppointmentStatus.OutSide));
             }
 
             if (startDate!=null && endDate != null)
@@ -523,6 +526,23 @@ namespace Hairhub.Service.Services.Services
                     case "Số tiền giảm dần":
                         statisticsList = statisticsList.OrderByDescending(s => s.TotalPrice).ToList();
                         break;
+                }
+            }
+            if (customertype != null)
+            {
+                switch (customertype)
+                {
+                    case "ROYAL":
+                        statisticsList = statisticsList.Where(s => s.NumberofSuccessAppointment > 2).ToList();
+                        break;
+                    case "POTENTIAL":
+                        statisticsList = statisticsList.Where(s => s.NumberofSuccessAppointment == 1).ToList();
+                        break;
+                    case "NEW":
+                        statisticsList = statisticsList.Where(s => s.NumberofSuccessAppointment == 0).ToList();
+                        break;
+                    default:
+                        throw new ArgumentException("Loại khách hàng không hợp lệ.");
                 }
             }
 
