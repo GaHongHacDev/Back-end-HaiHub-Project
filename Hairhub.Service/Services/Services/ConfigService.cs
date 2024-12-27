@@ -29,30 +29,47 @@ namespace Hairhub.Service.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<CreateConfigResponse> CreateConfigAsync(CreateConfigRequest request)
+        public async Task<bool> CreateCommisionConfig(CreateCommisionConfigRequest request)
         {
-            if (!request.Type.Equals(ConfigType.Commission) && !request.Type.Equals(ConfigType.Subcription))
+            if (!request.Type.Equals(ConfigType.Commission))
             {
                 throw new NotFoundException("Loại gói không hợp lệ");
             }
             var config = new Config()
             {
+                Id = Guid.NewGuid(),
                 PakageName = request.PakageName,
-                PakageFee = request.PakageFee,
                 Description = request.Description,
-                NumberOfDay = request.NumberOfDay,
                 CommissionRate = request.CommissionRate,
                 DateCreate = DateTime.Now,
                 IsActive = request.IsActive,
                 Type = request.Type,
             };
-
             await _unitofwork.GetRepository<Config>().InsertAsync(config);
-            await _unitofwork.CommitAsync();
-            return _mapper.Map<CreateConfigResponse>(config);
+            bool isCreate = await _unitofwork.CommitAsync()>0;
+            return isCreate;
         }
-
-
+        public async Task<bool> CreateSubcriptionConfig(CreateSubscriptionConfigRequest request)
+        {
+            if (!request.Type.Equals(ConfigType.Subcription))
+            {
+                throw new NotFoundException("Loại gói không hợp lệ");
+            }
+            var config = new Config()
+            {
+                Id = Guid.NewGuid(),
+                PakageName = request.PakageName,
+                Description = request.Description,
+                PakageFee = request.PakageFee,
+                DateCreate = DateTime.Now,
+                NumberOfDay = request.NumberOfDay,
+                IsActive = request.IsActive,
+                Type = request.Type,
+            };
+            await _unitofwork.GetRepository<Config>().InsertAsync(config);
+            bool isCreate = await _unitofwork.CommitAsync() > 0;
+            return isCreate;
+        }
 
         public async Task<bool> DeleteConfigAsync(Guid id)
         {

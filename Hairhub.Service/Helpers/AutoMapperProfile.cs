@@ -147,8 +147,7 @@ namespace Hairhub.Service.Helpers
             CreateMap<Voucher, GetVoucherResponse>().ReverseMap();
 
             //Config
-            CreateMap<CreateConfigRequest, Config>().ReverseMap();
-            CreateMap<Config, CreateConfigResponse>().ReverseMap();
+
             CreateMap<UpdateConfigRequest, Config>().ReverseMap();
 
 

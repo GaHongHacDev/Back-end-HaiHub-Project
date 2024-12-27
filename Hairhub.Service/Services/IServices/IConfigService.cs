@@ -18,12 +18,13 @@ namespace Hairhub.Service.Services.IServices
 
         Task<GetConfigResponse>? GetConfigbyIdAsync(Guid id);
 
-        Task<CreateConfigResponse> CreateConfigAsync(CreateConfigRequest request);
+        Task<bool> CreateCommisionConfig(CreateCommisionConfigRequest request);
 
         Task<bool> UpdateConfigAsync(Guid id, UpdateConfigRequest request);
 
         Task<bool> DeleteConfigAsync(Guid id);
         Task<Guid> GetConfigIdofCommissionRate();
         Task<IList<GetConfigResponse>> GetConfigByType(string? type);
+        Task<bool> CreateSubcriptionConfig(CreateSubscriptionConfigRequest request);
     }
 }

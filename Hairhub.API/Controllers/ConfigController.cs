@@ -55,11 +55,31 @@ namespace Hairhub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> CreateConfig([FromBody]CreateConfigRequest request)
+        public async Task<IActionResult> CreateCommissionConfig([FromBody]CreateCommisionConfigRequest request)
         {
             try
             {
-                var result = await _configservice.CreateConfigAsync(request);
+                var result = await _configservice.CreateCommisionConfig(request);
+                if (result == null)
+                {
+                    return NotFound("Cannot create config!!!");
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = RoleNameAuthor.Admin)]
+        public async Task<IActionResult> CreateSubscriptionConfig([FromBody] CreateSubscriptionConfigRequest request)
+        {
+            try
+            {
+                var result = await _configservice.CreateSubcriptionConfig(request);
                 if (result == null)
                 {
                     return NotFound("Cannot create config!!!");
