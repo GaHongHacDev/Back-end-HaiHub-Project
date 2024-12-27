@@ -9,6 +9,6 @@ namespace Hairhub.Domain.Enums
     public static class ConfigType
     {
         public const string Commission = "COMMISSION";
-        public const string Subcription = "SUBCRIPTION";
+        public const string Subcription = "SUBSCRIPTION";
     }
 }
