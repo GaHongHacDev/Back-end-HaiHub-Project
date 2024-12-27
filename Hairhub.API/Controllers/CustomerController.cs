@@ -24,10 +24,10 @@ namespace Hairhub.API.Controllers
 
         [HttpGet]
         //[Authorize(Roles = RoleNameAuthor.Admin)]
-        public async Task<IActionResult> GetAllCustomer([FromQuery] string? email, [FromQuery] bool? status, [FromQuery] string? customerName, [FromQuery] bool? isAscendingBooking, [FromQuery] int page=1, [FromQuery] int size=10) {
+        public async Task<IActionResult> GetAllCustomer([FromQuery] string? email, [FromQuery] bool? status, [FromQuery] string? customerName, [FromQuery] bool? isAscendingBooking, [FromQuery] string? customertype, [FromQuery] int page=1, [FromQuery] int size=10) {
             try
             {
-                var customers = await _customerService.GetCustomers(email, status, customerName, isAscendingBooking, page, size);
+                var customers = await _customerService.GetCustomers(email, status, customerName, isAscendingBooking, customertype, page, size);
                 return Ok(customers);
             }
             catch (Exception ex)

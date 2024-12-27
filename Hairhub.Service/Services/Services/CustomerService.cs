@@ -40,7 +40,7 @@ namespace Hairhub.Service.Services.Services
             _mapper = mapper;
             _mediaService = mediaService;
         }
-        public async Task<IPaginate<GetCustomerResponse>> GetCustomers(string? email, bool? status, string? customerName, bool? isAscendingBooking, int page, int size)
+        public async Task<IPaginate<GetCustomerResponse>> GetCustomers(string? email, bool? status, string? customerName, bool? isAscendingBooking, string? customertype, int page, int size)
         {
             ICollection<Customer> customerEntities;
             if (email.IsNullOrEmpty())
@@ -82,7 +82,23 @@ namespace Hairhub.Service.Services.Services
             {
                 result = (isAscendingBooking == true) ? result.OrderBy(x => x.NumberOfAppointment).ToList() : result.OrderByDescending(x => x.NumberOfAppointment).ToList();
             }
-
+            if (customertype != null)
+            {
+                switch (customertype)
+                {
+                    case "ROYAL":
+                        result = result.Where(s => s.NumberOfAppointment > 2).ToList();
+                        break;
+                    case "POTENTIAL":
+                        result = result.Where(s => s.NumberOfAppointment == 1).ToList();
+                        break;
+                    case "NEW":
+                        result = result.Where(s => s.NumberOfAppointment == 0).ToList();
+                        break;
+                    default:
+                        throw new ArgumentException("Loại khách hàng không hợp lệ.");
+                }
+            }
             var pagedResult = result.Skip((page - 1) * size).Take(size).ToList();
 
             var paginateResponse = new Paginate<GetCustomerResponse>
