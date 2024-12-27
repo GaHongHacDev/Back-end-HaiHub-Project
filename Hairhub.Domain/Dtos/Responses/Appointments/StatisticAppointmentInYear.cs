@@ -8,9 +8,6 @@ namespace Hairhub.Domain.Dtos.Responses.Appointments
 {
     public class StatisticAppointmentInYear
     {
-        public string TimeFrame { get; set; } 
-
-        public Dictionary<string, int> TotalAppointments { get; set; } 
         public Dictionary<string, int> OutsideAppointments { get; set; } 
         public Dictionary<string, int> SuccessedAppointments { get; set; }
         public Dictionary<string, int> FailedAppointments { get; set; }

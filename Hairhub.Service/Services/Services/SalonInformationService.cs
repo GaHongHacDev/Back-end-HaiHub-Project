@@ -848,7 +848,7 @@ namespace Hairhub.Service.Services.Services
                 NumberOfCancelAppointment = appointments.Count(a => a.Status == AppointmentStatus.CancelByCustomer),
                 NumberOfFailedAppointment = appointments.Count(a => a.Status == AppointmentStatus.Fail),
                 RateOfReturnCustomers = rateOfReturnCustomers,
-                ValueAverageOnProduct = valueAverageOnProduct, 
+                ValueAverageOnProduct = valueAverageOnProduct,
                 PriceDiscountforCustomers = DiscountPrice
             };
 
@@ -964,7 +964,7 @@ namespace Hairhub.Service.Services.Services
                 var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
                                                           .GetListAsync(
                                                                         predicate: x => x.SalonEmployeeId == employee.Id
-                                                                                    && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)) 
+                                                                                    && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed))
                                                                                     && x.StartTime.Date >= startDate.Date && x.EndTime.Date <= endDate.Date,
                                                                         include: x => x.Include(s => s.Appointment)
                                                                        );
@@ -1028,7 +1028,7 @@ namespace Hairhub.Service.Services.Services
         {
             List<CompileAppointmentSalonResponse> responses = new List<CompileAppointmentSalonResponse>();
             ICollection<Appointment> appointments;
-            if (startDate!=null && endDate != null)
+            if (startDate != null && endDate != null)
             {
                 appointments = await _unitOfWork.GetRepository<Appointment>()
                                     .GetListAsync(
@@ -1040,7 +1040,7 @@ namespace Hairhub.Service.Services.Services
             {
                 appointments = await _unitOfWork.GetRepository<Appointment>()
                                     .GetListAsync(
-                                                    predicate: x=>x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId)
+                                                    predicate: x => x.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId)
                                                  );
             }
 
@@ -1097,26 +1097,43 @@ namespace Hairhub.Service.Services.Services
         public async Task<StatisticsOfSalonsParticipating> StatisticsOfSalonsParticipating(string filter)
         {
             var salonInformation = await _unitOfWork.GetRepository<SalonInformation>().GetListAsync(predicate: p => p.Status == SalonStatus.Approved);
-            
+
             IEnumerable<SalonInformation> salons;
             DateTime currentDate = DateTime.Now;
             DateTime resultDate;
             var result = new StatisticsOfSalonsParticipating();
 
-            switch(filter)
+            switch (filter)
             {
                 case "YEAR":
                     result.InYears = new List<InYear>();
                     for (int month = 1; month <= 12; month++)
                     {
                         resultDate = new DateTime(currentDate.Year, month, 1);
-                        var endDate = resultDate.AddMonths(1).AddDays(-1); 
+                        var endDate = resultDate.AddMonths(1).AddDays(-1);
 
                         salons = salonInformation.Where(salon => salon.CreatedAt >= resultDate && salon.CreatedAt <= endDate);
 
                         result.InYears.Add(new InYear
                         {
-                            NumofMonth = resultDate.ToString("MMMM"), 
+                            NumofMonth = resultDate.ToString("MMMM"),
+                            value = salons.Count()
+                        });
+                    }
+                    break;
+
+                case "YEAR_BEFORE":
+                    result.InYears = new List<InYear>();
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        resultDate = new DateTime(currentDate.Year - 1, month, 1);
+                        var endDate = resultDate.AddMonths(1).AddDays(-1);
+
+                        salons = salonInformation.Where(salon => salon.CreatedAt >= resultDate && salon.CreatedAt <= endDate);
+
+                        result.InYears.Add(new InYear
+                        {
+                            NumofMonth = resultDate.ToString("MMMM"),
                             value = salons.Count()
                         });
                     }
@@ -1124,8 +1141,8 @@ namespace Hairhub.Service.Services.Services
 
                 case "MONTH":
                     result.InMonths = new List<InMonth>();
-                    resultDate = new DateTime(currentDate.Year, currentDate.Month, 1); 
-                    var lastDayOfMonth = resultDate.AddMonths(1).AddDays(-1); 
+                    resultDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    var lastDayOfMonth = resultDate.AddMonths(1).AddDays(-1);
 
                     for (DateTime date = resultDate; date <= lastDayOfMonth; date = date.AddDays(1))
                     {
@@ -1133,7 +1150,24 @@ namespace Hairhub.Service.Services.Services
 
                         result.InMonths.Add(new InMonth
                         {
-                            NumofDate = date.ToString("dd"), 
+                            NumofDate = date.ToString("dd"),
+                            value = salons.Count()
+                        });
+                    }
+                    break;
+
+                case "MONTH_BEFORE":
+                    result.InMonths = new List<InMonth>();
+                    resultDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
+                    var lastDayOfMonthBefore = resultDate.AddMonths(1).AddDays(-1);
+
+                    for (DateTime date = resultDate; date <= lastDayOfMonthBefore; date = date.AddDays(1))
+                    {
+                        salons = salonInformation.Where(salon => salon.CreatedAt!.Value.Date == date.Date);
+
+                        result.InMonths.Add(new InMonth
+                        {
+                            NumofDate = date.ToString("dd"),
                             value = salons.Count()
                         });
                     }
@@ -1141,8 +1175,8 @@ namespace Hairhub.Service.Services.Services
 
                 case "WEEK":
                     result.InWeeks = new List<InWeek>();
-                    var firstDayOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + 1); 
-                    var lastDayOfWeek = firstDayOfWeek.AddDays(6); 
+                    var firstDayOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + 1);
+                    var lastDayOfWeek = firstDayOfWeek.AddDays(6);
 
                     for (DateTime date = firstDayOfWeek; date <= lastDayOfWeek; date = date.AddDays(1))
                     {
@@ -1150,7 +1184,7 @@ namespace Hairhub.Service.Services.Services
 
                         result.InWeeks.Add(new InWeek
                         {
-                            NumofDate = date.ToString("dddd"), 
+                            NumofDate = date.ToString("dddd"),
                             value = salons.Count()
                         });
                     }
@@ -1196,6 +1230,14 @@ namespace Hairhub.Service.Services.Services
                 case "YEAR":
                     startDate = new DateTime(currentDate.Year, 1, 1);
                     endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+                case "YEAR_BEFORE":
+                    startDate = new DateTime(currentDate.Year - 1, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+                case "MONTH_BEFORE":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case "MONTH":
                     startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
@@ -1245,11 +1287,38 @@ namespace Hairhub.Service.Services.Services
                     });
                 }
             }
+            else if (filter?.ToUpper() == "MONTH_BEFORE")
+            {
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month - 1); day++)
+                {
+                    var date = new DateTime(currentDate.Year, currentDate.Month - 1, day);
+                    result.InMonths!.Add(new InMonth
+                    {
+                        NumofDate = date.ToString("dd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
+                }
+            }
             else if (filter?.ToUpper() == "YEAR")
             {
                 for (int month = 1; month <= 12; month++)
                 {
                     var monthStart = new DateTime(currentDate.Year, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+                    result.InYears!.Add(new InYear
+                    {
+                        NumofMonth = monthStart.ToString("MMMM"),
+                        value = appointments
+                            .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
+                            .Sum(x => x.TotalPrice)
+                    });
+                }
+            }
+            else if (filter?.ToUpper() == "YEAR_BEFORE")
+            {
+                for (int month = 1; month <= 12; month++)
+                {
+                    var monthStart = new DateTime(currentDate.Year - 1, month, 1);
                     var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
                     result.InYears!.Add(new InYear
                     {
@@ -1290,8 +1359,16 @@ namespace Hairhub.Service.Services.Services
                     startDate = new DateTime(currentDate.Year, 1, 1);
                     endDate = startDate.AddYears(1).AddTicks(-1);
                     break;
+                case "YEAR_BEFORE":
+                    startDate = new DateTime(currentDate.Year - 1, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
                 case "MONTH":
                     startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+                case "MONTH_BEFORE":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
                     endDate = startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case "WEEK":
@@ -1306,7 +1383,7 @@ namespace Hairhub.Service.Services.Services
             }
 
             predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
-            
+
 
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetListAsync(
@@ -1327,46 +1404,73 @@ namespace Hairhub.Service.Services.Services
                 InWeeks = new List<InWeek>()
             };
 
-                if (filter?.ToUpper() == "MONTH")
+            if (filter?.ToUpper() == "MONTH")
+            {
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
                 {
-                    for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
+                    var date = new DateTime(currentDate.Year, currentDate.Month, day);
+                    result.InMonths!.Add(new InMonth
                     {
-                        var date = new DateTime(currentDate.Year, currentDate.Month, day);
-                        result.InMonths!.Add(new InMonth
-                        {
-                            NumofDate = date.ToString("dd"),
-                            value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
-                        });
-                    }
+                        NumofDate = date.ToString("dd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
                 }
-                else if (filter?.ToUpper() == "YEAR")
+            }
+            else if (filter?.ToUpper() == "MONTH_BEFORE")
+            {
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month-1); day++)
                 {
-                    for (int month = 1; month <= 12; month++)
+                    var date = new DateTime(currentDate.Year, currentDate.Month-1, day);
+                    result.InMonths!.Add(new InMonth
                     {
-                        var monthStart = new DateTime(currentDate.Year, month, 1);
-                        var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
-                        result.InYears!.Add(new InYear
-                        {
-                            NumofMonth = monthStart.ToString("MMMM"),
-                            value = appointments
-                                .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
-                                .Sum(x => x.TotalPrice)
-                        });
-                    }
+                        NumofDate = date.ToString("dd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
                 }
-                else if (filter?.ToUpper() == "WEEK")
+            }
+            else if (filter?.ToUpper() == "YEAR")
+            {
+                for (int month = 1; month <= 12; month++)
                 {
-                    var startOfWeek = startDate;
-                    for (int i = 0; i < 7; i++)
+                    var monthStart = new DateTime(currentDate.Year, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+                    result.InYears!.Add(new InYear
                     {
-                        var date = startOfWeek.AddDays(i);
-                        result.InWeeks!.Add(new InWeek
-                        {
-                            NumofDate = date.ToString("dddd"),
-                            value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
-                        });
-                    }
+                        NumofMonth = monthStart.ToString("MMMM"),
+                        value = appointments
+                            .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
+                            .Sum(x => x.TotalPrice)
+                    });
                 }
+            }
+            else if (filter?.ToUpper() == "YEAR_BEFORE")
+            {
+                for (int month = 1; month <= 12; month++)
+                {
+                    var monthStart = new DateTime(currentDate.Year-1, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+                    result.InYears!.Add(new InYear
+                    {
+                        NumofMonth = monthStart.ToString("MMMM"),
+                        value = appointments
+                            .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
+                            .Sum(x => x.TotalPrice)
+                    });
+                }
+            }
+            else if (filter?.ToUpper() == "WEEK")
+            {
+                var startOfWeek = startDate;
+                for (int i = 0; i < 7; i++)
+                {
+                    var date = startOfWeek.AddDays(i);
+                    result.InWeeks!.Add(new InWeek
+                    {
+                        NumofDate = date.ToString("dddd"),
+                        value = groupedAppointments.ContainsKey(date) ? groupedAppointments[date] : 0
+                    });
+                }
+            }
             return result;
         }
 
@@ -1398,12 +1502,46 @@ namespace Hairhub.Service.Services.Services
                     }
                     break;
 
+                case "YEAR_BEFORE":
+                    result.InYears = new List<InYear>();
+                    for (int month = 1; month <= 12; month++)
+                    {
+                        resultDate = new DateTime(currentDate.Year - 1, month, 1);
+                        var endDate = resultDate.AddMonths(1).AddDays(-1);
+
+                        accounts = account.Where(salon => salon.CreatedDate >= resultDate && salon.CreatedDate <= endDate);
+
+                        result.InYears.Add(new InYear
+                        {
+                            NumofMonth = resultDate.ToString("MMMM"),
+                            value = accounts.Count()
+                        });
+                    }
+                    break;
+
                 case "MONTH":
                     result.InMonths = new List<InMonth>();
                     resultDate = new DateTime(currentDate.Year, currentDate.Month, 1);
                     var lastDayOfMonth = resultDate.AddMonths(1).AddDays(-1);
 
                     for (DateTime date = resultDate; date <= lastDayOfMonth; date = date.AddDays(1))
+                    {
+                        accounts = account.Where(salon => salon.CreatedDate!.Date == date.Date);
+
+                        result.InMonths.Add(new InMonth
+                        {
+                            NumofDate = date.ToString("dd"),
+                            value = accounts.Count()
+                        });
+                    }
+                    break;
+
+                case "MONTH_BEFORE":
+                    result.InMonths = new List<InMonth>();
+                    resultDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
+                    var lastDayOfMonthBefore = resultDate.AddMonths(1).AddDays(-1);
+
+                    for (DateTime date = resultDate; date <= lastDayOfMonthBefore; date = date.AddDays(1))
                     {
                         accounts = account.Where(salon => salon.CreatedDate!.Date == date.Date);
 
@@ -1469,14 +1607,14 @@ namespace Hairhub.Service.Services.Services
             GetCustomerQuantityResponse response = new GetCustomerQuantityResponse();
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                                                 .GetListAsync(
-                                                                predicate: x=> x.AppointmentDetails.Any(ad=>ad.SalonEmployee.SalonInformationId == salonId) && x.StartDate.Date == date.Date 
+                                                                predicate: x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) && x.StartDate.Date == date.Date
                                                                             && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Booking)),
-                                                                include: x=>x.Include(s=>s.AppointmentDetails)
+                                                                include: x => x.Include(s => s.AppointmentDetails)
                                                              );
             int newCus = 0, oldCus = 0;
-            foreach (var item in appointments) 
+            foreach (var item in appointments)
             {
-                var appointment = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) && x.CustomerId == item.CustomerId && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed )|| x.Status.Equals(AppointmentStatus.Booking)));
+                var appointment = await _unitOfWork.GetRepository<Appointment>().GetListAsync(predicate: x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonId) && x.CustomerId == item.CustomerId && (x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Booking)));
                 if (appointment.Count > 1)
                 {
                     oldCus++;
@@ -1501,21 +1639,21 @@ namespace Hairhub.Service.Services.Services
                 response.CustomerDate.OldCustomerPercent = (double)oldCus / response.CustomerDate.TotalCustomer;
                 response.CustomerDate.NewCustomerPercent = (double)newCus / response.CustomerDate.TotalCustomer;
             }
-           
 
-            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x=>x.SalonId == salonId);
+
+            var schedule = await _unitOfWork.GetRepository<Schedule>().SingleOrDefaultAsync(predicate: x => x.SalonId == salonId);
             if (schedule == null)
             {
                 throw new NotFoundException($"Không tìm thấy lịch làm việc của salon với id {salonId}");
             }
 
             List<int> listTime = GetHoursList(schedule.StartTime, schedule.EndTime);
-            foreach(var item in listTime)
+            foreach (var item in listTime)
             {
                 DateTime date1 = new DateTime(date.Year, date.Month, date.Day).AddHours(item);
-                DateTime date2 = new DateTime(date.Year, date.Month, date.Day).AddHours(item+1);
-                var uniqueCustomerCount = (appointments ?? new List<Appointment>()) 
-                    .Where(x => x.AppointmentDetails != null && 
+                DateTime date2 = new DateTime(date.Year, date.Month, date.Day).AddHours(item + 1);
+                var uniqueCustomerCount = (appointments ?? new List<Appointment>())
+                    .Where(x => x.AppointmentDetails != null &&
                                 x.AppointmentDetails.Any(ad => ad.StartTime >= date1 && ad.StartTime < date2))
                     .Select(x => x.CustomerId)
                     .Distinct()
@@ -1562,14 +1700,14 @@ namespace Hairhub.Service.Services.Services
                         .FirstOrDefault()!.StartTime)
                 );
 
-            
+
             var salon = await _unitOfWork.GetRepository<Schedule>()
                 .SingleOrDefaultAsync(predicate: x => x.SalonId == salonId);
-            
+
             var startHour = salon?.StartTime.Hour ?? 0;
             var endHour = (salon?.EndTime.Hour + 1) ?? 23;
 
-           
+
             var totalRevenue = appointments
                 .Where(a => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
                 .Sum(a => a.TotalPrice);
@@ -1578,12 +1716,12 @@ namespace Hairhub.Service.Services.Services
                 .Where(a => a.Status == AppointmentStatus.OutSide)
                 .Sum(a => a.TotalPrice);
 
-            
+
             var platformRevenue = appointments
                 .Where(a => a.Status == AppointmentStatus.Successed)
                 .Sum(a => a.TotalPrice);
 
-            
+
             var hourlyTotalRevenueData = appointments
                 .SelectMany(a => a.AppointmentDetails
                     .Where(ad => a.Status == AppointmentStatus.Successed || a.Status == AppointmentStatus.OutSide)
@@ -1599,7 +1737,7 @@ namespace Hairhub.Service.Services.Services
                 })
                 .ToList();
 
-            
+
             var hourlyPlatformRevenueData = appointments
                 .SelectMany(a => a.AppointmentDetails
                     .Where(ad => a.Status == AppointmentStatus.Successed)
@@ -1615,7 +1753,7 @@ namespace Hairhub.Service.Services.Services
                 })
                 .ToList();
 
-            
+
             var hourlyOutsideRevenueData = appointments
                 .SelectMany(a => a.AppointmentDetails
                     .Where(ad => a.Status == AppointmentStatus.OutSide)
@@ -1690,10 +1828,10 @@ namespace Hairhub.Service.Services.Services
             var responses = new List<GetEmployeeEvaluationResponse>();
 
             var predicate = PredicateBuilder.New<Feedback>(true);
-            predicate = predicate.And(x=>x.Appointment.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId) && x.IsActive);
-            if(startDate!=null && endDate != null)
+            predicate = predicate.And(x => x.Appointment.AppointmentDetails.Any(s => s.SalonEmployee.SalonInformationId == salonId) && x.IsActive);
+            if (startDate != null && endDate != null)
             {
-                predicate = predicate.And(x =>x.CreateDate.Date>=startDate.Value.Date && x.CreateDate.Date<=endDate.Value.Date);
+                predicate = predicate.And(x => x.CreateDate.Date >= startDate.Value.Date && x.CreateDate.Date <= endDate.Value.Date);
             }
             var feedbacks = await _unitOfWork.GetRepository<Feedback>()
                                       .GetListAsync(
@@ -1702,14 +1840,14 @@ namespace Hairhub.Service.Services.Services
                                                          .ThenInclude(fd => fd.AppointmentDetail)
                                       );
 
-            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x=>x.SalonInformationId == salonId && x.IsActive);
+            var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive);
             foreach (var employee in employees)
             {
                 var employeeFeedbackDetails = feedbacks
                     .SelectMany(f => f.FeedbackDetails)
                     .Where(fd => fd.AppointmentDetail.SalonEmployeeId == employee.Id);
 
-                var totalRatings = employeeFeedbackDetails.Sum(fd => fd.Rating);
+                decimal totalRatings = employeeFeedbackDetails.Sum(fd => fd.Rating);
                 var ratingCount = employeeFeedbackDetails.Count();
                 var averageRating = ratingCount > 0 ? (decimal)totalRatings / ratingCount : 0;
                 responses.Add(new GetEmployeeEvaluationResponse

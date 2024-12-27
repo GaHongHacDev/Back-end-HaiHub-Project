@@ -2307,6 +2307,16 @@ namespace Hairhub.Service.Services.Services
                     endDate = startDate.AddYears(1).AddTicks(-1);
                     break;
 
+                case "YEAR_BEFORE":
+                    startDate = new DateTime(currentDate.Year - 1, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+
+                case "MONTH_BEFORE":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+
                 case "MONTH":
                     startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
                     endDate = startDate.AddMonths(1).AddTicks(-1);
@@ -2344,7 +2354,12 @@ namespace Hairhub.Service.Services.Services
                 RateOfOut_SideAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.OutSide) / totalAppointments * 100 : 0,
                 RateOfSuccessedAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Successed) / totalAppointments * 100 : 0,
                 RateOfFailAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Fail) / totalAppointments * 100 : 0,
-                RateOfCancelAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer) / totalAppointments * 100 : 0
+                RateOfCancelAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer) / totalAppointments * 100 : 0,
+
+                NumberOfOut_SideAppointment = appointments.Count(x => x.Status == AppointmentStatus.OutSide),
+                NumberOfSuccessedAppointment = appointments.Count(x => x.Status == AppointmentStatus.Successed) ,
+                NumberOfFailAppointment = appointments.Count(x => x.Status == AppointmentStatus.Fail),
+                NumberOfCancelAppointment = appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer)
             };
 
             return result;
@@ -2370,6 +2385,16 @@ namespace Hairhub.Service.Services.Services
                     endDate = startDate.AddYears(1).AddTicks(-1);
                     break;
 
+                case "YEAR_BEFORE":
+                    startDate = new DateTime(currentDate.Year-1, 1, 1);
+                    endDate = startDate.AddYears(1).AddTicks(-1);
+                    break;
+
+                case "MONTH_BEFORE":
+                    startDate = new DateTime(currentDate.Year, currentDate.Month-1, 1);
+                    endDate = startDate.AddMonths(1).AddTicks(-1);
+                    break;
+
                 case "MONTH":
                     startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
                     endDate = startDate.AddMonths(1).AddTicks(-1);
@@ -2387,6 +2412,7 @@ namespace Hairhub.Service.Services.Services
                     break;
             }
 
+            predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetListAsync(
                     predicate: predicate,
@@ -2399,8 +2425,6 @@ namespace Hairhub.Service.Services.Services
 
             if (filter?.ToUpper() == "MONTH")
             {
-                result.TimeFrame = "Month";
-
                 for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month); day++)
                 {
                     var date = new DateTime(currentDate.Year, currentDate.Month, day);
@@ -2411,10 +2435,33 @@ namespace Hairhub.Service.Services.Services
                     result.CanceledAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.CancelByCustomer);
                 }
             }
+            else if (filter?.ToUpper() == "MONTH_BEFORE")
+            {
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month-1); day++)
+                {
+                    var date = new DateTime(currentDate.Year, currentDate.Month-1, day);
+
+                    result.OutsideAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.OutSide);
+                    result.SuccessedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Successed);
+                    result.FailedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Fail);
+                    result.CanceledAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.CancelByCustomer);
+                }
+            }
+            else if (filter?.ToUpper() == "YEAR_BEFORE")
+            {
+                for (int month = 1; month <= 12; month++)
+                {
+                    var monthStart = new DateTime(currentDate.Year-1, month, 1);
+                    var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
+
+                    result.OutsideAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.OutSide);
+                    result.SuccessedAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.Successed);
+                    result.FailedAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.Fail);
+                    result.CanceledAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.CancelByCustomer);
+                }
+            }
             else if (filter?.ToUpper() == "YEAR")
             {
-                result.TimeFrame = "Year";
-
                 for (int month = 1; month <= 12; month++)
                 {
                     var monthStart = new DateTime(currentDate.Year, month, 1);
@@ -2428,9 +2475,6 @@ namespace Hairhub.Service.Services.Services
             }
             else if (filter?.ToUpper() == "WEEK")
             {
-                result.TimeFrame = "Week";
-
-
                 var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + (int)DayOfWeek.Monday);
                 var endOfWeek = startOfWeek.AddDays(6);
 
