@@ -153,7 +153,7 @@ namespace Hairhub.Service.Services.Services
             {
                 type = "";
             }
-            var config = await _unitofwork.GetRepository<Config>().GetPagingListAsync(predicate: x=>x.Type.Contains(type!) && x.IsActive, page: page, size: size);
+            var config = await _unitofwork.GetRepository<Config>().GetPagingListAsync(predicate: x=>x.Type.Contains(type!), page: page, size: size);
             var ConfigResponses = new Paginate<GetConfigResponse>()
             {
                 Page = config.Page,
