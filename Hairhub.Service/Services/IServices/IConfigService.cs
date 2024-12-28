@@ -24,7 +24,7 @@ namespace Hairhub.Service.Services.IServices
 
         Task<bool> DeleteConfigAsync(Guid id);
         Task<Guid> GetConfigIdofCommissionRate();
-        Task<IList<GetConfigResponse>> GetConfigByType(string? type);
+        Task<IPaginate<GetConfigResponse>> GetConfigByType(string? type, int page, int size);
         Task<bool> CreateSubcriptionConfig(CreateSubscriptionConfigRequest request);
     }
 }

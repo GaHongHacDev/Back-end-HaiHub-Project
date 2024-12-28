@@ -159,12 +159,12 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> GetConfigByType([FromQuery] string? type)
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner)]
+        public async Task<IActionResult> GetConfigByType([FromQuery] string? type, [FromQuery] int page =1, [FromQuery] int size = 10)
         {
             try
             {
-                var config = await _configservice.GetConfigByType(type);
+                var config = await _configservice.GetConfigByType(type, page, size);
                 if (config == null)
                 {
                     return BadRequest("Không có config");

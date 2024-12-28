@@ -2552,6 +2552,21 @@ namespace Hairhub.Service.Services.Services
             return isUpdate;
         }
 
+        private string ConvertDayOfWeekToVietnamese(DayOfWeek dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                DayOfWeek.Monday => "Thứ Hai",
+                DayOfWeek.Tuesday => "Thứ Ba",
+                DayOfWeek.Wednesday => "Thứ Tư",
+                DayOfWeek.Thursday => "Thứ Năm",
+                DayOfWeek.Friday => "Thứ Sáu",
+                DayOfWeek.Saturday => "Thứ Bảy",
+                DayOfWeek.Sunday => "Chủ Nhật",
+                _ => "Không xác định"
+            };
+        }
+
         public async Task<GetCompileAppointmentAdmin> GetCompileAppointmentAdmin()
         {
             var appointments = await _unitOfWork.GetRepository<Appointment>().GetListAsync(
@@ -2565,7 +2580,7 @@ namespace Hairhub.Service.Services.Services
                 .GroupBy(x => x.StartDate.DayOfWeek)
                 .Select(g => new CompileAppointmentByDayOfWeek
                 {
-                    DayOfWeek = g.Key.ToString(), 
+                    DayOfWeek = ConvertDayOfWeekToVietnamese(g.Key), 
                     NumberOfSuccessedAppointment = g.LongCount()
                 })
                 .ToList();

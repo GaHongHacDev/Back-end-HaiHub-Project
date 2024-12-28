@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Hairhub.Domain.Dtos.Requests.Config;
 using Hairhub.Domain.Dtos.Responses.Config;
 using Hairhub.Domain.Dtos.Responses.ServiceHairs;
@@ -146,14 +147,22 @@ namespace Hairhub.Service.Services.Services
             return id;
         }
 
-        public async Task<IList<GetConfigResponse>> GetConfigByType(string? type)
+        public async Task<IPaginate<GetConfigResponse>> GetConfigByType(string? type, int page, int size)
         {
             if (type.IsNullOrEmpty())
             {
                 type = "";
             }
-            var config = await _unitofwork.GetRepository<Config>().GetListAsync(predicate: x=>x.Type.Contains(type!) && x.IsActive);
-            return _mapper.Map<IList<GetConfigResponse>>(config);
+            var config = await _unitofwork.GetRepository<Config>().GetPagingListAsync(predicate: x=>x.Type.Contains(type!) && x.IsActive, page: page, size: size);
+            var ConfigResponses = new Paginate<GetConfigResponse>()
+            {
+                Page = config.Page,
+                Size = config.Size,
+                Total = config.Total,
+                TotalPages = config.TotalPages,
+                Items = _mapper.Map<IList<GetConfigResponse>>(config.Items),
+            };
+            return ConfigResponses;
         }
     }
 }
