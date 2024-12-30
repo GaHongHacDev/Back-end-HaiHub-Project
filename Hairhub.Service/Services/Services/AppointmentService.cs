@@ -1117,11 +1117,11 @@ namespace Hairhub.Service.Services.Services
                     {
                         //Get appointment detail => Check available time
                         var appointmentDetails = (await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                        .GetListAsync(
-                                                                        predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
-                                                                               && (x.Status.Equals(AppointmentStatus.Booking)) || x.Status.Equals(AppointmentStatus.OutSide))
-                                                        )
-                                                        .ToList()
+                                                                    .GetListAsync(
+                                                                                    predicate: x => x.SalonEmployeeId == employee.Id && x.StartTime.Date == request.Day.Date && x.EndTime.Date == request.Day.Date
+                                                                                           && (x.Status.Equals(AppointmentStatus.Booking) || x.Status.Equals(AppointmentStatus.OutSide))
+                                                                                 )
+                                                 ).ToList()
                                                         .Where(a => ParseTimeToDecimal(a.StartTime) <= startTimeProcess && ParseTimeToDecimal(a.EndTime) > startTimeProcess
                                                                  || (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess && (decimal?)ParseTimeToDecimal(a.EndTime) >= endTimeProcess
                                                                  || ParseTimeToDecimal(a.StartTime) > startTimeProcess && (decimal?)ParseTimeToDecimal(a.StartTime) < endTimeProcess)
