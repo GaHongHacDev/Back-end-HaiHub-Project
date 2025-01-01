@@ -87,7 +87,7 @@ namespace Hairhub.Service.Services.Services
                 switch (customertype)
                 {
                     case "ROYAL":
-                        result = result.Where(s => s.NumberOfAppointment > 2).ToList();
+                        result = result.Where(s => s.NumberOfAppointment >= 2).ToList();
                         break;
                     case "POTENTIAL":
                         result = result.Where(s => s.NumberOfAppointment == 1).ToList();
