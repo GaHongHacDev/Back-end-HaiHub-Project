@@ -2347,19 +2347,19 @@ namespace Hairhub.Service.Services.Services
                 );
 
 
-            var totalAppointments = appointments.Count();
+            var totalAppointments = appointments.Where(x=>x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Fail) || x.Status.Equals(AppointmentStatus.CancelByCustomer)).Count();
             var result = new StatisticsNumberOfAppointmentOnPlatform
             {
+                NumberOfOut_SideAppointment = appointments.Count(x => x.Status == AppointmentStatus.OutSide),
+                NumberOfSuccessedAppointment = appointments.Count(x => x.Status == AppointmentStatus.Successed),
+                NumberOfFailAppointment = appointments.Count(x => x.Status == AppointmentStatus.Fail),
+                NumberOfCancelAppointment = appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer),
+
                 TotalAppointmenOnPlatform = totalAppointments,
                 RateOfOut_SideAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.OutSide) / totalAppointments * 100 : 0,
                 RateOfSuccessedAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Successed) / totalAppointments * 100 : 0,
                 RateOfFailAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.Fail) / totalAppointments * 100 : 0,
                 RateOfCancelAppointment = totalAppointments > 0 ? (decimal)appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer) / totalAppointments * 100 : 0,
-
-                NumberOfOut_SideAppointment = appointments.Count(x => x.Status == AppointmentStatus.OutSide),
-                NumberOfSuccessedAppointment = appointments.Count(x => x.Status == AppointmentStatus.Successed) ,
-                NumberOfFailAppointment = appointments.Count(x => x.Status == AppointmentStatus.Fail),
-                NumberOfCancelAppointment = appointments.Count(x => x.Status == AppointmentStatus.CancelByCustomer)
             };
 
             return result;
