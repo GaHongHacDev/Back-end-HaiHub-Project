@@ -1439,7 +1439,7 @@ namespace Hairhub.Service.Services.Services
                         NumofMonth = monthStart.ToString("MMMM"),
                         value = appointments
                             .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
-                            .Sum(x => x.TotalPrice)
+                            .Sum(x => x.TotalPrice*x.CommissionRate/100m)
                     });
                 }
             }
@@ -1454,7 +1454,7 @@ namespace Hairhub.Service.Services.Services
                         NumofMonth = monthStart.ToString("MMMM"),
                         value = appointments
                             .Where(x => x.StartDate >= monthStart && x.StartDate <= monthEnd)
-                            .Sum(x => x.TotalPrice)
+                            .Sum(x => x.TotalPrice * x.CommissionRate / 100m)
                     });
                 }
             }
