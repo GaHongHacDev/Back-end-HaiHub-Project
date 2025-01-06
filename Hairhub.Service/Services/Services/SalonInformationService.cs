@@ -1382,12 +1382,12 @@ namespace Hairhub.Service.Services.Services
                     break;
             }
 
-            predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
+            predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate && x.Status.Equals(AppointmentStatus.Successed));
 
 
             var appointments = await _unitOfWork.GetRepository<Appointment>()
                 .GetListAsync(
-                    predicate: predicate.And(x => x.Status == AppointmentStatus.Successed),
+                    predicate: predicate,
                     include: x => x.Include(s => s.AppointmentDetails)
                                    .ThenInclude(s => s.SalonEmployee)
                                    .ThenInclude(s => s.SalonInformation)
@@ -1395,7 +1395,7 @@ namespace Hairhub.Service.Services.Services
 
             var groupedAppointments = appointments
                 .GroupBy(x => x.StartDate.Date)
-                .ToDictionary(g => g.Key, g => g.Sum(a => a.TotalPrice * 0.1m));
+                .ToDictionary(g => g.Key, g => g.Sum(a => a.TotalPrice * a.CommissionRate/100m));
 
             var result = new StatisticsOfSalonsParticipating
             {
