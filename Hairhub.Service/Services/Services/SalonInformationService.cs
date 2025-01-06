@@ -1368,7 +1368,14 @@ namespace Hairhub.Service.Services.Services
                     endDate = startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case "MONTH_BEFORE":
-                    startDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
+                    if(currentDate.Month == 1)
+                    {
+                        startDate = new DateTime(currentDate.Year-1, 12, 1);
+                    }
+                    else
+                    {
+                        startDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
+                    }
                     endDate = startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case "WEEK":
@@ -1418,9 +1425,26 @@ namespace Hairhub.Service.Services.Services
             }
             else if (filter?.ToUpper() == "MONTH_BEFORE")
             {
-                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month-1); day++)
+                int dayInMonth=30;
+                if (currentDate.Month==1)
                 {
-                    var date = new DateTime(currentDate.Year, currentDate.Month-1, day);
+                    dayInMonth = DateTime.DaysInMonth(currentDate.Year-1, 12);
+                }
+                else
+                {
+                    dayInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month - 1);
+                }
+                for (int day = 1; day <= dayInMonth; day++)
+                {
+                    DateTime date;
+                    if (currentDate.Month == 1)
+                    {
+                        date = new DateTime(currentDate.Year - 1, 12, day);
+                    }
+                    else
+                    {
+                        date = new DateTime(currentDate.Year, currentDate.Month - 1, day);
+                    }
                     result.InMonths!.Add(new InMonth
                     {
                         NumofDate = date.ToString("dd"),
