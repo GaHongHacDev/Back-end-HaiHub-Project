@@ -955,19 +955,34 @@ namespace Hairhub.Service.Services.Services
 
             return result;
         }
-        public async Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime startDate, DateTime endDate, string? filter, int page, int size)
+        public async Task<IPaginate<EmployeeStatictisResponse>> CompileEmployeeRevenue(Guid salonId, DateTime? startDate, DateTime? endDate, string? filter, int page, int size)
         {
             List<EmployeeStatictisResponse> result = new List<EmployeeStatictisResponse>();
             var employees = await _unitOfWork.GetRepository<SalonEmployee>().GetPagingListAsync(predicate: x => x.SalonInformationId == salonId && x.IsActive, page: page, size: size);
             foreach (var employee in employees.Items)
             {
-                var appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
-                                                          .GetListAsync(
-                                                                        predicate: x => x.SalonEmployeeId == employee.Id
-                                                                                    && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed))
-                                                                                    && x.StartTime.Date >= startDate.Date && x.EndTime.Date <= endDate.Date,
-                                                                        include: x => x.Include(s => s.Appointment)
-                                                                       );
+                ICollection<AppointmentDetail> appointmentDetails;
+                if (startDate!=null && endDate != null)
+                {
+                    appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                                          .GetListAsync(
+                                                        predicate: x => x.SalonEmployeeId == employee.Id
+                                                                    && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed))
+                                                                    && x.StartTime.Date >= startDate.Value.Date && x.EndTime.Date <= endDate.Value.Date,
+                                                        include: x => x.Include(s => s.Appointment)
+                                                       );
+                }
+                else
+                {
+                    appointmentDetails = await _unitOfWork.GetRepository<AppointmentDetail>()
+                      .GetListAsync(
+                                    predicate: x => x.SalonEmployeeId == employee.Id
+                                                && (x.Appointment.Status.Equals(AppointmentStatus.OutSide) || x.Appointment.Status.Equals(AppointmentStatus.Successed)),
+                                    include: x => x.Include(s => s.Appointment)
+                                   );
+                }
+
+
                 var uniqueCustomerCount = appointmentDetails
                                             .Select(x => x.Appointment.CustomerId)
                                             .Distinct()

@@ -535,7 +535,7 @@ namespace Hairhub.API.Controllers
         [HttpGet]
         [Route("{salonId:Guid}")]
         //[Authorize(Roles = RoleNameAuthor.SalonOwner)]
-        public async Task<IActionResult> CompileEmployeeSalon([FromRoute] Guid salonId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] string? filter, [FromQuery] int page =1, [FromQuery] int size = 10)
+        public async Task<IActionResult> CompileEmployeeSalon([FromRoute] Guid salonId, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] string? filter, [FromQuery] int page =1, [FromQuery] int size = 10)
         {
             {
                 try
