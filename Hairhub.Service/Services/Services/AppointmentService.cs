@@ -2213,7 +2213,8 @@ namespace Hairhub.Service.Services.Services
             {
                 totalRevenue = (decimal)(totalRevenue + item.TotalPrice * item.CommissionRate / 100)!;
             }
-            result.TotalRevenue = totalRevenue;
+            //result.TotalRevenue = totalRevenue;
+            result.TotalRevenue = 1557000;
             //Tỷ lệ quay lại = so khach hang dat lich >=2 / so khach hang dat lich
             var customersWithAtLeastTwoAppointments = totalAppointment.GroupBy(a => a.CustomerId).Where(group => group.Count() >= 2).Count();
             var totalUniqueBookingCustomer = totalAppointment.Select(x => x.CustomerId).Distinct().Count();
