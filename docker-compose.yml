@@ -57,7 +57,7 @@ version: '3.4'
 
 services:
   hairhub.api:
-    container_name: hairhub-api-new  # Đổi tên container để tránh xung đột
+    container_name: hairhub-api-new
     build:
       context: .
       dockerfile: Hairhub.API/Dockerfile
@@ -70,7 +70,7 @@ services:
     environment:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionStrings__DefaultConnection=Server=160.187.240.158,1455;Database=HairHubDB;User Id=sa;Password=GaDev#32;
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=Tien2002@
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=GaDev#32
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - TZ=Asia/Ho_Chi_Minh
     volumes:
