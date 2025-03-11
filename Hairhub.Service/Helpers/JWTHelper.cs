@@ -64,8 +64,8 @@ namespace Hairhub.Service.Helpers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, roleName)
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, roleName)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 Issuer = JWTIssuer, //_configuaration["JWTSettings:Issuer"],
