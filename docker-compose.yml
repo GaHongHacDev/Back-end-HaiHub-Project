@@ -74,7 +74,8 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - TZ=Asia/Ho_Chi_Minh
     volumes:
-      - /var/docker/certs:/https:ro
+      # - /var/docker/certs:/https:ro
+      - /root/.aspnet/https:/https:ro
 
 networks:
   demo:
