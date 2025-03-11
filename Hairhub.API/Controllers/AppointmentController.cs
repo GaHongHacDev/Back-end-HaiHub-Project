@@ -26,7 +26,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllAppointment([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var appointmentsResponse = await _appointmentService.GetAllAppointment(page, size);
