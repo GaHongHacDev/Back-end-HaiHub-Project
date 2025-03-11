@@ -69,8 +69,9 @@ services:
       - "8085:80"   # Cổng HTTP (nếu cần)
     environment:
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__DefaultConnection=Server=160.187.240.158,1455;Database=HairHubDB;User Id=sa;Password=GaDev#32;TrustServerCertificate=True;
+      # - ConnectionStrings__DefaultConnection=Server=160.187.240.158,1455;Database=HairHubDB;User Id=sa;Password=GaDev#32;TrustServerCertificate=True;
       # - ConnectionStrings__DefaultConnection=Server=mssqlserver,1455;Database=HairHubDB;User Id=sa;Password=GaDev#32;
+      - ConnectionStrings__DefaultConnection=Server=mssql-db;Database=HairHubDB;User Id=sa;Password=GaDev#32;
       - ASPNETCORE_Kestrel__Certificates__Default__Password=GaDev#32
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - TZ=Asia/Ho_Chi_Minh
