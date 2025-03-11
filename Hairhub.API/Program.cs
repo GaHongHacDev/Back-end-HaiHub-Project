@@ -99,7 +99,8 @@ builder.Services.AddCors(options =>
             policy.WithOrigins("http://localhost:5173", 
                                "https://www.hairhub.com.vn", 
                                "https://hairhub.id.vn", 
-                               "http://localhost:3010", 
+                               "http://localhost:3010",
+                               "http://160.187.240.158:8085",
                                "https://h5.zdn.vn/",
                                "zbrowser://h5.zdn.vn/")
                   .AllowAnyHeader()
