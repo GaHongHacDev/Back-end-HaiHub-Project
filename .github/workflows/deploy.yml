@@ -7,7 +7,7 @@ on:
 
 jobs:
   Deploy-Hairhub-Container:
-    runs-on: [self-hosted, hairhub-runner]
+    runs-on: [self-hosted]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
