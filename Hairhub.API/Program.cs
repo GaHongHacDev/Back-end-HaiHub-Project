@@ -95,10 +95,11 @@ builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CorsConstant.PolicyName,
-        policy => {
-            policy.WithOrigins("http://localhost:5173", 
-                               "https://www.hairhub.com.vn", 
-                               "https://hairhub.id.vn", 
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173",
+                               "https://www.hairhub.com.vn",
+                               "https://hairhub.id.vn",
                                "http://localhost:3010",
                                "http://160.187.240.158:8085",
                                "https://h5.zdn.vn/",
@@ -149,11 +150,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-app.UseSwagger();
+    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseCors(CorsConstant.PolicyName);
 
