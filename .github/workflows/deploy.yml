@@ -6,7 +6,7 @@ on:
       - deploy-backup
 
 jobs:
-  deploy-server-vps:
+  Deploy-Hairhub-Container:
     runs-on: self-hosted
     steps:
       - name: Checkout code
