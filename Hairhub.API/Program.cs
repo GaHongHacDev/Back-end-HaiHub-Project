@@ -154,6 +154,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//Xóa chỗ này nè
 // app.UseHttpsRedirection();
 
 app.UseCors(CorsConstant.PolicyName);
