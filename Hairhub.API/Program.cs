@@ -155,7 +155,7 @@ if (app.Environment.IsDevelopment())
 }
 
 //xoa dong nay
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseCors(CorsConstant.PolicyName);
 
