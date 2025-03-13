@@ -153,7 +153,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+//Command 12345
 // app.UseHttpsRedirection();
 
 app.UseCors(CorsConstant.PolicyName);
