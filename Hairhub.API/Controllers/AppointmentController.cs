@@ -26,7 +26,7 @@ namespace Hairhub.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
+        [Authorize(Roles = RoleNameAuthor.Admin + "," + RoleNameAuthor.SalonOwner + "," + RoleNameAuthor.Customer)]
         public async Task<IActionResult> GetAllAppointment([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
             var appointmentsResponse = await _appointmentService.GetAllAppointment(page, size);
@@ -135,7 +135,7 @@ namespace Hairhub.API.Controllers
         {
             try
             {
-                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, statusAppointment,filter, customertype, page, size);
+                var appointmentResponse = await _appointmentService.NumberAppointmentOfAppointment(salonId, startDate, endDate, statusAppointment, filter, customertype, page, size);
                 if (appointmentResponse == null)
                 {
                     return NotFound(new { message = "Không tìm thấy khách hàng" });
