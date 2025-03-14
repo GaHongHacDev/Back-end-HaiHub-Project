@@ -65,7 +65,6 @@ services:
     networks:
       - demo
     ports:
-
       - "8085:8085"   # Cổng HTTP (nếu cần)
     environment:
       - ASPNETCORE_URLS=http://+:8085
