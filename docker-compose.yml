@@ -68,7 +68,7 @@ services:
       - "8444:443"  # Cổng HTTPS
       - "8085:80"   # Cổng HTTP (nếu cần)
     environment:
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:8085
       - ConnectionStrings__DefaultConnection=Server=160.187.240.158,1455;Database=HairHubDB;User Id=sa;Password=GaDev#32;
       - TZ=Asia/Ho_Chi_Minh
     restart: always
