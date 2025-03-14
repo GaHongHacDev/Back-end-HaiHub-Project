@@ -73,8 +73,6 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=GaDev#32
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - TZ=Asia/Ho_Chi_Minh
-    # volumes:
-    #   - /root/.aspnet/https:/https:ro
 
 networks:
   demo:
