@@ -15,9 +15,12 @@ jobs:
       - name: Stop and remove old containers
         run: docker compose down
 
-      - name: Remove unused images, containers, and volumes
+      - name: Remove all old containers, images, and volumes
         run: |
-          docker system prune -af --volumes
+          docker stop $(docker ps -aq) || true
+          docker rm $(docker ps -aq) || true
+          docker rmi $(docker images -q) || true
+          docker volume prune -f
 
       - name: Run Docker compose command
         run: |
