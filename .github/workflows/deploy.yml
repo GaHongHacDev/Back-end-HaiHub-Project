@@ -12,15 +12,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Stop and remove old containers
-        run: docker compose down
+      # - name: Stop and remove old containers
+      #   run: docker compose down
 
-      - name: Remove all old containers, images, and volumes
+      - name: Remove unused images, containers, and volumes
         run: |
-          docker stop $(docker ps -aq) || true
-          docker rm $(docker ps -aq) || true
-          docker rmi $(docker images -q) || true
-          docker volume prune -f
+          docker ps -aq --filter "name=hairhub-api-new" | xargs -r docker stop
+          docker ps -aq --filter "name=hairhub-api-new" | xargs -r docker rm
+          docker images | grep "hairhub-api-new" | awk '{print $3}' | xargs -r docker rmi -f
+          docker volume ls -q | grep "hairhub-api" | xargs -r docker volume rm
 
       - name: Run Docker compose command
         run: |
