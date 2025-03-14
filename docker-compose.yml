@@ -65,8 +65,8 @@ services:
     networks:
       - demo
     ports:
-      - "8444:443"  # Cổng HTTPS
-      - "8085:80"   # Cổng HTTP (nếu cần)
+      - "8444:8444"  # Cổng HTTPS
+      - "8085:8085"   # Cổng HTTP (nếu cần)
     environment:
       - ASPNETCORE_URLS=http://+:8085
       # - ConnectionStrings__DefaultConnection=Server=160.187.240.158,1455;Database=HairHubDB;User Id=sa;Password=GaDev#32;
