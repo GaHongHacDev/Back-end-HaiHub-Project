@@ -11,7 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+      - name: Pull latest code
+        run: git fetch --all && git reset --hard origin/deploy-backup
       # - name: Stop and remove old containers
       #   run: docker compose down
 
@@ -19,7 +20,7 @@ jobs:
         run: |
           docker ps -aq --filter "name=hairhub-api-new" | xargs -r docker stop
           docker ps -aq --filter "name=hairhub-api-new" | xargs -r docker rm
-          docker images | grep "hairhub-api-new" | awk '{print $3}' | xargs -r docker rmi -f
+          docker image prune -f
           docker volume ls -q | grep "hairhub-api" | xargs -r docker volume rm
 
       - name: Run Docker compose command
