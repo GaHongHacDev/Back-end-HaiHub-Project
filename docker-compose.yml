@@ -69,6 +69,33 @@ services:
     environment:
       - ASPNETCORE_URLS=http://+:8085
       - TZ=Asia/Ho_Chi_Minh
+    depends_on: 
+      - redis
+  redis:
+    image: redis:7.0-alpine
+    container_name: hairhub-cache-redis
+    networks:
+      - demo
+    ports:
+      - "6382:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G  # Giới hạn RAM cho container
+    command: >-
+      redis-server 
+      --maxmemory 1gb 
+      --maxmemory-policy allkeys-lru
+      --save 60 1 
+      --loglevel warning 
+      --requirepass your_strong_password
 networks:
   demo:
     driver: bridge
+volumes:
+  redis_data:

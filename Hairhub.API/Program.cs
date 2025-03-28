@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using Hairhub.Domain.JsonConverter;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,13 +70,15 @@ builder.Services.AddHttpClient<GeminiAIService>(client =>
 });
 builder.Services.AddHttpContextAccessor();
 
-// Add Background Service 
+// Add Background Service and Database
 builder.Services.AddHostedService<BackgroundWorkerService>();
 builder.Services.AddDbContext<HaiHubDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.EnableSensitiveDataLogging();
 });
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!));
 
 // Config SignalR RealTime
 builder.Services.AddSignalR();

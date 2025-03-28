@@ -52,6 +52,7 @@ namespace Hairhub.Infrastructure.Configuration
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IVNPayService, VNPayService>();
             services.AddScoped<IBusyScheduleEmployeeSerivce, BusyScheduleEmployeeSerivce>();
+            services.AddScoped<ICacheRedis, CacheRedis>();
             return services;
         }
         public static IServiceCollection AddDIRepositories(this IServiceCollection services)

@@ -27,6 +27,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Drawing;
 using static System.Net.Mime.MediaTypeNames;
 using System.Globalization;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 //using CloudinaryDotNet;
 
 
@@ -42,8 +43,11 @@ namespace Hairhub.Service.Services.Services
         private readonly IEmailService _emailService;
         private readonly IMediaService _mediaService;
         private readonly IConfiguration _configuration;
+        private readonly ICacheRedis _redisCache;
+
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IAppointmentDetailService appointmentDetailService,
-                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService, IConfiguration configuration)
+                                    IQRCodeService qrCodeService, IEmailService emailService, IMediaService mediaService,
+                                    IConfiguration configuration, ICacheRedis redisCache)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -52,6 +56,7 @@ namespace Hairhub.Service.Services.Services
             _emailService = emailService;
             _mediaService = mediaService;
             _configuration = configuration;
+            _redisCache = redisCache;
         }
 
         #region GET
@@ -416,7 +421,7 @@ namespace Hairhub.Service.Services.Services
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
 
-            if(id != null)
+            if (id != null)
             {
                 predicate = predicate.And(x =>
                 x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == id));
@@ -438,9 +443,9 @@ namespace Hairhub.Service.Services.Services
                  (x.Status == AppointmentStatus.Successed || x.Status == AppointmentStatus.OutSide));
             }
 
-            if (startDate!=null && endDate != null)
+            if (startDate != null && endDate != null)
             {
-                predicate = predicate.And(x=>x.StartDate.Date>=startDate.Value.Date && x.StartDate.Date<=endDate.Value.Date);
+                predicate = predicate.And(x => x.StartDate.Date >= startDate.Value.Date && x.StartDate.Date <= endDate.Value.Date);
             }
             IEnumerable<Appointment> appointments;
 
@@ -509,7 +514,7 @@ namespace Hairhub.Service.Services.Services
                 .ToList();
             }
 
-    
+
             if (filter != null)
             {
                 switch (filter)
@@ -1243,7 +1248,7 @@ namespace Hairhub.Service.Services.Services
         #region Create Update Delete Active
         public async Task<(bool, Guid)> CreateAppointment(CreateAppointmentRequest request)
         {
-            var config = await _unitOfWork.GetRepository<Config>().SingleOrDefaultAsync(predicate: x => x.CommissionRate != null && x.IsActive);
+            var config = await _unitOfWork.GetRepository<Hairhub.Domain.Entitities.Config>().SingleOrDefaultAsync(predicate: x => x.CommissionRate != null && x.IsActive);
             if (config == null)
             {
                 throw new NotFoundException("Không tìm thấy config phần trăm hoa hồng");
@@ -1385,6 +1390,13 @@ namespace Hairhub.Service.Services.Services
             }
 
             bool isInsert = await _unitOfWork.CommitAsync() > 0;
+
+            // Lưu redis
+            if (isInsert)
+            {
+                var cacheKey = $"Appointment:{appointment.Id}";
+                await _redisCache.SetAsync(cacheKey, appointment, TimeSpan.FromMinutes(30));
+            }
             return (isInsert, id);
         }
 
@@ -1417,6 +1429,10 @@ namespace Hairhub.Service.Services.Services
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
 
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            if (isUpdate)
+            {
+                await _redisCache.RemoveAsync($"Appointment:{appoinment.Id}");
+            }
             return isUpdate;
         }
 
@@ -1430,6 +1446,10 @@ namespace Hairhub.Service.Services.Services
             appoinment.Status = AppointmentStatus.Fail;
             _unitOfWork.GetRepository<Appointment>().UpdateAsync(appoinment);
             bool isUpdate = await _unitOfWork.CommitAsync() > 0;
+            if (isUpdate)
+            {
+                await _redisCache.RemoveAsync($"Appointment:{appoinment.Id}");
+            }
             return isUpdate;
         }
 
@@ -1548,6 +1568,13 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<DataOfMonths> GetAppointmentbyStatusByAdmin(string status, int year)
         {
+            var cacheKey = $"AppointmentbyStatusByAdmin";
+            var cachedData = await _redisCache.GetAsync<DataOfMonths>(cacheKey);
+            if (cachedData != null)
+            {
+                return cachedData;
+            }
+
             if (year == 0)
             {
                 year = DateTime.Now.Year;
@@ -1568,12 +1595,21 @@ namespace Hairhub.Service.Services.Services
                 November = appointments.Count(a => a.StartDate.Month == 11),
                 December = appointments.Count(a => a.StartDate.Month == 12)
             };
+
+            await _redisCache.SetAsync(cacheKey, dataOfMonths, TimeSpan.FromMinutes(30));
             return dataOfMonths;
 
         }
 
         public async Task<DataOfMonths> GetRevenueByAdmin(int year)
         {
+            var cacheKey = $"RevenueByAdmin";
+            var cachedData = await _redisCache.GetAsync<DataOfMonths>(cacheKey);
+            if (cachedData != null)
+            {
+                return cachedData;
+            }
+
             if (year == 0)
             {
                 year = DateTime.Now.Year;
@@ -1594,11 +1630,19 @@ namespace Hairhub.Service.Services.Services
                 November = (int?)payments.Where(a => a.StartDate.Month == 11).Sum(a => a.TotalPrice),
                 December = (int?)payments.Where(a => a.StartDate.Month == 12).Sum(a => a.TotalPrice)
             };
+            await _redisCache.SetAsync(cacheKey, dataOfMonths, TimeSpan.FromMinutes(30));
             return dataOfMonths;
         }
 
         public async Task<DataOfMonths> GetCommissionByAdmin(int year)
         {
+            var cacheKey = $"CommissionByAdmin";
+            var cachedData = await _redisCache.GetAsync<DataOfMonths>(cacheKey);
+            if (cachedData != null)
+            {
+                return cachedData;
+            }
+
             if (year == 0)
             {
                 year = DateTime.Now.Year;
@@ -1619,11 +1663,18 @@ namespace Hairhub.Service.Services.Services
                 November = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 11).Sum(a => a.TotalAmount),
                 December = (int?)payments.Where(a => a.PaymentDate!.Value.Month == 12).Sum(a => a.TotalAmount)
             };
+            await _redisCache.SetAsync(cacheKey, dataOfMonths, TimeSpan.FromMinutes(30));
             return dataOfMonths;
         }
 
         public async Task<List<RatioData>> GetPercentagebyStatusOfAppointmentByAdmin(int? year)
         {
+            var cacheKey = $"PercentagebyStatusOfAppointmentByAdmin";
+            var cachedData = await _redisCache.GetListAsync<RatioData>(cacheKey);
+            if (cachedData != null)
+            {
+                return (List<RatioData>)cachedData;
+            }
             if (year == 0 || year == null)
             {
                 year = DateTime.Now.Year;
@@ -1669,10 +1720,10 @@ namespace Hairhub.Service.Services.Services
                     ratio.Percentage = data.Percentage;
                 }
             }
-
+            await _redisCache.SetAsync(cacheKey, ratioData, TimeSpan.FromMinutes(30));
             return ratioData;
         }
-
+//##########################################################################aaaaaaaaaaaaaaaa
         private string GetStatusLabel(string status)
         {
             return status switch
@@ -2348,7 +2399,7 @@ namespace Hairhub.Service.Services.Services
                 );
 
 
-            var totalAppointments = appointments.Where(x=>x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Fail) || x.Status.Equals(AppointmentStatus.CancelByCustomer)).Count();
+            var totalAppointments = appointments.Where(x => x.Status.Equals(AppointmentStatus.OutSide) || x.Status.Equals(AppointmentStatus.Successed) || x.Status.Equals(AppointmentStatus.Fail) || x.Status.Equals(AppointmentStatus.CancelByCustomer)).Count();
             var result = new StatisticsNumberOfAppointmentOnPlatform
             {
                 NumberOfOut_SideAppointment = appointments.Count(x => x.Status == AppointmentStatus.OutSide),
@@ -2387,12 +2438,12 @@ namespace Hairhub.Service.Services.Services
                     break;
 
                 case "YEAR_BEFORE":
-                    startDate = new DateTime(currentDate.Year-1, 1, 1);
+                    startDate = new DateTime(currentDate.Year - 1, 1, 1);
                     endDate = startDate.AddYears(1).AddTicks(-1);
                     break;
 
                 case "MONTH_BEFORE":
-                    startDate = new DateTime(currentDate.Year, currentDate.Month-1, 1);
+                    startDate = new DateTime(currentDate.Year, currentDate.Month - 1, 1);
                     endDate = startDate.AddMonths(1).AddTicks(-1);
                     break;
 
@@ -2438,9 +2489,9 @@ namespace Hairhub.Service.Services.Services
             }
             else if (filter?.ToUpper() == "MONTH_BEFORE")
             {
-                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month-1); day++)
+                for (int day = 1; day <= DateTime.DaysInMonth(currentDate.Year, currentDate.Month - 1); day++)
                 {
-                    var date = new DateTime(currentDate.Year, currentDate.Month-1, day);
+                    var date = new DateTime(currentDate.Year, currentDate.Month - 1, day);
 
                     result.OutsideAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.OutSide);
                     result.SuccessedAppointments[date.ToString("d")] = appointments.Count(x => x.StartDate.Date == date && x.Status == AppointmentStatus.Successed);
@@ -2452,7 +2503,7 @@ namespace Hairhub.Service.Services.Services
             {
                 for (int month = 1; month <= 12; month++)
                 {
-                    var monthStart = new DateTime(currentDate.Year-1, month, 1);
+                    var monthStart = new DateTime(currentDate.Year - 1, month, 1);
                     var monthEnd = monthStart.AddMonths(1).AddTicks(-1);
 
                     result.OutsideAppointments[monthStart.ToString("MMMM")] = appointments.Count(x => x.StartDate >= monthStart && x.StartDate <= monthEnd && x.Status == AppointmentStatus.OutSide);
@@ -2495,7 +2546,7 @@ namespace Hairhub.Service.Services.Services
         {
             var predicate = PredicateBuilder.New<Appointment>(true);
             predicate = predicate.And(x => x.AppointmentDetails.Any(ad => ad.SalonEmployee.SalonInformationId == salonid));
-            if (startDate.HasValue  && endDate.HasValue)
+            if (startDate.HasValue && endDate.HasValue)
             {
                 predicate = predicate.And(x => x.StartDate >= startDate && x.StartDate <= endDate);
             }
@@ -2537,7 +2588,7 @@ namespace Hairhub.Service.Services.Services
 
         public async Task<bool> CancelOutsideAppointment(Guid id)
         {
-            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x=>x.Id == id && x.Status.Equals(AppointmentStatus.OutSide), include: x=>x.Include(s=>s.AppointmentDetails));
+            var appointment = await _unitOfWork.GetRepository<Appointment>().SingleOrDefaultAsync(predicate: x => x.Id == id && x.Status.Equals(AppointmentStatus.OutSide), include: x => x.Include(s => s.AppointmentDetails));
             if (appointment == null)
             {
                 throw new NotFoundException($"Không tìm thấy lịch hẹn ngoài với id {id}");
@@ -2581,7 +2632,7 @@ namespace Hairhub.Service.Services.Services
                 .GroupBy(x => x.StartDate.DayOfWeek)
                 .Select(g => new CompileAppointmentByDayOfWeek
                 {
-                    DayOfWeek = ConvertDayOfWeekToVietnamese(g.Key), 
+                    DayOfWeek = ConvertDayOfWeekToVietnamese(g.Key),
                     NumberOfSuccessedAppointment = g.LongCount()
                 })
                 .ToList();
